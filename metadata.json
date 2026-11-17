@@ -1,0 +1,8 @@
+{
+  "name": "Projeto Brasil 11",
+  "description": "Portal de Gestão Escolar e Esportiva",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

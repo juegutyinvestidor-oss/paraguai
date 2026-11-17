@@ -1,0 +1,134 @@
+# EDUKNE - Regras de Desenvolvimento
+
+## Geração de IDs Sequenciais
+
+**REGRA OBRIGATÓRIA:** IDs de novos registros DEVEM ser gerados pelo banco (sequences/auto-increment), nunca no front-end com `Math.max()`, `useRef`, `Date.now()` ou lógica client-side.
+
+### Por quê
+
+- `Math.max(...ids) + 1` colide quando dois usuários cadastram ao mesmo tempo
+- `useRef` zera ao dar F5
+- `Date.now()` gera IDs únicos mas não sequenciais
+
+### Como funciona
+
+O banco tem sequences atômicas por tabela. O front chama funções/funções RPC que executam o `nextval()` de forma isolada e transacional.
+
+```
+// ✅ CORRETO - chamada ao banco (atômica)
+const newId = await supabase.rpc('next_patient_id');
+
+// ❌ ERRADO - lógica no front
+const nextIdNum = Math.max(...numericIds) + 1;
+```
+
+> **Atenção:** Em caso de falha de conexão ou ambiente sem banco, use fallback estático (ex.: `PAC_0001`). **NUNCA usar `Date.now()`**.
+
+---
+
+## Otimização de Imagens
+
+**REGRA OBRIGATÓRIA:** TODA imagem em JSX DEVE usar o componente otimizado do framework (ex.: `<Image>` do `next/image`), nunca `<img>` cru.
+
+### Por quê
+
+- ✅ Redimensionamento automático (não baixa arquivo gigante para mostrar 32×32)
+- ✅ Conversão para WebP, lazy loading
+- ✅ Cumpre o lint
+
+### Pontos de atenção
+
+- Ao usar `fill`, o **pai precisa ter `position: relative`** (e tamanho definido)
+- Domínios externos de imagens devem estar no config de imagens do projeto
+
+---
+
+
+
+
+## RBAC / Controle de Acesso
+
+**REGRA OBRIGATÓRIA:** Ao finalizar a construção de qualquer módulo/feature novo, o agente DEVE perguntar ao usuário se deseja atualizar o RBAC (permissões de acesso) do sistema.
+
+### Checklist
+
+1. Adicionar o módulo no catálogo de permissões (ex.: `lib/rbac/catalog.ts`)
+2. Mapear ações do módulo às permissões
+3. Proteger o componente com `PermissionGate` / `canAccessTab`
+4. Validar com `npx tsc --noEmit` (0 erros) e lint (0 erros)
+5. Commit com mensagem: `rbac: adicionar permissões do módulo [Nome]`
+
+---
+
+## Conformidade com a LGPD (Lei Geral de Proteção de Dados)
+
+**REGRA OBRIGATÓRIA:** Todo o desenvolvimento deve seguir a LGPD (Lei nº 13.709/2018). O agente DEVE verificar a conformidade do projeto com a legislação em cada feature que envolva dados pessoais.
+
+### Princípios Base
+
+- **Finalidade:** Coletar dados apenas para finalidades específicas, informadas e legítimas
+- **Adequação:** Dados compatíveis com a finalidade informada ao titular
+- **Necessidade:** Coletar apenas o mínimo necessário para a finalidade
+- **Livre acesso:** Garantir ao titular consulta facilitada sobre o tratamento de seus dados
+- **Qualidade dos dados:** Manter dados corretos, claros e atualizados
+- **Transparência:** Informar ao titular sobre o tratamento de seus dados
+- **Segurança:** Utilizar medidas técnicas e administrativas adequadas
+- **Prevenção:** Adotar medidas para prevenir danos
+- **Não discriminação:** Não realizar tratamento para fins discriminatórios ilícitos
+
+### Checklist de Conformidade
+
+1. **Consentimento:** Dados pessoais coletados com consentimento explícito e específico do titular
+2. **Bases legais:** Cada tratamento de dados possui base legal documentada (consentimento, obrigação legal, legítimo interesse, etc.)
+3. **Dados sensíveis:** Dados de saúde, biométricos, etc. possuem tratamento reforçado com consentimento específico
+4. **Direitos do titular:** Implementar mecanismos para:
+   - Confirmação da existência de tratamento
+   - Acesso aos dados
+   - Correção de dados incompletos ou desatualizados
+   - Anonimização, bloqueio ou eliminação de dados desnecessários
+   - Portabilidade dos dados
+   - Eliminação dos dados tratados com consentimento
+   - Informação sobre compartilhamento de dados
+   - Revogação do consentimento
+5. **Segurança dos dados:** Dados armazenados com criptografia em repouso e trânsito
+6. **Registro de operações:** Manter logs de tratamento de dados pessoais
+7. **Encarregado (DPO):** Dados de contato do encarregado disponíveis para os titulares
+8. **Transferência internacional:** Dados não transferidos para fora do Brasil sem adequação
+
+### No Código
+
+```typescript
+// ✅ CORRETO - Dados mínimos necessários
+const { data } = await supabase
+  .from('patients')
+  .select('id, name, cpf')  // Apenas campos necessários
+
+// ❌ ERRADO - Seleciona todos os dados sem necessidade
+const { data } = await supabase
+  .from('patients')
+  .select('*')
+```
+
+```typescript
+// ✅ CORRETO - Criptografia para dados sensíveis
+// Usar funções do banco para criptografar dados como CPF, prontuários
+
+// ❌ ERRADO - Dados sensíveis em texto plano no banco
+```
+
+### Pontos de Atenção
+
+- **CPF, prontuários médicos e dados de saúde** são dados sensíveis (Art. 5º, II) e exigem consentimento específico e destacado
+- Logs de acesso devem registrar **quem** acessou, **quando** e **qual** dado
+- Dados de menores de idade possuem regras especiais (consentimento do responsável legal)
+- Mantenha registros de todas as bases legais utilizadas no projeto
+
+---
+
+## Outras Regras
+
+- Seguir o estilo de código existente no repositório
+- Manter o código limpo, eliminando comentários desnecessários
+- Preferir edições em arquivos existentes antes de criar arquivos duplicados
+- Nunca commitar senhas, tokens ou chaves secretas
+- Se a task for complexa, rodar `npx tsc --noEmit` e lint ao final para garantir 0 erros

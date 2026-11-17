@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    height: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    height: 100%;
+    margin: 0;
+    background-color: #0b1326;
+    color: #dae2fd;
+    /* Evita que textos longos sem espaços (CPF, e-mail, IDs) estourem a largura */
+    overflow-wrap: break-word;
+  }
+
+  /* Remove o flash azul ao tocar em botões no mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Inputs com 16px ou mais evitam o zoom automático do Safari no iOS */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  @media (min-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: revert;
+    }
+  }
+
+  /* Barra de rolagem discreta e consistente entre navegadores */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #3e484f transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(62, 72, 79, 0.6);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(56, 189, 248, 0.5);
+  }
+}
+
+/* Login: modo overlay (fiel à mockup) em telas grandes, fallback com fundo desfocado no mobile */
+.login-overlay {
+  display: none;
+}
+
+.login-fallback {
+  display: flex;
+}
+
+@media (min-width: 1200px) and (min-height: 620px) {
+  .login-fallback {
+    display: none;
+  }
+
+  .login-overlay {
+    display: flex;
+  }
+}
+
+@media print {
+  html,
+  body {
+    height: auto;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Esconde a navegação e o chrome da aplicação ao imprimir */
+  aside,
+  header,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+}
