@@ -22,8 +22,10 @@ import {
   BarChart3,
   FolderOpen
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { type UserProfile } from '../types/edukyne';
 import { canAccessTab, normalizeRole, canAccessTabDynamic, type UserRole, type Permission } from '../lib/rbac';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface SidebarProps {
   activeTab: string;
@@ -39,6 +41,7 @@ interface SidebarProps {
 export default function Sidebar({ activeTab, setActiveTab, user, onQuickCreate: _onQuickCreate, isOpen = false, onClose, onLogout, rolePermissions }: SidebarProps) {
   const normalizedUserRole = normalizeRole(user.role || '');  const [isQuestionariosOpen, setIsQuestionariosOpen] = React.useState(false);
   const [isPerformanceOpen, setIsPerformanceOpen] = React.useState(false);
+  const t = useTranslations('sidebar');
 
   type NavSubItem = {
     id: string;
@@ -56,52 +59,39 @@ export default function Sidebar({ activeTab, setActiveTab, user, onQuickCreate: 
   };
 
   const navItems: NavItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'contrato', label: 'Contratos', icon: FileText },
-    { id: 'alunos', label: 'Alunos', icon: Users },
-    { id: 'presenca', label: 'Controle de Presença', icon: CheckSquare },
-    { id: 'profissionais', label: 'Profissionais', icon: Briefcase },
-    { id: 'modalidades', label: 'Modalidades Esportivas', icon: Activity },
-    { id: 'avaliacoes', label: 'Avaliações', icon: Award },
-    { id: 'plano-acao', label: 'Plano de Ação', icon: FolderOpen },
+    { id: 'dashboard', label: t('dashboard'), icon: LayoutDashboard },
+    { id: 'contrato', label: t('contratos'), icon: FileText },
+    { id: 'alunos', label: t('alunos'), icon: Users },
+    { id: 'presenca', label: t('presenca'), icon: CheckSquare },
+    { id: 'profissionais', label: t('profissionais'), icon: Briefcase },
+    { id: 'modalidades', label: t('modalidades'), icon: Activity },
+    { id: 'avaliacoes', label: t('avaliacoes'), icon: Award },
+    { id: 'plano-acao', label: t('planoAcao'), icon: FolderOpen },
     { 
       id: 'questionarios_menu', 
-      label: 'Questionários', 
+      label: t('questionarios'), 
       icon: ClipboardList,
       isParent: true,
-      subItems: [
-        { id: 'questionario-m1', label: 'Módulo 1' },
-        { id: 'questionario-m2', label: 'Módulo 2' },
-        { id: 'questionario-m3', label: 'Módulo 3' },
-        { id: 'questionario-m4', label: 'Módulo 4' },
-        { id: 'questionario-m5', label: 'Módulo 5' },
-        { id: 'questionario-m6', label: 'Módulo 6' },
-        { id: 'questionario-m7', label: 'Módulo 7' },
-        { id: 'questionario-m8', label: 'Módulo 8' },
-        { id: 'questionario-m9', label: 'Módulo 9' },
-        { id: 'questionario-m10', label: 'Módulo 10' },
-        { id: 'questionario-m11', label: 'Módulo 11' },
-        { id: 'questionario-m12', label: 'Módulo 12' },
-        { id: 'questionario-m13', label: 'Módulo 13' },
-        { id: 'questionario-m14', label: 'Módulo 14' },
-        { id: 'questionario-m15', label: 'Módulo 15' }
-      ]
+      subItems: Array.from({length: 15}, (_, index) => ({
+        id: `questionario-m${index + 1}`,
+        label: t('modulo', {n: index + 1})
+      }))
     },
     { 
       id: 'performance_menu', 
-      label: 'Relatório de Performance', 
+      label: t('performance'), 
       icon: LineChart,
       isParent: true,
       isOpen: isPerformanceOpen,
       setIsOpen: setIsPerformanceOpen,
       subItems: [
-        { id: 'performance', label: 'Desempenho por Aluno', icon: User },
-        { id: 'analise-geral', label: 'Análise Geral', icon: Flag },
-        { id: 'painel-estatistico', label: 'Painel Estatístico', icon: LineChart }
+        { id: 'performance', label: t('desempenhoAluno'), icon: User },
+        { id: 'analise-geral', label: t('analiseGeral'), icon: Flag },
+        { id: 'painel-estatistico', label: t('painelEstatistico'), icon: LineChart }
       ]
     },
-    { id: 'estudo-comparativo', label: 'Estudo Comparativo', icon: BarChart3 },
-    { id: 'perfil', label: 'Perfil de Usuário', icon: User },
+    { id: 'estudo-comparativo', label: t('estudoComparativo'), icon: BarChart3 },
+    { id: 'perfil', label: t('perfil'), icon: User },
   ];
 
   return (
@@ -264,7 +254,7 @@ export default function Sidebar({ activeTab, setActiveTab, user, onQuickCreate: 
             >
               <div className="flex items-center gap-3">
                 <Settings className="w-4 h-4 text-[#87929a]" />
-                <span>Configurações</span>
+                <span>{t('configuracoes')}</span>
               </div>
             </button>
           );
@@ -275,14 +265,18 @@ export default function Sidebar({ activeTab, setActiveTab, user, onQuickCreate: 
             if (onLogout) {
               onLogout();
             } else {
-              alert('Sessão encerrada com sucesso!');
+              alert(t('sessaoEncerrada'));
             }
           }}
           className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-[#ffb4ab] hover:bg-[#93000a]/20 transition-colors"
         >
           <LogOut className="w-4 h-4 text-[#ffb4ab]" />
-          <span>Sair</span>
+          <span>{t('sair')}</span>
         </button>
+
+        <div className="mt-4 px-1">
+          <LanguageSwitcher />
+        </div>
 
         {/* Mini Profile Summary */}
         <div className="flex items-center gap-3 px-2 mt-4 pt-4 border-t border-[#3e484f]/25">

@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useTranslations } from 'next-intl';
+import { Link } from '../i18n/navigation';
 import { nextStudentId, uuid } from '../lib/idGenerator';
 import { 
   UserPlus, 
@@ -48,6 +50,7 @@ interface AlunosViewProps {
 }
 
 export default function AlunosView({ students, setStudents, isAddModalOpen, setIsAddModalOpen, runWithPermission, contratos, user }: AlunosViewProps) {
+  const t = useTranslations('alunos');
   const [filterStatus, setFilterStatus] = useState<'Todos' | 'Ativos' | 'Inativos'>('Todos');
   const [localSearch, setLocalSearch] = useState('');
 
@@ -380,7 +383,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
       if (url) {
         setNewAvatarUrl(url);
       } else {
-        alert('Falha ao enviar a foto. Verifique a configuração do Storage no Supabase.');
+        alert(t('erroUploadFoto'));
       }
     } catch (err) {
       console.error('Erro no upload do avatar do aluno:', err);
@@ -422,7 +425,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
       await videoRef.current.play();
     } catch (err) {
       console.error('Erro ao abrir a câmera:', err);
-      alert('Não foi possível acessar a câmera. Verifique as permissões do navegador.');
+      alert(t('erroCamera'));
       setCameraModalOpen(false);
     }
   };
@@ -457,7 +460,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
         canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.92),
       );
       if (!blob) {
-        alert('Falha ao capturar a foto.');
+        alert(t('erroCaptura'));
         setIsCapturingPhoto(false);
         return;
       }
@@ -483,7 +486,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
         stopCameraStream();
         setCameraModalOpen(false);
       } else {
-        alert('Falha ao enviar a foto. Verifique a configuração do Storage no Supabase.');
+        alert(t('erroUploadFoto'));
       }
     } catch (err) {
       console.error('Erro ao capturar foto:', err);
@@ -578,7 +581,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
       if (url) {
         setEditAvatarUrl(url);
       } else {
-        alert('Falha ao enviar a foto. Verifique a configuração do Storage no Supabase.');
+        alert(t('erroUploadFoto'));
       }
     } catch (err) {
       console.error('Erro no upload do avatar do aluno:', err);
@@ -612,15 +615,15 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
   const handleSaveEditStudent = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editName || !editEmail || !editEnrollmentId || !editCpf || !editBirthDate || !editPhone || !editParentName || !editContrato || !editEstado || !editRegiao || !editLocality || !editPassword) {
-      alert('Por favor, preencha todos os campos obrigatórios (incluindo Contrato, Estado, Região, Localidade e Senha).');
+      alert(t('erroCamposObrigatorios'));
       return;
     }
     if (editCpf.length !== 14) {
-      alert('Por favor, digite o CPF completo no formato 000.000.000-00.');
+      alert(t('erroCpf'));
       return;
     }
     if (editPhone.length !== 15) {
-      alert('Por favor, digite o Telefone de Contato completo no formato (00) 00000-0000.');
+      alert(t('erroTelefone'));
       return;
     }
 
@@ -663,15 +666,15 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
   const handleAddStudent = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName || !newEmail || !newCpf || !newBirthDate || !newPhone || !newParentName || !newContrato || !newEstado || !newRegiao || !newLocality || !newPassword) {
-      alert('Por favor, preencha todos os campos obrigatórios (incluindo Contrato, Estado, Região, Localidade e Senha).');
+      alert(t('erroCamposObrigatorios'));
       return;
     }
     if (newCpf.length !== 14) {
-      alert('Por favor, digite o CPF completo no formato 000.000.000-00.');
+      alert(t('erroCpf'));
       return;
     }
     if (newPhone.length !== 15) {
-      alert('Por favor, digite o Telefone de Contato completo no formato (00) 00000-0000.');
+      alert(t('erroTelefone'));
       return;
     }
 
@@ -917,14 +920,14 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
       {/* Table Title Block & Action */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#3e484f]/25 pb-4">
         <div>
-          <h3 className="text-xl font-bold text-[#8ed5ff]">Base de Dados</h3>
+          <h3 className="text-xl font-bold text-[#8ed5ff]">{t('baseDados')}</h3>
         </div>
         <button 
           onClick={() => setIsAddModalOpen(true)}
           className="px-5 py-2.5 bg-[#38bdf8] text-[#001e2c] hover:bg-[#38bdf8]/90 font-bold text-xs rounded-lg flex items-center gap-2 transition-transform active:scale-95 shadow-lg shadow-[#38bdf8]/10"
         >
           <UserPlus className="w-4 h-4" />
-          <span>Matricular Aluno</span>
+          <span>{t('matricularAluno')}</span>
         </button>
       </div>
 
@@ -932,7 +935,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
       <section className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 shadow-lg space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#3e484f]/25 pb-2">
           <h4 className="text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">
-            Filtro Unificado - Alunos por Localidade e Série
+            {t('filtroTitulo')}
           </h4>
         </div>
         
@@ -940,7 +943,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
           {/* Contrato */}
           <div className="flex flex-col gap-1.5 font-sans">
             <div className="flex items-center gap-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90">Contrato:</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90">{t('contrato')}</label>
             </div>
             <select 
               value={contract}
@@ -954,7 +957,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               }}
               className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <option value="Todos">Todos os Contratos</option>
+              <option value="Todos">{t('todosContratos')}</option>
               {availableContracts.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -964,7 +967,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
           {/* Estado */}
           <div className="flex flex-col gap-1.5 font-sans">
             <div className="flex items-center gap-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90">Estado:</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90">{t('estado')}</label>
             </div>
             <select 
               value={stateFilter}
@@ -977,7 +980,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               }}
               className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <option value="Todos">Todos os Estados</option>
+              <option value="Todos">{t('todosEstados')}</option>
               {availableStates.map(st => (
                 <option key={st} value={st}>{st}</option>
               ))}
@@ -987,7 +990,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
           {/* Região */}
           <div className="flex flex-col gap-1.5 font-sans">
             <div className="flex items-center gap-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90">Região:</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90">{t('regiao')}</label>
             </div>
             <select 
               value={cityFilter}
@@ -999,7 +1002,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               }}
               className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <option value="Todos">Todas as Regiões</option>
+              <option value="Todos">{t('todasRegioes')}</option>
               {availableRegions.map(reg => (
                 <option key={reg} value={reg}>{reg}</option>
               ))}
@@ -1009,7 +1012,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
           {/* Localidade */}
           <div className="flex flex-col gap-1.5 font-sans">
             <div className="flex items-center gap-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90">Localidade:</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90">{t('localidade')}</label>
             </div>
             <select 
               value={localityFilter}
@@ -1020,7 +1023,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               }}
               className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all font-sans disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <option value="Todos">Todas as Localidades</option>
+              <option value="Todos">{t('todasLocalidades')}</option>
               {availableLocalities.map(loc => (
                 <option key={loc} value={loc}>{loc}</option>
               ))}
@@ -1030,7 +1033,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
           {/* Série/Turma */}
           <div className="flex flex-col gap-1.5 font-sans">
             <div className="flex items-center gap-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90">Série/Turma:</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90">{t('serieTurma')}</label>
             </div>
             <select 
               value={selectedGrade}
@@ -1038,7 +1041,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               onChange={(e) => setSelectedGrade(e.target.value || 'Todos')}
               className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all font-sans disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <option value="Todos">Todas as Turmas</option>
+              <option value="Todos">{t('todasTurmas')}</option>
               {availableGrades.map(g => (
                 <option key={g} value={g}>{g}</option>
               ))}
@@ -1063,7 +1066,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                     : 'text-[#bdc8d1] hover:text-[#dae2fd]'
                 }`}
               >
-                {tab}
+                {tab === 'Todos' ? t('todos') : tab === 'Ativos' ? t('ativos') : t('inativos')}
               </button>
             ))}
           </div>
@@ -1074,7 +1077,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#87929a]" />
               <input 
                 type="text"
-                placeholder="Filtrar aluno..."
+                placeholder={t('filtrarAluno')}
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
                 className="w-full bg-[#0b1326] border border-[#3e484f]/60 rounded-lg pl-9 pr-4 py-1.5 text-xs text-[#dae2fd] placeholder-[#87929a] focus:ring-1 focus:ring-[#38bdf8] outline-none"
@@ -1084,19 +1087,19 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
             <button 
               onClick={exportToExcel}
               className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs text-white font-bold rounded-lg flex items-center gap-1.5 transition-all shadow-md active:scale-95 border border-emerald-500/20 cursor-pointer"
-              title="Exportar para Excel"
+              title={t('exportarExcel')}
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>Excel</span>
+              <span>{t('excel')}</span>
             </button>
 
             <button 
               onClick={exportToPDF}
               className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-xs text-white font-bold rounded-lg flex items-center gap-1.5 transition-all shadow-md active:scale-95 border border-rose-500/20 cursor-pointer"
-              title="Exportar para PDF"
+              title={t('exportarPdf')}
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>PDF</span>
+              <span>{t('pdf')}</span>
             </button>
           </div>
         </div>
@@ -1106,18 +1109,18 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
           <table className="w-full border-collapse min-w-[640px]">
             <thead>
               <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                <th className="px-3 md:px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aluno</th>
-                <th className="px-3 md:px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">ID Matrícula</th>
-                <th className="px-3 md:px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Turma</th>
-                <th className="px-3 md:px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Status</th>
-                <th className="px-3 md:px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">Ações</th>
+                <th className="px-3 md:px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaAluno')}</th>
+                <th className="px-3 md:px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('idMatricula')}</th>
+                <th className="px-3 md:px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('turma')}</th>
+                <th className="px-3 md:px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('status')}</th>
+                <th className="px-3 md:px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#3e484f]/30">
               {filteredStudents.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-3 md:px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                    Nenhum aluno encontrado correspondente aos critérios aplicados.
+                    {t('nenhumAluno')}
                   </td>
                 </tr>
               ) : (
@@ -1137,15 +1140,15 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                           <p className="text-[10px] text-[#bdc8d1]/70">{student.email}</p>
                           {(student.cpf || student.phone || student.parentName || student.locality || student.gender || student.birthDate || student.contrato || student.estado || student.regiao) && (
                             <p className="text-[9px] text-[#87929a] mt-1 space-x-1.5 font-sans leading-tight">
-                              {student.cpf && <span>CPF: <strong className="text-[#9fcfff]">{maskCPF(student.cpf)}</strong></span>}
-                              {student.gender && <span>• Sexo: <strong className="text-[#9fcfff]">{student.gender}</strong></span>}
-                              {student.birthDate && <span>• Nasc: <strong className="text-[#9fcfff]">{formatDateBR(student.birthDate)}</strong></span>}
-                              {student.phone && <span>• Tel: <strong className="text-[#9fcfff]">{student.phone}</strong></span>}
-                              {student.parentName && <span>• Responsável: <strong className="text-[#9fcfff]">{student.parentName}</strong></span>}
-                              {student.locality && <span>• Localidade: <strong className="text-[#9fcfff]">{student.locality}</strong></span>}
-                              {student.contrato && <span>• Contrato: <strong className="text-[#38bdf8]">{student.contrato}</strong></span>}
-                              {student.estado && <span>• Estado: <strong className="text-[#38bdf8]">{student.estado}</strong></span>}
-                              {student.regiao && <span>• Região: <strong className="text-[#38bdf8]">{student.regiao}</strong></span>}
+                              {student.cpf && <span>{t('cpf')} <strong className="text-[#9fcfff]">{maskCPF(student.cpf)}</strong></span>}
+                              {student.gender && <span>{t('sexo')} <strong className="text-[#9fcfff]">{student.gender}</strong></span>}
+                              {student.birthDate && <span>{t('nasc')} <strong className="text-[#9fcfff]">{formatDateBR(student.birthDate)}</strong></span>}
+                              {student.phone && <span>{t('tel')} <strong className="text-[#9fcfff]">{student.phone}</strong></span>}
+                              {student.parentName && <span>{t('responsavel')} <strong className="text-[#9fcfff]">{student.parentName}</strong></span>}
+                              {student.locality && <span>{t('localidadeCurta')} <strong className="text-[#9fcfff]">{student.locality}</strong></span>}
+                              {student.contrato && <span>{t('contratoCurta')} <strong className="text-[#38bdf8]">{student.contrato}</strong></span>}
+                              {student.estado && <span>{t('estadoCurta')} <strong className="text-[#38bdf8]">{student.estado}</strong></span>}
+                              {student.regiao && <span>{t('regiaoCurta')} <strong className="text-[#38bdf8]">{student.regiao}</strong></span>}
                             </p>
                           )}
                         </div>
@@ -1161,10 +1164,10 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                             ? 'bg-[#8ed5ff]/10 text-[#38bdf8] border-[#38bdf8]/30 hover:bg-[#8ed5ff]/20'
                             : 'bg-[#93000a]/15 text-[#ffb4ab] border-[#93000a]/30 hover:bg-[#93000a]/30'
                         }`}
-                        title="Clique para alternar o status do aluno"
+                        title={t('clicarAlternarStatus')}
                       >
                         <span className={`w-1.5 h-1.5 rounded-full ${student.status === 'Ativo' ? 'bg-[#38bdf8]' : 'bg-[#ffb4ab]'}`}></span>
-                        <span>{student.status}</span>
+                        <span>{student.status === 'Ativo' ? t('ativo') : t('inativo')}</span>
                       </button>
                     </td>
                     <td className="px-3 md:px-6 py-4 text-xs text-right">
@@ -1172,14 +1175,14 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                         <button 
                           onClick={() => handleOpenEdit(student)}
                           className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#8ed5ff] rounded transition-colors"
-                          title="Editar Cadastro"
+                          title={t('editarCadastro')}
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
                         <button 
                           onClick={() => setStudentToDelete(student)}
                           className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded transition-colors"
-                          title="Excluir Matrícula"
+                          title={t('excluirMatricula')}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -1195,12 +1198,12 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
         {/* Paginated Footer Row */}
         <div className="p-4 bg-[#0b1326] border-t border-[#3e484f]/40 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[10px] text-[#bdc8d1]/80">
-            Mostrando 1-{filteredStudents.length} de {filteredStudents.length} alunos cadastrados
+            {t('mostrando', { inicio: filteredStudents.length, total: filteredStudents.length })}
           </p>
           <div className="flex bg-[#131b2e] border border-[#3e484f]/40 rounded-lg p-0.5">
-            <button className="px-2 py-1 hover:bg-[#39485a] rounded text-xs text-[#bdc8d1] hover:text-[#dae2fd] transition-colors">Anterior</button>
+            <button className="px-2 py-1 hover:bg-[#39485a] rounded text-xs text-[#bdc8d1] hover:text-[#dae2fd] transition-colors">{t('anterior')}</button>
             <span className="px-3 py-1 bg-[#39485a] text-[#8ed5ff] rounded text-xs font-bold font-mono">1</span>
-            <button className="px-2 py-1 hover:bg-[#39485a] rounded text-xs text-[#bdc8d1] hover:text-[#dae2fd] transition-colors">Avançar</button>
+            <button className="px-2 py-1 hover:bg-[#39485a] rounded text-xs text-[#bdc8d1] hover:text-[#dae2fd] transition-colors">{t('avancar')}</button>
           </div>
         </div>
       </section>
@@ -1217,16 +1220,16 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
             </button>
 
             <h4 className="text-sm font-bold text-[#8ed5ff] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              Nova Matrícula de Aluno
+              {t('novaMatricula')}
             </h4>
 
             <form onSubmit={handleAddStudent} className="space-y-3 max-h-[80dvh] overflow-y-auto pr-1">
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Foto de Perfil (opcional):</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('fotoPerfil')}</label>
                 <div className="flex items-center gap-3">
                   <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#38bdf8]/40 bg-[#0b1326] flex items-center justify-center shrink-0">
                     {newAvatarUrl ? (
-                      <Image src={newAvatarUrl} alt="Foto de perfil" width={56} height={56} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <Image src={newAvatarUrl} alt={t('fotoPerfilAlt')} width={56} height={56} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                       <User className="w-6 h-6 text-[#87929a]" />
                     )}
@@ -1234,7 +1237,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                   <div className="flex flex-1 gap-2">
                     <label className="flex-1 text-[11px] bg-[#0b1326] border border-dashed border-[#3e484f]/60 hover:border-[#38bdf8]/60 text-[#8ed5ff] px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 font-semibold cursor-pointer">
                       {isAvatarUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
-                      <span>{isAvatarUploading ? 'Enviando...' : (newAvatarUrl ? 'Trocar Foto' : 'Anexar Foto')}</span>
+                      <span>{isAvatarUploading ? t('enviando') : (newAvatarUrl ? t('trocarFoto') : t('anexarFoto'))}</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -1248,18 +1251,18 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                       className="text-[11px] bg-[#0b1326] border border-dashed border-[#3e484f]/60 hover:border-[#38bdf8]/60 text-[#8ed5ff] px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 font-semibold"
                     >
                       <Camera className="w-3.5 h-3.5" />
-                      <span>Tirar Foto</span>
+                      <span>{t('tirarFoto')}</span>
                     </button>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Nome Completo: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('nomeCompleto')}</label>
                 <input 
                   type="text"
                   required
-                  placeholder="Ex: Arthur Andrade"
+                  placeholder={t('nomeExemplo')}
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all"
@@ -1268,7 +1271,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">CPF: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('cpfObrigatorio')}</label>
                   <input 
                     type="text"
                     required
@@ -1281,21 +1284,21 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Sexo: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('sexoObrigatorio')}</label>
                   <select 
                     value={newGender}
                     onChange={(e) => setNewGender(e.target.value as 'Masculino' | 'Feminino')}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                   >
-                    <option value="Masculino">Masculino</option>
-                    <option value="Feminino">Feminino</option>
+                    <option value="Masculino">{t('masculino')}</option>
+                    <option value="Feminino">{t('feminino')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Data de Nascimento: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('dataNascimento')}</label>
                   <input 
                     type="date"
                     required
@@ -1306,7 +1309,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Telefone: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('telefone')}</label>
                   <input 
                     type="text"
                     required
@@ -1320,11 +1323,11 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">E-mail de Contato: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('emailContato')}</label>
                 <input 
                   type="email"
                   required
-                  placeholder="Ex: arthur@email.com"
+                  placeholder={t('emailExemplo')}
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   autoComplete="new-email"
@@ -1333,11 +1336,11 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Senha de Acesso: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('senhaAcesso')}</label>
                 <input 
                   type="password"
                   required
-                  placeholder="Mínimo 4 caracteres"
+                  placeholder={t('senhaMin')}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   autoComplete="new-password"
@@ -1346,11 +1349,11 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Nome do Responsável: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('nomeResponsavel')}</label>
                 <input 
                   type="text"
                   required
-                  placeholder="Ex: Maria de Andrade"
+                  placeholder={t('responsavelExemplo')}
                   value={newParentName}
                   onChange={(e) => setNewParentName(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all"
@@ -1359,12 +1362,12 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
 
               {/* Contrato, Estado, Regiao, Localidade selectors */}
               <div className="space-y-3 p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Vínculo Escolar</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('vinculoEscolar')}</p>
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <label className="text-xs font-semibold text-[#bdc8d1] block">Contrato: *</label>
+                    <label className="text-xs font-semibold text-[#bdc8d1] block">{t('contratoObrigatorio')}</label>
                     {isContractLocked && (
-                      <span title="Vínculo permanente do registro do profissional">
+                      <span title={t('vinculoPermanente')}>
                         <Lock className="w-3 h-3 text-amber-400" />
                       </span>
                     )}
@@ -1392,7 +1395,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                     }}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <option value="">Selecione...</option>
+                    <option value="">{t('selecione')}</option>
                     {availableContracts.map(c => (
                       <option key={c.id} value={c.name}>{c.name}</option>
                     ))}
@@ -1402,9 +1405,9 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <div className="flex items-center gap-1.5 mb-1">
-                      <label className="text-xs font-semibold text-[#bdc8d1] block">Estado: *</label>
+                      <label className="text-xs font-semibold text-[#bdc8d1] block">{t('estadoObrigatorio')}</label>
                       {isStateLocked && (
-                        <span title="Vínculo permanente do registro do profissional">
+                        <span title={t('vinculoPermanente')}>
                           <Lock className="w-3 h-3 text-amber-400" />
                         </span>
                       )}
@@ -1421,7 +1424,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                       }}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione...</option>
+                      <option value="">{t('selecione')}</option>
                       {(() : string[] => {
                         if (!newContrato) return [];
                         const cObj = availableContracts.find(c => c.name === newContrato || c.id === newContrato);
@@ -1438,9 +1441,9 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
 
                   <div>
                     <div className="flex items-center gap-1.5 mb-1">
-                      <label className="text-xs font-semibold text-[#bdc8d1] block">Região: *</label>
+                      <label className="text-xs font-semibold text-[#bdc8d1] block">{t('regiaoObrigatorio')}</label>
                       {isRegionLocked && (
-                        <span title="Vínculo permanente do registro do profissional">
+                        <span title={t('vinculoPermanente')}>
                           <Lock className="w-3 h-3 text-amber-400" />
                         </span>
                       )}
@@ -1456,7 +1459,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                       }}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione...</option>
+                      <option value="">{t('selecione')}</option>
                       {(() : string[] => {
                         if (!newContrato) return [];
                         const cObj = availableContracts.find(c => c.name === newContrato || c.id === newContrato);
@@ -1475,9 +1478,9 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
 
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <label className="text-xs font-semibold text-[#bdc8d1] block">Localidade: *</label>
+                    <label className="text-xs font-semibold text-[#bdc8d1] block">{t('localidadeObrigatorio')}</label>
                     {isLocalityLocked && (
-                      <span title="Vínculo permanente do registro do profissional">
+                      <span title={t('vinculoPermanente')}>
                         <Lock className="w-3 h-3 text-amber-400" />
                       </span>
                     )}
@@ -1492,7 +1495,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                     }}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <option value="">Selecione...</option>
+                    <option value="">{t('selecione')}</option>
                     {(() : string[] => {
                       if (!newContrato) return [];
                       const cObj = availableContracts.find(c => c.name === newContrato || c.id === newContrato);
@@ -1510,7 +1513,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Série / Turma: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('serieTurmaObrigatorio')}</label>
                   <select 
                     required
                     value={newGrade}
@@ -1518,7 +1521,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                     onChange={(e) => setNewGrade(e.target.value)}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <option value="">Selecione a Turma...</option>
+                    <option value="">{t('selecioneTurma')}</option>
                     {getGradesForSelectedContract(newContrato, newEstado, newRegiao, newLocality).map(opt => (
                       <option key={opt} value={opt}>{opt}</option>
                     ))}
@@ -1527,14 +1530,14 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Status Inicial:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('statusInicial')}</label>
                 <select 
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value as 'Ativo' | 'Inativo')}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                 >
-                  <option value="Ativo">Ativo (Normal)</option>
-                  <option value="Inativo">Inativo (Afastado)</option>
+                  <option value="Ativo">{t('ativoNormal')}</option>
+                  <option value="Inativo">{t('inativoAfastado')}</option>
                 </select>
               </div>
 
@@ -1543,16 +1546,16 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                 <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider flex items-center justify-between gap-1.5">
                   <span className="flex items-center gap-1.5">
                     <Shield className="w-3.5 h-3.5" />
-                    Consentimento LGPD (Lei 13.709/2018)
+                    {t('consentimentoLgpd')}
                   </span>
-                  <a
+                  <Link
                     href="/politica-privacidade"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-semibold text-[#38bdf8] hover:text-[#8ed5ff] underline underline-offset-2 transition-colors normal-case tracking-normal"
                   >
-                    Ler a Política de Privacidade
-                  </a>
+                    {t('lerPolitica')}
+                  </Link>
                 </p>
 
                 <label className="flex items-start gap-2 cursor-pointer">
@@ -1562,7 +1565,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                     className="mt-0.5 accent-[#38bdf8] shrink-0"
                   />
                   <span className="text-[11px] text-[#bdc8d1] leading-relaxed">
-                    <strong className="text-[#dae2fd]">Cadastral e administrativo:</strong> autorizo o tratamento de nome, CPF, nascimento, sexo, contato, responsável, escola/turma, localização e frequência do aluno, para a gestão do vínculo escolar no programa Edukyne, incluindo armazenamento em ambiente de nuvem, conforme a Lei Geral de Proteção de Dados (Art. 7º e Art. 14) e nossa Política de Privacidade.
+                    <strong className="text-[#dae2fd]">{t('cadastralTitle')}</strong> {t('cadastralText')}
                   </span>
                 </label>
 
@@ -1573,7 +1576,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                     className="mt-0.5 accent-[#38bdf8] shrink-0"
                   />
                   <span className="text-[11px] text-[#bdc8d1] leading-relaxed">
-                    <strong className="text-[#dae2fd]">Dados de saúde (Art. 11):</strong> declaro que sou o responsável legal pelo aluno e autorizo, de forma específica, a coleta e o tratamento de dados de saúde — avaliações físicas, índice de massa corporal e capacidades motoras — para fins exclusivos de acompanhamento pedagógico-esportivo.
+                    <strong className="text-[#dae2fd]">{t('saudeTitle')}</strong> {t('saudeText')}
                   </span>
                 </label>
 
@@ -1584,7 +1587,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                     className="mt-0.5 accent-[#38bdf8] shrink-0"
                   />
                   <span className="text-[11px] text-[#bdc8d1] leading-relaxed">
-                    <strong className="text-[#dae2fd]">Questionários e relatórios:</strong> autorizo a coleta das respostas de questionários, avaliações escritas e protocolos avaliativos (atuais ou futuros) e a emissão de relatórios de desempenho, para orientação do aluno, conforme os acessos descritos na Política de Privacidade.
+                    <strong className="text-[#dae2fd]">{t('questionariosTitle')}</strong> {t('questionariosText')}
                   </span>
                 </label>
               </div>
@@ -1595,13 +1598,13 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                   onClick={handleCloseAddModal}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {t('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs shadow-md shadow-[#38bdf8]/10"
                 >
-                  Confirmar Cadastro
+                  {t('confirmarCadastro')}
                 </button>
               </div>
             </form>
@@ -1621,16 +1624,16 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              Editar Cadastro de Aluno
+              {t('editarCadastroAluno')}
             </h4>
 
             <form onSubmit={handleSaveEditStudent} className="space-y-3 max-h-[80dvh] overflow-y-auto pr-1">
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Foto de Perfil (opcional):</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('fotoPerfil')}</label>
                 <div className="flex items-center gap-3">
                   <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#38bdf8]/40 bg-[#0b1326] flex items-center justify-center shrink-0">
                     {editAvatarUrl ? (
-                      <Image src={editAvatarUrl} alt="Foto de perfil" width={56} height={56} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <Image src={editAvatarUrl} alt={t('fotoPerfilAlt')} width={56} height={56} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                       <User className="w-6 h-6 text-[#87929a]" />
                     )}
@@ -1638,7 +1641,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                   <div className="flex flex-1 gap-2">
                     <label className="flex-1 text-[11px] bg-[#0b1326] border border-dashed border-[#3e484f]/60 hover:border-[#38bdf8]/60 text-[#8ed5ff] px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 font-semibold cursor-pointer">
                       {isEditAvatarUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
-                      <span>{isEditAvatarUploading ? 'Enviando...' : (editAvatarUrl ? 'Trocar Foto' : 'Anexar Foto')}</span>
+                      <span>{isEditAvatarUploading ? t('enviando') : (editAvatarUrl ? t('trocarFoto') : t('anexarFoto'))}</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -1652,18 +1655,18 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                       className="text-[11px] bg-[#0b1326] border border-dashed border-[#3e484f]/60 hover:border-[#38bdf8]/60 text-[#8ed5ff] px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 font-semibold"
                     >
                       <Camera className="w-3.5 h-3.5" />
-                      <span>Tirar Foto</span>
+                      <span>{t('tirarFoto')}</span>
                     </button>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Nome Completo: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('nomeCompleto')}</label>
                 <input 
                   type="text"
                   required
-                  placeholder="Ex: Arthur Andrade"
+                  placeholder={t('nomeExemplo')}
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all"
@@ -1672,7 +1675,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">CPF: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('cpfObrigatorio')}</label>
                   <input 
                     type="text"
                     required
@@ -1685,21 +1688,21 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Sexo: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('sexoObrigatorio')}</label>
                   <select 
                     value={editGender}
                     onChange={(e) => setEditGender(e.target.value as 'Masculino' | 'Feminino')}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                   >
-                    <option value="Masculino">Masculino</option>
-                    <option value="Feminino">Feminino</option>
+                    <option value="Masculino">{t('masculino')}</option>
+                    <option value="Feminino">{t('feminino')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Data de Nascimento: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('dataNascimento')}</label>
                   <input 
                     type="date"
                     required
@@ -1710,7 +1713,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Telefone: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('telefone')}</label>
                   <input 
                     type="text"
                     required
@@ -1724,11 +1727,11 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">E-mail de Contato: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('emailContato')}</label>
                 <input 
                   type="email"
                   required
-                  placeholder="Ex: arthur@email.com"
+                  placeholder={t('emailExemplo')}
                   value={editEmail}
                   onChange={(e) => setEditEmail(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all"
@@ -1736,11 +1739,11 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Senha de Acesso: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('senhaAcesso')}</label>
                 <input 
                   type="password"
                   required
-                  placeholder="Mínimo 4 caracteres"
+                  placeholder={t('senhaMin')}
                   value={editPassword}
                   onChange={(e) => setEditPassword(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all"
@@ -1748,11 +1751,11 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Nome do Responsável: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('nomeResponsavel')}</label>
                 <input 
                   type="text"
                   required
-                  placeholder="Ex: Maria de Andrade"
+                  placeholder={t('responsavelExemplo')}
                   value={editParentName}
                   onChange={(e) => setEditParentName(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all"
@@ -1760,11 +1763,11 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">ID Matrícula: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('idMatriculaObrigatorio')}</label>
                 <input 
                   type="text"
                   required
-                  placeholder="Ex: #2026-100"
+                  placeholder={t('idMatriculaExemplo')}
                   value={editEnrollmentId}
                   onChange={(e) => setEditEnrollmentId(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all font-mono"
@@ -1773,9 +1776,9 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
 
               {/* Contrato, Estado, Regiao, Localidade selectors for EDIT */}
               <div className="space-y-3 p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg">
-                <p className="text-[10px] font-bold text-[#38bdf8] uppercase tracking-wider">Vínculo Escolar</p>
+                <p className="text-[10px] font-bold text-[#38bdf8] uppercase tracking-wider">{t('vinculoEscolar')}</p>
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Contrato: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('contratoObrigatorio')}</label>
                   <select 
                     required
                     value={editContrato}
@@ -1798,7 +1801,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                     }}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                   >
-                    <option value="">Selecione...</option>
+                    <option value="">{t('selecione')}</option>
                     {availableContracts.map(c => (
                       <option key={c.id} value={c.name}>{c.name}</option>
                     ))}
@@ -1807,7 +1810,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Estado: *</label>
+                    <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('estadoObrigatorio')}</label>
                     <select 
                       required
                       value={editEstado}
@@ -1819,7 +1822,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                       }}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                     >
-                      <option value="">Selecione...</option>
+                      <option value="">{t('selecione')}</option>
                       {(() : string[] => {
                         if (!editContrato) return [];
                         const cObj = availableContracts.find(c => c.name === editContrato || c.id === editContrato);
@@ -1835,7 +1838,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Região: *</label>
+                    <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('regiaoObrigatorio')}</label>
                     <select 
                       required
                       value={editRegiao}
@@ -1846,7 +1849,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                       }}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                     >
-                      <option value="">Selecione...</option>
+                      <option value="">{t('selecione')}</option>
                       {(() : string[] => {
                         if (!editContrato) return [];
                         const cObj = availableContracts.find(c => c.name === editContrato || c.id === editContrato);
@@ -1864,7 +1867,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Localidade: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('localidadeObrigatorio')}</label>
                   <select 
                     required
                     value={editLocality}
@@ -1874,7 +1877,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                     }}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                   >
-                    <option value="">Selecione...</option>
+                    <option value="">{t('selecione')}</option>
                     {(() : string[] => {
                       if (!editContrato) return [];
                       const cObj = availableContracts.find(c => c.name === editContrato || c.id === editContrato);
@@ -1892,7 +1895,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Série / Turma: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('serieTurmaObrigatorio')}</label>
                   <select 
                     required
                     value={editGrade}
@@ -1900,7 +1903,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                     onChange={(e) => setEditGrade(e.target.value)}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <option value="">Selecione a Turma...</option>
+                    <option value="">{t('selecioneTurma')}</option>
                     {getGradesForSelectedContract(editContrato, editEstado, editRegiao, editLocality).map(opt => (
                       <option key={opt} value={opt}>{opt}</option>
                     ))}
@@ -1909,14 +1912,14 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Status:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('status')}</label>
                 <select 
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value as 'Ativo' | 'Inativo')}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                 >
-                  <option value="Ativo">Ativo</option>
-                  <option value="Inativo">Inativo</option>
+                  <option value="Ativo">{t('ativo')}</option>
+                  <option value="Inativo">{t('inativo')}</option>
                 </select>
               </div>
 
@@ -1926,13 +1929,13 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                   onClick={handleCloseEditModal}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {t('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs shadow-md"
                 >
-                  Salvar Alterações
+                  {t('salvarAlteracoes')}
                 </button>
               </div>
             </form>
@@ -1945,10 +1948,10 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
         <div className="fixed inset-0 bg-[#060e20]/85 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-[#171f33] border border-[#ffb4ab]/40 w-full max-w-sm rounded-xl shadow-2xl p-5 relative animate-in fade-in zoom-in duration-150">
             <h4 className="text-sm font-bold text-[#ffb4ab] uppercase tracking-wider mb-2">
-              Confirmar Exclusão
+              {t('confirmarExclusao')}
             </h4>
             <p className="text-xs text-[#bdc8d1] mb-5 leading-relaxed">
-              Tem certeza de que deseja remover permanentemente a matrícula de <span className="text-[#dae2fd] font-bold">{studentToDelete.name}</span> ({studentToDelete.enrollmentId})? Esta ação não pode ser desfeita.
+              {t('confirmarRemocao', { nome: studentToDelete.name, id: studentToDelete.enrollmentId ?? '' })}
             </p>
             <div className="flex gap-2 justify-end">
               <button 
@@ -1956,14 +1959,14 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
                 onClick={() => setStudentToDelete(null)}
                 className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
               >
-                Cancelar
+                {t('cancelar')}
               </button>
               <button 
                 type="button"
                 onClick={handleConfirmDelete}
                 className="px-5 py-2 bg-[#93000a] hover:bg-[#b31412] text-[#ffb4ab] font-bold rounded-lg text-xs shadow-md"
               >
-                Confirmar Excluir
+                {t('confirmarExcluir')}
               </button>
             </div>
           </div>
@@ -1986,7 +1989,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               <X className="w-4 h-4" />
             </button>
             <h4 className="text-sm font-bold text-[#8ed5ff] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              Tirar Foto
+              {t('tirarFoto')}
             </h4>
             <div className="relative w-full aspect-[4/3] bg-black rounded-lg overflow-hidden border border-[#3e484f]/60">
               <video
@@ -2006,7 +2009,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
               className="mt-4 w-full px-4 py-3 bg-[#38bdf8] hover:bg-[#0ea5e9] text-[#060e20] font-bold rounded-lg text-sm flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isCapturingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-              {isCapturingPhoto ? 'Capturando...' : 'Capturar Foto'}
+              {isCapturingPhoto ? t('capturando') : t('capturarFoto')}
             </button>
           </div>
         </div>,

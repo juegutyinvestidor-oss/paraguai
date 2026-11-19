@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { createPortal } from 'react-dom';
 import {
   ResponsiveContainer,
@@ -132,6 +133,8 @@ export default function DashboardView({
   contratos,
   user
 }: DashboardViewProps) {
+  const t = useTranslations('dashboard');
+
   // Security Context checks: Lock filters if they have single value, restrict if multiple values
   const isHydrating = user?.id === 'loading';
   const isUserAdmin = user?.role === 'Administrador' || !user;
@@ -1346,7 +1349,7 @@ export default function DashboardView({
         <section className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 shadow-lg space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#3e484f]/25 pb-2">
             <h4 className="text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">
-              Filtro Unificado - Territórios & Contratos administrados
+              {t('filtroTitulo')}
             </h4>
           </div>
           
@@ -1354,7 +1357,7 @@ export default function DashboardView({
             {/* Contrato */}
             <div className="flex flex-col gap-1.5 font-sans">
               <div className="flex items-center gap-1">
-                <label className="text-xs font-semibold text-[#bdc8d1]/90">Contrato:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1]/90">{t('contrato')}</label>
               </div>
               <select 
                 value={contract}
@@ -1368,7 +1371,7 @@ export default function DashboardView({
                 }}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] focus:ring-1 focus:ring-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="Todos">Todos os Contratos</option>
+                <option value="Todos">{t('todosContratos')}</option>
                 {availableContracts.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
@@ -1378,7 +1381,7 @@ export default function DashboardView({
             {/* Estado */}
             <div className="flex flex-col gap-1.5 font-sans">
               <div className="flex items-center gap-1">
-                <label className="text-xs font-semibold text-[#bdc8d1]/90">Estado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1]/90">{t('estado')}</label>
               </div>
               <select 
                 value={stateFilter}
@@ -1391,7 +1394,7 @@ export default function DashboardView({
                 }}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] focus:ring-1 focus:ring-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="Todos">Todos os Estados</option>
+                <option value="Todos">{t('todosEstados')}</option>
                 {availableStates.map(st => (
                   <option key={st} value={st}>{st}</option>
                 ))}
@@ -1401,7 +1404,7 @@ export default function DashboardView({
             {/* Região */}
             <div className="flex flex-col gap-1.5 font-sans">
               <div className="flex items-center gap-1">
-                <label className="text-xs font-semibold text-[#bdc8d1]/90">Região:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1]/90">{t('regiao')}</label>
               </div>
               <select 
                 value={cityFilter}
@@ -1413,7 +1416,7 @@ export default function DashboardView({
                 }}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] focus:ring-1 focus:ring-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="Todos">Todas as Regiões</option>
+                <option value="Todos">{t('todasRegioes')}</option>
                 {availableRegions.map(reg => (
                   <option key={reg} value={reg}>{reg}</option>
                 ))}
@@ -1423,7 +1426,7 @@ export default function DashboardView({
             {/* Localidade */}
             <div className="flex flex-col gap-1.5 font-sans">
               <div className="flex items-center gap-1">
-                <label className="text-xs font-semibold text-[#bdc8d1]/90">Localidade:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1]/90">{t('localidade')}</label>
               </div>
               <select 
                 value={localityFilter}
@@ -1434,7 +1437,7 @@ export default function DashboardView({
                 }}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] focus:ring-1 focus:ring-[#38bdf8] outline-none transition-all font-sans disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="Todos">Todas as Localidades</option>
+                <option value="Todos">{t('todasLocalidades')}</option>
                 {availableLocalities.map(loc => (
                   <option key={loc} value={loc}>{loc}</option>
                 ))}
@@ -1444,7 +1447,7 @@ export default function DashboardView({
             {/* Série/Turma */}
             <div className="flex flex-col gap-1.5 font-sans animate-fade-in text-[#dae2fd]">
               <div className="flex items-center gap-1">
-                <label className="text-xs font-semibold text-[#bdc8d1]/90">Série/Turma:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1]/90">{t('serieTurma')}</label>
               </div>
               <select 
                 value={selectedGrade}
@@ -1452,7 +1455,7 @@ export default function DashboardView({
                 onChange={(e) => setSelectedGrade(e.target.value || 'Todos')}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] focus:ring-1 focus:ring-[#38bdf8] outline-none transition-all font-sans disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="Todos">Todas as Turmas</option>
+                <option value="Todos">{t('todasTurmas')}</option>
                 {availableGrades.map(g => (
                   <option key={g} value={g}>{g}</option>
                 ))}
@@ -1469,13 +1472,13 @@ export default function DashboardView({
             {/* KPI 1 - Seu Cadastro */}
             <div className="bg-[#171f33] border border-[#3e484f]/40 p-4 rounded-xl shadow-md hover:border-[#38bdf8]/50 transition-all group lg:col-span-3">
               <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase">Seu Cadastro</span>
+                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase">{t('seuCadastro')}</span>
                 <Users className="w-4 h-4 text-[#38bdf8] group-hover:scale-110 transition-transform" />
               </div>
               <div className="mt-2">
-                <h4 className="text-xl font-bold tracking-tight text-[#dae2fd] truncate">{loggedInStudentObj?.name || user?.name || 'Aluno'}</h4>
+                <h4 className="text-xl font-bold tracking-tight text-[#dae2fd] truncate">{loggedInStudentObj?.name || user?.name || t('alunoLabel')}</h4>
                 <p className="text-[10px] text-[#bdc8d1]/70 mt-1">
-                  Status: <span className="text-[#38bdf8] font-semibold">{loggedInStudentObj?.status || 'Ativo'}</span>
+                  {t('status')} <span className="text-[#38bdf8] font-semibold">{loggedInStudentObj?.status || t('ativoLabel')}</span>
                 </p>
               </div>
             </div>
@@ -1483,13 +1486,13 @@ export default function DashboardView({
             {/* KPI 2 - Sua Turma */}
             <div className="bg-[#171f33] border border-[#3e484f]/40 p-4 rounded-xl shadow-md hover:border-[#38bdf8]/50 transition-all group lg:col-span-3">
               <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase font-medium">Sua Turma</span>
+                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase font-medium">{t('suaTurma')}</span>
                 <Award className="w-4 h-4 text-[#38bdf8] group-hover:scale-110 transition-transform" />
               </div>
               <div className="mt-2">
-                <h4 className="text-2xl font-bold tracking-tight text-[#dae2fd]">{loggedInStudentObj?.grade || 'Sem Turma'}</h4>
+                <h4 className="text-2xl font-bold tracking-tight text-[#dae2fd]">{loggedInStudentObj?.grade || t('semTurma')}</h4>
                 <p className="text-[10px] text-[#bdc8d1]/70 mt-1 truncate animate-fade-in" title={loggedInStudentObj?.contrato}>
-                  Contrato: {loggedInStudentObj?.contrato || '-'}
+                  {t('contrato')} {loggedInStudentObj?.contrato || '-'}
                 </p>
               </div>
             </div>
@@ -1497,26 +1500,26 @@ export default function DashboardView({
             {/* KPI 3 - Suas Oficinas */}
             <div className="bg-[#171f33] border border-[#3e484f]/40 p-4 rounded-xl shadow-md hover:border-[#38bdf8]/50 transition-all group lg:col-span-3">
               <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase">Suas Oficinas</span>
+                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase">{t('suasOficinas')}</span>
                 <Activity className="w-4 h-4 text-[#38bdf8] group-hover:scale-110 transition-transform" />
               </div>
               <div className="mt-2">
                 <h4 className="text-2xl font-bold tracking-tight text-[#dae2fd]">
                   {filteredModalities.length}
                 </h4>
-                <p className="text-[10px] text-[#bdc8d1]/70 mt-1">Modalidades vinculadas</p>
+                <p className="text-[10px] text-[#bdc8d1]/70 mt-1">{t('modalidadesVinculadas')}</p>
               </div>
             </div>
 
             {/* KPI 4 - Sua Unidade */}
             <div className="bg-[#171f33] border border-[#3e484f]/40 p-4 rounded-xl shadow-md hover:border-[#38bdf8]/50 transition-all group lg:col-span-3">
               <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase font-medium">Sua Unidade</span>
+                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase font-medium">{t('suaUnidade')}</span>
                 <TrendingUp className="w-4 h-4 text-[#38bdf8] group-hover:scale-110 transition-transform" />
               </div>
               <div className="mt-2">
                 <h4 className="text-2xl font-bold tracking-tight text-[#dae2fd]">
-                  {loggedInStudentObj?.locality || 'Centro'}
+                  {loggedInStudentObj?.locality || t('centro')}
                 </h4>
                 <p className="text-[10px] text-[#bdc8d1]/70 mt-1">
                   {loggedInStudentObj?.regiao || ''} - {loggedInStudentObj?.estado || ''}
@@ -1529,13 +1532,13 @@ export default function DashboardView({
             {/* KPI 1 */}
             <div className="bg-[#171f33] border border-[#3e484f]/40 p-4 rounded-xl shadow-md hover:border-[#38bdf8]/50 transition-all group lg:col-span-4">
               <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase">Matrículas Totais</span>
+                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase">{t('matriculasTotais')}</span>
                 <Users className="w-4 h-4 text-[#38bdf8] group-hover:scale-110 transition-transform" />
               </div>
               <div className="mt-2">
                 <h4 className="text-2xl font-bold tracking-tight text-[#dae2fd]">{totalStudents}</h4>
                 <p className="text-[10px] text-[#bdc8d1]/70 mt-1">
-                  <span className="text-[#38bdf8] font-semibold">+{activeStudents} ativos</span> este ciclo
+                  <span className="text-[#38bdf8] font-semibold">+{activeStudents} {t('ativos')}</span> {t('esteCiclo')}
                 </p>
               </div>
             </div>
@@ -1543,28 +1546,28 @@ export default function DashboardView({
             {/* KPI 3 */}
             <div className="bg-[#171f33] border border-[#3e484f]/40 p-4 rounded-xl shadow-md hover:border-[#38bdf8]/50 transition-all group lg:col-span-4">
               <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase">Extracurriculares</span>
+                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase">{t('extracurriculares')}</span>
                 <Activity className="w-4 h-4 text-[#38bdf8] group-hover:scale-110 transition-transform" />
               </div>
               <div className="mt-2">
                 <h4 className="text-2xl font-bold tracking-tight text-[#dae2fd]">
                   {modalitiesChartData.reduce((acc, curr) => acc + curr.value, 0)}
                 </h4>
-                <p className="text-[10px] text-[#bdc8d1]/70 mt-1">Matrículas por Modalidade Esportiva</p>
+                <p className="text-[10px] text-[#bdc8d1]/70 mt-1">{t('matriculasPorModalidade')}</p>
               </div>
             </div>
 
             {/* KPI 4 */}
             <div className="bg-[#171f33] border border-[#3e484f]/40 p-4 rounded-xl shadow-md hover:border-[#38bdf8]/50 transition-all group lg:col-span-4">
               <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase font-medium">Turmas Operantes</span>
+                <span className="text-[10px] font-bold text-[#bdc8d1] tracking-wider uppercase font-medium">{t('turmasOperantes')}</span>
                 <Award className="w-4 h-4 text-[#38bdf8] group-hover:scale-110 transition-transform" />
               </div>
               <div className="mt-2">
                 <h4 className="text-2xl font-bold tracking-tight text-[#dae2fd]">
                   {new Set(filteredStudentsList.filter(s => s.status === 'Ativo').map(s => s.grade)).size}
                 </h4>
-                <p className="text-[10px] text-[#ffb4ab] mt-1 font-semibold">{inactiveStudents} alunos inativos</p>
+                <p className="text-[10px] text-[#ffb4ab] mt-1 font-semibold">{inactiveStudents} {t('alunosInativos')}</p>
               </div>
             </div>
           </>
@@ -1574,22 +1577,22 @@ export default function DashboardView({
       {/* Visual Analytics Grid */}
       <div className="grid grid-cols-1 gap-6">
         <ColumnChartCard 
-          title="Índice Geral" 
+          title={t('indiceGeral')} 
           data={coverageChartData}
         />
         {/* Recharts modern area chart - stretched to full width */}
         <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 shadow-md">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
             <div>
-              <h4 className="text-sm font-bold text-[#dae2fd] tracking-tight">Matrículas &amp; Frequência Mensal</h4>
-              <p className="text-xs text-[#bdc8d1]/75 mt-0.5">Alunos Matriculados</p>
+              <h4 className="text-sm font-bold text-[#dae2fd] tracking-tight">{t('matriculasFrequenciaMensal')}</h4>
+              <p className="text-xs text-[#bdc8d1]/75 mt-0.5">{t('alunosMatriculados')}</p>
             </div>
             {enrollmentNoDate > 0 && (
               <span
                 className="text-[10px] font-bold text-amber-400 tracking-wider uppercase bg-amber-500/10 px-2.5 py-1 rounded-md self-start sm:self-auto border border-amber-500/25"
-                title={`${enrollmentNoDate} aluno(s) ativo(s) sem data de matrícula não entram na curva`}
+                title={t('semDataMatriculaTooltip', { total: enrollmentNoDate })}
               >
-                {enrollmentNoDate} sem data de matrícula
+                {enrollmentNoDate} {t('semDataMatricula')}
               </span>
             )}
           </div>
@@ -1597,7 +1600,7 @@ export default function DashboardView({
           <div className="w-full h-64 pt-2">
             {!isMounted ? (
               <div className="w-full h-full bg-[#0b1326]/30 animate-pulse rounded-lg flex items-center justify-center border border-[#3e484f]/25">
-                <span className="text-xs text-[#bdc8d1]/50 font-sans">Carregando gráfico de matrículas e frequência...</span>
+                <span className="text-xs text-[#bdc8d1]/50 font-sans">{t('carregandoGrafico')}</span>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -1682,15 +1685,15 @@ export default function DashboardView({
                       <div className="flex justify-center gap-6 mt-4 text-xs font-sans font-semibold">
                         <div className="flex items-center gap-2 text-[#bdc8d1] hover:text-white transition-colors cursor-pointer">
                           <span className="w-3 h-3 rounded-full bg-[#38bdf8] shadow-md shadow-[#38bdf8]/20" />
-                          <span>Matriculas</span>
+                          <span>{t('matriculas')}</span>
                         </div>
                         <div className="flex items-center gap-2 text-[#bdc8d1] hover:text-white transition-colors cursor-pointer">
                           <span className="w-3 h-3 rounded-full bg-[#34d399] shadow-md shadow-[#34d399]/20" />
-                          <span>Frequência (%)</span>
+                          <span>{t('frequencia')}</span>
                         </div>
                         <div className="flex items-center gap-2 text-[#bdc8d1] hover:text-white transition-colors cursor-pointer">
                           <span className="w-3 h-3 rounded-full bg-[#f87171] shadow-md shadow-[#f87171]/20" />
-                          <span>Ausência (%)</span>
+                          <span>{t('ausencia')}</span>
                         </div>
                       </div>
                     )}
@@ -1738,27 +1741,27 @@ export default function DashboardView({
       <section className="space-y-6 pt-5 border-t border-[#3e484f]/20">
         <div className="flex flex-col gap-1">
           <h3 className="text-sm font-bold text-[#8ed5ff] uppercase tracking-wider">
-            Desempenho Físico-Vocacional
+            {t('desempenhoFisicoVocacional')}
           </h3>
         </div>
  
         <div className="flex flex-col gap-8">
           <ColumnChartCard 
-            title="Matrículas por Modalidade Esportiva" 
+            title={t('matriculasPorModalidade')} 
             data={modalitiesChartData}
           />
           <ColumnChartCard 
-            title="Índice de Massa Corporal (IMC)" 
-            subtitle="Distribuição por status nutricional" 
+            title={t('imc')}
+            subtitle={t('imcSubtitle')} 
             data={imcChartData}
           />
           {/* Custom Pillar Stack Chart for "Qualidade Motora" */}
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-2xl p-6 shadow-xl flex flex-col justify-between min-h-[460px] hover:border-[#38bdf8]/50 hover:shadow-2xl transition-all group duration-300 w-full overflow-hidden" id="custom-motor-qualities-card">
             <div className="mb-6">
-              <h4 className="text-sm sm:text-base font-bold text-[#dae2fd] group-hover:text-[#38bdf8] transition-colors">Qualidade Motora</h4>
-              <p className="text-[11px] sm:text-xs text-[#bdc8d1]/75 mt-0.5">Distribuição das classificações por capacidade motora avaliada</p>
+              <h4 className="text-sm sm:text-base font-bold text-[#dae2fd] group-hover:text-[#38bdf8] transition-colors">{t('qualidadeMotora')}</h4>
+              <p className="text-[11px] sm:text-xs text-[#bdc8d1]/75 mt-0.5">{t('qualidadeMotoraDesc')}</p>
               {Object.values(motorMatrix).every(item => item.counts.Excelente + item.counts.Bom + item.counts.Regular + item.counts.Insuficiente === 0) && (
-                <p className="text-[11px] text-[#bdc8d1]/50 mt-3 font-sans">Nenhuma avaliação motora registrada no filtro atual.</p>
+                <p className="text-[11px] text-[#bdc8d1]/50 mt-3 font-sans">{t('nenhumaAvaliacaoMotora')}</p>
               )}
             </div>
 
@@ -1785,7 +1788,7 @@ export default function DashboardView({
                             const isHov = motorHover?.cap === key && motorHover?.lvl === lvl;
 
                             // Truncate to compact abbreviation inside the pillar segments
-                            const shortLabel = lvl === 'Excelente' ? 'Exc.' : lvl === 'Regular' ? 'Reg.' : lvl === 'Insuficiente' ? 'Insuf.' : 'Bom';
+                            const shortLabel = lvl === 'Excelente' ? t('excelenteCurto') : lvl === 'Regular' ? t('regularCurto') : lvl === 'Insuficiente' ? t('insuficienteCurto') : t('bomCurto');
 
                             return (
                               <div 
@@ -1804,22 +1807,22 @@ export default function DashboardView({
                                     className="fixed z-50 bg-[#080f1d] border border-[#38bdf8]/40 px-3 py-2 rounded-lg text-xs text-[#dae2fd] shadow-2xl pointer-events-none font-sans min-w-[150px]"
                                     style={{ left: motorHover.x, top: motorHover.y, transform: 'translate(-50%, -100%)' }}
                                   >
-                                    <div className="font-semibold text-[#8ed5ff] border-b border-[#3e484f]/40 pb-1.5 mb-1.5">{item.label} — {lvl}</div>
+                                    <div className="font-semibold text-[#8ed5ff] border-b border-[#3e484f]/40 pb-1.5 mb-1.5">{item.label} — {lvl === 'Excelente' ? t('excelente') : lvl === 'Bom' ? t('bom') : lvl === 'Regular' ? t('regular') : t('insuficiente')}</div>
                                     <div className="flex items-center justify-between gap-4 mt-1">
-                                      <span className="text-[#bdc8d1]">Total:</span>
+                                      <span className="text-[#bdc8d1]">{t('total')}</span>
                                       <span className="font-bold text-white">{count}</span>
                                     </div>
                                     <div className="flex items-center justify-between gap-4 mt-1">
                                       <div className="flex items-center gap-1.5">
                                         <span className="w-2 h-2 rounded-full bg-[#38bdf8]" />
-                                        <span className="text-[#bdc8d1]">Masculino:</span>
+                                        <span className="text-[#bdc8d1]">{t('masculino')}</span>
                                       </div>
                                       <span className="font-bold text-[#38bdf8]">{genders.male}</span>
                                     </div>
                                     <div className="flex items-center justify-between gap-4 mt-1">
                                       <div className="flex items-center gap-1.5">
                                         <span className="w-2 h-2 rounded-full bg-[#f472b6]" />
-                                        <span className="text-[#bdc8d1]">Feminino:</span>
+                                        <span className="text-[#bdc8d1]">{t('feminino')}</span>
                                       </div>
                                       <span className="font-bold text-[#f472b6]">{genders.female}</span>
                                     </div>
@@ -1858,51 +1861,51 @@ export default function DashboardView({
             </div>
           </div>
           <ColumnChartCard 
-            title="Esportes Indicados" 
+            title={t('esportesIndicados')} 
             data={sportChartData}
           />
           <ColumnChartCard 
-            title="Vocacionamento" 
+            title={t('vocacionamento')} 
             data={vocationalChartData}
           />
           <ColumnChartCard 
-            title="Saúde Global" 
+            title={t('saudeGlobal')} 
             data={healthChartData}
           />
           <ColumnChartCard 
-            title="Higiene Bucal" 
+            title={t('higieneBucal')} 
             data={oralChartData}
           />
           <ColumnChartCard 
-            title="Autoconceito" 
+            title={t('autoconceito')} 
             data={autoChartData}
           />
           <ColumnChartCard 
-            title="Índice Alimentar" 
+            title={t('indiceAlimentar')} 
             data={iasChartData}
           />
           <ColumnChartCard 
-            title="Rastreamento TDAH (SNAP-IV)" 
+            title={t('snap')} 
             data={snapChartData}
           />
           <ColumnChartCard 
-            title="Rastreamento Precoce do TEA (AQ-10)" 
+            title={t('aq10')} 
             data={aq10ChartData}
           />
           <ColumnChartCard 
-            title="Qualidade Motora PCD" 
-            subtitle="Distribuição das classificações do perfil motor" 
+            title={t('qualidadeMotoraPCD')}
+            subtitle={t('pcdSubtitle')} 
             data={pcdChartData}
           />
           <ColumnChartCard 
-            title="Modalidades Sugeridas PCD" 
-            subtitle="Distribuição da modalidade de maior IAR por avaliação" 
+            title={t('modalidadesSugeridasPCD')}
+            subtitle={t('pcdModSubtitle')} 
             data={pcdModChartFull}
             hideEmptyOverlay
           />
           <ColumnChartCard 
-            title="Grupos PCD" 
-            subtitle="Distribuição das avaliações por grupo de deficiência" 
+            title={t('gruposPCD')}
+            subtitle={t('pcdGrupoSubtitle')} 
             data={pcdGrupoChartData}
             hideEmptyOverlay
           />
@@ -1919,6 +1922,7 @@ function ColumnChartCard({ title, subtitle, data, hideEmptyOverlay }: {
   data: { label: string; value: number; maleCount?: number; femaleCount?: number; startColor: string; endColor: string }[];
   hideEmptyOverlay?: boolean;
 }) {
+  const t = useTranslations('dashboard');
   const [hover, setHover] = useState<{ index: number; x: number; y: number } | null>(null);
   const maxVal = Math.max(...data.map(d => d.value), 1);
   const hasData = data.some(d => d.value > 0);
@@ -1934,7 +1938,7 @@ function ColumnChartCard({ title, subtitle, data, hideEmptyOverlay }: {
         <div className={`relative h-64 flex items-end justify-around border-b border-[#3e484f]/30 pb-2 select-none ${data.length > 5 ? 'min-w-[600px]' : 'w-full'} px-4`}>
           {!hasData && !hideEmptyOverlay && (
             <div className="absolute inset-0 z-10 flex items-center justify-center">
-              <span className="text-[11px] text-[#bdc8d1]/50 bg-[#0b1326]/85 border border-[#3e484f]/30 rounded-lg px-3 py-2 font-sans">Nenhum dado no filtro atual</span>
+              <span className="text-[11px] text-[#bdc8d1]/50 bg-[#0b1326]/85 border border-[#3e484f]/30 rounded-lg px-3 py-2 font-sans">{t('nenhumDadoFiltro')}</span>
             </div>
           )}
           {/* Background Grid Accent Lines */}
@@ -1971,20 +1975,20 @@ function ColumnChartCard({ title, subtitle, data, hideEmptyOverlay }: {
                   >
                     <div className="font-semibold text-[#8ed5ff] border-b border-[#3e484f]/40 pb-1.5 mb-1.5">{item.label}</div>
                     <div className="flex items-center justify-between gap-4 mt-1">
-                      <span className="text-[#bdc8d1]">Total:</span>
-                      <span className="font-bold text-white">{item.value} {item.value === 1 ? 'aluno' : 'alunos'}</span>
+                      <span className="text-[#bdc8d1]">{t('total')}</span>
+                      <span className="font-bold text-white">{item.value} {item.value === 1 ? t('aluno') : t('alunos')}</span>
                     </div>
                     <div className="flex items-center justify-between gap-4 mt-1">
                       <div className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-[#38bdf8]" />
-                        <span className="text-[#bdc8d1]">Masculino:</span>
+                        <span className="text-[#bdc8d1]">{t('masculino')}</span>
                       </div>
                       <span className="font-bold text-[#38bdf8]">{male}</span>
                     </div>
                     <div className="flex items-center justify-between gap-4 mt-1">
                       <div className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-[#f472b6]" />
-                        <span className="text-[#bdc8d1]">Feminino:</span>
+                        <span className="text-[#bdc8d1]">{t('feminino')}</span>
                       </div>
                       <span className="font-bold text-[#f472b6]">{female}</span>
                     </div>

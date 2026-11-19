@@ -3,7 +3,10 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Shield, Lock, Mail, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Link } from '../i18n/navigation';
 import { setSessionToken } from '../lib/sessionClient';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface LoginViewProps {
   onLoginSuccess: (userName: string, userEmail: string, role?: string, id?: string) => void;
@@ -32,6 +35,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const t = useTranslations('login');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,13 +43,13 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
     setError(null);
 
     if (!email.includes('@')) {
-      setError('Insira um endereço de e-mail corporativo válido.');
+      setError(t('erroEmail'));
       setIsSubmitting(false);
       return;
     }
 
     if (password.length < 4) {
-      setError('A senha deve possuir no mínimo 4 caracteres.');
+      setError(t('erroSenha'));
       setIsSubmitting(false);
       return;
     }
@@ -64,11 +68,11 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
       if (!res.ok) {
         const msg = typeof data?.error === 'string' ? data.error : '';
         if (res.status === 423 || msg.includes('bloqueada') || msg.includes('bloqueado')) {
-          setError('Conta temporariamente bloqueada devido a múltiplas tentativas. Aguarde 15 minutos.');
+          setError(t('erroBloqueada'));
         } else if (res.status === 401) {
-          setError('E-mail ou senha incorretos.');
+          setError(t('erroCredenciais'));
         } else {
-          setError(msg || 'Erro ao autenticar. Tente novamente.');
+          setError(msg || t('erroAutenticar'));
         }
         setIsSubmitting(false);
         return;
@@ -76,7 +80,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
 
       const matchedUser = data?.user;
       if (!matchedUser || !data?.token) {
-        setError('Resposta de autenticação inválida.');
+        setError(t('erroResposta'));
         setIsSubmitting(false);
         return;
       }
@@ -85,7 +89,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
       onLoginSuccess(matchedUser.name, matchedUser.email, matchedUser.role, matchedUser.id);
     } catch (err) {
       console.error('Exceção no login:', err);
-      setError('Erro inesperado ao autenticar. Tente novamente.');
+      setError(t('erroInesperado'));
       setIsSubmitting(false);
     }
   };
@@ -106,16 +110,19 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
           </span>
         </div>
         <p className="text-[max(12px,2.7cqw)] text-slate-500 uppercase tracking-[0.15em] font-semibold leading-[1.7] max-w-[88%] mx-auto">
-          Plataforma Multidisciplinar de Prospecção e Desenvolvimento
+          {t('plataforma')}
         </p>
+        <div className="flex justify-center pt-1">
+          <LanguageSwitcher variant="light" />
+        </div>
       </div>
 
       <hr className="border-slate-200" />
 
       <div className="space-y-[max(3px,1.2cqw)] pt-[max(8px,3cqw)]">
-        <h3 className="text-[max(17px,5.1cqw)] font-bold text-slate-900 leading-tight">Acesso</h3>
+        <h3 className="text-[max(17px,5.1cqw)] font-bold text-slate-900 leading-tight">{t('acesso')}</h3>
         <p className="text-[max(12px,3.2cqw)] text-slate-500 leading-snug">
-          Entre suas credenciais corporativas registradas.
+          {t('instrucao')}
         </p>
       </div>
 
@@ -123,7 +130,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
         {/* E-mail Field */}
         <div className="space-y-[max(7px,2.6cqw)]">
           <label className="text-[max(12px,2.8cqw)] font-semibold text-slate-700 block" htmlFor={`${idPrefix}-email`}>
-            <span>E-mail de Acesso</span>
+            <span>{t('email')}</span>
           </label>
           <div className="relative">
             <Mail className="absolute left-[max(12px,3.4cqw)] top-1/2 -translate-y-1/2 w-[max(16px,3.8cqw)] h-[max(16px,3.8cqw)] text-slate-400" />
@@ -132,7 +139,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
               type="email"
               required
               autoComplete="off"
-              placeholder="seu@email.com"
+              placeholder={t('emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-white border border-slate-300 rounded-[max(8px,1.7cqw)] h-[max(44px,10.6cqw)] pl-[max(38px,10cqw)] pr-[max(12px,3cqw)] text-[max(16px,3.15cqw)] text-slate-800 focus:ring-2 focus:ring-sky-400 focus:border-sky-400 outline-none transition-all placeholder:text-slate-400"
@@ -143,7 +150,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
         {/* Password Field */}
         <div className="space-y-[max(7px,2.6cqw)]">
           <label className="text-[max(12px,2.8cqw)] font-semibold text-slate-700 block" htmlFor={`${idPrefix}-password`}>
-            <span>Senha de Acesso</span>
+            <span>{t('senha')}</span>
           </label>
           <div className="relative">
             <Lock className="absolute left-[max(12px,3.4cqw)] top-1/2 -translate-y-1/2 w-[max(16px,3.8cqw)] h-[max(16px,3.8cqw)] text-slate-400" />
@@ -152,7 +159,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
               type={showPassword ? 'text' : 'password'}
               required
               autoComplete="off"
-              placeholder="Digite sua senha"
+              placeholder={t('senhaPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-white border border-slate-300 rounded-[max(8px,1.7cqw)] h-[max(44px,10.6cqw)] pl-[max(38px,10cqw)] pr-[max(38px,9.4cqw)] text-[max(16px,3.15cqw)] text-slate-800 focus:ring-2 focus:ring-sky-400 focus:border-sky-400 outline-none transition-all placeholder:text-slate-400"
@@ -160,7 +167,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              aria-label={showPassword ? t('ocultarSenha') : t('mostrarSenha')}
               className="absolute right-[max(10px,2.8cqw)] top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 focus:outline-none"
             >
               {showPassword ? (
@@ -188,12 +195,12 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
           {isSubmitting ? (
             <>
               <div className="w-[max(16px,3.8cqw)] h-[max(16px,3.8cqw)] border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Autenticando...</span>
+              <span>{t('autenticando')}</span>
             </>
           ) : (
             <>
               <Shield className="w-[max(16px,3.8cqw)] h-[max(16px,3.8cqw)]" />
-              <span>Entrar no Sistema</span>
+              <span>{t('entrar')}</span>
             </>
           )}
         </button>
@@ -201,15 +208,15 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
 
       {/* Footnote */}
       <div className="text-center text-[max(11px,2.6cqw)] text-slate-400 space-y-[max(4px,1.5cqw)] pt-[max(9px,2.7cqw)]">
-        <p>© 2026 EDUKYNE Inc. Todos os direitos reservados.</p>
-        <p>Conexão criptografada SSL.</p>
+        <p>{t('copyright')}</p>
+        <p>{t('ssl')}</p>
         <p className="pt-[max(8px,3cqw)]">
-          <a
+          <Link
             href="/politica-privacidade"
             className="text-slate-500 hover:text-slate-800 underline underline-offset-2 transition-colors"
           >
-            Política de Privacidade — LGPD
-          </a>
+            {t('privacidade')}
+          </Link>
         </p>
       </div>
       </div>

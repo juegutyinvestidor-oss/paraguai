@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { Search, Plus, Award, Mail, Trash2, Edit3, X, Lock, Camera, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { createPortal } from 'react-dom';
@@ -27,6 +28,8 @@ interface ProfissionaisViewProps {
 }
 
 export default function ProfissionaisView({ professionals, setProfessionals, runWithPermission, contratos, user }: ProfissionaisViewProps) {
+  const t = useTranslations('profissionais');
+  const ta = useTranslations('alunos');
   const [search, setSearch] = useState('');
 
   // Security Context checks: Lock filters if they have single value, restrict if multiple values
@@ -272,7 +275,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
       if (url) {
         setProgAvatarUrl(url);
       } else {
-        alert('Falha ao enviar a foto. Verifique a configuração do Storage no Supabase.');
+        alert(ta('erroUploadFoto'));
       }
     } catch (err) {
       console.error('Erro no upload do avatar do profissional:', err);
@@ -290,7 +293,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
       if (url) {
         setEditProfAvatarUrl(url);
       } else {
-        alert('Falha ao enviar a foto. Verifique a configuração do Storage no Supabase.');
+        alert(ta('erroUploadFoto'));
       }
     } catch (err) {
       console.error('Erro no upload do avatar do profissional:', err);
@@ -332,7 +335,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
       await videoRef.current.play();
     } catch (err) {
       console.error('Erro ao abrir a câmera:', err);
-      alert('Não foi possível acessar a câmera. Verifique as permissões do navegador.');
+      alert(ta('erroCamera'));
       setCameraModalOpen(false);
     }
   };
@@ -367,7 +370,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
         canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.92),
       );
       if (!blob) {
-        alert('Falha ao capturar a foto.');
+        alert(ta('erroCaptura'));
         setIsCapturingPhoto(false);
         return;
       }
@@ -393,7 +396,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
         stopCameraStream();
         setCameraModalOpen(false);
       } else {
-        alert('Falha ao enviar a foto. Verifique a configuração do Storage no Supabase.');
+        alert(ta('erroUploadFoto'));
       }
     } catch (err) {
       console.error('Erro ao capturar foto:', err);
@@ -706,15 +709,15 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
   const handleSaveEditProf = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editProfName || !editProfEmail || !editProfCpf || !editProfBirthDate || !editProfPhone || !editProfSpecialty || !editProfContrato || !editProfEstado || !editProfRegiao || !editProfLocality || !editProfPassword) {
-      alert('Por favor, preencha todos os campos obrigatórios (incluindo Contrato, Estado, Região, Localidade e Senha).');
+      alert(ta('erroCamposObrigatorios'));
       return;
     }
     if (editProfCpf.length !== 14) {
-      alert('Por favor, digite o CPF completo no formato 000.000.000-00.');
+      alert(ta('erroCpf'));
       return;
     }
     if (editProfPhone.length !== 15) {
-      alert('Por favor, digite o Telefone de Contato completo no formato (00) 00000-0000.');
+      alert(ta('erroTelefone'));
       return;
     }
 
@@ -788,15 +791,15 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
   const handleAddCreator = (e: React.FormEvent) => {
     e.preventDefault();
     if (!progName || !progEmail || !progCpf || !progBirthDate || !progPhone || !progSpec || !progContrato || !progEstado || !progRegiao || !progLocality || !progPassword) {
-      alert('Por favor, preencha todos os campos obrigatórios (incluindo Contrato, Estado, Região, Localidade e Senha).');
+      alert(ta('erroCamposObrigatorios'));
       return;
     }
     if (progCpf.length !== 14) {
-      alert('Por favor, digite o CPF completo no formato 000.000.000-00.');
+      alert(ta('erroCpf'));
       return;
     }
     if (progPhone.length !== 15) {
-      alert('Por favor, digite o Telefone de Contato completo no formato (00) 00000-0000.');
+      alert(ta('erroTelefone'));
       return;
     }
 
@@ -900,23 +903,23 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
       {/* Table Title Block & Action */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#3e484f]/25 pb-4">
         <div>
-          <h3 className="text-xl font-bold text-[#8ed5ff]">Docentes e Colaboradores</h3>
+          <h3 className="text-xl font-bold text-[#8ed5ff]">{t('titulo')}</h3>
         </div>
       </div>
 
       {/* FILTER PANEL - MATCHING DASHBOARD EXACTLY */}
       <section className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 shadow-lg space-y-4">
         <h4 className="text-xs font-bold text-[#bdc8d1] uppercase tracking-wider border-b border-[#3e484f]/25 pb-2">
-          Filtro Unificado - Profissionais por Localidade
+          {t('filtroTitulo')}
         </h4>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
           {/* Contrato */}
           <div className="flex flex-col gap-1.5 font-sans">
             <div className="flex items-center gap-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90">Contrato:</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90">{ta('contrato')}</label>
               {!isUserAdmin && assignedContracts.length === 1 && (
-                <span title="Vínculo permanente do registro do usuário">
+                <span title={t('vinculoPermanente')}>
                   <Lock className="w-3 h-3 text-amber-400" />
                 </span>
               )}
@@ -932,7 +935,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               disabled={isHydrating || isContractLocked}
               className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <option value="Todos">Todos os Contratos</option>
+              <option value="Todos">{ta('todosContratos')}</option>
               {availableContracts.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -942,9 +945,9 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
           {/* Estado */}
           <div className="flex flex-col gap-1.5 font-sans font-sans">
             <div className="flex items-center gap-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90">Estado:</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90">{ta('estado')}</label>
               {!isUserAdmin && assignedStates.length === 1 && (
-                <span title="Vínculo permanente do registro do usuário">
+                <span title={t('vinculoPermanente')}>
                   <Lock className="w-3 h-3 text-amber-400" />
                 </span>
               )}
@@ -959,7 +962,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               disabled={isHydrating || isStateLocked}
               className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed font-sans"
             >
-              <option value="Todos">Todos os Estados</option>
+              <option value="Todos">{ta('todosEstados')}</option>
               {availableStates.map(st => (
                 <option key={st} value={st}>{st}</option>
               ))}
@@ -969,9 +972,9 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
           {/* Região */}
           <div className="flex flex-col gap-1.5 font-sans">
             <div className="flex items-center gap-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90">Região:</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90">{ta('regiao')}</label>
               {!isUserAdmin && assignedRegions.length === 1 && (
-                <span title="Vínculo permanente do registro do usuário">
+                <span title={t('vinculoPermanente')}>
                   <Lock className="w-3 h-3 text-amber-400" />
                 </span>
               )}
@@ -985,7 +988,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               disabled={isHydrating || isRegionLocked}
               className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed font-sans"
             >
-              <option value="Todos">Todas as Regiões</option>
+              <option value="Todos">{ta('todasRegioes')}</option>
               {availableRegions.map(reg => (
                 <option key={reg} value={reg}>{reg}</option>
               ))}
@@ -995,9 +998,9 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
           {/* Localidade */}
           <div className="flex flex-col gap-1.5 font-sans">
             <div className="flex items-center gap-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90">Localidade:</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90">{ta('localidade')}</label>
               {!isUserAdmin && assignedLocalities.length === 1 && (
-                <span title="Vínculo permanente do registro do usuário">
+                <span title={t('vinculoPermanente')}>
                   <Lock className="w-3 h-3 text-amber-400" />
                 </span>
               )}
@@ -1008,7 +1011,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               disabled={isHydrating || isLocalityLocked}
               className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed font-sans"
             >
-              <option value="Todos">Todas as Localidades</option>
+              <option value="Todos">{ta('todasLocalidades')}</option>
               {availableLocalities.map(loc => (
                 <option key={loc} value={loc}>{loc}</option>
               ))}
@@ -1023,7 +1026,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#87929a]" />
           <input 
             type="text"
-            placeholder="Pesquisar profissionais..."
+            placeholder={t('pesquisar')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-[#131b2e] border border-[#3e484f]/60 rounded-lg pl-9 pr-4 py-2 text-xs text-[#dae2fd]"
@@ -1035,7 +1038,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
           className="px-4 py-2 bg-[#1e293b] hover:bg-[#334155] border border-[#3e484f] rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md"
         >
           <Plus className="w-4 h-4 text-[#38bdf8]" />
-          <span>Registrar Profissional</span>
+          <span>{t('registrar')}</span>
         </button>
       </div>
 
@@ -1051,16 +1054,16 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
             </button>
 
             <h4 className="text-sm font-bold text-[#8ed5ff] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              Registrar Profissional
+              {t('registrar')}
             </h4>
 
             <form onSubmit={handleAddCreator} className="space-y-3 max-h-[80dvh] overflow-y-auto pr-1">
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Nome Completo: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('nomeCompleto')}</label>
                 <input 
                   type="text" 
                   required
-                  placeholder="Ex: Carlos Oliveira"
+                  placeholder={t('nomeExemplo')}
                   value={progName}
                   onChange={(e) => setProgName(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -1068,11 +1071,11 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Foto de Perfil (opcional):</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('fotoPerfil')}</label>
                 <div className="flex items-center gap-3">
                   <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#38bdf8]/40 bg-[#0b1326] flex items-center justify-center shrink-0">
                     {progAvatarUrl ? (
-                      <Image src={progAvatarUrl} alt="Foto de perfil" width={56} height={56} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <Image src={progAvatarUrl} alt={ta('fotoPerfilAlt')} width={56} height={56} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                       <Award className="w-6 h-6 text-[#87929a]" />
                     )}
@@ -1080,7 +1083,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                   <div className="flex flex-1 gap-2">
                     <label className="flex-1 text-[11px] bg-[#0b1326] border border-dashed border-[#3e484f]/60 hover:border-[#38bdf8]/60 text-[#8ed5ff] px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 font-semibold cursor-pointer">
                       {isAvatarUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
-                      <span>{isAvatarUploading ? 'Enviando...' : (progAvatarUrl ? 'Trocar Foto' : 'Anexar Foto')}</span>
+                      <span>{isAvatarUploading ? ta('enviando') : (progAvatarUrl ? ta('trocarFoto') : ta('anexarFoto'))}</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -1094,7 +1097,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                       className="text-[11px] bg-[#0b1326] border border-dashed border-[#3e484f]/60 hover:border-[#38bdf8]/60 text-[#8ed5ff] px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 font-semibold"
                     >
                       <Camera className="w-3.5 h-3.5" />
-                      <span>Tirar Foto</span>
+                      <span>{ta('tirarFoto')}</span>
                     </button>
                   </div>
                 </div>
@@ -1102,7 +1105,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">CPF: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('cpfObrigatorio')}</label>
                   <input 
                     type="text" 
                     required
@@ -1115,21 +1118,21 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Sexo: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('sexoObrigatorio')}</label>
                   <select 
                     value={progGender}
                     onChange={(e) => setProgGender(e.target.value as 'Masculino' | 'Feminino')}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                   >
-                    <option value="Masculino">Masculino</option>
-                    <option value="Feminino">Feminino</option>
+                    <option value="Masculino">{ta('masculino')}</option>
+                    <option value="Feminino">{ta('feminino')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Data de Nascimento: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('dataNascimento')}</label>
                   <input 
                     type="date" 
                     required
@@ -1140,7 +1143,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Telefone: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('telefone')}</label>
                   <input 
                     type="text" 
                     required
@@ -1154,11 +1157,11 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               </div>
 
                <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">E-mail de Contato: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('emailContato')}</label>
                 <input 
                   type="email" 
                   required
-                  placeholder="Ex: carlos@edukyne.edu.br"
+                  placeholder={t('emailExemplo')}
                   value={progEmail}
                   onChange={(e) => setProgEmail(e.target.value)}
                   autoComplete="new-email"
@@ -1167,11 +1170,11 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Senha de Acesso: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('senhaAcesso')}</label>
                 <input 
                   type="password"
                   required
-                  placeholder="Mínimo 4 caracteres"
+                  placeholder={ta('senhaMin')}
                   value={progPassword}
                   onChange={(e) => setProgPassword(e.target.value)}
                   autoComplete="new-password"
@@ -1180,11 +1183,11 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Especialidade / Matérias: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('especialidade')}</label>
                 <input 
                   type="text" 
                   required
-                  placeholder="Ex: Futebol, Atletismo e Futsal"
+                  placeholder={t('especialidadeExemploAdd')}
                   value={progSpec}
                   onChange={(e) => setProgSpec(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -1192,7 +1195,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Cargo: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('cargo')}</label>
                 <select 
                   value={progRole}
                   onChange={(e) => {
@@ -1217,9 +1220,9 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
 
               {/* Contrato, Estado, Regiao, Localidade selectors */}
               <div className="space-y-3 p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Vínculo Escolar</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{ta('vinculoEscolar')}</p>
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Contrato: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('contratoObrigatorio')}</label>
                   <select 
                     required
                     value={progContrato}
@@ -1248,7 +1251,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     }}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                   >
-                    <option value="">Selecione...</option>
+                    <option value="">{ta('selecione')}</option>
                     {availableContracts.map(c => (
                       <option key={c.id} value={c.name}>{c.name}</option>
                     ))}
@@ -1260,14 +1263,14 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     {/* Estados Selector Panel (Max 2) */}
                     <div className="flex flex-col gap-1.5 font-sans">
                       <div className="flex items-center justify-between">
-                        <label className="text-[11px] font-bold text-[#bdc8d1]">Estados (Máx 2): *</label>
+                        <label className="text-[11px] font-bold text-[#bdc8d1]">{t('estadosMax')}</label>
                         <span className="text-[10px] text-[#38bdf8] font-mono font-bold">
                           {selectedStates.length}/2
                         </span>
                       </div>
                       <div className="bg-[#0b1326] border border-[#3e484f]/50 rounded-lg p-2.5 space-y-1.5 max-h-32 overflow-y-auto w-full">
                         {contractStates.length === 0 ? (
-                          <div className="text-[10px] text-[#bdc8d1]/50 italic">Selecione um contrato...</div>
+                          <div className="text-[10px] text-[#bdc8d1]/50 italic">{t('selecioneContrato')}</div>
                         ) : (
                           contractStates.map((state: string) => {
                             const isChecked = selectedStates.includes(state);
@@ -1301,14 +1304,14 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     {/* Regiões Selector Panel (Max 10) */}
                     <div className="flex flex-col gap-1.5 font-sans mt-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-[11px] font-bold text-[#bdc8d1]">Regiões (Máx 10): *</label>
+                        <label className="text-[11px] font-bold text-[#bdc8d1]">{t('regioesMax')}</label>
                         <span className="text-[10px] text-[#38bdf8] font-mono font-bold">
                           {selectedRegions.length}/10
                         </span>
                       </div>
                       <div className="bg-[#0b1326] border border-[#3e484f]/50 rounded-lg p-2.5 space-y-1.5 max-h-36 overflow-y-auto w-full">
                         {contractRegions.length === 0 ? (
-                          <div className="text-[10px] text-[#bdc8d1]/50 italic">Selecione um contrato...</div>
+                          <div className="text-[10px] text-[#bdc8d1]/50 italic">{t('selecioneContrato')}</div>
                         ) : (
                           contractRegions.map((reg: string) => {
                             const isChecked = selectedRegions.includes(reg);
@@ -1342,14 +1345,14 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     {/* Localidades Selector Panel (Max 20) */}
                     <div className="flex flex-col gap-1.5 font-sans mt-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-[11px] font-bold text-[#bdc8d1]">Localidades (Máx 20): *</label>
+                        <label className="text-[11px] font-bold text-[#bdc8d1]">{t('localidadesMax')}</label>
                         <span className="text-[10px] text-[#38bdf8] font-mono font-bold">
                           {selectedLocalities.length}/20
                         </span>
                       </div>
                       <div className="bg-[#0b1326] border border-[#3e484f]/50 rounded-lg p-2.5 space-y-1.5 max-h-44 overflow-y-auto w-full">
                         {contractLocalities.length === 0 ? (
-                          <div className="text-[10px] text-[#bdc8d1]/50 italic">Selecione um contrato...</div>
+                          <div className="text-[10px] text-[#bdc8d1]/50 italic">{t('selecioneContrato')}</div>
                         ) : (
                           contractLocalities.map((loc: string) => {
                             const isChecked = selectedLocalities.includes(loc);
@@ -1394,7 +1397,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Estado: *</label>
+                        <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('estadoObrigatorio')}</label>
                         <select 
                           required
                           value={progEstado}
@@ -1406,7 +1409,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                           }}
                           className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                         >
-                          <option value="">Selecione...</option>
+                          <option value="">{ta('selecione')}</option>
                           {(() : string[] => {
                             if (!progContrato) return [];
                             const cObj = availableContracts.find(c => c.name === progContrato || c.id === progContrato);
@@ -1422,7 +1425,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                       </div>
 
                       <div>
-                        <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Região: *</label>
+                        <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('regiaoObrigatorio')}</label>
                         <select 
                           required
                           value={progRegiao}
@@ -1433,7 +1436,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                           }}
                           className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                         >
-                          <option value="">Selecione...</option>
+                          <option value="">{ta('selecione')}</option>
                           {(() : string[] => {
                             if (!progContrato) return [];
                             const cObj = availableContracts.find(c => c.name === progContrato || c.id === progContrato);
@@ -1451,7 +1454,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Localidade: *</label>
+                      <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('localidadeObrigatorio')}</label>
                       <select 
                         required
                         value={progLocality}
@@ -1461,7 +1464,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                         }}
                         className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       >
-                        <option value="">Selecione...</option>
+                        <option value="">{ta('selecione')}</option>
                         {(() : string[] => {
                           if (!progContrato) return [];
                           const cObj = availableContracts.find(c => c.name === progContrato || c.id === progContrato);
@@ -1483,16 +1486,16 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                 {/* Série/Turma */}
                 <div className="flex flex-col gap-1.5 font-sans pt-2 border-t border-[#3e484f]/20 mt-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-[#bdc8d1]">Série/Turma (Selecione uma ou mais):</label>
+                    <label className="text-xs font-semibold text-[#bdc8d1]">{t('seriesTurmas')}</label>
                     <span className="text-[10px] text-[#38bdf8] font-mono font-bold">
-                      {progGrade ? progGrade.split(',').map(s => s.trim()).filter(Boolean).length : 0} selecionada(s)
+                      {progGrade ? progGrade.split(',').map(s => s.trim()).filter(Boolean).length : 0} {t('selecionada')}
                     </span>
                   </div>
                   <div className="bg-[#0b1326] border border-[#3e484f]/50 rounded-lg p-2.5 space-y-1.5 max-h-36 overflow-y-auto w-full">
                     {(() => {
                       const options = getGradesForSelectedContract(progContrato, progEstado, progRegiao, progLocality);
                       if (options.length === 0) {
-                        return <div className="text-[10px] text-[#bdc8d1]/50 italic">Selecione uma localidade válida para carregar turmas...</div>;
+                        return <div className="text-[10px] text-[#bdc8d1]/50 italic">{t('selecioneLocalidade')}</div>;
                       }
                       return options.map((opt: string) => {
                         const selectedGrades = progGrade ? progGrade.split(',').map(s => s.trim()).filter(Boolean) : [];
@@ -1535,13 +1538,13 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                   onClick={handleCloseAddProf} 
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit" 
                   className="px-5 py-2 bg-[#38bdf8] text-[#001e2c] font-bold rounded-lg text-xs shadow-md shadow-[#38bdf8]/10"
                 >
-                  Confirmar Registro
+                  {t('confirmarRegistro')}
                 </button>
               </div>
             </form>
@@ -1552,7 +1555,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
       {/* Professional List Card Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {filteredProgs.length === 0 ? (
-          <p className="col-span-full py-12 text-center text-xs text-[#bdc8d1]/60">Nenhum profissional listado.</p>
+          <p className="col-span-full py-12 text-center text-xs text-[#bdc8d1]/60">{t('nenhumProfissional')}</p>
         ) : (
           filteredProgs.map((prog) => (
             <div key={prog.id} className="bg-[#171f33] border border-[#3e484f]/40 p-4 rounded-xl shadow-lg relative group overflow-hidden">
@@ -1588,14 +1591,14 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                   </p>
                   {(prog.cpf || prog.phone || prog.locality || prog.gender || prog.birthDate || prog.contrato || prog.estado || prog.regiao || prog.grade) && (
                     <div className="pt-2 border-t border-[#3e484f]/15 mt-2 text-[9px] text-[#87929a] space-y-0.5 font-sans">
-                      {prog.cpf && <p>CPF: <strong className="text-[#9fcfff] font-mono">{maskCPF(prog.cpf)}</strong></p>}
-                      {prog.phone && <p>Tel: <strong className="text-[#9fcfff] font-mono">{prog.phone}</strong></p>}
-                      {prog.birthDate && <p>Nasc: <strong className="text-[#9fcfff]">{formatDateBR(prog.birthDate)}</strong> ({prog.gender})</p>}
-                      {prog.locality && <p>Localidade: <strong className="text-[#9fcfff]">{prog.locality}</strong></p>}
-                      {prog.contrato && <p>Contrato: <strong className="text-[#38bdf8]">{prog.contrato}</strong></p>}
-                      {prog.estado && <p>Estado: <strong className="text-[#38bdf8]">{prog.estado}</strong></p>}
-                      {prog.regiao && <p>Região: <strong className="text-[#38bdf8]">{prog.regiao}</strong></p>}
-                      {prog.grade && <p>Série/Turma: <strong className="text-[#38bdf8]">{prog.grade}</strong></p>}
+                      {prog.cpf && <p>{t('cpfCurto')} <strong className="text-[#9fcfff] font-mono">{maskCPF(prog.cpf)}</strong></p>}
+                      {prog.phone && <p>{t('telCurto')} <strong className="text-[#9fcfff] font-mono">{prog.phone}</strong></p>}
+                      {prog.birthDate && <p>{t('nascCurto')} <strong className="text-[#9fcfff]">{formatDateBR(prog.birthDate)}</strong> ({prog.gender})</p>}
+                      {prog.locality && <p>{t('localidadeCurta')} <strong className="text-[#9fcfff]">{prog.locality}</strong></p>}
+                      {prog.contrato && <p>{t('contratoCurta')} <strong className="text-[#38bdf8]">{prog.contrato}</strong></p>}
+                      {prog.estado && <p>{t('estadoCurta')} <strong className="text-[#38bdf8]">{prog.estado}</strong></p>}
+                      {prog.regiao && <p>{t('regiaoCurta')} <strong className="text-[#38bdf8]">{prog.regiao}</strong></p>}
+                      {prog.grade && <p>{t('serieTurmaCurta')} <strong className="text-[#38bdf8]">{prog.grade}</strong></p>}
                     </div>
                   )}
                 </div>
@@ -1605,7 +1608,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     type="button"
                     onClick={() => handleOpenEditProf(prog)}
                     className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded transition-colors"
-                    title="Editar Profissional"
+                    title={t('editarProfissional')}
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                   </button>
@@ -1613,7 +1616,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     type="button"
                     onClick={() => setProfToDelete(prog)}
                     className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded transition-colors"
-                    title="Excluir Profissional"
+                    title={t('excluirProfissional')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -1636,16 +1639,16 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              Editar Cadastro de Profissional
+              {t('editarCadastroProfissional')}
             </h4>
 
             <form onSubmit={handleSaveEditProf} className="space-y-3 max-h-[80dvh] overflow-y-auto pr-1">
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Foto de Perfil (opcional):</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('fotoPerfil')}</label>
                 <div className="flex items-center gap-3">
                   <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#38bdf8]/40 bg-[#0b1326] flex items-center justify-center shrink-0">
                     {editProfAvatarUrl ? (
-                      <Image src={editProfAvatarUrl} alt="Foto de perfil" width={56} height={56} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <Image src={editProfAvatarUrl} alt={ta('fotoPerfilAlt')} width={56} height={56} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                       <Award className="w-6 h-6 text-[#87929a]" />
                     )}
@@ -1653,7 +1656,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                   <div className="flex flex-1 gap-2">
                     <label className="flex-1 text-[11px] bg-[#0b1326] border border-dashed border-[#3e484f]/60 hover:border-[#38bdf8]/60 text-[#8ed5ff] px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 font-semibold cursor-pointer">
                       {isEditAvatarUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
-                      <span>{isEditAvatarUploading ? 'Enviando...' : (editProfAvatarUrl ? 'Trocar Foto' : 'Anexar Foto')}</span>
+                      <span>{isEditAvatarUploading ? ta('enviando') : (editProfAvatarUrl ? ta('trocarFoto') : ta('anexarFoto'))}</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -1667,18 +1670,18 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                       className="text-[11px] bg-[#0b1326] border border-dashed border-[#3e484f]/60 hover:border-[#38bdf8]/60 text-[#8ed5ff] px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 font-semibold"
                     >
                       <Camera className="w-3.5 h-3.5" />
-                      <span>Tirar Foto</span>
+                      <span>{ta('tirarFoto')}</span>
                     </button>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Nome Completo: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('nomeCompleto')}</label>
                 <input 
                   type="text"
                   required
-                  placeholder="Ex: Carlos Oliveira"
+                  placeholder={t('nomeExemplo')}
                   value={editProfName}
                   onChange={(e) => setEditProfName(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -1687,7 +1690,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">CPF: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('cpfObrigatorio')}</label>
                   <input 
                     type="text"
                     required
@@ -1700,21 +1703,21 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Sexo: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('sexoObrigatorio')}</label>
                   <select 
                     value={editProfGender}
                     onChange={(e) => setEditProfGender(e.target.value as 'Masculino' | 'Feminino')}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                   >
-                    <option value="Masculino">Masculino</option>
-                    <option value="Feminino">Feminino</option>
+                    <option value="Masculino">{ta('masculino')}</option>
+                    <option value="Feminino">{ta('feminino')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Data de Nascimento: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('dataNascimento')}</label>
                   <input 
                     type="date"
                     required
@@ -1725,7 +1728,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Telefone: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('telefone')}</label>
                   <input 
                     type="text"
                     required
@@ -1739,11 +1742,11 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">E-mail de Contato: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('emailContato')}</label>
                 <input 
                   type="email"
                   required
-                  placeholder="Ex: carlos@edukyne.edu.br"
+                  placeholder={t('emailExemplo')}
                   value={editProfEmail}
                   onChange={(e) => setEditProfEmail(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -1751,11 +1754,11 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Senha de Acesso: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('senhaAcesso')}</label>
                 <input 
                   type="password"
                   required
-                  placeholder="Mínimo 4 caracteres"
+                  placeholder={ta('senhaMin')}
                   value={editProfPassword}
                   onChange={(e) => setEditProfPassword(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -1763,11 +1766,11 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Especialidade / Matérias: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('especialidade')}</label>
                 <input 
                   type="text"
                   required
-                  placeholder="Ex: Futebol e Atletismo"
+                  placeholder={t('especialidadeExemploEdit')}
                   value={editProfSpecialty}
                   onChange={(e) => setEditProfSpecialty(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -1775,7 +1778,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Cargo: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('cargo')}</label>
                 <select 
                   value={editProfRole}
                   onChange={(e) => {
@@ -1800,9 +1803,9 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
 
               {/* Contrato, Estado, Regiao, Localidade selectors for EDIT */}
               <div className="space-y-3 p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg">
-                <p className="text-[10px] font-bold text-[#38bdf8] uppercase tracking-wider">Vínculo Escolar</p>
+                <p className="text-[10px] font-bold text-[#38bdf8] uppercase tracking-wider">{ta('vinculoEscolar')}</p>
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Contrato: *</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('contratoObrigatorio')}</label>
                   <select 
                     required
                     value={editProfContrato}
@@ -1831,7 +1834,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     }}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                   >
-                    <option value="">Selecione...</option>
+                    <option value="">{ta('selecione')}</option>
                     {availableContracts.map(c => (
                       <option key={c.id} value={c.name}>{c.name}</option>
                     ))}
@@ -1843,14 +1846,14 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     {/* Estados Selector Panel (Max 2) */}
                     <div className="flex flex-col gap-1.5 font-sans">
                       <div className="flex items-center justify-between">
-                        <label className="text-[11px] font-bold text-[#bdc8d1]">Estados (Máx 2): *</label>
+                        <label className="text-[11px] font-bold text-[#bdc8d1]">{t('estadosMax')}</label>
                         <span className="text-[10px] text-[#38bdf8] font-mono font-bold">
                           {editSelectedStates.length}/2
                         </span>
                       </div>
                       <div className="bg-[#0b1326] border border-[#3e484f]/50 rounded-lg p-2.5 space-y-1.5 max-h-32 overflow-y-auto w-full">
                         {editContractStates.length === 0 ? (
-                          <div className="text-[10px] text-[#bdc8d1]/50 italic">Selecione um contrato...</div>
+                          <div className="text-[10px] text-[#bdc8d1]/50 italic">{t('selecioneContrato')}</div>
                         ) : (
                           editContractStates.map((state: string) => {
                             const isChecked = editSelectedStates.includes(state);
@@ -1884,14 +1887,14 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     {/* Regiões Selector Panel (Max 10) */}
                     <div className="flex flex-col gap-1.5 font-sans mt-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-[11px] font-bold text-[#bdc8d1]">Regiões (Máx 10): *</label>
+                        <label className="text-[11px] font-bold text-[#bdc8d1]">{t('regioesMax')}</label>
                         <span className="text-[10px] text-[#38bdf8] font-mono font-bold">
                           {editSelectedRegions.length}/10
                         </span>
                       </div>
                       <div className="bg-[#0b1326] border border-[#3e484f]/50 rounded-lg p-2.5 space-y-1.5 max-h-36 overflow-y-auto w-full">
                         {editContractRegions.length === 0 ? (
-                          <div className="text-[10px] text-[#bdc8d1]/50 italic">Selecione um contrato...</div>
+                          <div className="text-[10px] text-[#bdc8d1]/50 italic">{t('selecioneContrato')}</div>
                         ) : (
                           editContractRegions.map((reg: string) => {
                             const isChecked = editSelectedRegions.includes(reg);
@@ -1925,14 +1928,14 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     {/* Localidades Selector Panel (Max 20) */}
                     <div className="flex flex-col gap-1.5 font-sans mt-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-[11px] font-bold text-[#bdc8d1]">Localidades (Máx 20): *</label>
+                        <label className="text-[11px] font-bold text-[#bdc8d1]">{t('localidadesMax')}</label>
                         <span className="text-[10px] text-[#38bdf8] font-mono font-bold">
                           {editSelectedLocalities.length}/20
                         </span>
                       </div>
                       <div className="bg-[#0b1326] border border-[#3e484f]/50 rounded-lg p-2.5 space-y-1.5 max-h-44 overflow-y-auto w-full">
                         {editContractLocalities.length === 0 ? (
-                          <div className="text-[10px] text-[#bdc8d1]/50 italic">Selecione um contrato...</div>
+                          <div className="text-[10px] text-[#bdc8d1]/50 italic">{t('selecioneContrato')}</div>
                         ) : (
                           editContractLocalities.map((loc: string) => {
                             const isChecked = editSelectedLocalities.includes(loc);
@@ -1977,7 +1980,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Estado: *</label>
+                        <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('estadoObrigatorio')}</label>
                         <select 
                           required
                           value={editProfEstado}
@@ -1989,7 +1992,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                           }}
                           className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                         >
-                          <option value="">Selecione...</option>
+                          <option value="">{ta('selecione')}</option>
                           {(() : string[] => {
                             if (!editProfContrato) return [];
                             const cObj = availableContracts.find(c => c.name === editProfContrato || c.id === editProfContrato);
@@ -2005,7 +2008,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                       </div>
 
                       <div>
-                        <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Região: *</label>
+                        <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('regiaoObrigatorio')}</label>
                         <select 
                           required
                           value={editProfRegiao}
@@ -2016,7 +2019,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                           }}
                           className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                         >
-                          <option value="">Selecione...</option>
+                          <option value="">{ta('selecione')}</option>
                           {(() : string[] => {
                             if (!editProfContrato) return [];
                             const cObj = availableContracts.find(c => c.name === editProfContrato || c.id === editProfContrato);
@@ -2034,7 +2037,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Localidade: *</label>
+                      <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{ta('localidadeObrigatorio')}</label>
                       <select 
                         required
                         value={editProfLocality}
@@ -2044,7 +2047,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                         }}
                         className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       >
-                        <option value="">Selecione...</option>
+                        <option value="">{ta('selecione')}</option>
                         {(() : string[] => {
                           if (!editProfContrato) return [];
                           const cObj = availableContracts.find(c => c.name === editProfContrato || c.id === editProfContrato);
@@ -2066,16 +2069,16 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                 {/* Série/Turma */}
                 <div className="flex flex-col gap-1.5 font-sans pt-2 border-t border-[#3e484f]/20 mt-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-[#bdc8d1]">Série/Turma (Selecione uma ou mais):</label>
+                    <label className="text-xs font-semibold text-[#bdc8d1]">{t('seriesTurmas')}</label>
                     <span className="text-[10px] text-[#38bdf8] font-mono font-bold">
-                      {editProfGrade ? editProfGrade.split(',').map(s => s.trim()).filter(Boolean).length : 0} selecionada(s)
+                      {editProfGrade ? editProfGrade.split(',').map(s => s.trim()).filter(Boolean).length : 0} {t('selecionada')}
                     </span>
                   </div>
                   <div className="bg-[#0b1326] border border-[#3e484f]/50 rounded-lg p-2.5 space-y-1.5 max-h-36 overflow-y-auto w-full">
                     {(() => {
                       const options = getGradesForSelectedContract(editProfContrato, editProfEstado, editProfRegiao, editProfLocality);
                       if (options.length === 0) {
-                        return <div className="text-[10px] text-[#bdc8d1]/50 italic">Selecione uma localidade válida para carregar turmas...</div>;
+                        return <div className="text-[10px] text-[#bdc8d1]/50 italic">{t('selecioneLocalidade')}</div>;
                       }
                       return options.map((opt: string) => {
                         const selectedGrades = editProfGrade ? editProfGrade.split(',').map(s => s.trim()).filter(Boolean) : [];
@@ -2118,13 +2121,13 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                   onClick={handleCloseEditProf}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs shadow-md"
                 >
-                  Salvar Alterações
+                  {ta('salvarAlteracoes')}
                 </button>
               </div>
             </form>
@@ -2137,10 +2140,10 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
         <div className="fixed inset-0 bg-[#060e20]/85 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-[#171f33] border border-[#ffb4ab]/40 w-full max-w-sm rounded-xl shadow-2xl p-5 relative animate-in fade-in zoom-in duration-150">
             <h4 className="text-sm font-bold text-[#ffb4ab] uppercase tracking-wider mb-2">
-              Confirmar Exclusão
+              {ta('confirmarExclusao')}
             </h4>
             <p className="text-xs text-[#bdc8d1] mb-5 leading-relaxed">
-              Tem certeza de que deseja remover permanentemente o registro de <span className="text-[#dae2fd] font-bold">{profToDelete.name}</span> ({profToDelete.role})? Esta ação não pode ser desfeita.
+              {t('confirmarRemocao', { nome: profToDelete.name, id: profToDelete.role ?? '' })}
             </p>
             <div className="flex gap-2 justify-end">
               <button 
@@ -2148,14 +2151,14 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
                 onClick={() => setProfToDelete(null)}
                 className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
               >
-                Cancelar
+                {ta('cancelar')}
               </button>
               <button 
                 type="button"
                 onClick={handleConfirmDeleteProf}
                 className="px-5 py-2 bg-[#93000a] hover:bg-[#b31412] text-[#ffb4ab] font-bold rounded-lg text-xs shadow-md"
               >
-                Confirmar Excluir
+                {ta('confirmarExcluir')}
               </button>
             </div>
           </div>
@@ -2178,7 +2181,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               <X className="w-4 h-4" />
             </button>
             <h4 className="text-sm font-bold text-[#8ed5ff] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              Tirar Foto
+              {ta('tirarFoto')}
             </h4>
             <div className="relative w-full aspect-[4/3] bg-black rounded-lg overflow-hidden border border-[#3e484f]/60">
               <video
@@ -2198,7 +2201,7 @@ export default function ProfissionaisView({ professionals, setProfessionals, run
               className="mt-4 w-full px-4 py-3 bg-[#38bdf8] hover:bg-[#0ea5e9] text-[#060e20] font-bold rounded-lg text-sm flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isCapturingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-              {isCapturingPhoto ? 'Capturando...' : 'Capturar Foto'}
+              {isCapturingPhoto ? ta('capturando') : ta('capturarFoto')}
             </button>
           </div>
         </div>,

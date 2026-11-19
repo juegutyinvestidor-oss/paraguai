@@ -8,7 +8,12 @@
     "start": "next start -p 3000",
     "backup": "node scripts/export_backup.js",
     "backup-full": "node scripts/backup_full.js",
+    "restore": "node scripts/restore_backup.js",
     "reclassify-snap": "node scripts/reclassify-snap.js",
+    "i18n:check": "node scripts/check-i18n.mjs",
+    "i18n:scan": "node scripts/i18n-scan.mjs",
+    "i18n:extract": "node scripts/extract-i18n.mjs",
+    "content:build": "node scripts/build-content-dictionary.mjs",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -25,6 +30,7 @@
     "jszip": "^3.10.1",
     "lucide-react": "^0.468.0",
     "next": "^15.5.24",
+    "next-intl": "^4.15.1",
     "postcss": "^8.5.28",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

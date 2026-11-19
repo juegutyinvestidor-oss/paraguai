@@ -1,0 +1,110 @@
+{
+  "voc_questions": {
+    "q1": {
+      "statement": "In a school group project, you prefer to:",
+      "option_a": "Write the text and research the topics.",
+      "option_b": "Do the calculations or create charts for the data.",
+      "option_c": "Draw, paint, or take care of the visual presentation.",
+      "option_d": "Organize the group, the deadlines, and who will speak."
+    },
+    "q2": {
+      "statement": "In your free time, what do you like doing most?",
+      "option_a": "Read books, watch movies, or discuss ideas with friends.",
+      "option_b": "Build or fix things, or play logic games.",
+      "option_c": "Play sports, take care of plants or animals.",
+      "option_d": "Plan events, lead teams, or negotiate agreements."
+    },
+    "q3": {
+      "statement": "Which of these school subjects do you find most interesting?",
+      "option_a": "History, Literature, or Philosophy.",
+      "option_b": "Math, Physics, or Chemistry.",
+      "option_c": "Biology, Physical Education, or Art.",
+      "option_d": "Geography, Writing, or Sociology."
+    },
+    "q4": {
+      "statement": "How do you usually solve a difficult problem?",
+      "option_a": "Talking and trying to understand people's point of view.",
+      "option_b": "Using numbers, data, and exact facts.",
+      "option_c": "Creating a practical and innovative solution.",
+      "option_d": "Preparing a step-by-step action plan."
+    },
+    "q5": {
+      "statement": "Would you describe yourself as someone who:",
+      "option_a": "Likes helping others and expressing yourself well.",
+      "option_b": "Is curious about how things work.",
+      "option_c": "Has a lot of energy and likes creating new things.",
+      "option_d": "Is organized, practical, and likes giving orders."
+    },
+    "q6": {
+      "statement": "If you could travel to one of these places, which would you choose?",
+      "option_a": "A historic city full of museums and culture.",
+      "option_b": "A high-tech center or a science fair.",
+      "option_c": "An ecological reserve or an arts center.",
+      "option_d": "A large business and commerce metropolis."
+    },
+    "q7": {
+      "statement": "What attracts you most in a project?",
+      "option_a": "The impact it will have on people's lives.",
+      "option_b": "How it was built and its logical structure.",
+      "option_c": "The aesthetics and creativity of the final result.",
+      "option_d": "The financial results and the project's success."
+    },
+    "q8": {
+      "statement": "You prefer a work environment where:",
+      "option_a": "You can debate ideas and write.",
+      "option_b": "There are clear routines, research, and a lot of technology.",
+      "option_c": "You can express your creativity and act freely.",
+      "option_d": "There is leadership, clear goals, and quick decisions."
+    },
+    "q9": {
+      "statement": "When it comes to helping others, you prefer to:",
+      "option_a": "Listen, advise, and care for health or rights.",
+      "option_b": "Teach exact sciences or create new technologies for life.",
+      "option_c": "Use art or sport to brighten someone's day.",
+      "option_d": "Manage resources and organize donations."
+    },
+    "q10": {
+      "statement": "Among these reading options, which do you prefer?",
+      "option_a": "Biographies, novels, or articles about behavior.",
+      "option_b": "Scientific magazines or books about technology and innovation.",
+      "option_c": "Decoration, design, or comic magazines.",
+      "option_d": "Books about economics, finance, or management."
+    },
+    "q11": {
+      "statement": "How would you describe your skills?",
+      "option_a": "Ease at speaking, writing, and arguing.",
+      "option_b": "Good memory for data and ease with numbers.",
+      "option_c": "A lot of imagination, creativity, and intuition.",
+      "option_d": "Talent for convincing, leading, and planning."
+    },
+    "q12": {
+      "statement": "What matters most to you in a future profession?",
+      "option_a": "Making a difference in society and in the world.",
+      "option_b": "Discovering how things work and solving challenges.",
+      "option_c": "Having freedom to create and innovate always.",
+      "option_d": "Achieving financial success and a leadership position."
+    }
+  },
+  "m4_imc_config": {
+    "1": {
+      "classification": "Normal weight",
+      "status": "Ideal BMI",
+      "description": "The student shows an excellent body composition appropriate for their age group. This condition directly supports cardiovascular performance, allowing higher-intensity training with excellent physical recovery and a lower risk of injury."
+    },
+    "2": {
+      "classification": "Underweight",
+      "status": "Nutritional attention",
+      "description": "The index signals the need for nutritional attention. A lack of lean mass or energy reserve may limit the student's muscle strength and endurance in long-duration activities, causing early fatigue."
+    },
+    "3": {
+      "classification": "Overweight",
+      "status": "Mild excess",
+      "description": "The indicator points to a slight excess of weight for the body structure. This condition puts more strain on the joints during impact training, but it can be quickly improved by increasing the frequency and intensity of sports activities."
+    },
+    "4": {
+      "classification": "Obesity",
+      "status": "Risk factor",
+      "description": "The index indicates a risk factor for cardiovascular and joint health. A low-impact physical activity plan (such as swimming or brisk walking) is recommended, combined with nutritional monitoring to ensure the student's safety and well-being."
+    }
+  }
+}

@@ -6,6 +6,7 @@ import { getSupabase } from '../lib/supabase';
 import { apiCall } from '../lib/sessionClient';
 import { normalizeRole } from '../lib/rbac';
 import { type LgpdRequest } from '../types/edukyne';
+import { Link } from '../i18n/navigation';
 
 const LGPD_REQUEST_LABELS: Record<string, string> = {
   copia: 'Cópia de dados',
@@ -295,9 +296,9 @@ export default function ConfiguracoesView() {
               Para revogar consentimento, solicitar portabilidade ou esclarecer dúvidas,
               entre em contato pelo e-mail <span className="text-[#8ed5ff] font-mono">lgpd@edukyne.com.br</span>.
               Consulte também nossa{' '}
-              <a href="/politica-privacidade" className="text-[#38bdf8] underline hover:text-[#8ed5ff]">
+              <Link href="/politica-privacidade" className="text-[#38bdf8] underline hover:text-[#8ed5ff]">
                 Política de Privacidade
-              </a>.
+              </Link>.
             </p>
           </div>
         </div>

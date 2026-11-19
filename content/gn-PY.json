@@ -1,0 +1,110 @@
+{
+  "voc_questions": {
+    "q1": {
+      "statement": "Pe mba’apo ñondivepa mbo’ehaópe, ¿mba’épa porãve ne ñe’ẽme?",
+      "option_a": "Ajapóta jehaipy ha aheka umi tema.",
+      "option_b": "Ajapóta ñemboguejy ha ajapo umi gráfico.",
+      "option_c": "Ajapóta dibujo, amongu’ã ha añangareko jehechápe.",
+      "option_d": "Amohenda’ĩta aty, umi arange ha oyano va’erã."
+    },
+    "q2": {
+      "statement": "Ne aravo henyhẽvévemi, ¿mba’épa omoñe’ẽveva nde?",
+      "option_a": "Amoñe’ẽ aranduka, amba’apo filmes térã añomongeta amigos ndive.",
+      "option_b": "Amontaña térã ambojo’o mba’é, térã ajapo juegos de lógica.",
+      "option_c": "Ajapo deporte, añangareko ka’avo térã mymba.",
+      "option_d": "Amohenda events, a’e aty ha ajojui acuerdos."
+    },
+    "q3": {
+      "statement": "¿Kóva apytépe mba’e materiapá porãve ne?",
+      "option_a": "Historia, Literatura térã Filosofía.",
+      "option_b": "Matemáticas, Física térã Química.",
+      "option_c": "Biología, Educación Física térã Artes.",
+      "option_d": "Geografía, Redacción térã Sociología."
+    },
+    "q4": {
+      "statement": "¿Mba’éichapa ojapo kua’ỹva problema hasýva?",
+      "option_a": "Añomongeta ha aheka entende mba’épa he’i umi tapicha.",
+      "option_b": "Aipuru números, datos ha hechos exactos.",
+      "option_c": "Ajapo solución práctica ha innovadora.",
+      "option_d": "Amopu’ã peteĩ plan de acción paso a paso."
+    },
+    "q5": {
+      "statement": "¿Nde re’e ndekuehe máva omba’apo va’erã?:",
+      "option_a": "Gusta ayudar umi tapicha ha añe’ẽ porã.",
+      "option_b": "Aheka mba’éichapa omba’apo umi mba’e.",
+      "option_c": "Hetave mbarete ha gusta ajapo mba’e pyahu.",
+      "option_d": "Ha’e organizada, práctica ha gusta ami órden."
+    },
+    "q6": {
+      "statement": "Ipóta reho viaje ko’ã tendápe, ¿mba’épa reiporãta?",
+      "option_a": "Peteĩ táva ymaguaré museum ha cultura ndie.",
+      "option_b": "Peteĩ centro tecnología yvate térã feria de ciencias.",
+      "option_c": "Peteĩ reserva ecológica térã centro de artes.",
+      "option_d": "Peteĩ táva tuicha negocio ha comercio."
+    },
+    "q7": {
+      "statement": "¿Mba’épa omoñe’ẽveva ne peteĩ proyectope?",
+      "option_a": "Impacto og̃uahẽva tapicha rekovepe.",
+      "option_b": "Mba’éichapa oñemopu’ã ha estructuras lógica.",
+      "option_c": "Estética ha creatividad resultado final.",
+      "option_d": "Resultados financieros ha éxito proyecto."
+    },
+    "q8": {
+      "statement": "¿Mba’éichapa tenda de trabajo reiporãva?",
+      "option_a": "Ikatúva añomongeta ideias ha ahai.",
+      "option_b": "Oĩva rutina clara, investigación ha tecnología hetave.",
+      "option_c": "Ikatúva aaponu creatividad ha ajapo libremente.",
+      "option_d": "Oĩva líder, metas claras ha decisión pya’e."
+    },
+    "q9": {
+      "statement": "Oñepyrũvo ñaipytũ umi tapichape, ¿mba’épa reiporãva?",
+      "option_a": "Ajapysaka, ami consejo ha añangareko salud térã derecho.",
+      "option_b": "A’e exactas térã ajapo tecnología pyahu vidape.",
+      "option_c": "Aipuru arte térã deporte ombopy’aguasu’ã hag̃ua.",
+      "option_d": "Amohenda recursos ha donaciones."
+    },
+    "q10": {
+      "statement": "Ko’ã ñemoñe’ẽ apytépe, ¿mba’épa reiporãva?",
+      "option_a": "Biografías, novelas térã artículos de comportamiento.",
+      "option_b": "Revistas científicas térã aranduka tecnología ha innovación.",
+      "option_c": "Revistas decoración, diseño térã historietas.",
+      "option_d": "Aranduka economía, finanzas térã administración."
+    },
+    "q11": {
+      "statement": "¿Mba’éichapa reñe’ẽta nde mba’apo kuaa?",
+      "option_a": "Fácil añe’ẽ, ahai ha aargumenta.",
+      "option_b": "Memoria porã datospe ha fácil númerospe.",
+      "option_c": "Imaginación, creatividad ha intuición hetave.",
+      "option_d": "Talento ombotu’u, omo’e ha omohenda."
+    },
+    "q12": {
+      "statement": "¿Mba’épa tuichave peteĩ mba’apo tenonderãpe nde?",
+      "option_a": "Ajapo diferencia sociedade ha mundope.",
+      "option_b": "Aikuaa mba’éichapa omba’apo ha ajapo desafíos.",
+      "option_c": "Aipu’ã creatividad ha innovación oipe’a’ỹre.",
+      "option_d": "Aguãta éxito financiero ha cargo de jefe."
+    }
+  },
+  "m4_imc_config": {
+    "1": {
+      "classification": "Peso normal",
+      "status": "IMC ideal",
+      "description": "Estudiante oguereko peteĩ cuerpo composición porã ha oĩ porãva i-edadpe. Kóva omo’ỹ porã cardiovascular, ha ikatu omba’apo tuichave intensidad ndive, heko porã recovered ha mba’asy’ỹ."
+    },
+    "2": {
+      "classification": "Peso’ỹ",
+      "status": "Ñangareko nutricional",
+      "description": "Índice ohechauka tekotevẽ ñangareko nutricional. Músculo masa’ỹ térã energía reserva’ỹ ikatu ombog̃ue mbarete ha resistencia estudiante, omo’ẽ kansa’ẽ pya’e."
+    },
+    "3": {
+      "classification": "Peso hetave",
+      "status": "Hetave’ỹ",
+      "description": "Indicador ohechauka oĩ hetave peso cuerpo structurespe. Kóva omoingove articulacionespe entrenamiento impacto ndive, ha ikatu oñembo’y pya’e omo’ỹve frecuencia ha intensidad deporte."
+    },
+    "4": {
+      "classification": "Obesidad",
+      "status": "Mba’asy ñepyrũ",
+      "description": "Índice ohechauka factor de riesgo cardiovascular ha articulación. Oñemoneí peteĩ plan de actividad física de bajo impacto (natación térã ñangutiningo pya’e) ñangareko nutricional ndive, estudiante seguridá ha bienestar omo’ã hag̃ua."
+    }
+  }
+}

@@ -1,10 +1,12 @@
 'use client';
 
-import { getSupabase } from './supabase';
-import { getSessionToken } from './sessionClient';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import {getSupabase} from './supabase';
+import {getSessionToken} from './sessionClient';
+import {currentLocale, loadContentTranslations, localizeRows} from './contentI18n';
+import type {SupabaseClient} from '@supabase/supabase-js';
 
-type QueryResult = { data: unknown; error: { message: string } | null };
+type QueryResult = {data: unknown; error: {message: string} | null};
+type Builder = Record<string, unknown>;
 
 function notifySessionExpired(): void {
   if (typeof window !== 'undefined') {
@@ -19,7 +21,7 @@ async function dataWrite(body: Record<string, unknown>): Promise<QueryResult> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(token ? {Authorization: `Bearer ${token}`} : {}),
       },
       body: JSON.stringify(body),
     });
@@ -28,28 +30,28 @@ async function dataWrite(body: Record<string, unknown>): Promise<QueryResult> {
       notifySessionExpired();
     }
     if (!res.ok || json?.error) {
-      return { data: null, error: { message: String(json?.error || `HTTP ${res.status}`) } };
+      return {data: null, error: {message: String(json?.error || `HTTP ${res.status}`)}};
     }
-    return { data: [], error: null };
+    return {data: [], error: null};
   } catch (err) {
-    return { data: null, error: { message: err instanceof Error ? err.message : 'Falha de rede' } };
+    return {data: null, error: {message: err instanceof Error ? err.message : 'Falha de rede'}};
   }
 }
 
 function deleteChain(table: string) {
   const ids: string[] = [];
-  const run = () => dataWrite({ table, op: 'delete', ids });
+  const run = () => dataWrite({table, op: 'delete', ids});
   return {
     eq: (col: string, val: unknown): Promise<QueryResult> | QueryResult => {
       if (col !== 'id') {
-        return Promise.resolve({ data: null, error: { message: 'delete via facade suporta apenas filtro por id' } });
+        return Promise.resolve({data: null, error: {message: 'delete via facade suporta apenas filtro por id'}});
       }
       ids.push(String(val));
       return run();
     },
     in: (col: string, vals: unknown[]): Promise<QueryResult> | QueryResult => {
       if (col !== 'id') {
-        return Promise.resolve({ data: null, error: { message: 'delete via facade suporta apenas filtro por id' } });
+        return Promise.resolve({data: null, error: {message: 'delete via facade suporta apenas filtro por id'}});
       }
       ids.push(...vals.map(v => String(v)));
       return run();
@@ -57,19 +59,58 @@ function deleteChain(table: string) {
   };
 }
 
-function tableFacade(table: string, real: SupabaseClient): Record<string, unknown> {
-  const upsert = (rows: unknown): Promise<QueryResult> => dataWrite({ table, op: 'upsert', rows });
-  const writes: Record<string, unknown> = {
+function wrapReadBuilder(table: string, target: Builder, locale: string): Builder {
+  return new Proxy(target, {
+    get(object, key: string) {
+      if (key === 'then') {
+        return (
+          onfulfilled: (value: unknown) => unknown,
+          onrejected?: (reason: unknown) => unknown
+        ) =>
+          Promise.resolve(object as unknown as PromiseLike<unknown>)
+            .then(async (result) => {
+              if (!result || typeof result !== 'object') return result;
+              const response = result as {data?: unknown};
+              const dictionary = await loadContentTranslations(locale);
+              return {...response, data: localizeRows(table, response.data, dictionary)};
+            })
+            .then(onfulfilled, onrejected);
+      }
+
+      const value = Reflect.get(object, key, object);
+      if (typeof value !== 'function') return value;
+
+      return (...args: unknown[]) => {
+        const result = (value as (...args: unknown[]) => unknown).apply(object, args);
+        if (result && typeof (result as Builder).then === 'function') {
+          return wrapReadBuilder(table, result as Builder, locale);
+        }
+        return result;
+      };
+    },
+  });
+}
+
+function tableFacade(table: string, real: SupabaseClient, locale: string): Builder {
+  const upsert = (rows: unknown): Promise<QueryResult> => dataWrite({table, op: 'upsert', rows});
+  const writes: Builder = {
     upsert,
     insert: upsert,
     delete: () => deleteChain(table),
   };
-  return new Proxy({} as Record<string, unknown>, {
+  return new Proxy({} as Builder, {
     get(_t, key: string) {
       if (key in writes) return writes[key];
-      const builder = real.from(table) as unknown as Record<string, unknown>;
+      const builder = real.from(table) as unknown as Builder;
       const value = builder[key];
-      return typeof value === 'function' ? value.bind(builder) : value;
+      if (typeof value !== 'function') return value;
+      return (...args: unknown[]) => {
+        const result = (value as (...args: unknown[]) => unknown).apply(builder, args);
+        if (result && typeof (result as Builder).then === 'function') {
+          return wrapReadBuilder(table, result as Builder, locale);
+        }
+        return result;
+      };
     },
     has(_t, key: string) {
       return key in writes;
@@ -80,20 +121,12 @@ function tableFacade(table: string, real: SupabaseClient): Record<string, unknow
 export function getDb(): SupabaseClient | null {
   const real = getSupabase();
   if (!real) return null;
+  const locale = currentLocale();
+
   return new Proxy(real, {
     get(target, prop, _receiver) {
       if (prop === 'from') {
-        return (table: string) => {
-          const facade = tableFacade(table, target);
-          return new Proxy(facade, {
-            get(f, key: string) {
-              if (key in facade) return facade[key];
-              const builder = target.from(table) as unknown as Record<string, unknown>;
-              const value = builder[key];
-              return typeof value === 'function' ? value.bind(builder) : value;
-            },
-          });
-        };
+        return (table: string) => tableFacade(table, target, locale);
       }
       const value = Reflect.get(target, prop, target);
       return typeof value === 'function' ? value.bind(target) : value;

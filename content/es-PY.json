@@ -1,0 +1,110 @@
+{
+  "voc_questions": {
+    "q1": {
+      "statement": "En un trabajo de grupo en la escuela, prefieres:",
+      "option_a": "Escribir el texto e investigar los temas.",
+      "option_b": "Hacer los cálculos o crear gráficos con los datos.",
+      "option_c": "Dibujar, pintar o encargarte de la presentación visual.",
+      "option_d": "Organizar al grupo, los plazos y quién hablará."
+    },
+    "q2": {
+      "statement": "En tu tiempo libre, ¿qué te gusta hacer más?",
+      "option_a": "Leer libros, ver películas o debatir ideas con amigos.",
+      "option_b": "Armar o reparar cosas, o jugar juegos de lógica.",
+      "option_c": "Practicar deportes, cuidar plantas o animales.",
+      "option_d": "Planificar eventos, liderar equipos o negociar acuerdos."
+    },
+    "q3": {
+      "statement": "¿Cuál de estas materias escolares te parece más interesante?",
+      "option_a": "Historia, Literatura o Filosofía.",
+      "option_b": "Matemáticas, Física o Química.",
+      "option_c": "Biología, Educación Física o Artes.",
+      "option_d": "Geografía, Redacción o Sociología."
+    },
+    "q4": {
+      "statement": "¿Cómo sueles resolver un problema difícil?",
+      "option_a": "Hablando y tratando de entender el punto de vista de las personas.",
+      "option_b": "Usando números, datos y hechos exactos.",
+      "option_c": "Creando una solución práctica e innovadora.",
+      "option_d": "Preparando un plan de acción paso a paso."
+    },
+    "q5": {
+      "statement": "¿Te consideras una persona que:",
+      "option_a": "Le gusta ayudar a los demás y expresarse bien.",
+      "option_b": "Siente curiosidad por cómo funcionan las cosas.",
+      "option_c": "Tiene mucha energía y gusta crear cosas nuevas.",
+      "option_d": "Es organizada, práctica y gusta dar órdenes."
+    },
+    "q6": {
+      "statement": "Si pudieras viajar a uno de estos lugares, ¿cuál elegirías?",
+      "option_a": "Una ciudad histórica llena de museos y cultura.",
+      "option_b": "Un centro de alta tecnología o una feria de ciencias.",
+      "option_c": "Una reserva ecológica o un centro de artes.",
+      "option_d": "Una gran metrópoli de negocios y comercio."
+    },
+    "q7": {
+      "statement": "¿Qué te llama más la atención en un proyecto?",
+      "option_a": "El impacto que tendrá en la vida de las personas.",
+      "option_b": "Cómo se construyó y su estructura lógica.",
+      "option_c": "La estética y la creatividad del resultado final.",
+      "option_d": "Los resultados financieros y el éxito del proyecto."
+    },
+    "q8": {
+      "statement": "Prefieres un entorno de trabajo donde:",
+      "option_a": "Puedas debatir ideas y escribir.",
+      "option_b": "Haya rutinas claras, investigación y mucha tecnología.",
+      "option_c": "Puedas expresar tu creatividad y actuar libremente.",
+      "option_d": "Exista liderazgo, metas claras y decisiones rápidas."
+    },
+    "q9": {
+      "statement": "Cuando se trata de ayudar a los demás, prefieres:",
+      "option_a": "Escuchar, aconsejar y cuidar la salud o los derechos.",
+      "option_b": "Enseñar ciencias exactas o crear nuevas tecnologías para la vida.",
+      "option_c": "Usar el arte o el deporte para alegrar el día.",
+      "option_d": "Administrar recursos y organizar donaciones."
+    },
+    "q10": {
+      "statement": "Entre estas opciones de lectura, ¿cuál prefieres?",
+      "option_a": "Biografías, novelas o artículos de comportamiento.",
+      "option_b": "Revistas científicas o libros de tecnología e innovación.",
+      "option_c": "Revistas de decoración, diseño o historietas.",
+      "option_d": "Libros sobre economía, finanzas o administración."
+    },
+    "q11": {
+      "statement": "¿Cómo describirías tus habilidades?",
+      "option_a": "Facilidad para hablar, escribir y argumentar.",
+      "option_b": "Buena memoria para datos y facilidad con los números.",
+      "option_c": "Mucha imaginación, creatividad e intuición.",
+      "option_d": "Talento para convencer, liderar y planificar."
+    },
+    "q12": {
+      "statement": "¿Qué es lo más importante en una futura profesión para ti?",
+      "option_a": "Marcar la diferencia en la sociedad y en el mundo.",
+      "option_b": "Descubrir cómo funcionan las cosas y resolver desafíos.",
+      "option_c": "Tener libertad para crear e innovar siempre.",
+      "option_d": "Lograr éxito financiero y un cargo directivo."
+    }
+  },
+  "m4_imc_config": {
+    "1": {
+      "classification": "Peso normal",
+      "status": "IMC ideal",
+      "description": "El estudiante presenta una composición corporal excelente y adecuada para su grupo de edad. Esta condición favorece directamente el rendimiento cardiovascular, permitiendo entrenamientos de mayor intensidad con excelente recuperación física y menor riesgo de lesiones."
+    },
+    "2": {
+      "classification": "Bajo peso",
+      "status": "Atención nutricional",
+      "description": "El índice señala la necesidad de atención nutricional. La falta de masa muscular o de reserva energética puede limitar la fuerza y la resistencia del estudiante en actividades de larga duración, provocando fatiga precoz."
+    },
+    "3": {
+      "classification": "Sobrepeso",
+      "status": "Exceso leve",
+      "description": "El indicador apunta un leve exceso de peso para la estructura corporal. Esta situación exige mayor esfuerzo de las articulaciones en entrenamientos de impacto, pero puede equilibrarse rápidamente aumentando la frecuencia y la intensidad de las actividades deportivas."
+    },
+    "4": {
+      "classification": "Obesidad",
+      "status": "Factor de riesgo",
+      "description": "El índice indica un factor de riesgo para la salud cardiovascular y articular. Se recomienda un plan de actividad física de bajo impacto (como natación o caminatas rápidas) junto con un seguimiento nutricional para garantizar la seguridad y el bienestar del estudiante."
+    }
+  }
+}

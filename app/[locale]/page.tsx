@@ -1,30 +1,30 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import DashboardView from '../components/DashboardView';
-import AlunosView from '../components/AlunosView';
-import PresencaView from '../components/PresencaView';
-import ProfissionaisView from '../components/ProfissionaisView';
-import ModalidadesView from '../components/ModalidadesView';
-import PerformanceView from '../components/PerformanceView';
-import ComparativeStudyView from '../components/ComparativeStudyView';
-import QuestionarioView from '../components/QuestionarioView';
-import AvaliacoesView from '../components/AvaliacoesView';
-import PlanoAcaoView from '../components/PlanoAcaoView';
-import PerfilView from '../components/PerfilView';
-import ConfiguracoesView from '../components/ConfiguracoesView';
-import LoginView from '../components/LoginView';
-import ContratosView from '../components/ContratosView';
+import Sidebar from '../../components/Sidebar';
+import Header from '../../components/Header';
+import DashboardView from '../../components/DashboardView';
+import AlunosView from '../../components/AlunosView';
+import PresencaView from '../../components/PresencaView';
+import ProfissionaisView from '../../components/ProfissionaisView';
+import ModalidadesView from '../../components/ModalidadesView';
+import PerformanceView from '../../components/PerformanceView';
+import ComparativeStudyView from '../../components/ComparativeStudyView';
+import QuestionarioView from '../../components/QuestionarioView';
+import AvaliacoesView from '../../components/AvaliacoesView';
+import PlanoAcaoView from '../../components/PlanoAcaoView';
+import PerfilView from '../../components/PerfilView';
+import ConfiguracoesView from '../../components/ConfiguracoesView';
+import LoginView from '../../components/LoginView';
+import ContratosView from '../../components/ContratosView';
 
-import { type Student, type Modality, type Professional, type UserProfile, type ImcRecord, type MotorRecord, type SportRecord, type VocationalRecord, type HealthRecord, type OralRecord, type AutoconceptRecord, type IasRecord, type SnapRecord, type Aq10Record, type PcdRecord, type ContratoItem, type AttendanceEntry } from '../types/edukyne';
-import { isSupabaseConfigured, setPasswordSecure, getDecryptedCpf } from '../lib/supabase';
-import { getDb } from '../lib/dbFacade';
-import { apiWrite, profilePayloadFromUser, setSessionToken, getSessionToken } from '../lib/sessionClient';
+import { type Student, type Modality, type Professional, type UserProfile, type ImcRecord, type MotorRecord, type SportRecord, type VocationalRecord, type HealthRecord, type OralRecord, type AutoconceptRecord, type IasRecord, type SnapRecord, type Aq10Record, type PcdRecord, type ContratoItem, type AttendanceEntry } from '../../types/edukyne';
+import { isSupabaseConfigured, setPasswordSecure, getDecryptedCpf } from '../../lib/supabase';
+import { getDb } from '../../lib/dbFacade';
+import { apiWrite, profilePayloadFromUser, setSessionToken, getSessionToken } from '../../lib/sessionClient';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Check, Database, WifiOff, ShieldAlert } from 'lucide-react';
-import { normalizeRole, TAB_PERMISSION_MAP, PERMISSION_LABELS, type Permission, ROLE_PERMISSIONS, type UserRole, hasPermissionDynamic, canAccessTabDynamic } from '../lib/rbac';
+import { normalizeRole, TAB_PERMISSION_MAP, PERMISSION_LABELS, type Permission, ROLE_PERMISSIONS, type UserRole, hasPermissionDynamic, canAccessTabDynamic } from '../../lib/rbac';
 
 const INITIAL_STUDENTS: Student[] = [];
 
