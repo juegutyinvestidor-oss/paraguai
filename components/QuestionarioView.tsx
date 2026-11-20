@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   ClipboardList,
   Search,
@@ -364,6 +365,78 @@ const APTIDAO_PREFIX: Record<string, string> = {
   velocidade: "v",
 };
 
+const DISPLAY_KEYS: Record<string, string> = {
+  "Peso normal": "classPesoNormal",
+  "Abaixo do Peso": "classAbaixoPeso",
+  "Abaixo do peso": "classAbaixoPeso",
+  "Sobrepeso": "classSobrepeso",
+  "Obesidade": "classObesidade",
+  "IMC Ideal": "statusImcIdeal",
+  "Atenção Nutricional": "statusAtencaoNutricional",
+  "Excesso Leve": "statusExcessoLeve",
+  "Fator de Risco": "statusFatorRisco",
+  "Insuficiente": "insuficiente",
+  "Regular": "regular",
+  "Bom": "bom",
+  "Excelente": "excelente",
+  "Verde": "verde",
+  "Amarelo": "amarelo",
+  "Laranja": "laranja",
+  "Vermelho": "vermelho",
+  "Azul": "azul",
+  "Masculino": "masculino",
+  "Feminino": "feminino",
+  "Todos os sexos": "todosOsSexos",
+  "Pontua se Concordo": "pontuaSeConcordo",
+  "Pontua se Discordo": "pontuaSeDiscordo",
+  "Não pontua": "naoPontua",
+  "maior-melhor": "maiorMelhor",
+  "menor-melhor": "menorMelhor",
+  "CENÁRIO A – MAIS PRESENÇAS DO QUE FALTAS": "cenarioACompleto",
+  "CENÁRIO B – MAIS FALTAS DO QUE PRESENÇAS": "cenarioBCompleto",
+  "CENÁRIO C – NÃO HOUVER PRESENÇA OU FALTA REGISTRADA": "cenarioCCompleto",
+  "Atletismo": "modalidadeAtletismo",
+  "Natação": "modalidadeNatacao",
+  "Basquete": "modalidadeBasquete",
+  "Handebol": "modalidadeHandebol",
+  "Futebol": "modalidadeFutebol",
+  "Vôlei": "modalidadeVolei",
+  "Ginástica": "modalidadeGinastica",
+  "Lutas": "modalidadeLutas",
+  "Padrão": "statusPadrao",
+  "Adaptado": "statusAdaptado",
+  "Substituído": "statusSubstituido",
+  "Não configurada": "naoConfigurada",
+  "Positivo": "positivo",
+  "Negativo": "negativo",
+  "Criança (4-11)": "crianca4a11",
+  "Adolescente (12-15)": "adolescente12a15",
+  "Sim": "sim",
+  "Não": "nao",
+  "Ativo": "ativo",
+  "O estudante demonstrou excelente regularidade e compromisso com a rotina escolar ao longo deste mês. A baixa taxa de absenteísmo reflete uma postura participativa e engajada com o ambiente de aprendizagem.": "parecerFreqA",
+  "Parabéns pelo incentivo e parceria. A presença constante tem sido o pilar para os bons resultados mantidos até aqui.": "parecerPaisA",
+  "Identificamos um número crítico de ausências neste período, superando os dias de comparecimento em sala de aula. Esse padrão de faltas excessivas acende um alerta pedagógico, pois interrompe a sequência didática e prejudica a absorção dos conteúdos ministrados.": "parecerFreqB",
+  "Solicitamos uma atenção especial e um diálogo familiar para identificarmos o motivo das ausências. É fundamental restabelecer a rotina de idas à escola para evitar prejuízos severos na avaliação final deste ciclo.": "parecerPaisB",
+  "Até o momento, não foram identificados registros de presença ou ausência para o estudante no sistema neste período. A ausência de dados impede uma avaliação precisa do acompanhamento escolar, tornando indispensável a verificação imediata junto à secretaria ou equipe pedagógica para a regularização dos lançamentos.": "parecerFreqC",
+  "Solicitamos que entrem em contato com a secretaria escolar para a regularização dos registros. Constatamos que não há lançamentos de presença ou falta até o momento, o que impossibilita o acompanhamento correto della rotina do estudante.": "parecerPaisC",
+  "Continuidade Pedagógica": "vantagemContinuidade",
+  "Quando presente, o aluno acompanha as explicações passo a passo, facilitando a execução de tarefas complexas.": "vantagemContinuidadeDesc",
+  "Socialização Ativa": "vantagemSocializacao",
+  "A convivência diária fortalece os vínculos com professores e colegas, desenvolvendo inteligência emocional e trabalho em equipe.": "vantagemSocializacaoDesc",
+  "Ritmo de Avaliação": "vantagemRitmo",
+  "Menor necessidade de aplicação de provas substitutivas ou trabalhos de recuperação de nota por perda de prazos.": "vantagemRitmoDesc",
+  "Lacunas de Conteúdo": "desvantagemLacunas",
+  "Cada ausência gera a perda de conceitos-chave, acumulando dúvidas para as unidades seguintes.": "desvantagemLacunasDesc",
+  "Desengajamento Escolar": "desvantagemDesengajamento",
+  "O excesso de faltas quebra a rotina do estudante, gerando desmotivação e sensação de isolamento em relação à turma.": "desvantagemDesengajamentoDesc",
+  "Sobrecarga de Tarefas": "desvantagemSobrecarga",
+  "Acúmulo de atividades pendentes que precisam ser realizadas em casa para cumprir as exigências do ano letivo.": "desvantagemSobrecargaDesc",
+  "Índice Corporal": "indiceCorporal",
+  "20 metros": "vinteMetros",
+  "Flexão de Braços": "flexaoBracos",
+};
+
 type M3Cenario = {
   id: string;
   cenario: string;
@@ -397,6 +470,17 @@ export default function QuestionarioView({
   user,
   activeTab,
 }: QuestionarioViewProps) {
+  const locale = useLocale();
+  const t = useTranslations("questionario");
+
+  const displayValue = (value: unknown): string => {
+    if (value == null) return "";
+    const raw = String(value);
+    const key = DISPLAY_KEYS[raw];
+    return key ? t(key) : raw;
+  };
+
+  const periodoExemplo = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date());
 
   // IMC state for M4
   const [imcRows, setImcRows] = useState<IMCRow[]>(() => {
@@ -1465,7 +1549,7 @@ export default function QuestionarioView({
   }, [m15Funil]);
 
   const saveM15Grupo = async (g: PcdGroupConfig) => {
-    if (!g.nome.trim()) { alert("Preencha o nome do grupo."); return; }
+    if (!g.nome.trim()) { alert(t('preencha_o_nome_do_grupo')); return; }
     if (g.id && m15Grupos.some(row => row.id === g.id)) {
       setM15Grupos(m15Grupos.map(row => row.id === g.id ? g : row));
     } else {
@@ -1473,7 +1557,7 @@ export default function QuestionarioView({
       setM15Grupos([...m15Grupos, newG]);
     }
     setM15GrupoEditing(null);
-    setSuccessMessage("Grupo salvo com sucesso!");
+    setSuccessMessage(t('grupo_salvo_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -1496,7 +1580,7 @@ export default function QuestionarioView({
 
   const ensureM15Adaptacoes = (grupo: number, detalhe: string) => {
     (Object.keys(PCD_TESTES_MAP) as PcdTesteKey[]).forEach(t => { void addM15Adaptacao(grupo, detalhe, t); });
-    setSuccessMessage("Adaptações de referência aplicadas ao grupo selecionado.");
+    setSuccessMessage(t('adaptacoes_de_referencia_aplicadas_ao_grupo_selecionado'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -1518,12 +1602,12 @@ export default function QuestionarioView({
 
   const ensureM15Faixas = (grupo: number, detalhe: string, teste: PcdTesteKey) => {
     [1, 2, 3].forEach(n => { void addM15Faixa(grupo, detalhe, teste, n); });
-    setSuccessMessage("Faixas de referência aplicadas ao teste selecionado.");
+    setSuccessMessage(t('faixas_de_referencia_aplicadas_ao_teste_selecionado'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
   const saveM15Matriz = async (m: PcdModalidadeConfig) => {
-    if (!m.nome.trim()) { alert("Preencha o nome da modalidade."); return; }
+    if (!m.nome.trim()) { alert(t('preencha_o_nome_da_modalidade')); return; }
     if (m.id && m15Modalidades.some(row => row.id === m.id)) {
       setM15Modalidades(m15Modalidades.map(row => row.id === m.id ? m : row));
     } else {
@@ -1531,7 +1615,7 @@ export default function QuestionarioView({
       setM15Modalidades([...m15Modalidades, newM]);
     }
     setM15MatrizEditing(null);
-    setSuccessMessage("Modalidade salva com sucesso!");
+    setSuccessMessage(t('modalidade_salva_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -1554,7 +1638,7 @@ export default function QuestionarioView({
 
   const ensureM15Funil = (grupo: number) => {
     [1, 2, 3].forEach(m => { void addM15Funil(grupo, m); });
-    setSuccessMessage("Regras do funil aplicadas ao grupo selecionado.");
+    setSuccessMessage(t('regras_do_funil_aplicadas_ao_grupo_selecionado'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -2134,7 +2218,7 @@ export default function QuestionarioView({
     const next = m2Modalidades.filter((m) => m.id !== m2ModalityToDelete.id);
     saveM2Modalidades(next);
     setM2ModalityToDelete(null);
-    setSuccessMessage("Modalidade removida com sucesso!");
+    setSuccessMessage(t('modalidade_removida_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -2591,7 +2675,7 @@ export default function QuestionarioView({
   });
 
   const [m3FormStudentId, setM3FormStudentId] = useState("");
-  const [m3FormPeriodo, setM3FormPeriodo] = useState("Junho/2026");
+  const [m3FormPeriodo, setM3FormPeriodo] = useState(periodoExemplo);
   const [m3FormCenario, setM3FormCenario] = useState<"A" | "B" | "C">("A");
   const [m3FormParecerFrequencia, setM3FormParecerFrequencia] = useState("");
   const [m3FormVantagens, setM3FormVantagens] = useState<string[]>([]);
@@ -2852,11 +2936,11 @@ export default function QuestionarioView({
     if (m3DeleteConfirmType === "cenario") {
       const updated = m3Cenarios.filter((item) => item.id !== m3DeleteConfirmId);
       saveCenarios(updated);
-      setSuccessMessage("Cenário de frequência excluído com sucesso!");
+      setSuccessMessage(t('cenario_de_frequencia_excluido_com_sucesso'));
     } else if (m3DeleteConfirmType === "impacto") {
       const updated = m3Impactos.filter((item) => item.id !== m3DeleteConfirmId);
       saveImpactos(updated);
-      setSuccessMessage("Ponto de impacto excluído com sucesso!");
+      setSuccessMessage(t('ponto_de_impacto_excluido_com_sucesso'));
     }
 
     // Remove do Supabase explicitamente
@@ -3596,7 +3680,7 @@ export default function QuestionarioView({
   const handleSaveM3 = (e: React.FormEvent) => {
     e.preventDefault();
     if (!m3FormStudentId) {
-      alert("Favor selecionar o estudante.");
+      alert(t('favor_selecionar_o_estudante'));
       return;
     }
     const selectedStudent = students.find((s) => s.id === m3FormStudentId);
@@ -3620,10 +3704,10 @@ export default function QuestionarioView({
       updatedList = m3Analises.map((item) =>
         item.id === m3EditingItem.id ? record : item,
       );
-      setSuccessMessage("Análise de frequência atualizada com sucesso!");
+      setSuccessMessage(t('analise_de_frequencia_atualizada_com_sucesso'));
     } else {
       updatedList = [record, ...m3Analises];
-      setSuccessMessage("Análise de frequência adicionada com sucesso!");
+      setSuccessMessage(t('analise_de_frequencia_adicionada_com_sucesso'));
     }
 
     setM3Analises(updatedList);
@@ -3662,7 +3746,7 @@ export default function QuestionarioView({
   const _handleOpenM3Add = () => {
     setM3EditingItem(null);
     setM3FormStudentId(students[0]?.id || "");
-    setM3FormPeriodo("Junho/2026");
+    setM3FormPeriodo(periodoExemplo);
     setM3FormCenario("A");
     setM3FormParecerFrequencia(M3_SCENARIOS.A.parecerFrequencia);
     setM3FormVantagens(M3_ADVANTAGES);
@@ -3772,8 +3856,8 @@ export default function QuestionarioView({
 
     setSuccessMessage(
       editingRefItem
-        ? "Referencial atualizado com sucesso!"
-        : "Novo referencial cadastrado com sucesso!",
+        ? t('referencial_atualizado_sucesso')
+        : t('novo_referencial_cadastrado_sucesso'),
     );
     setTimeout(() => setSuccessMessage(null), 4000);
   };
@@ -3802,7 +3886,7 @@ export default function QuestionarioView({
       }
     }
     setRefToDelete(null);
-    setSuccessMessage("Referencial removido com sucesso!");
+    setSuccessMessage(t('referencial_removido_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -3835,34 +3919,34 @@ export default function QuestionarioView({
 
     return (
       <div className="p-6 bg-white rounded-xl shadow-md border border-slate-300">
-        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">Tabela de Classificação e Parecer do IMC</h1>
+        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">{t('tabela_de_classificacao_e_parecer_do_imc')}</h1>
         
         {/* Simple Add Form */}
         <div className="mb-8 p-6 bg-white border-4 border-black rounded-xl space-y-5 shadow-md">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">Adicionar nova classificação</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">{t('adicionar_nova_classificacao')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black uppercase tracking-wider">Classificação (IMC)</label>
+              <label className="text-xs font-black text-black uppercase tracking-wider">{t('classificacao_imc')}</label>
               <input 
                 type="text" 
-                placeholder="Ex: Peso normal, Sobrepeso..." 
+                placeholder={t('ex_peso_normal_sobrepeso')} 
                 className="p-3 border-2 border-black bg-white text-black placeholder:text-slate-700 rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none shadow-sm" 
                 value={newRow.classification} 
                 onChange={e => setNewRow({...newRow, classification: e.target.value})} 
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black uppercase tracking-wider">Status</label>
+              <label className="text-xs font-black text-black uppercase tracking-wider">{t('status')}</label>
               <input 
                 type="text" 
-                placeholder="Ex: IMC Ideal, Excesso Leve..." 
+                placeholder={t('ex_imc_ideal_excesso_leve')} 
                 className="p-3 border-2 border-black bg-white text-black placeholder:text-slate-700 rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none shadow-sm" 
                 value={newRow.status} 
                 onChange={e => setNewRow({...newRow, status: e.target.value})} 
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black uppercase tracking-wider">Alerta visual</label>
+              <label className="text-xs font-black text-black uppercase tracking-wider">{t('alertaVisual')}</label>
               <select 
                 className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm font-black focus:ring-2 focus:ring-black outline-none shadow-sm" 
                 value={newRow.alertColor} 
@@ -3873,29 +3957,29 @@ export default function QuestionarioView({
                   }
                 }} 
               >
-                <option value="emerald">Verde</option>
-                <option value="yellow">Amarelo</option>
-                <option value="orange">Laranja</option>
-                <option value="rose">Vermelho</option>
+                <option value="emerald">{t('verde')}</option>
+                <option value="yellow">{t('amarelo')}</option>
+                <option value="orange">{t('laranja')}</option>
+                <option value="rose">{t('vermelho')}</option>
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black uppercase tracking-wider">IMC mínimo</label>
+              <label className="text-xs font-black text-black uppercase tracking-wider">{t('imc_minimo')}</label>
               <input
                 type="number"
                 step="0.1"
-                placeholder="Ex: 18.5"
+                placeholder={t('ex_18_5')}
                 className="p-3 border-2 border-black bg-white text-black placeholder:text-slate-700 rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none shadow-sm"
                 value={newRow.imcMin ?? ''}
                 onChange={e => setNewRow({ ...newRow, imcMin: e.target.value === '' ? null : Number(e.target.value) })}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black uppercase tracking-wider">IMC máximo</label>
+              <label className="text-xs font-black text-black uppercase tracking-wider">{t('imc_maximo')}</label>
               <input
                 type="number"
                 step="0.1"
-                placeholder="Ex: 24.9 (vazio = sem limite)"
+                placeholder={t('ex_24_9_vazio_sem_limite')}
                 className="p-3 border-2 border-black bg-white text-black placeholder:text-slate-700 rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none shadow-sm"
                 value={newRow.imcMax ?? ''}
                 onChange={e => setNewRow({ ...newRow, imcMax: e.target.value === '' ? null : Number(e.target.value) })}
@@ -3903,9 +3987,9 @@ export default function QuestionarioView({
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-black uppercase tracking-wider">Parecer Técnico / Recomendação Pedagógica</label>
+            <label className="text-xs font-black text-black uppercase tracking-wider">{t('parecer_tecnico_recomendacao_pedagogica')}</label>
             <textarea 
-              placeholder="Digite a recomendação detalhada do IMC..." 
+              placeholder={t('digite_a_recomendacao_detalhada_do_imc')} 
               className="p-3 border-2 border-black bg-white text-black placeholder:text-slate-700 rounded-lg text-sm w-full min-h-[120px] font-black focus:ring-2 focus:ring-black outline-none shadow-sm" 
               value={newRow.description} 
               onChange={e => setNewRow({...newRow, description: e.target.value})} 
@@ -3916,8 +4000,7 @@ export default function QuestionarioView({
               onClick={addRow} 
               className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide"
             >
-              Adicionar Classificação
-            </button>
+              {t('adicionar_classificacao')}</button>
           </div>
         </div>
 
@@ -3925,12 +4008,12 @@ export default function QuestionarioView({
           <table className="w-full text-left border-collapse border border-slate-300 min-w-[820px]">
             <thead>
               <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
-                <th className="py-3 px-3 w-[10%] border-r border-slate-300">Classificação (IMC)</th>
-                <th className="py-3 px-3 w-[12%] border-r border-slate-300">Status</th>
-                <th className="py-3 px-3 w-[12%] border-r border-slate-300">Alerta visual</th>
-                <th className="py-3 px-3 w-[15%] border-r border-slate-300">Faixa (IMC)</th>
-                <th className="py-3 px-3 w-[43%] border-r border-slate-300">Parecer Técnico / Recomendação Pedagógica</th>
-                <th className="py-3 px-3 w-[8%] text-right">Ações</th>
+                <th className="py-3 px-3 w-[10%] border-r border-slate-300">{t('classificacao_imc')}</th>
+                <th className="py-3 px-3 w-[12%] border-r border-slate-300">{t('status')}</th>
+                <th className="py-3 px-3 w-[12%] border-r border-slate-300">{t('alertaVisual')}</th>
+                <th className="py-3 px-3 w-[15%] border-r border-slate-300">{t('faixa_imc')}</th>
+                <th className="py-3 px-3 w-[43%] border-r border-slate-300">{t('parecer_tecnico_recomendacao_pedagogica')}</th>
+                <th className="py-3 px-3 w-[8%] text-right">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -3969,16 +4052,16 @@ export default function QuestionarioView({
                               }
                             }} 
                           >
-                            <option value="emerald">Verde</option>
-                            <option value="yellow">Amarelo</option>
-                            <option value="orange">Laranja</option>
-                            <option value="rose">Vermelho</option>
+                            <option value="emerald">{t('verde')}</option>
+                            <option value="yellow">{t('amarelo')}</option>
+                            <option value="orange">{t('laranja')}</option>
+                            <option value="rose">{t('vermelho')}</option>
                           </select>
                         </td>
                         <td className="py-4 px-3 align-top border-r border-slate-300">
                           <div className="flex flex-col gap-2">
-                            <input type="number" step="0.1" placeholder="Mínimo" className="p-2 border-2 border-slate-500 bg-white text-black rounded text-base w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" value={editingRowData.imcMin ?? ''} onChange={e => setEditingRowData({ ...editingRowData, imcMin: e.target.value === '' ? null : Number(e.target.value) })} />
-                            <input type="number" step="0.1" placeholder="Máximo" className="p-2 border-2 border-slate-500 bg-white text-black rounded text-base w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" value={editingRowData.imcMax ?? ''} onChange={e => setEditingRowData({ ...editingRowData, imcMax: e.target.value === '' ? null : Number(e.target.value) })} />
+                            <input type="number" step="0.1" placeholder={t('minimo')} className="p-2 border-2 border-slate-500 bg-white text-black rounded text-base w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" value={editingRowData.imcMin ?? ''} onChange={e => setEditingRowData({ ...editingRowData, imcMin: e.target.value === '' ? null : Number(e.target.value) })} />
+                            <input type="number" step="0.1" placeholder={t('maximo')} className="p-2 border-2 border-slate-500 bg-white text-black rounded text-base w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" value={editingRowData.imcMax ?? ''} onChange={e => setEditingRowData({ ...editingRowData, imcMax: e.target.value === '' ? null : Number(e.target.value) })} />
                           </div>
                         </td>
                         <td className="py-4 px-3 align-top border-r border-slate-300">
@@ -3994,14 +4077,12 @@ export default function QuestionarioView({
                               onClick={saveEditing} 
                               className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold transition-all shadow-md active:scale-95 border border-green-700"
                             >
-                              Salvar
-                            </button>
+                              {t('salvar')}</button>
                             <button 
                               onClick={cancelEditing} 
                               className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold transition-all shadow-md active:scale-95 border border-slate-600"
                             >
-                              Cancelar
-                            </button>
+                              {t('cancelar')}</button>
                           </div>
                         </td>
                       </>
@@ -4012,7 +4093,7 @@ export default function QuestionarioView({
                         <td className="py-4 px-3 align-top border-r border-slate-300">
                           <div className="flex items-center gap-2">
                             <div className={`w-4 h-4 rounded-full ${colorInfo.bg} shadow-md border border-black/20`}></div> 
-                            <span className="font-bold text-black">{colorInfo.label}</span>
+                            <span className="font-bold text-black">{displayValue(colorInfo.label)}</span>
                           </div>
                         </td>
                         <td className="py-4 px-3 font-bold text-black align-top border-r border-slate-300 whitespace-nowrap">
@@ -4024,18 +4105,18 @@ export default function QuestionarioView({
                             <button 
                               onClick={() => startEditing(row)} 
                               className="text-blue-700 hover:text-white flex items-center gap-1 font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md transition-all cursor-pointer border border-blue-400"
-                              title="Editar"
+                              title={t('editar')}
                             >
                               <Edit className="w-4 h-4" />
-                              <span>Editar</span>
+                              <span>{t('editar')}</span>
                             </button>
                             <button 
                               onClick={() => deleteRow(row.id)} 
                               className="text-red-700 hover:text-white flex items-center gap-1 font-bold text-xs bg-red-100 hover:bg-red-700 px-3 py-2 rounded-md transition-all cursor-pointer border border-red-400"
-                              title="Excluir"
+                              title={t('excluir')}
                             >
                               <Trash2 className="w-4 h-4" />
-                              <span>Excluir</span>
+                              <span>{t('excluir')}</span>
                             </button>
                           </div>
                         </td>
@@ -4054,30 +4135,26 @@ export default function QuestionarioView({
             <div className="bg-white border border-slate-300 w-full max-w-md rounded-xl shadow-2xl p-4 sm:p-6 relative animate-in fade-in zoom-in duration-150">
               <h4 className="text-lg font-black text-black uppercase tracking-tight mb-2 flex items-center gap-2 border-b pb-2">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
-                Confirmar Exclusão
-              </h4>
+                {t('confirmarExclusao')}</h4>
               <p className="text-sm text-slate-700 mb-6 leading-relaxed">
-                Tem certeza de que deseja excluir permanentemente a classificação{" "}
+                {t('tem_certeza_de_que_deseja_excluir_permanentemente_a_classificacao')}{" "}
                 <span className="text-black font-extrabold font-mono bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
                   {m4RowToDelete.classification}
                 </span>{" "}
-                ({m4RowToDelete.status})? Esta ação não pode ser desfeita.
-              </p>
+                ({m4RowToDelete.status}{t('esta_acao_nao_pode_ser_desfeita')}</p>
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={() => setM4RowToDelete(null)}
                   className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-xs font-black text-slate-800 transition-colors cursor-pointer"
                 >
-                  Cancelar
-                </button>
+                  {t('cancelar')}</button>
                 <button
                   type="button"
                   onClick={handleConfirmDeleteM4}
                   className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black rounded-lg text-xs shadow-md transition-colors cursor-pointer border border-red-700"
                 >
-                  Confirmar Excluir
-                </button>
+                  {t('confirmarExcluir')}</button>
               </div>
             </div>
           </div>
@@ -4109,8 +4186,8 @@ export default function QuestionarioView({
       <div className="p-6 bg-white rounded-xl shadow-md border border-slate-300">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b pb-4">
           <div>
-            <h1 className="text-2xl font-black text-black tracking-tight">Tabelas de Diagnóstico e Recomendações (Capacidades Físicas)</h1>
-            <p className="text-sm text-slate-600 font-bold mt-1">Configure o Parecer de Saúde e as Diretrizes Pedagógicas para as Capacidades Físicas</p>
+            <h1 className="text-2xl font-black text-black tracking-tight">{t('tabelas_de_diagnostico_e_recomendacoes_capacidades_fisicas')}</h1>
+            <p className="text-sm text-slate-600 font-bold mt-1">{t('configure_o_parecer_de_saude_e_as_diretrizes_pedagogicas_para_as_capac')}</p>
           </div>
         </div>
 
@@ -4134,7 +4211,7 @@ export default function QuestionarioView({
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                <span>{tab.label}</span>
+                <span>{displayValue(tab.label)}</span>
               </button>
             );
           })}
@@ -4144,21 +4221,21 @@ export default function QuestionarioView({
         <div className="mb-8 p-6 bg-slate-100 border-2 border-slate-400 rounded-xl space-y-4 shadow-sm">
           <h3 className="font-extrabold text-lg text-black uppercase tracking-wide flex items-center gap-2">
             <PlusCircle className="w-5 h-5 text-black" />
-            Adicionar nova classificação — {m5Tabs.find(t => t.id === activeM5Tab)?.label}
+            {t('adicionar_nova_classificacao_2')}{displayValue(m5Tabs.find(t => t.id === activeM5Tab)?.label)}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-black uppercase tracking-wider">Status / Nível</label>
+              <label className="text-xs font-bold text-black uppercase tracking-wider">{t('status_nivel')}</label>
               <input 
                 type="text" 
-                placeholder="Ex: INSUFICIENTE, REGULAR, BOM, EXCELENTE..." 
+                placeholder={t('ex_insuficiente_regular_bom_excelente')} 
                 className="p-3 border-2 border-slate-500 bg-white text-black placeholder:text-slate-600 rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" 
                 value={m5NewRow.level} 
                 onChange={e => setM5NewRow({...m5NewRow, level: e.target.value})} 
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-black uppercase tracking-wider">Alerta visual</label>
+              <label className="text-xs font-bold text-black uppercase tracking-wider">{t('alertaVisual')}</label>
               <select 
                 className="p-3 border-2 border-slate-500 bg-white text-black rounded-lg text-sm font-bold focus:ring-2 focus:ring-blue-600 outline-none" 
                 value={m5NewRow.alertColor} 
@@ -4169,37 +4246,37 @@ export default function QuestionarioView({
                   }
                 }} 
               >
-                <option value="rose">Vermelho (Crítico)</option>
-                <option value="yellow">Amarelo (Atenção)</option>
-                <option value="emerald">Verde (Bom)</option>
-                <option value="blue">Azul (Excelente)</option>
+                <option value="rose">{t('vermelho_critico')}</option>
+                <option value="yellow">{t('amarelo_atencao')}</option>
+                <option value="emerald">{t('verde_bom')}</option>
+                <option value="blue">{t('azul_excelente')}</option>
               </select>
             </div>
           </div>
           
           <div className="grid grid-cols-1 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-black uppercase tracking-wider">Parecer de Saúde</label>
+              <label className="text-xs font-bold text-black uppercase tracking-wider">{t('parecerSaude')}</label>
               <textarea 
-                placeholder="Ex: A capacidade de deslocamento rápido e o tempo de reação estão..." 
+                placeholder={t('ex_a_capacidade_de_deslocamento_rapido_e_o_tempo_de_reacao_estao')} 
                 className="p-3 border-2 border-slate-500 bg-white text-black placeholder:text-slate-600 rounded-lg text-sm w-full min-h-[80px] font-bold focus:ring-2 focus:ring-blue-600 outline-none" 
                 value={m5NewRow.healthStatus} 
                 onChange={e => setM5NewRow({...m5NewRow, healthStatus: e.target.value})} 
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-black uppercase tracking-wider">O que deve melhorar</label>
+              <label className="text-xs font-bold text-black uppercase tracking-wider">{t('oQueMelhorar')}</label>
               <textarea 
-                placeholder="Ex: O aluno precisa desenvolver a eficiência da passada..." 
+                placeholder={t('ex_o_aluno_precisa_desenvolver_a_eficiencia_da_passada')} 
                 className="p-3 border-2 border-slate-500 bg-white text-black placeholder:text-slate-600 rounded-lg text-sm w-full min-h-[80px] font-bold focus:ring-2 focus:ring-blue-600 outline-none" 
                 value={m5NewRow.toImprove} 
                 onChange={e => setM5NewRow({...m5NewRow, toImprove: e.target.value})} 
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-black uppercase tracking-wider">Recomendação Pedagógica</label>
+              <label className="text-xs font-bold text-black uppercase tracking-wider">{t('recomendacaoPedagogica')}</label>
               <textarea 
-                placeholder="Ex: Incentivamos o estímulo em casa através de..." 
+                placeholder={t('ex_incentivamos_o_estimulo_em_casa_atraves_de')} 
                 className="p-3 border-2 border-slate-500 bg-white text-black placeholder:text-slate-600 rounded-lg text-sm w-full min-h-[80px] font-bold focus:ring-2 focus:ring-blue-600 outline-none" 
                 value={m5NewRow.recommendation} 
                 onChange={e => setM5NewRow({...m5NewRow, recommendation: e.target.value})} 
@@ -4212,8 +4289,7 @@ export default function QuestionarioView({
               onClick={m5AddRow} 
               className="bg-black hover:bg-slate-800 text-white px-8 py-3 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-slate-700"
             >
-              Adicionar Classificação
-            </button>
+              {t('adicionar_classificacao')}</button>
           </div>
         </div>
 
@@ -4222,11 +4298,11 @@ export default function QuestionarioView({
           <table className="w-full text-left border-collapse border border-slate-300 min-w-[640px]">
             <thead>
               <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
-                <th className="py-3 px-3 w-[15%] border-r border-slate-300">Nível / Status Atual</th>
-                <th className="py-3 px-3 w-[27%] border-r border-slate-300">Parecer de Saúde</th>
-                <th className="py-3 px-3 w-[24%] border-r border-slate-300">O que deve melhorar</th>
-                <th className="py-3 px-3 w-[24%] border-r border-slate-300">Recomendação Pedagógica</th>
-                <th className="py-3 px-3 w-[10%] text-right">Ações</th>
+                <th className="py-3 px-3 w-[15%] border-r border-slate-300">{t('nivel_status_atual')}</th>
+                <th className="py-3 px-3 w-[27%] border-r border-slate-300">{t('parecerSaude')}</th>
+                <th className="py-3 px-3 w-[24%] border-r border-slate-300">{t('oQueMelhorar')}</th>
+                <th className="py-3 px-3 w-[24%] border-r border-slate-300">{t('recomendacaoPedagogica')}</th>
+                <th className="py-3 px-3 w-[10%] text-right">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -4255,10 +4331,10 @@ export default function QuestionarioView({
                               }
                             }} 
                           >
-                            <option value="rose">Vermelho</option>
-                            <option value="yellow">Amarelo</option>
-                            <option value="emerald">Verde</option>
-                            <option value="blue">Azul</option>
+                            <option value="rose">{t('vermelho')}</option>
+                            <option value="yellow">{t('amarelo')}</option>
+                            <option value="emerald">{t('verde')}</option>
+                            <option value="blue">{t('azul')}</option>
                           </select>
                         </td>
                         <td className="py-4 px-3 align-top border-r border-slate-300">
@@ -4288,14 +4364,12 @@ export default function QuestionarioView({
                               onClick={m5SaveEditing} 
                               className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold transition-all shadow-md active:scale-95 border border-green-700"
                             >
-                              Salvar
-                            </button>
+                              {t('salvar')}</button>
                             <button 
                               onClick={m5CancelEditing} 
                               className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold transition-all shadow-md active:scale-95 border border-slate-600"
                             >
-                              Cancelar
-                            </button>
+                              {t('cancelar')}</button>
                           </div>
                         </td>
                       </>
@@ -4315,18 +4389,18 @@ export default function QuestionarioView({
                             <button 
                               onClick={() => m5StartEditing(row)} 
                               className="text-blue-700 hover:text-white flex items-center justify-center gap-1 font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md transition-all cursor-pointer border border-blue-400 w-full"
-                              title="Editar"
+                              title={t('editar')}
                             >
                               <Edit className="w-4 h-4" />
-                              <span>Editar</span>
+                              <span>{t('editar')}</span>
                             </button>
                             <button 
                               onClick={() => m5DeleteRow(row.id)} 
                               className="text-red-700 hover:text-white flex items-center justify-center gap-1 font-bold text-xs bg-red-100 hover:bg-red-700 px-3 py-2 rounded-md transition-all cursor-pointer border border-red-400 w-full"
-                              title="Excluir"
+                              title={t('excluir')}
                             >
                               <Trash2 className="w-4 h-4" />
-                              <span>Excluir</span>
+                              <span>{t('excluir')}</span>
                             </button>
                           </div>
                         </td>
@@ -4345,30 +4419,26 @@ export default function QuestionarioView({
             <div className="bg-white border border-slate-300 w-full max-w-md rounded-xl shadow-2xl p-4 sm:p-6 relative animate-in fade-in zoom-in duration-150">
               <h4 className="text-lg font-black text-black uppercase tracking-tight mb-2 flex items-center gap-2 border-b pb-2">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
-                Confirmar Exclusão
-              </h4>
+                {t('confirmarExclusao')}</h4>
               <p className="text-sm text-slate-700 mb-6 leading-relaxed">
-                Tem certeza de que deseja excluir permanentemente a classificação{" "}
+                {t('tem_certeza_de_que_deseja_excluir_permanentemente_a_classificacao')}{" "}
                 <span className="text-black font-extrabold font-mono bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
                   {m5RowToDelete.level}
                 </span>{" "}
-                desta capacidade física? Esta ação não pode ser desfeita.
-              </p>
+                {t('desta_capacidade_fisica_esta_acao_nao_pode_ser_desfeita')}</p>
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={() => setM5RowToDelete(null)}
                   className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-xs font-black text-slate-800 transition-colors cursor-pointer"
                 >
-                  Cancelar
-                </button>
+                  {t('cancelar')}</button>
                 <button
                   type="button"
                   onClick={handleConfirmDeleteM5}
                   className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black rounded-lg text-xs shadow-md transition-colors cursor-pointer border border-red-700"
                 >
-                  Confirmar Excluir
-                </button>
+                  {t('confirmarExcluir')}</button>
               </div>
             </div>
           </div>
@@ -4421,16 +4491,12 @@ export default function QuestionarioView({
             <div className="flex items-center gap-2 mb-1">
               <ClipboardList className="w-5 h-5 text-[#8ed5ff]" />
               <span className="text-xs font-mono text-[#8ed5ff] uppercase tracking-wider">
-                Acompanhamento e Parâmetros
-              </span>
+                {t('acompanhamento_e_parametros')}</span>
             </div>
             <h2 className="text-2xl font-bold text-[#dae2fd]">
-              Módulo 3: Análise de Frequência Escolar
-            </h2>
+              {t('modulo_3_analise_de_frequencia_escolar')}</h2>
             <p className="text-sm text-[#bdc8d1]/80 mt-1 max-w-3xl">
-              Consulte e imprima a matriz de parâmetros de frequência pedagógica
-              e impactos no aprendizado.
-            </p>
+              {t('consulte_e_imprima_a_matriz_de_parametros_de_frequencia_pedagogica_e_i')}</p>
           </div>
 
 
@@ -4444,20 +4510,19 @@ export default function QuestionarioView({
           {/* Main Title Header mimicking the image layout */}
           <div className="text-center border-b-2 border-slate-900 pb-5">
             <h1 className="text-xl font-bold tracking-tight text-slate-800">
-              Análise de Frequência Escolar
-            </h1>
+              {t('analiseFrequenciaEscolar')}</h1>
           </div>
 
           {/* TABLE 1: ANÁLISE DE FREQUÊNCIA ESCOLAR */}
           <div className="space-y-4">
             <div className="flex items-center justify-between no-print">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">Tabela de Referência de Cenários</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">{t('tabela_de_referencia_de_cenarios')}</h3>
               <button
                 onClick={handleOpenAddCenario}
                 className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Novo Cenário</span>
+                <span>{t('novo_cenario')}</span>
               </button>
             </div>
             
@@ -4465,19 +4530,18 @@ export default function QuestionarioView({
               <table className="w-full text-left border-collapse border border-slate-300 min-w-[640px]">
                 <thead>
                   <tr className="bg-slate-50 text-[11.5px] font-bold text-slate-900 border-b border-slate-300">
-                    <th className="py-3 px-4 border border-slate-300 w-[12%] text-center">Cenário</th>
-                    <th className="py-3 px-4 border border-slate-300 w-[18%]">Condição</th>
-                    <th className="py-3 px-4 border border-slate-300 w-[35%]">Frequência</th>
-                    <th className="py-3 px-4 border border-slate-300 w-[25%]">Mensagem Direcionada aos Pais e Responsáveis</th>
-                    <th className="py-3 px-4 border border-slate-300 w-[10%] text-center no-print border-l">Ações</th>
+                    <th className="py-3 px-4 border border-slate-300 w-[12%] text-center">{t('cenario')}</th>
+                    <th className="py-3 px-4 border border-slate-300 w-[18%]">{t('condicao')}</th>
+                    <th className="py-3 px-4 border border-slate-300 w-[35%]">{t('frequencia')}</th>
+                    <th className="py-3 px-4 border border-slate-300 w-[25%]">{t('mensagemPaisResponsaveis')}</th>
+                    <th className="py-3 px-4 border border-slate-300 w-[10%] text-center no-print border-l">{t('acoes')}</th>
                   </tr>
                 </thead>
                 <tbody className="text-[11.5px] leading-relaxed text-[#111111]">
                   {m3Cenarios.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="py-6 text-center text-slate-400 font-medium">
-                        Nenhum cenário cadastrado. Clique em &quot;Novo Cenário&quot; para começar.
-                      </td>
+                        {t('nenhum_cenario_cadastrado_clique_em_novo_cenario_para_comecar')}</td>
                     </tr>
                   ) : (
                     m3Cenarios.map((item) => (
@@ -4499,18 +4563,18 @@ export default function QuestionarioView({
                             <button
                               onClick={() => handleOpenEditCenario(item)}
                               className="p-2 px-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 rounded-md transition-colors text-xs font-semibold flex items-center gap-1 cursor-pointer"
-                              title="Editar Cenário"
+                              title={t('editar_cenario')}
                             >
                               <Edit className="w-3.5 h-3.5" />
-                              <span>Editar</span>
+                              <span>{t('editar')}</span>
                             </button>
                             <button
                               onClick={() => handleDeleteCenario(item.id)}
                               className="p-2 px-2.5 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-md transition-colors text-xs font-semibold flex items-center gap-1 cursor-pointer"
-                              title="Excluir Cenário"
+                              title={t('excluir_cenario')}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
-                              <span>Deletar</span>
+                              <span>{t('excluir_2')}</span>
                             </button>
                           </div>
                         </td>
@@ -4525,13 +4589,13 @@ export default function QuestionarioView({
           {/* TABLE 2: MATRIZ DE IMPACTOS */}
           <div className="space-y-4 pt-4 border-t border-slate-200">
             <div className="flex items-center justify-between no-print">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">Matriz de Impactos Pedagógicos</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">{t('matriz_de_impactos_pedagogicos')}</h3>
               <button
                 onClick={handleOpenAddImpacto}
                 className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Novo Impacto</span>
+                <span>{t('novo_impacto')}</span>
               </button>
             </div>
 
@@ -4539,18 +4603,17 @@ export default function QuestionarioView({
               <table className="w-full text-left border-collapse border border-slate-300 min-w-[640px]">
                 <thead>
                   <tr className="bg-slate-50 text-[11.5px] font-bold text-slate-900 border-b border-slate-300">
-                    <th className="py-3 px-4 border border-slate-300 w-[22%]">Tipo de Impacto</th>
-                    <th className="py-3 px-4 border border-slate-300 w-[25%]">Indicador</th>
-                    <th className="py-3 px-4 border border-slate-300 w-[43%]">Descrição Detalhada</th>
-                    <th className="py-3 px-4 border border-slate-300 w-[10%] text-center no-print border-l">Ações</th>
+                    <th className="py-3 px-4 border border-slate-300 w-[22%]">{t('tipoImpacto')}</th>
+                    <th className="py-3 px-4 border border-slate-300 w-[25%]">{t('indicador')}</th>
+                    <th className="py-3 px-4 border border-slate-300 w-[43%]">{t('descricaoDetalhada')}</th>
+                    <th className="py-3 px-4 border border-slate-300 w-[10%] text-center no-print border-l">{t('acoes')}</th>
                   </tr>
                 </thead>
                 <tbody className="text-[11.5px] leading-relaxed text-[#111111]">
                   {m3Impactos.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="py-6 text-center text-slate-400 font-medium">
-                        Nenhum impacto cadastrado. Clique em &quot;Novo Impacto&quot; para começar.
-                      </td>
+                        {t('nenhum_impacto_cadastrado_clique_em_novo_impacto_para_comecar')}</td>
                     </tr>
                   ) : (
                     m3Impactos.map((item) => (
@@ -4569,18 +4632,18 @@ export default function QuestionarioView({
                             <button
                               onClick={() => handleOpenEditImpacto(item)}
                               className="p-2 px-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 rounded-md transition-colors text-xs font-semibold flex items-center gap-1 cursor-pointer"
-                              title="Editar Impacto"
+                              title={t('editar_impacto')}
                             >
                               <Edit className="w-3.5 h-3.5" />
-                              <span>Editar</span>
+                              <span>{t('editar')}</span>
                             </button>
                             <button
                               onClick={() => handleDeleteImpacto(item.id)}
                               className="p-2 px-2.5 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-md transition-colors text-xs font-semibold flex items-center gap-1 cursor-pointer"
-                              title="Excluir Impacto"
+                              title={t('excluir_impacto')}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
-                              <span>Deletar</span>
+                              <span>{t('excluir_2')}</span>
                             </button>
                           </div>
                         </td>
@@ -4595,10 +4658,8 @@ export default function QuestionarioView({
           {/* Document Footer */}
           <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-[10px] text-slate-400 font-mono gap-2 no-print">
             <span>
-              &copy; {new Date().getFullYear()} - Diretrizes de Atendimento
-              Escolar
-            </span>
-            <span>Matriz Curricular de Referência</span>
+              {'©'}{new Date().getFullYear()} {t('diretrizes_de_atendimento_escolar')}</span>
+            <span>{t('matriz_curricular_de_referencia')}</span>
           </div>
         </div>
 
@@ -4609,7 +4670,7 @@ export default function QuestionarioView({
               <div className="flex items-center justify-between border-b border-[#232e48] pb-3">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <ClipboardList className="w-4 h-4 text-[#8ed5ff]" />
-                  <span>{m3CenarioEditingItem ? "Editar Cenário de Frequência" : "Adicionar Novo Cenário"}</span>
+                  <span>{m3CenarioEditingItem ? t('editar_cenario_frequencia') : t('adicionar_novo_cenario')}</span>
                 </h3>
                 <button
                   onClick={() => setM3EditCenarioModal(false)}
@@ -4621,50 +4682,50 @@ export default function QuestionarioView({
 
               <form onSubmit={handleSaveCenario} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">Identificador do Cenário *</label>
+                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">{t('identificador_do_cenario')}</label>
                   <input
                     type="text"
                     required
                     value={m3CenarioFormCenario}
                     onChange={(e) => setM3CenarioFormCenario(e.target.value)}
                     className="w-full bg-[#16223d] border border-[#232e48] rounded-xl p-2.5 text-xs text-[#dae2fd] focus:outline-none focus:border-blue-500 font-sans"
-                    placeholder="Ex: CENÁRIO A, CENÁRIO D..."
+                    placeholder={t('ex_cenario_a_cenario_d')}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">Condição *</label>
+                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">{t('condicao_2')}</label>
                   <input
                     type="text"
                     required
                     value={m3CenarioFormCondicao}
                     onChange={(e) => setM3CenarioFormCondicao(e.target.value)}
                     className="w-full bg-[#16223d] border border-[#232e48] rounded-xl p-2.5 text-xs text-[#dae2fd] focus:outline-none focus:border-blue-500 font-sans"
-                    placeholder="Ex: Mais presenças do que faltas..."
+                    placeholder={t('ex_mais_presencas_do_que_faltas')}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">Frequência Pedagógica / Parecer *</label>
+                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">{t('frequencia_pedagogica_parecer')}</label>
                   <textarea
                     required
                     rows={4}
                     value={m3CenarioFormFrequencia}
                     onChange={(e) => setM3CenarioFormFrequencia(e.target.value)}
                     className="w-full bg-[#16223d] border border-[#232e48] rounded-xl p-2.5 text-xs text-[#dae2fd] focus:outline-none focus:border-blue-500 font-sans"
-                    placeholder="Descrição detalhada do comportamento e ritmo esperado..."
+                    placeholder={t('descricao_detalhada_do_comportamento_e_ritmo_esperado')}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">Mensagem para Pais / Responsáveis *</label>
+                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">{t('mensagem_para_pais_responsaveis')}</label>
                   <textarea
                     required
                     rows={3}
                     value={m3CenarioFormMensagem}
                     onChange={(e) => setM3CenarioFormMensagem(e.target.value)}
                     className="w-full bg-[#16223d] border border-[#232e48] rounded-xl p-2.5 text-xs text-[#dae2fd] focus:outline-none focus:border-blue-500 font-sans"
-                    placeholder="Mensagem recomendada direcionada aos pais..."
+                    placeholder={t('mensagem_recomendada_direcionada_aos_pais')}
                   />
                 </div>
 
@@ -4674,13 +4735,12 @@ export default function QuestionarioView({
                     onClick={() => setM3EditCenarioModal(false)}
                     className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
                   >
-                    Cancelar
-                  </button>
+                    {t('cancelar')}</button>
                   <button
                     type="submit"
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs cursor-pointer shadow-md"
                   >
-                    {m3CenarioEditingItem ? "Salvar Alterações" : "Criar Cenário"}
+                    {m3CenarioEditingItem ? t('salvar_alteracoes') : t('criar_cenario')}
                   </button>
                 </div>
               </form>
@@ -4695,7 +4755,7 @@ export default function QuestionarioView({
               <div className="flex items-center justify-between border-b border-[#232e48] pb-3">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <ClipboardList className="w-4 h-4 text-[#8ed5ff]" />
-                  <span>{m3ImpactoEditingItem ? "Editar Ponto de Impacto" : "Adicionar Novo Ponto de Impacto"}</span>
+                  <span>{m3ImpactoEditingItem ? t('editar_ponto_impacto') : t('adicionar_novo_ponto_impacto')}</span>
                 </h3>
                 <button
                   onClick={() => setM3EditImpactoModal(false)}
@@ -4707,39 +4767,39 @@ export default function QuestionarioView({
 
               <form onSubmit={handleSaveImpacto} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">Tipo de Impacto *</label>
+                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">{t('tipo_de_impacto')}</label>
                   <select
                     required
                     value={m3ImpactoFormTipo}
                     onChange={(e) => setM3ImpactoFormTipo(e.target.value)}
                     className="w-full bg-[#16223d] border border-[#232e48] rounded-xl p-2.5 text-xs text-[#dae2fd] focus:outline-none focus:border-blue-500 font-sans"
                   >
-                    <option value="Vantagem (Ponto Forte)">Vantagem (Ponto Forte)</option>
-                    <option value="Desvantagem (Ponto de Atenção)">Desvantagem (Ponto de Atenção)</option>
+                    <option value="Vantagem (Ponto Forte)">{t('vantagemPontoForte')}</option>
+                    <option value="Desvantagem (Ponto de Atenção)">{t('desvantagemPontoAtencao')}</option>
                   </select>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">Indicador *</label>
+                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">{t('indicador_2')}</label>
                   <input
                     type="text"
                     required
                     value={m3ImpactoFormIndicador}
                     onChange={(e) => setM3ImpactoFormIndicador(e.target.value)}
                     className="w-full bg-[#16223d] border border-[#232e48] rounded-xl p-2.5 text-xs text-[#dae2fd] focus:outline-none focus:border-blue-500 font-sans"
-                    placeholder="Ex: Continuidade Pedagógica..."
+                    placeholder={t('ex_continuidade_pedagogica')}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">Descrição Detalhada *</label>
+                  <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider font-mono">{t('descricao_detalhada')}</label>
                   <textarea
                     required
                     rows={4}
                     value={m3ImpactoFormDescricao}
                     onChange={(e) => setM3ImpactoFormDescricao(e.target.value)}
                     className="w-full bg-[#16223d] border border-[#232e48] rounded-xl p-2.5 text-xs text-[#dae2fd] focus:outline-none focus:border-blue-500 font-sans"
-                    placeholder="Digite a descrição dos impactos..."
+                    placeholder={t('digite_a_descricao_dos_impactos')}
                   />
                 </div>
 
@@ -4749,13 +4809,12 @@ export default function QuestionarioView({
                     onClick={() => setM3EditImpactoModal(false)}
                     className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
                   >
-                    Cancelar
-                  </button>
+                    {t('cancelar')}</button>
                   <button
                     type="submit"
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs cursor-pointer shadow-md"
                   >
-                    {m3ImpactoEditingItem ? "Salvar Alterações" : "Criar Impacto"}
+                    {m3ImpactoEditingItem ? t('salvar_alteracoes') : t('criar_impacto')}
                   </button>
                 </div>
               </form>
@@ -4773,11 +4832,9 @@ export default function QuestionarioView({
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
-                    Confirmar Exclusão
-                  </h3>
+                    {t('confirmarExclusao')}</h3>
                   <p className="text-xs text-[#bdc8d1]/90 mt-2 leading-relaxed">
-                    Você tem certeza de que deseja realizar a exclusão permanentemente? Esta ação não pode ser desfeita.
-                  </p>
+                    {t('voce_tem_certeza_de_que_deseja_realizar_a_exclusao_permanentemente_est')}</p>
                 </div>
               </div>
 
@@ -4791,15 +4848,14 @@ export default function QuestionarioView({
                   }}
                   className="px-3.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
                 >
-                  Cancelar
-                </button>
+                  {t('cancelar')}</button>
                 <button
                   type="button"
                   onClick={executeM3Delete}
                   className="px-3.5 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs cursor-pointer shadow-md transition-all flex items-center gap-1.5"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span>Confirmar</span>
+                  <span>{t('confirmar')}</span>
                 </button>
               </div>
             </div>
@@ -4833,7 +4889,7 @@ export default function QuestionarioView({
               <div className="bg-[#121c33] border border-[#232e48] p-4 rounded-xl space-y-3.5 shadow-lg">
                 <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
                   <ListCollapse className="w-4 h-4 text-blue-400" />
-                  <span>Base de Lançamentos ({filteredM3.length})</span>
+                  <span>{t('base_de_lancamentos')}{filteredM3.length})</span>
                 </h3>
 
                 {/* Sidebar Search Bar */}
@@ -4841,7 +4897,7 @@ export default function QuestionarioView({
                   <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#bdc8d1]" />
                   <input
                     type="text"
-                    placeholder="Filtrar estudante, período ou cenário..."
+                    placeholder={t('filtrar_estudante_periodo_ou_cenario')}
                     value={m3SearchQuery}
                     onChange={(e) => setM3SearchQuery(e.target.value)}
                     className="w-full bg-[#16223d] border border-[#232e48] rounded-xl pl-9 pr-4 py-2 text-xs focus:outline-none focus:border-blue-500 text-[#dae2fd]"
@@ -4852,8 +4908,7 @@ export default function QuestionarioView({
                 <div className="space-y-2.5 max-h-[500px] overflow-y-auto pr-1 scrollbar-thin">
                   {filteredM3.length === 0 ? (
                     <div className="py-8 text-center text-[#bdc8d1]/50 text-xs">
-                      Nenhuma análise de frequência cadastrada neste filtro.
-                    </div>
+                      {t('nenhuma_analise_de_frequencia_cadastrada_neste_filtro')}</div>
                   ) : (
                     filteredM3.map((item) => {
                       const isSelected = item.id === activeSelectedId;
@@ -4873,33 +4928,28 @@ export default function QuestionarioView({
                                 {item.studentName}
                               </span>
                               <span className="text-[10px] text-[#bdc8d1] font-mono block">
-                                Período: {item.periodo}
+                                {t('periodo')}{item.periodo}
                               </span>
                             </div>
 
                             {item.cenario === "A" && (
                               <span className="px-2 py-0.5 rounded text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase">
-                                CENÁRIO A
-                              </span>
+                                {t('cenario_a')}</span>
                             )}
                             {item.cenario === "B" && (
                               <span className="px-2 py-0.5 rounded text-[9px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-bold uppercase">
-                                CENÁRIO B
-                              </span>
+                                {t('cenario_b')}</span>
                             )}
                             {item.cenario === "C" && (
                               <span className="px-2 py-0.5 rounded text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold uppercase">
-                                CENÁRIO C
-                              </span>
+                                {t('cenario_c')}</span>
                             )}
                           </div>
 
                           {/* Card CRUD Actions */}
                           <div className="flex items-center justify-between border-t border-[#232e48]/60 pt-2 text-[10px]">
                             <span className="text-[9px] text-[#bdc8d1]/60 font-mono">
-                              {new Date(item.updatedAt).toLocaleDateString(
-                                "pt-BR",
-                              )}
+                              {new Date(item.updatedAt).toLocaleDateString(locale)}
                             </span>
                             <div
                               className="flex items-center gap-2"
@@ -4908,18 +4958,18 @@ export default function QuestionarioView({
                               <button
                                 onClick={() => handleOpenM3Edit(item)}
                                 className="text-blue-400 hover:text-blue-300 font-bold flex items-center gap-0.5"
-                                title="Editar"
+                                title={t('editar')}
                               >
                                 <Edit className="w-3.5 h-3.5" />
-                                <span>Editar</span>
+                                <span>{t('editar')}</span>
                               </button>
                               <button
                                 onClick={() => handleDeleteM3(item.id)}
                                 className="text-rose-400 hover:text-rose-300 font-bold flex items-center gap-0.5"
-                                title="Excluir"
+                                title={t('excluir')}
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
-                                <span>Excluir</span>
+                                <span>{t('excluir')}</span>
                               </button>
                             </div>
                           </div>
@@ -4939,7 +4989,7 @@ export default function QuestionarioView({
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
                     <span className="text-xs text-[#dae2fd]/90">
-                      Visualizando Ficha Oficial de{" "}
+                      {t('visualizando_ficha_oficial_de')}{" "}
                       <strong>{selectedRecord!.studentName}</strong>
                     </span>
                   </div>
@@ -4949,7 +4999,7 @@ export default function QuestionarioView({
                       className="p-2 px-3 rounded bg-blue-600/15 hover:bg-blue-600/25 text-[#8ed5ff] border border-blue-500/20 transition-all flex items-center gap-1.5 cursor-pointer text-xs"
                     >
                       <Edit className="w-3.5 h-3.5" />
-                      <span>Editar Ficha</span>
+                      <span>{t('editar_ficha')}</span>
                     </button>
                     <button
                       onClick={() => {
@@ -4960,7 +5010,7 @@ export default function QuestionarioView({
                       className="p-2 px-3 rounded bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer text-xs"
                     >
                       <Printer className="w-3.5 h-3.5" />
-                      <span>Imprimir Ficha</span>
+                      <span>{t('imprimir_ficha')}</span>
                     </button>
                   </div>
                 </div>
@@ -4974,73 +5024,61 @@ export default function QuestionarioView({
                 {/* Report Header Block */}
                 <div className="border-b-2 border-slate-900 pb-4 text-center">
                   <span className="font-mono text-[10px] tracking-widest text-[#5d6874] uppercase block mb-1">
-                    Diretoria de Ensino Pedro II &bull; Relatório Individual
-                  </span>
+                    {t('diretoria_de_ensino_pedro_ii_relatorio_individual')}</span>
                   <h1 className="text-xl font-bold tracking-tight text-slate-900 uppercase">
-                    Análise de Frequência Escolar
-                  </h1>
+                    {t('analiseFrequenciaEscolar')}</h1>
 
                   {selectedRecord ? (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4 text-[11px] text-slate-700 bg-slate-50 border border-slate-200 p-3 rounded-lg text-left font-mono">
                       <div>
                         <span className="font-sans text-[10px] uppercase font-bold text-slate-500 block">
-                          Estudante
-                        </span>
+                          {t('estudante')}</span>
                         <strong className="text-slate-900 text-xs font-sans font-bold">
                           {selectedRecord!.studentName}
                         </strong>
                       </div>
                       <div>
                         <span className="font-sans text-[10px] uppercase font-bold text-slate-500 block">
-                          Período de Referência
-                        </span>
+                          {t('periodo_de_referencia')}</span>
                         <strong className="text-slate-900 text-xs font-sans font-bold">
                           {selectedRecord!.periodo}
                         </strong>
                       </div>
                       <div>
                         <span className="font-sans text-[10px] uppercase font-bold text-slate-500 block">
-                          Avaliação Diagnóstica
-                        </span>
+                          {t('avaliacao_diagnostica')}</span>
                         <strong className="text-slate-900 text-xs font-sans font-bold">
                           {selectedRecord!.cenario === "A"
-                            ? "Cenário A - Assíduo"
+                            ? t('cenario_a_assiduo')
                             : selectedRecord!.cenario === "B"
-                              ? "Cenário B - Alerta"
-                              : "Cenário C - Sem dados"}
+                              ? t('cenario_b_alerta')
+                              : t('cenario_c_sem_dados')}
                         </strong>
                       </div>
                     </div>
                   ) : (
                     <p className="text-xs text-slate-500 mt-1 italic">
-                      Nenhum aluno ativo. Exibindo Matriz de Referência Padrão
-                      de Análise de Frequência.
-                    </p>
+                      {t('nenhum_aluno_ativo_exibindo_matriz_de_referencia_padrao_de_analise_de_')}</p>
                   )}
                 </div>
 
                 {/* TABLE 1: ANÁLISE DE FREQUÊNCIA ESCOLARES (MATCHING SCREENSHOT) */}
                 <div className="space-y-2">
                   <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider font-mono">
-                    &bull; Matriz de Diagnósticos por Cenário
-                  </h3>
+                    {t('matriz_de_diagnosticos_por_cenario')}</h3>
 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse border border-slate-300 min-w-[640px]">
                       <thead>
                         <tr className="bg-slate-50 text-[11.5px] text-slate-900 font-bold border-b border-slate-300">
                           <th className="py-2.5 px-3 border border-slate-300 w-[12%]">
-                            Cenário
-                          </th>
+                            {t('cenario')}</th>
                           <th className="py-2.5 px-3 border border-slate-300 w-[18%]">
-                            Condição
-                          </th>
+                            {t('condicao')}</th>
                           <th className="py-2.5 px-3 border border-slate-300 w-[40%]">
-                            Frequência
-                          </th>
+                            {t('frequencia')}</th>
                           <th className="py-2.5 px-3 border border-slate-300 w-[30%]">
-                            Mensagem Direcionada aos Pais e Responsáveis
-                          </th>
+                            {t('mensagemPaisResponsaveis')}</th>
                         </tr>
                       </thead>
                       <tbody className="text-[11px] leading-relaxed text-slate-800">
@@ -5053,25 +5091,22 @@ export default function QuestionarioView({
                           }`}
                         >
                           <td className="py-3 px-3 border border-slate-300 font-bold text-slate-950 align-top">
-                            CENÁRIO A
-                            {selectedRecord?.cenario === "A" && (
+                            {t('cenario_a')}{selectedRecord?.cenario === "A" && (
                               <span className="block text-[8px] tracking-tighter text-emerald-600 block uppercase font-bold mt-1 bg-emerald-100 px-1 py-0.5 rounded text-center">
-                                Ativo
-                              </span>
+                                {t('ativo')}</span>
                             )}
                           </td>
                           <td className="py-3 px-3 border border-slate-300 font-bold text-slate-800 align-top">
-                            Mais presenças do que faltas
-                          </td>
+                            {t('mais_presencas_do_que_faltas')}</td>
                           <td className="py-3 px-3 border border-slate-300 align-top">
                             {selectedRecord!.cenario === "A"
-                              ? selectedRecord!.parecerFrequencia
-                              : M3_SCENARIOS.A.parecerFrequencia}
+                              ? displayValue(selectedRecord!.parecerFrequencia)
+                              : displayValue(M3_SCENARIOS.A.parecerFrequencia)}
                           </td>
                           <td className="py-3 px-3 border border-slate-300 align-top text-slate-700">
                             {selectedRecord!.cenario === "A"
-                              ? selectedRecord!.parecerPais
-                              : M3_SCENARIOS.A.parecerPais}
+                              ? displayValue(selectedRecord!.parecerPais)
+                              : displayValue(M3_SCENARIOS.A.parecerPais)}
                           </td>
                         </tr>
 
@@ -5084,25 +5119,22 @@ export default function QuestionarioView({
                           }`}
                         >
                           <td className="py-3 px-3 border border-slate-300 font-bold text-slate-950 align-top">
-                            CENÁRIO B
-                            {selectedRecord?.cenario === "B" && (
+                            {t('cenario_b')}{selectedRecord?.cenario === "B" && (
                               <span className="block text-[8px] tracking-tighter text-rose-600 block uppercase font-bold mt-1 bg-rose-100 px-1 py-0.5 rounded text-center">
-                                Ativo
-                              </span>
+                                {t('ativo')}</span>
                             )}
                           </td>
                           <td className="py-3 px-3 border border-slate-300 font-bold text-slate-800 align-top">
-                            Mais faltas do que presenças
-                          </td>
+                            {t('mais_faltas_do_que_presencas')}</td>
                           <td className="py-3 px-3 border border-slate-300 align-top">
                             {selectedRecord!.cenario === "B"
-                              ? selectedRecord!.parecerFrequencia
-                              : M3_SCENARIOS.B.parecerFrequencia}
+                              ? displayValue(selectedRecord!.parecerFrequencia)
+                              : displayValue(M3_SCENARIOS.B.parecerFrequencia)}
                           </td>
                           <td className="py-3 px-3 border border-slate-300 align-top text-slate-700">
                             {selectedRecord!.cenario === "B"
-                              ? selectedRecord!.parecerPais
-                              : M3_SCENARIOS.B.parecerPais}
+                              ? displayValue(selectedRecord!.parecerPais)
+                              : displayValue(M3_SCENARIOS.B.parecerPais)}
                           </td>
                         </tr>
 
@@ -5115,25 +5147,22 @@ export default function QuestionarioView({
                           }`}
                         >
                           <td className="py-3 px-3 border border-slate-300 font-bold text-slate-950 align-top">
-                            CENÁRIO C
-                            {selectedRecord?.cenario === "C" && (
+                            {t('cenario_c')}{selectedRecord?.cenario === "C" && (
                               <span className="block text-[8px] tracking-tighter text-amber-600 block uppercase font-bold mt-1 bg-amber-100 px-1 py-0.5 rounded text-center">
-                                Ativo
-                              </span>
+                                {t('ativo')}</span>
                             )}
                           </td>
                           <td className="py-3 px-3 border border-slate-300 font-bold text-slate-800 align-top">
-                            Não houver presença ou falta registrada
-                          </td>
+                            {t('nao_houver_presenca_ou_falta_registrada')}</td>
                           <td className="py-3 px-3 border border-slate-300 align-top font-sans">
                             {selectedRecord!.cenario === "C"
-                              ? selectedRecord!.parecerFrequencia
-                              : M3_SCENARIOS.C.parecerFrequencia}
+                              ? displayValue(selectedRecord!.parecerFrequencia)
+                              : displayValue(M3_SCENARIOS.C.parecerFrequencia)}
                           </td>
                           <td className="py-3 px-3 border border-slate-300 align-top text-slate-700 font-sans">
                             {selectedRecord!.cenario === "C"
-                              ? selectedRecord!.parecerPais
-                              : M3_SCENARIOS.C.parecerPais}
+                              ? displayValue(selectedRecord!.parecerPais)
+                              : displayValue(M3_SCENARIOS.C.parecerPais)}
                           </td>
                         </tr>
                       </tbody>
@@ -5144,22 +5173,18 @@ export default function QuestionarioView({
                 {/* TABLE 2: MATRIZ DE IMPACTOS (MATCHING SCREENSHOT) */}
                 <div className="space-y-2 pt-2">
                   <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider font-mono">
-                    &bull; Impactos no Aprendizado
-                  </h3>
+                    {t('impactos_no_aprendizado')}</h3>
 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse border border-slate-300 min-w-[480px]">
                       <thead>
                         <tr className="bg-slate-50 text-[11.5px] text-slate-900 font-bold border-b border-slate-300">
                           <th className="py-2.5 px-3 border border-slate-300 w-[22%]">
-                            Tipo de Impacto
-                          </th>
+                            {t('tipoImpacto')}</th>
                           <th className="py-2.5 px-3 border border-slate-300 w-[30%]">
-                            Indicador
-                          </th>
+                            {t('indicador')}</th>
                           <th className="py-2.5 px-3 border border-slate-300 w-[48%]">
-                            Descrição Detalhada
-                          </th>
+                            {t('descricaoDetalhada')}</th>
                         </tr>
                       </thead>
                       <tbody className="text-[11px] leading-relaxed text-slate-800">
@@ -5172,12 +5197,9 @@ export default function QuestionarioView({
                           }`}
                         >
                           <td className="py-4 px-3 border border-slate-300 font-bold text-slate-950 align-top">
-                            Vantagem (Ponto Forte)
-                          </td>
+                            {t('vantagemPontoForte')}</td>
                           <td className="py-4 px-3 border border-slate-300 font-bold text-slate-800 align-top">
-                            Continuidade Pedagógica, Socialização e Ritmo de
-                            Avaliação
-                          </td>
+                            {t('continuidade_pedagogica_socializacao_e_ritmo_de_avaliacao')}</td>
                           <td className="py-4 px-3 border border-slate-300 align-top text-slate-700">
                             {selectedRecord &&
                             selectedRecord!.impactosVantagens &&
@@ -5204,12 +5226,9 @@ export default function QuestionarioView({
                           }`}
                         >
                           <td className="py-4 px-3 border border-slate-300 font-bold text-slate-950 align-top">
-                            Desvantagem (Ponto de Atenção)
-                          </td>
+                            {t('desvantagemPontoAtencao')}</td>
                           <td className="py-4 px-3 border border-slate-300 font-bold text-slate-800 align-top">
-                            Lacunas de Conteúdo, Desengajamento Escolar e
-                            Sobrecarga de Tarefas
-                          </td>
+                            {t('lacunas_de_conteudo_desengajamento_escolar_e_sobrecarga_de_tarefas')}</td>
                           <td className="py-4 px-3 border border-slate-300 align-top text-slate-700">
                             {selectedRecord &&
                             selectedRecord!.impactosDesvantagens &&
@@ -5235,11 +5254,11 @@ export default function QuestionarioView({
                 <div className="pt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-12 text-[10px] text-slate-600 text-center font-mono">
                   <div className="space-y-1">
                     <div className="w-48 mx-auto border-b border-slate-400 h-6" />
-                    <span>Coordenação Pedagógica</span>
+                    <span>{t('coordenacao_pedagogica')}</span>
                   </div>
                   <div className="space-y-1">
                     <div className="w-48 mx-auto border-b border-slate-400 h-6" />
-                    <span>Pais ou Responsável Legal</span>
+                    <span>{t('pais_ou_responsavel_legal')}</span>
                   </div>
                 </div>
               </div>
@@ -5257,8 +5276,8 @@ export default function QuestionarioView({
                 <div className="p-5 border-b border-[#232e48] flex items-center justify-between bg-[#16223d]">
                   <h3 className="text-base font-bold text-[#dae2fd]">
                     {m3EditingItem
-                      ? "Editar Análise de Frequência"
-                      : "Nova Análise de Frequência"}
+                      ? t('editar_analise_frequencia')
+                      : t('nova_analise_frequencia')}
                   </h3>
                   <button
                     type="button"
@@ -5278,8 +5297,7 @@ export default function QuestionarioView({
                     {/* Student input field */}
                     <div className="space-y-1.5">
                       <label className="text-xs font-semibold text-[#bdc8d1]">
-                        Estudante *
-                      </label>
+                        {t('estudante_2')}</label>
                       <select
                         value={m3FormStudentId}
                         onChange={(e) => setM3FormStudentId(e.target.value)}
@@ -5287,8 +5305,7 @@ export default function QuestionarioView({
                         className="w-full bg-[#16223d] border border-[#232e48] rounded-xl p-2.5 text-xs text-[#dae2fd] focus:outline-none focus:border-blue-500 h-[38px]"
                       >
                         <option value="" disabled>
-                          Selecione um estudante
-                        </option>
+                          {t('selecione_um_estudante')}</option>
                         {students.map((st) => (
                           <option key={st.id} value={st.id}>
                             {st.name}
@@ -5300,11 +5317,10 @@ export default function QuestionarioView({
                     {/* Period input field */}
                     <div className="space-y-1.5">
                       <label className="text-xs font-semibold text-[#bdc8d1]">
-                        Período (Mês e Ano) *
-                      </label>
+                        {t('periodo_mes_e_ano')}</label>
                       <input
                         type="text"
-                        placeholder="Ex: Junho/2026"
+                        placeholder={t('ex_junho_2026', { exemplo: periodoExemplo })}
                         value={m3FormPeriodo}
                         onChange={(e) => setM3FormPeriodo(e.target.value)}
                         required
@@ -5316,8 +5332,7 @@ export default function QuestionarioView({
                   {/* Scenario Selection Selector */}
                   <div className="space-y-2">
                     <label className="text-xs font-semibold text-[#bdc8d1] block">
-                      Cenário de Análise *
-                    </label>
+                      {t('cenario_de_analise')}</label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       {/* Scenario A Card */}
                       <button
@@ -5330,11 +5345,9 @@ export default function QuestionarioView({
                         }`}
                       >
                         <span className="text-xs font-bold text-emerald-400">
-                          Cenário A
-                        </span>
+                          {t('cenario_a_2')}</span>
                         <span className="text-[10px] text-[#bdc8d1] mt-1">
-                          Mais presenças do que faltas
-                        </span>
+                          {t('mais_presencas_do_que_faltas')}</span>
                       </button>
 
                       {/* Scenario B Card */}
@@ -5348,11 +5361,9 @@ export default function QuestionarioView({
                         }`}
                       >
                         <span className="text-xs font-bold text-rose-400">
-                          Cenário B
-                        </span>
+                          {t('cenario_b_2')}</span>
                         <span className="text-[10px] text-[#bdc8d1] mt-1">
-                          Mais faltas do que presenças
-                        </span>
+                          {t('mais_faltas_do_que_presencas')}</span>
                       </button>
 
                       {/* Scenario C Card */}
@@ -5366,11 +5377,9 @@ export default function QuestionarioView({
                         }`}
                       >
                         <span className="text-xs font-bold text-amber-400">
-                          Cenário C
-                        </span>
+                          {t('cenario_c_2')}</span>
                         <span className="text-[10px] text-[#bdc8d1] mt-1">
-                          Nenhum registro de falta/presença
-                        </span>
+                          {t('nenhum_registro_de_falta_presenca')}</span>
                       </button>
                     </div>
                   </div>
@@ -5380,12 +5389,11 @@ export default function QuestionarioView({
                     {/* Advantages Checkboxes */}
                     <div className="space-y-2 bg-[#16223d]/50 p-3.5 border border-[#232e48] rounded-xl">
                       <span className="text-[11px] uppercase tracking-wider font-mono text-emerald-400 font-bold block">
-                        Vantagens (Pontos Fortes)
-                      </span>
+                        {t('vantagens_pontos_fortes')}</span>
                       <div className="space-y-2.5">
                         {M3_ADVANTAGES.map((adv) => {
                           const title = adv.split(":")[0];
-                          const desc = adv.split(":")[1];
+                          const desc = adv.split(":")[1]?.trim();
                           const checked = m3FormVantagens.includes(adv);
                           return (
                             <label
@@ -5411,9 +5419,9 @@ export default function QuestionarioView({
                               />
                               <div>
                                 <strong className="text-emerald-300">
-                                  {title}:
+                                  {displayValue(title)}:
                                 </strong>
-                                {desc}
+                                {displayValue(desc)}
                               </div>
                             </label>
                           );
@@ -5424,12 +5432,11 @@ export default function QuestionarioView({
                     {/* Disadvantages Checkboxes */}
                     <div className="space-y-2 bg-[#16223d]/50 p-3.5 border border-[#232e48] rounded-xl">
                       <span className="text-[11px] uppercase tracking-wider font-mono text-rose-400 font-bold block">
-                        Desvantagens (Pontos de Atenção)
-                      </span>
+                        {t('desvantagens_pontos_de_atencao')}</span>
                       <div className="space-y-2.5">
                         {M3_DISADVANTAGES.map((dis) => {
                           const title = dis.split(":")[0];
-                          const desc = dis.split(":")[1];
+                          const desc = dis.split(":")[1]?.trim();
                           const checked = m3FormDesvantagens.includes(dis);
                           return (
                             <label
@@ -5457,9 +5464,9 @@ export default function QuestionarioView({
                               />
                               <div>
                                 <strong className="text-rose-300">
-                                  {title}:
+                                  {displayValue(title)}:
                                 </strong>
-                                {desc}
+                                {displayValue(desc)}
                               </div>
                             </label>
                           );
@@ -5471,8 +5478,7 @@ export default function QuestionarioView({
                   {/* Parecer de Frequência Field */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-[#bdc8d1]">
-                      Parecer de Frequência *
-                    </label>
+                      {t('parecer_de_frequencia')}</label>
                     <textarea
                       rows={4}
                       value={m3FormParecerFrequencia}
@@ -5481,22 +5487,21 @@ export default function QuestionarioView({
                       }
                       required
                       className="w-full bg-[#16223d] border border-[#232e48] rounded-xl p-2.5 text-xs text-[#dae2fd] focus:outline-none focus:border-blue-500 font-sans"
-                      placeholder="Selecione um cenário para carregar o parecer padrão, ou digite aqui para personalizar o texto..."
+                      placeholder={t('selecione_um_cenario_para_carregar_o_parecer_padrao_ou_digite_aqui_par')}
                     />
                   </div>
 
                   {/* Parecer Direcionado aos Pais e Responsáveis Field */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-[#bdc8d1]">
-                      Parecer Direcionado aos Pais e Responsáveis *
-                    </label>
+                      {t('parecer_direcionado_aos_pais_e_responsaveis')}</label>
                     <textarea
                       rows={3}
                       value={m3FormParecerPais}
                       onChange={(e) => setM3FormParecerPais(e.target.value)}
                       required
                       className="w-full bg-[#16223d] border border-[#232e48] rounded-xl p-2.5 text-xs text-[#dae2fd] focus:outline-none focus:border-blue-500 font-sans"
-                      placeholder="Selecione um cenário para carregar o parecer dos pais padrão, ou digite aqui para personalizar..."
+                      placeholder={t('selecione_um_cenario_para_carregar_o_parecer_dos_pais_padrao_ou_digite')}
                     />
                   </div>
 
@@ -5510,13 +5515,12 @@ export default function QuestionarioView({
                       }}
                       className="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl text-xs transition-all cursor-pointer font-sans"
                     >
-                      Cancelar
-                    </button>
+                      {t('cancelar')}</button>
                     <button
                       type="submit"
                       className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs transition-all cursor-pointer font-sans shadow-md"
                     >
-                      {m3EditingItem ? "Atualizar Análise" : "Salvar Análise"}
+                      {m3EditingItem ? t('atualizar_analise') : t('salvar_analise')}
                     </button>
                   </div>
                 </form>
@@ -5531,21 +5535,21 @@ export default function QuestionarioView({
   if (activeTab === "questionario-m1") {
     const unitLabel =
       activeTableTab === "impulsao"
-        ? "Distância (centímetros)"
+        ? t('distancia_centimetros')
         : activeTableTab === "agilidade" || activeTableTab === "velocidade"
-          ? "Tempo (segundos)"
-          : "Quantidade de Repetições";
+          ? t('tempo_segundos')
+          : t('quantidade_repeticoes');
 
     const tableTitle =
       activeTableTab === "forca"
-        ? "Tabela de Aptidão: Força Muscular"
+        ? t('tabela_aptidao_forca_muscular')
         : activeTableTab === "impulsao"
-          ? "Tabela de Aptidão: Impulsão"
+          ? t('tabela_aptidao_impulsao')
           : activeTableTab === "abdomen"
-            ? "Tabela de Aptidão: Abdômen"
+            ? t('tabela_aptidao_abdomen')
             : activeTableTab === "agilidade"
-              ? "Tabela de Aptidão: Agilidade"
-              : "Tabela de Aptidão: Velocidade";
+              ? t('tabela_aptidao_agilidade')
+              : t('tabela_aptidao_velocidade');
 
     const showBomAndInsuficiente = activeTableTab !== "abdomen";
 
@@ -5563,16 +5567,12 @@ export default function QuestionarioView({
             <div className="flex items-center gap-2 mb-1">
               <ClipboardList className="w-5 h-5 text-[#8ed5ff]" />
               <span className="text-xs font-mono text-[#8ed5ff] uppercase tracking-wider">
-                Mapeamento &amp; Classificação
-              </span>
+                {t('mapeamento_classificacao')}</span>
             </div>
             <h2 className="text-2xl font-bold text-[#dae2fd]">
-              Módulo 1: Referenciais e Tabelas de Aptidão Motora
-            </h2>
+              {t('modulo_1_referenciais_e_tabelas_de_aptidao_motora')}</h2>
             <p className="text-sm text-[#bdc8d1]/80 mt-1 max-w-3xl">
-              Consulte e configure os limites e critérios oficiais de pontuação
-              por faixa etária e sexo para as capacidades motoras da plataforma.
-            </p>
+              {t('consulte_e_configure_os_limites_e_criterios_oficiais_de_pontuacao_por_')}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -5590,7 +5590,7 @@ export default function QuestionarioView({
               className="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-md flex items-center gap-2 transition-all cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Adicionar Faixa</span>
+              <span>{t('adicionar_faixa')}</span>
             </button>
           </div>
         </div>
@@ -5617,7 +5617,7 @@ export default function QuestionarioView({
             }`}
             id="btn-tab-forca"
           >
-            <span>Força Muscular</span>
+            <span>{t('forcaMuscular')}</span>
           </button>
           <button
             onClick={() => setActiveTableTab("impulsao")}
@@ -5628,7 +5628,7 @@ export default function QuestionarioView({
             }`}
             id="btn-tab-impulsao"
           >
-            <span>Impulsão</span>
+            <span>{t('impulsao')}</span>
           </button>
           <button
             onClick={() => setActiveTableTab("abdomen")}
@@ -5639,7 +5639,7 @@ export default function QuestionarioView({
             }`}
             id="btn-tab-abdomen"
           >
-            <span>Abdômen</span>
+            <span>{t('abdomen')}</span>
           </button>
           <button
             onClick={() => setActiveTableTab("agilidade")}
@@ -5650,7 +5650,7 @@ export default function QuestionarioView({
             }`}
             id="btn-tab-agilidade"
           >
-            <span>Agilidade</span>
+            <span>{t('agilidade')}</span>
           </button>
           <button
             onClick={() => setActiveTableTab("velocidade")}
@@ -5661,7 +5661,7 @@ export default function QuestionarioView({
             }`}
             id="btn-tab-velocidade"
           >
-            <span>Velocidade</span>
+            <span>{t('velocidade')}</span>
           </button>
         </div>
 
@@ -5684,25 +5684,21 @@ export default function QuestionarioView({
               <table className="w-full text-left border-collapse min-w-[820px]">
                 <thead>
                   <tr className="bg-[#16223d] border-b border-[#232e48] text-xs font-mono uppercase text-[#dae2fd]/75">
-                    <th className="py-3 px-4">Idade</th>
-                    <th className="py-3 px-4">Sexo</th>
+                    <th className="py-3 px-4">{t('idade')}</th>
+                    <th className="py-3 px-4">{t('sexo')}</th>
                     {showBomAndInsuficiente && (
                       <th className="py-3 px-4 text-center text-red-400">
-                        Insuficiente
-                      </th>
+                        {t('insuficiente')}</th>
                     )}
                     <th className="py-3 px-4 text-center text-amber-400">
-                      Regular
-                    </th>
+                      {t('regular')}</th>
                     {showBomAndInsuficiente && (
                       <th className="py-3 px-4 text-center text-emerald-400">
-                        Bom
-                      </th>
+                        {t('bom')}</th>
                     )}
                     <th className="py-3 px-4 text-center text-blue-400 font-bold">
-                      Excelente
-                    </th>
-                    <th className="py-3 px-4 text-right col-actions">Ações</th>
+                      {t('excelente')}</th>
+                    <th className="py-3 px-4 text-right col-actions">{t('acoes')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#232e48]/50 text-xs">
@@ -5712,10 +5708,7 @@ export default function QuestionarioView({
                         colSpan={showBomAndInsuficiente ? 7 : 5}
                         className="py-8 text-center text-[#bdc8d1]/55 italic"
                       >
-                        Nenhum referencial cadastrado nesta faixa de aptidão.
-                        Clique em &quot;Adicionar Faixa&quot; para criar o
-                        primeiro.
-                      </td>
+                        {t('nenhum_referencial_cadastrado_nesta_faixa_de_aptidao_clique_em_adicion')}</td>
                     </tr>
                   ) : (
                     currentFilteredRefs.map((item) => (
@@ -5748,14 +5741,14 @@ export default function QuestionarioView({
                             <button
                               onClick={() => handleStartEditRef(item)}
                               className="p-2 hover:bg-[#232e48]/60 hover:text-white rounded text-[#8ed5ff] transition-all cursor-pointer"
-                              title="Editar"
+                              title={t('editar')}
                             >
                               <Edit className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => handleDeleteRef(item)}
                               className="p-2 hover:bg-[#232e48]/60 text-rose-400 hover:text-rose-300 rounded transition-all cursor-pointer"
-                              title="Excluir"
+                              title={t('excluir')}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -5777,8 +5770,8 @@ export default function QuestionarioView({
               <div className="bg-[#16223d] px-6 py-4 border-b border-[#232e48] flex items-center justify-between">
                 <h3 className="text-base font-bold text-[#dae2fd]">
                   {editingRefItem
-                    ? "Editar Faixa de Referência"
-                    : "Cadastrar Faixa de Referência"}
+                    ? t('editar_faixa_referencia')
+                    : t('cadastrar_faixa_referencia')}
                 </h3>
                 <button
                   onClick={() => setIsEditingRef(false)}
@@ -5792,30 +5785,28 @@ export default function QuestionarioView({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-mono text-[#8ed5ff] uppercase tracking-wider mb-2">
-                      Faixa de Idade *
-                    </label>
+                      {t('faixa_de_idade')}</label>
                     <input
                       type="text"
                       value={formIdade}
                       onChange={(e) => setFormIdade(e.target.value)}
-                      placeholder="Ex: 9 a 12 ou 18 ou mais"
+                      placeholder={t('ex_9_a_12_ou_18_ou_mais')}
                       className="w-full bg-[#1e2944] border border-[#232e48] rounded-lg px-3 py-2 text-sm text-[#dae2fd] focus:outline-none focus:border-[#8ed5ff]"
                       required
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-mono text-[#8ed5ff] uppercase tracking-wider mb-2">
-                      Sexo *
-                    </label>
+                      {t('sexo_2')}</label>
                     <select
                       value={formSexo}
                       onChange={(e) => setFormSexo(e.target.value)}
                       className="w-full bg-[#1e2944] border border-[#232e48] rounded-lg px-3 py-2 text-sm text-[#dae2fd] focus:outline-none focus:border-[#8ed5ff]"
                       required
                     >
-                      <option value="Masculino">Masculino</option>
-                      <option value="Feminino">Feminino</option>
-                      <option value="Todos os sexos">Todos os sexos</option>
+                      <option value="Masculino">{t('masculino')}</option>
+                      <option value="Feminino">{t('feminino')}</option>
+                      <option value="Todos os sexos">{t('todos_os_sexos')}</option>
                     </select>
                   </div>
                 </div>
@@ -5824,26 +5815,24 @@ export default function QuestionarioView({
                   {showBomAndInsuficiente ? (
                     <div>
                       <label className="block text-xs font-mono text-[#8ed5ff] uppercase tracking-wider mb-2">
-                        Insuficiente
-                      </label>
+                        {t('insuficiente')}</label>
                       <input
                         type="text"
                         value={formInsuficiente}
                         onChange={(e) => setFormInsuficiente(e.target.value)}
-                        placeholder="Ex: 0 a 2 ou 7,00 ou mais"
+                        placeholder={t('ex_0_a_2_ou_7_00_ou_mais')}
                         className="w-full bg-[#1e2944] border border-[#232e48] rounded-lg px-3 py-2 text-sm text-[#dae2fd] focus:outline-none focus:border-[#8ed5ff]"
                       />
                     </div>
                   ) : null}
                   <div>
                     <label className="block text-xs font-mono text-[#8ed5ff] uppercase tracking-wider mb-2">
-                      Regular *
-                    </label>
+                      {t('regular_2')}</label>
                     <input
                       type="text"
                       value={formRegular}
                       onChange={(e) => setFormRegular(e.target.value)}
-                      placeholder="Ex: 3 a 4"
+                      placeholder={t('ex_3_a_4')}
                       className="w-full bg-[#1e2944] border border-[#232e48] rounded-lg px-3 py-2 text-sm text-[#dae2fd] focus:outline-none focus:border-[#8ed5ff]"
                       required
                     />
@@ -5854,26 +5843,24 @@ export default function QuestionarioView({
                   {showBomAndInsuficiente ? (
                     <div>
                       <label className="block text-xs font-mono text-[#8ed5ff] uppercase tracking-wider mb-2">
-                        Bom
-                      </label>
+                        {t('bom')}</label>
                       <input
                         type="text"
                         value={formBom}
                         onChange={(e) => setFormBom(e.target.value)}
-                        placeholder="Ex: 5 a 6"
+                        placeholder={t('ex_5_a_6')}
                         className="w-full bg-[#1e2944] border border-[#232e48] rounded-lg px-3 py-2 text-sm text-[#dae2fd] focus:outline-none focus:border-[#8ed5ff]"
                       />
                     </div>
                   ) : null}
                   <div>
                     <label className="block text-xs font-mono text-[#8ed5ff] uppercase tracking-wider mb-2">
-                      Excelente *
-                    </label>
+                      {t('excelente_2')}</label>
                     <input
                       type="text"
                       value={formExcelente}
                       onChange={(e) => setFormExcelente(e.target.value)}
-                      placeholder="Ex: 7 ou mais"
+                      placeholder={t('ex_7_ou_mais')}
                       className="w-full bg-[#1e2944] border border-[#232e48] rounded-lg px-3 py-2 text-sm text-[#dae2fd] focus:outline-none focus:border-[#8ed5ff]"
                       required
                     />
@@ -5881,7 +5868,7 @@ export default function QuestionarioView({
                 </div>
 
                 <div className="text-xs text-[#bdc8d1]/60 font-mono mt-1">
-                  * Campos obrigatórios. A faixa será criada na aba ativa:{" "}
+                  {t('campos_obrigatorios_a_faixa_sera_criada_na_aba_ativa')}{" "}
                   <span className="text-[#8ed5ff] font-bold">
                     {activeTableTab.toUpperCase()}
                   </span>
@@ -5893,13 +5880,12 @@ export default function QuestionarioView({
                     onClick={() => setIsEditingRef(false)}
                     className="px-4 py-2 rounded-lg text-xs font-medium border border-[#232e48] hover:bg-[#1e2944] text-[#bdc8d1] hover:text-white transition-all cursor-pointer"
                   >
-                    Cancelar
-                  </button>
+                    {t('cancelar')}</button>
                   <button
                     type="submit"
                     className="px-5 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all cursor-pointer"
                   >
-                    {editingRefItem ? "Salvar Alterações" : "Cadastrar"}
+                    {editingRefItem ? t('salvar_alteracoes') : t('cadastrar')}
                   </button>
                 </div>
               </form>
@@ -5913,41 +5899,36 @@ export default function QuestionarioView({
             <div className="bg-[#171f33] border border-[#ffb4ab]/40 w-full max-w-sm rounded-xl shadow-2xl p-5 relative animate-in fade-in zoom-in duration-150">
               <h4 className="text-sm font-bold text-[#ffb4ab] uppercase tracking-wider mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-rose-400" />
-                Confirmar Exclusão
-              </h4>
+                {t('confirmarExclusao')}</h4>
               <p className="text-xs text-[#bdc8d1] mb-5 leading-relaxed">
-                Tem certeza de que deseja remover permanentemente o limite de
-                aptidão para{" "}
+                {t('tem_certeza_de_que_deseja_remover_permanentemente_o_limite_de_aptidao_')}{" "}
                 <span className="text-[#dae2fd] font-bold">
                   {refToDelete.idade}
                 </span>{" "}
-                ({refToDelete.sexo}) da tabela de{" "}
+                ({refToDelete.sexo}{t('da_tabela_de')}{" "}
                 {refToDelete.category === "forca"
-                  ? "Força Muscular"
+                  ? t('forcaMuscular')
                   : refToDelete.category === "impulsao"
-                    ? "Impulsão"
+                    ? t('impulsao')
                     : refToDelete.category === "abdomen"
-                      ? "Abdômen"
+                      ? t('abdomen')
                       : refToDelete.category === "agilidade"
-                        ? "Agilidade"
-                        : "Velocidade"}
-                ? Esta ação não pode ser desfeita.
-              </p>
+                        ? t('agilidade')
+                        : t('velocidade')}
+                {t('esta_acao_nao_pode_ser_desfeita_2')}</p>
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={() => setRefToDelete(null)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1] cursor-pointer"
                 >
-                  Cancelar
-                </button>
+                  {t('cancelar')}</button>
                 <button
                   type="button"
                   onClick={handleConfirmDeleteRef}
                   className="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs shadow-md cursor-pointer"
                 >
-                  Confirmar Excluir
-                </button>
+                  {t('confirmarExcluir')}</button>
               </div>
             </div>
           </div>
@@ -6053,7 +6034,7 @@ export default function QuestionarioView({
     ) => {
       if (user?.role === "Aluno") {
         alert(
-          "Apenas professores e administradores podem editar a matriz de requisitos esportivos.",
+          t('apenas_professores_e_administradores_podem_editar_a_matriz_de_requisit'),
         );
         return;
       }
@@ -6090,18 +6071,12 @@ export default function QuestionarioView({
             <div className="flex items-center gap-2 mb-1">
               <Award className="w-5 h-5 text-[#8ed5ff]" />
               <span className="text-xs font-mono text-[#8ed5ff] uppercase tracking-wider">
-                Mapeamento Vocacional Esportivo
-              </span>
+                {t('mapeamento_vocacional_esportivo')}</span>
             </div>
             <h2 className="text-2xl font-bold text-[#dae2fd]">
-              Módulo 2: Direcionamento Vocacional e Tabela de Aptidão por
-              Modalidade
-            </h2>
+              {t('modulo_2_direcionamento_vocacional_e_tabela_de_aptidao_por_modalidade')}</h2>
             <p className="text-sm text-[#bdc8d1]/80 mt-1 max-w-3xl">
-              Consulte e edite os perfis físicos ideais necessários para cada
-              modalidade. Selecione um aluno para analisar sua compatibilidade
-              física instantaneamente com cada esporte.
-            </p>
+              {t('consulte_e_edite_os_perfis_fisicos_ideais_necessarios_para_cada_modali')}</p>
           </div>
           {successMessage && (
             <div className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-4 py-2.5 rounded-lg text-xs font-semibold flex items-center gap-2 animate-pulse shrink-0">
@@ -6116,15 +6091,14 @@ export default function QuestionarioView({
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-5 rounded-xl bg-[#121c33] border border-[#232e48] shadow-lg">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <span className="text-xs font-bold text-[#bdc8d1] whitespace-nowrap">
-                Simular Resultados do Aluno:
-              </span>
+                {t('simular_resultados_do_aluno')}</span>
               <select
                 value={simulatedStudentId}
                 onChange={(e) => setSimulatedStudentId(e.target.value)}
                 disabled={user?.role === "Aluno"}
                 className="bg-[#0b1326] border border-[#2a3652] text-xs text-[#dae2fd] rounded-lg p-2.5 focus:border-[#8ed5ff] focus:outline-none focus:ring-1 focus:ring-[#8ed5ff] cursor-pointer"
               >
-                <option value="">Nenhum - Mostrar Apenas Matriz</option>
+                <option value="">{t('nenhum_mostrar_apenas_matriz')}</option>
                 {students.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.name} ({s.grade || "S/T"})
@@ -6153,7 +6127,7 @@ export default function QuestionarioView({
                     className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all duration-200 shadow-md cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>Indicar Novo Esporte</span>
+                    <span>{t('indicar_novo_esporte')}</span>
                   </button>
 
                 </>
@@ -6166,14 +6140,13 @@ export default function QuestionarioView({
             <div className="p-5 rounded-xl bg-blue-950/20 border border-blue-500/20 flex flex-col lg:flex-row lg:items-center justify-between gap-5 animate-in slide-in-from-top duration-200 shadow-inner">
               <div className="shrink-0">
                 <span className="text-[10px] font-mono text-[#8ed5ff] uppercase tracking-widest block mb-0.5">
-                  Perfil Selecionado
-                </span>
+                  {t('perfil_selecionado')}</span>
                 <h4 className="text-base font-bold text-white flex items-center gap-2">
                   <User className="w-4 h-4 text-[#8ed5ff]" />
                   {simulatedStudent?.name}
                 </h4>
                 <p className="text-xs text-[#bdc8d1]/75 mt-0.5">
-                  Ano/Série: {simulatedStudent?.grade || "Não informada"}
+                  {t('ano_serie')}{simulatedStudent?.grade || t('nao_informada')}
                 </p>
               </div>
               {simLevels ? (
@@ -6197,7 +6170,7 @@ export default function QuestionarioView({
                       className="bg-[#0b1326]/90 border border-[#232e48] px-4 py-2.5 rounded-xl text-center shadow-sm"
                     >
                       <span className="text-[10px] text-[#bdc8d1] block font-semibold uppercase tracking-wider">
-                        {f.label}
+                        {displayValue(f.label)}
                       </span>
                       <span
                         className={`text-xs font-extrabold block mt-1 ${
@@ -6221,9 +6194,7 @@ export default function QuestionarioView({
                 <div className="text-xs text-amber-300 font-semibold flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 p-3 rounded-lg">
                   <Info className="w-4 h-4 shrink-0" />
                   <span>
-                    Nenhum boletim ou avaliação motora cadastrada para este
-                    aluno.
-                  </span>
+                    {t('nenhum_boletim_ou_avaliacao_motora_cadastrada_para_este_aluno')}</span>
                 </div>
               )}
             </div>
@@ -6233,9 +6204,7 @@ export default function QuestionarioView({
         {/* Informative text about editability */}
         {user?.role !== "Aluno" && (
           <p className="text-[11px] text-[#bdc8d1]/65 mb-4 italic">
-            * Dica: Você pode reconfigurar os requisitos ideais clicando
-            diretamente nas classificações de qualquer coluna na tabela abaixo.
-          </p>
+            {t('dica_voce_pode_reconfigurar_os_requisitos_ideais_clicando_diretamente_')}</p>
         )}
 
         {/* Matrix Table */}
@@ -6244,30 +6213,22 @@ export default function QuestionarioView({
             <thead>
               <tr className="bg-[#0b1326] border-b border-[#232e48]/90">
                 <th className="p-3 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider min-w-[170px]">
-                  Modalidade
-                </th>
+                  {t('modalidade')}</th>
                 <th className="p-3 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center w-[13%]">
-                  Índice Corporal
-                </th>
+                  {t('indice_corporal')}</th>
                 <th className="p-3 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center w-[13%]">
-                  20 metros
-                </th>
+                  {t('20_metros')}</th>
                 <th className="p-3 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center w-[13%]">
-                  Impulsão
-                </th>
+                  {t('impulsao')}</th>
                 <th className="p-3 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center w-[13%]">
-                  Flexão de Braços
-                </th>
+                  {t('flexao_de_bracos')}</th>
                 <th className="p-3 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center w-[13%]">
-                  Agilidade
-                </th>
+                  {t('agilidade')}</th>
                 <th className="p-3 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center w-[13%]">
-                  Abdominal
-                </th>
+                  {t('abdomen_2')}</th>
                 {user?.role !== "Aluno" && (
                   <th className="p-3 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right w-[10%]">
-                    AÇÕES
-                  </th>
+                    {t('acoes_2')}</th>
                 )}
               </tr>
             </thead>
@@ -6302,11 +6263,9 @@ export default function QuestionarioView({
                             {match.isCompatible && (
                               <Award className="w-3 h-3 text-emerald-400 shrink-0" />
                             )}
-                            {match.percent}% Apto
-                          </span>
+                            {match.percent}{t('apto')}</span>
                           <span className="text-[9px] text-[#bdc8d1]/65 font-mono">
-                            ({match.matchCount} de 6 testes)
-                          </span>
+                            ({match.matchCount} {t('de_6_testes')}</span>
                         </div>
                       )}
                     </td>
@@ -6411,21 +6370,19 @@ export default function QuestionarioView({
                               setShowM2Modal(true);
                             }}
                             className="p-2 px-2 py-0.5 text-[11px] font-semibold border border-[#232e48] hover:bg-[#1e2944] text-[#bdc8d1] hover:text-white rounded transition-all"
-                            title="Renomear Modalidade"
+                            title={t('renomear_modalidade')}
                           >
                             <Edit className="w-3 h-3 inline mr-1" />
-                            Editar
-                          </button>
+                            {t('editar')}</button>
                           <button
                             onClick={() => {
                               setM2ModalityToDelete(mod);
                             }}
                             className="p-2 px-2 py-0.5 text-[11px] font-semibold border border-red-950 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded transition-all"
-                            title="Remover Modalidade"
+                            title={t('remover_modalidade')}
                           >
                             <Trash2 className="w-3 h-3 inline mr-1" />
-                            Excluir
-                          </button>
+                            {t('excluir')}</button>
                         </div>
                       </td>
                     )}
@@ -6443,8 +6400,8 @@ export default function QuestionarioView({
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#232e48]">
                 <h3 className="text-lg font-bold text-[#dae2fd]">
                   {m2ModalMode === "create"
-                    ? "Indicar Nova Modalidade"
-                    : "Editar Nome da Modalidade"}
+                    ? t('indicar_nova_modalidade')
+                    : t('editar_nome_modalidade')}
                 </h3>
                 <button
                   onClick={() => setShowM2Modal(false)}
@@ -6479,8 +6436,8 @@ export default function QuestionarioView({
                   setShowM2Modal(false);
                   setSuccessMessage(
                     m2ModalMode === "create"
-                      ? "Modalidade adicionada com sucesso!"
-                      : "Modalidade renomeada com sucesso!",
+                      ? t('modalidade_adicionada_sucesso')
+                      : t('modalidade_renomeada_sucesso'),
                   );
                   setTimeout(() => setSuccessMessage(null), 4000);
                 }}
@@ -6488,14 +6445,13 @@ export default function QuestionarioView({
               >
                 <div>
                   <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">
-                    Nome da Modalidade/Esporte:
-                  </label>
+                    {t('nome_da_modalidade_esporte')}</label>
                   <input
                     type="text"
                     required
                     value={m2NewName}
                     onChange={(e) => setM2NewName(e.target.value)}
-                    placeholder="Ex: Tênis de Mesa, Judô, Atletismo"
+                    placeholder={t('ex_tenis_de_mesa_judo_atletismo')}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg p-3.5 text-xs text-[#dae2fd] focus:border-[#8ed5ff] focus:outline-none transition-all"
                   />
                 </div>
@@ -6505,15 +6461,14 @@ export default function QuestionarioView({
                     onClick={() => setShowM2Modal(false)}
                     className="px-4 py-2 rounded-lg text-xs font-medium border border-[#232e48] hover:bg-[#1e2944] text-[#bdc8d1] hover:text-white transition-all cursor-pointer"
                   >
-                    Cancelar
-                  </button>
+                    {t('cancelar')}</button>
                   <button
                     type="submit"
                     className="px-5 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all cursor-pointer"
                   >
                     {m2ModalMode === "create"
-                      ? "Indicar Esporte"
-                      : "Salvar Alterações"}
+                      ? t('indicar_esporte')
+                      : t('salvar_alteracoes')}
                   </button>
                 </div>
               </form>
@@ -6527,31 +6482,26 @@ export default function QuestionarioView({
             <div className="bg-[#171f33] border border-[#ffb4ab]/40 w-full max-w-sm rounded-xl shadow-2xl p-5 relative animate-in fade-in zoom-in duration-150">
               <h4 className="text-sm font-bold text-[#ffb4ab] uppercase tracking-wider mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-rose-400" />
-                Confirmar Exclusão
-              </h4>
+                {t('confirmarExclusao')}</h4>
               <p className="text-xs text-[#bdc8d1] mb-5 leading-relaxed">
-                Tem certeza de que deseja remover permanentemente a modalidade{" "}
+                {t('tem_certeza_de_que_deseja_remover_permanentemente_a_modalidade')}{" "}
                 <span className="text-white font-bold">
                   {m2ModalityToDelete.name}
                 </span>{" "}
-                e todas as suas configurações de aptidão? Esta ação não pode ser
-                desfeita.
-              </p>
+                {t('e_todas_as_suas_configuracoes_de_aptidao_esta_acao_nao_pode_ser_desfei')}</p>
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={() => setM2ModalityToDelete(null)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1] cursor-pointer"
                 >
-                  Cancelar
-                </button>
+                  {t('cancelar')}</button>
                 <button
                   type="button"
                   onClick={handleConfirmDeleteM2Modality}
                   className="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs shadow-md cursor-pointer"
                 >
-                  Confirmar Excluir
-                </button>
+                  {t('confirmarExcluir')}</button>
               </div>
             </div>
           </div>
@@ -6569,7 +6519,7 @@ export default function QuestionarioView({
         row.condition.toLowerCase().includes(q) ||
         row.report.toLowerCase().includes(q)
       );
-    }).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+    }).sort((a, b) => a.name.localeCompare(b.name, locale));
 
     const filteredM6Diretrizes = m6Diretrizes.filter((row) => {
       const q = searchQuery.toLowerCase();
@@ -6758,11 +6708,9 @@ export default function QuestionarioView({
           <div>
             <h1 className="text-2xl font-black text-black tracking-tight flex items-center gap-2">
               <ClipboardList className="w-7 h-7 text-blue-600" />
-              Módulo 6: Direcionamento por Modalidade e Diretrizes
-            </h1>
+              {t('modulo_6_direcionamento_por_modalidade_e_diretrizes')}</h1>
             <p className="text-sm text-slate-600 font-bold mt-1">
-              Configure as Tabelas de Direcionamento por Esporte e Diretrizes de Intervenção
-            </p>
+              {t('configure_as_tabelas_de_direcionamento_por_esporte_e_diretrizes_de_int')}</p>
           </div>
           
           {/* Global Search inside this tab */}
@@ -6770,7 +6718,7 @@ export default function QuestionarioView({
             <Search className="w-5 h-5 absolute left-3 top-3 text-slate-500" />
             <input
               type="text"
-              placeholder="Pesquisar registros..."
+              placeholder={t('pesquisar_registros')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-slate-50 border-2 border-slate-300 rounded-lg py-2 pl-10 pr-4 text-sm text-black placeholder-slate-500 focus:outline-none focus:border-black font-semibold"
@@ -6793,7 +6741,7 @@ export default function QuestionarioView({
             }`}
           >
             <Dumbbell className="w-4 h-4" />
-            <span>Direcionamento por Modalidade ({m6Modalidades.length})</span>
+            <span>{t('direcionamento_por_modalidade')}{m6Modalidades.length})</span>
           </button>
           <button
             onClick={() => {
@@ -6808,7 +6756,7 @@ export default function QuestionarioView({
             }`}
           >
             <Activity className="w-4 h-4" />
-            <span>Diretrizes de Intervenção ({m6Diretrizes.length})</span>
+            <span>{t('diretrizes_de_intervencao')}{m6Diretrizes.length})</span>
           </button>
         </div>
 
@@ -6819,34 +6767,33 @@ export default function QuestionarioView({
             <div className="bg-slate-50 border-2 border-slate-300 rounded-xl p-5">
               <h3 className="text-base font-black text-black uppercase tracking-tight mb-4 flex items-center gap-2 border-b pb-2">
                 <Plus className="w-5 h-5 text-blue-600" />
-                Novo Direcionamento de Modalidade
-              </h3>
+                {t('novo_direcionamento_de_modalidade')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
-                  <label className="text-xs font-extrabold text-slate-800 block mb-1">Modalidade / Esporte:</label>
+                  <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('modalidadeEsporte')}</label>
                   <input
                     type="text"
-                    placeholder="Ex: BASQUETE 🏀"
+                    placeholder={t('ex_basquete')}
                     value={m6NewModality.name}
                     onChange={(e) => setM6NewModality({ ...m6NewModality, name: e.target.value })}
                     className="w-full bg-white border-2 border-slate-300 rounded-lg p-2.5 text-sm text-black focus:border-black focus:outline-none font-bold"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-extrabold text-slate-800 block mb-1">Valências Importantes:</label>
+                  <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('valencias_importantes')}</label>
                   <input
                     type="text"
-                    placeholder="Ex: Impulsão, Agilidade..."
+                    placeholder={t('ex_impulsao_agilidade')}
                     value={m6NewModality.valencias}
                     onChange={(e) => setM6NewModality({ ...m6NewModality, valencias: e.target.value })}
                     className="w-full bg-white border-2 border-slate-300 rounded-lg p-2.5 text-sm text-black focus:border-black focus:outline-none font-bold"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-extrabold text-slate-800 block mb-1">Condição Pedagógica (Nível):</label>
+                  <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('condicao_pedagogica_nivel')}</label>
                   <input
                     type="text"
-                    placeholder="Ex: Níveis Bom / Excelente em..."
+                    placeholder={t('ex_niveis_bom_excelente_em')}
                     value={m6NewModality.condition}
                     onChange={(e) => setM6NewModality({ ...m6NewModality, condition: e.target.value })}
                     className="w-full bg-white border-2 border-slate-300 rounded-lg p-2.5 text-sm text-black focus:border-black focus:outline-none font-bold"
@@ -6854,9 +6801,9 @@ export default function QuestionarioView({
                 </div>
               </div>
               <div className="mb-4">
-                <label className="text-xs font-extrabold text-slate-800 block mb-1">Parecer Técnico / Impacto na Saúde:</label>
+                <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('parecer_tecnico_impacto_na_saude')}</label>
                 <textarea
-                  placeholder="Descreva o parecer técnico detalhadamente ou o impacto na saúde..."
+                  placeholder={t('descreva_o_parecer_tecnico_detalhadamente_ou_o_impacto_na_saude')}
                   value={m6NewModality.report}
                   onChange={(e) => setM6NewModality({ ...m6NewModality, report: e.target.value })}
                   rows={3}
@@ -6870,7 +6817,7 @@ export default function QuestionarioView({
                   className="px-6 py-3 bg-black hover:bg-slate-800 text-white font-black rounded-lg text-xs tracking-wider uppercase transition-all shadow-md active:scale-95 cursor-pointer border border-black flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Adicionar Registro</span>
+                  <span>{t('adicionarRegistro')}</span>
                 </button>
               </div>
             </div>
@@ -6880,19 +6827,18 @@ export default function QuestionarioView({
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-slate-100 text-slate-800 uppercase text-xs font-black border-b-2 border-slate-300">
-                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/6">Modalidade</th>
-                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/6">Valências Importantes</th>
-                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/4">Condição Pedagógica (Nível)</th>
-                    <th className="py-4 px-4 text-left border-r border-slate-300">Parecer Técnico / Impacto na Saúde</th>
-                    <th className="py-4 px-4 text-center w-28">Ações</th>
+                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/6">{t('modalidade')}</th>
+                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/6">{t('valencias_importantes_2')}</th>
+                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/4">{t('condicao_pedagogica_nivel_2')}</th>
+                    <th className="py-4 px-4 text-left border-r border-slate-300">{t('parecer_tecnico_impacto_na_saude_2')}</th>
+                    <th className="py-4 px-4 text-center w-28">{t('acoes')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredM6Modalidades.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="py-12 text-center text-slate-500 font-bold italic bg-slate-50">
-                        Nenhum registro encontrado.
-                      </td>
+                        {t('nenhumRegistro')}</td>
                     </tr>
                   ) : (
                     filteredM6Modalidades.map((row) => {
@@ -6941,14 +6887,12 @@ export default function QuestionarioView({
                                     onClick={m6SaveEditingModality}
                                     className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold transition-all shadow-md active:scale-95 border border-green-700"
                                   >
-                                    Salvar
-                                  </button>
+                                    {t('salvar')}</button>
                                   <button
                                     onClick={m6CancelEditingModality}
                                     className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold transition-all shadow-md active:scale-95 border border-slate-600"
                                   >
-                                    Cancelar
-                                  </button>
+                                    {t('cancelar')}</button>
                                 </div>
                               </td>
                             </>
@@ -6971,18 +6915,18 @@ export default function QuestionarioView({
                                   <button
                                     onClick={() => m6StartEditingModality(row)}
                                     className="text-blue-700 hover:text-white flex items-center justify-center gap-1 font-bold text-[10px] bg-blue-100 hover:bg-blue-700 px-2 py-1.5 rounded-md transition-all cursor-pointer border border-blue-400"
-                                    title="Editar"
+                                    title={t('editar')}
                                   >
                                     <Edit className="w-3.5 h-3.5" />
-                                    <span>Editar</span>
+                                    <span>{t('editar')}</span>
                                   </button>
                                   <button
                                     onClick={() => m6DeleteModality(row.id)}
                                     className="text-red-700 hover:text-white flex items-center justify-center gap-1 font-bold text-[10px] bg-red-100 hover:bg-red-700 px-2 py-1.5 rounded-md transition-all cursor-pointer border border-red-400"
-                                    title="Excluir"
+                                    title={t('excluir')}
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
-                                    <span>Excluir</span>
+                                    <span>{t('excluir')}</span>
                                   </button>
                                 </div>
                               </td>
@@ -7005,24 +6949,23 @@ export default function QuestionarioView({
             <div className="bg-slate-50 border-2 border-slate-300 rounded-xl p-5">
               <h3 className="text-base font-black text-black uppercase tracking-tight mb-4 flex items-center gap-2 border-b pb-2">
                 <Plus className="w-5 h-5 text-blue-600" />
-                Nova Diretriz de Intervenção
-              </h3>
+                {t('nova_diretriz_de_intervencao')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="text-xs font-extrabold text-slate-800 block mb-1">Diretriz / Intervenção:</label>
+                  <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('diretriz_intervencao')}</label>
                   <input
                     type="text"
-                    placeholder="Ex: APRIMORAR HABILIDADES MOTORAS 🏃‍♂️"
+                    placeholder={t('ex_aprimorar_habilidades_motoras')}
                     value={m6NewDiretriz.diretriz}
                     onChange={(e) => setM6NewDiretriz({ ...m6NewDiretriz, diretriz: e.target.value })}
                     className="w-full bg-white border-2 border-slate-300 rounded-lg p-2.5 text-sm text-black focus:border-black focus:outline-none font-bold"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-extrabold text-slate-800 block mb-1">Critério Técnico de Ativação:</label>
+                  <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('criterio_tecnico_de_ativacao')}</label>
                   <input
                     type="text"
-                    placeholder="Ex: Se três ou mais valências..."
+                    placeholder={t('ex_se_tres_ou_mais_valencias')}
                     value={m6NewDiretriz.criterio}
                     onChange={(e) => setM6NewDiretriz({ ...m6NewDiretriz, criterio: e.target.value })}
                     className="w-full bg-white border-2 border-slate-300 rounded-lg p-2.5 text-sm text-black focus:border-black focus:outline-none font-bold"
@@ -7031,9 +6974,9 @@ export default function QuestionarioView({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="text-xs font-extrabold text-slate-800 block mb-1">Parecer Técnico / Conduta Pedagógica:</label>
+                  <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('parecer_tecnico_conduta_pedagogica')}</label>
                   <textarea
-                    placeholder="Descreva a conduta pedagógica detalhadamente..."
+                    placeholder={t('descreva_a_conduta_pedagogica_detalhadamente')}
                     value={m6NewDiretriz.conduta}
                     onChange={(e) => setM6NewDiretriz({ ...m6NewDiretriz, conduta: e.target.value })}
                     rows={3}
@@ -7041,9 +6984,9 @@ export default function QuestionarioView({
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-extrabold text-slate-800 block mb-1">Impacto na Saúde / Objetivo:</label>
+                  <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('impacto_na_saude_objetivo')}</label>
                   <textarea
-                    placeholder="Descreva o impacto na saúde ou o objetivo principal..."
+                    placeholder={t('descreva_o_impacto_na_saude_ou_o_objetivo_principal')}
                     value={m6NewDiretriz.objetivo}
                     onChange={(e) => setM6NewDiretriz({ ...m6NewDiretriz, objetivo: e.target.value })}
                     rows={3}
@@ -7058,7 +7001,7 @@ export default function QuestionarioView({
                   className="px-6 py-3 bg-black hover:bg-slate-800 text-white font-black rounded-lg text-xs tracking-wider uppercase transition-all shadow-md active:scale-95 cursor-pointer border border-black flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Adicionar Diretriz</span>
+                  <span>{t('adicionar_diretriz')}</span>
                 </button>
               </div>
             </div>
@@ -7068,19 +7011,18 @@ export default function QuestionarioView({
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-slate-100 text-slate-800 uppercase text-xs font-black border-b-2 border-slate-300">
-                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/5">Diretriz / Intervenção</th>
-                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/5">Critério de Ativação</th>
-                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/4">Conduta Pedagógica</th>
-                    <th className="py-4 px-4 text-left border-r border-slate-300">Impacto na Saúde / Objetivo</th>
-                    <th className="py-4 px-4 text-center w-28">Ações</th>
+                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/5">{t('diretriz_intervencao_2')}</th>
+                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/5">{t('criterio_de_ativacao')}</th>
+                    <th className="py-4 px-4 text-left border-r border-slate-300 w-1/4">{t('conduta_pedagogica')}</th>
+                    <th className="py-4 px-4 text-left border-r border-slate-300">{t('impacto_na_saude_objetivo_2')}</th>
+                    <th className="py-4 px-4 text-center w-28">{t('acoes')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredM6Diretrizes.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="py-12 text-center text-slate-500 font-bold italic bg-slate-50">
-                        Nenhuma diretriz de intervenção encontrada.
-                      </td>
+                        {t('nenhuma_diretriz_de_intervencao_encontrada')}</td>
                     </tr>
                   ) : (
                     filteredM6Diretrizes.map((row) => {
@@ -7128,14 +7070,12 @@ export default function QuestionarioView({
                                     onClick={m6SaveEditingDiretriz}
                                     className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold transition-all shadow-md active:scale-95 border border-green-700"
                                   >
-                                    Salvar
-                                  </button>
+                                    {t('salvar')}</button>
                                   <button
                                     onClick={m6CancelEditingDiretriz}
                                     className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold transition-all shadow-md active:scale-95 border border-slate-600"
                                   >
-                                    Cancelar
-                                  </button>
+                                    {t('cancelar')}</button>
                                 </div>
                               </td>
                             </>
@@ -7158,18 +7098,18 @@ export default function QuestionarioView({
                                   <button
                                     onClick={() => m6StartEditingDiretriz(row)}
                                     className="text-blue-700 hover:text-white flex items-center justify-center gap-1 font-bold text-[10px] bg-blue-100 hover:bg-blue-700 px-2 py-1.5 rounded-md transition-all cursor-pointer border border-blue-400"
-                                    title="Editar"
+                                    title={t('editar')}
                                   >
                                     <Edit className="w-3.5 h-3.5" />
-                                    <span>Editar</span>
+                                    <span>{t('editar')}</span>
                                   </button>
                                   <button
                                     onClick={() => m6DeleteDiretriz(row.id)}
                                     className="text-red-700 hover:text-white flex items-center justify-center gap-1 font-bold text-[10px] bg-red-100 hover:bg-red-700 px-2 py-1.5 rounded-md transition-all cursor-pointer border border-red-400"
-                                    title="Excluir"
+                                    title={t('excluir')}
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
-                                    <span>Excluir</span>
+                                    <span>{t('excluir')}</span>
                                   </button>
                                 </div>
                               </td>
@@ -7191,30 +7131,26 @@ export default function QuestionarioView({
             <div className="bg-white border border-slate-300 w-full max-w-md rounded-xl shadow-2xl p-4 sm:p-6 relative animate-in fade-in zoom-in duration-150">
               <h4 className="text-lg font-black text-black uppercase tracking-tight mb-2 flex items-center gap-2 border-b pb-2">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
-                Confirmar Exclusão
-              </h4>
+                {t('confirmarExclusao')}</h4>
               <p className="text-sm text-slate-700 mb-6 leading-relaxed">
-                Tem certeza de que deseja excluir permanentemente o direcionamento da modalidade{" "}
+                {t('tem_certeza_de_que_deseja_excluir_permanentemente_o_direcionamento_da_')}{" "}
                 <span className="text-black font-extrabold font-mono bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
                   {m6ModalityToDelete.name}
                 </span>{" "}
-                ({m6ModalityToDelete.condition})? Esta ação não pode ser desfeita.
-              </p>
+                ({m6ModalityToDelete.condition}{t('esta_acao_nao_pode_ser_desfeita')}</p>
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={() => setM6ModalityToDelete(null)}
                   className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-xs font-black text-slate-800 transition-colors cursor-pointer"
                 >
-                  Cancelar
-                </button>
+                  {t('cancelar')}</button>
                 <button
                   type="button"
                   onClick={handleConfirmDeleteM6Modality}
                   className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black rounded-lg text-xs shadow-md transition-colors cursor-pointer border border-red-700"
                 >
-                  Confirmar Excluir
-                </button>
+                  {t('confirmarExcluir')}</button>
               </div>
             </div>
           </div>
@@ -7226,30 +7162,26 @@ export default function QuestionarioView({
             <div className="bg-white border border-slate-300 w-full max-w-md rounded-xl shadow-2xl p-4 sm:p-6 relative animate-in fade-in zoom-in duration-150">
               <h4 className="text-lg font-black text-black uppercase tracking-tight mb-2 flex items-center gap-2 border-b pb-2">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
-                Confirmar Exclusão
-              </h4>
+                {t('confirmarExclusao')}</h4>
               <p className="text-sm text-slate-700 mb-6 leading-relaxed">
-                Tem certeza de que deseja excluir permanentemente a diretriz{" "}
+                {t('tem_certeza_de_que_deseja_excluir_permanentemente_a_diretriz')}{" "}
                 <span className="text-black font-extrabold font-mono bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
                   {m6DiretrizToDelete.diretriz}
                 </span>{" "}
-                ? Esta ação não pode ser desfeita.
-              </p>
+                {t('esta_acao_nao_pode_ser_desfeita_2')}</p>
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={() => setM6DiretrizToDelete(null)}
                   className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-xs font-black text-slate-800 transition-colors cursor-pointer"
                 >
-                  Cancelar
-                </button>
+                  {t('cancelar')}</button>
                 <button
                   type="button"
                   onClick={handleConfirmDeleteM6Diretriz}
                   className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black rounded-lg text-xs shadow-md transition-colors cursor-pointer border border-red-700"
                 >
-                  Confirmar Excluir
-                </button>
+                  {t('confirmarExcluir')}</button>
               </div>
             </div>
           </div>
@@ -7260,7 +7192,7 @@ export default function QuestionarioView({
 
   const addVocQuestion = async () => {
     if (!vocNew.statement.trim() || !vocNew.optionA.trim() || !vocNew.optionB.trim() || !vocNew.optionC.trim() || !vocNew.optionD.trim()) {
-      alert("Preencha a pergunta e as 4 alternativas.");
+      alert(t('preencha_a_pergunta_e_as_4_alternativas'));
       return;
     }
     const nextOrd = vocQuestions.reduce((m, q) => Math.max(m, q.ord || 0), 0) + 1;
@@ -7275,7 +7207,7 @@ export default function QuestionarioView({
     };
     setVocQuestions([...vocQuestions, newQ]);
     setVocNew({ statement: "", optionA: "", optionB: "", optionC: "", optionD: "" });
-    setSuccessMessage("Pergunta adicionada com sucesso!");
+    setSuccessMessage(t('pergunta_adicionada_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7284,13 +7216,13 @@ export default function QuestionarioView({
   const saveVocEdit = () => {
     if (!vocEditData) return;
     if (!vocEditData.statement.trim() || !vocEditData.optionA.trim() || !vocEditData.optionB.trim() || !vocEditData.optionC.trim() || !vocEditData.optionD.trim()) {
-      alert("Preencha a pergunta e as 4 alternativas.");
+      alert(t('preencha_a_pergunta_e_as_4_alternativas'));
       return;
     }
     setVocQuestions(vocQuestions.map(q => q.id === vocEditData.id ? vocEditData : q));
     setVocEditingId(null);
     setVocEditData(null);
-    setSuccessMessage("Pergunta atualizada com sucesso!");
+    setSuccessMessage(t('pergunta_atualizada_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
   const confirmDeleteVoc = () => {
@@ -7306,29 +7238,29 @@ export default function QuestionarioView({
         });
       }
     }
-    setSuccessMessage("Pergunta removida com sucesso!");
+    setSuccessMessage(t('pergunta_removida_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
   if (activeTab === "questionario-m8") {
     return (
       <div className="p-6 bg-white rounded-xl shadow-md border border-slate-300">
-        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">Módulo 8: Perguntas do Questionário Vocacional</h1>
+        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">{t('modulo_8_perguntas_do_questionario_vocacional')}</h1>
 
         <div className="mb-8 p-6 bg-white border-4 border-black rounded-xl space-y-4 shadow-md">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">Adicionar nova pergunta</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">{t('adicionar_nova_pergunta')}</h3>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-black uppercase tracking-wider">Pergunta</label>
-            <input type="text" placeholder="Ex: Em um trabalho de grupo, você prefere:" className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none" value={vocNew.statement} onChange={e => setVocNew({ ...vocNew, statement: e.target.value })} />
+            <label className="text-xs font-black text-black uppercase tracking-wider">{t('pergunta')}</label>
+            <input type="text" placeholder={t('ex_em_um_trabalho_de_grupo_voce_prefere')} className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none" value={vocNew.statement} onChange={e => setVocNew({ ...vocNew, statement: e.target.value })} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5"><label className="text-xs font-black text-black uppercase tracking-wider">Alternativa A (Humanas)</label><input type="text" className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none" value={vocNew.optionA} onChange={e => setVocNew({ ...vocNew, optionA: e.target.value })} /></div>
-            <div className="flex flex-col gap-1.5"><label className="text-xs font-black text-black uppercase tracking-wider">Alternativa B (Exatas)</label><input type="text" className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none" value={vocNew.optionB} onChange={e => setVocNew({ ...vocNew, optionB: e.target.value })} /></div>
-            <div className="flex flex-col gap-1.5"><label className="text-xs font-black text-black uppercase tracking-wider">Alternativa C (Biológicas)</label><input type="text" className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none" value={vocNew.optionC} onChange={e => setVocNew({ ...vocNew, optionC: e.target.value })} /></div>
-            <div className="flex flex-col gap-1.5"><label className="text-xs font-black text-black uppercase tracking-wider">Alternativa D (Negócios)</label><input type="text" className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none" value={vocNew.optionD} onChange={e => setVocNew({ ...vocNew, optionD: e.target.value })} /></div>
+            <div className="flex flex-col gap-1.5"><label className="text-xs font-black text-black uppercase tracking-wider">{t('alternativa_a_humanas')}</label><input type="text" className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none" value={vocNew.optionA} onChange={e => setVocNew({ ...vocNew, optionA: e.target.value })} /></div>
+            <div className="flex flex-col gap-1.5"><label className="text-xs font-black text-black uppercase tracking-wider">{t('alternativa_b_exatas')}</label><input type="text" className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none" value={vocNew.optionB} onChange={e => setVocNew({ ...vocNew, optionB: e.target.value })} /></div>
+            <div className="flex flex-col gap-1.5"><label className="text-xs font-black text-black uppercase tracking-wider">{t('alternativa_c_biologicas')}</label><input type="text" className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none" value={vocNew.optionC} onChange={e => setVocNew({ ...vocNew, optionC: e.target.value })} /></div>
+            <div className="flex flex-col gap-1.5"><label className="text-xs font-black text-black uppercase tracking-wider">{t('alternativa_d_negocios')}</label><input type="text" className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none" value={vocNew.optionD} onChange={e => setVocNew({ ...vocNew, optionD: e.target.value })} /></div>
           </div>
           <div className="flex justify-end pt-2">
-            <button onClick={addVocQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">Adicionar Pergunta</button>
+            <button onClick={addVocQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">{t('adicionar_pergunta')}</button>
           </div>
         </div>
 
@@ -7337,9 +7269,9 @@ export default function QuestionarioView({
             <thead>
               <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
                 <th className="py-3 px-3 w-[5%] border-r border-slate-300">#</th>
-                <th className="py-3 px-3 w-[35%] border-r border-slate-300">Pergunta</th>
-                <th className="py-3 px-3 border-r border-slate-300">Alternativas (A/B/C/D)</th>
-                <th className="py-3 px-3 w-[15%] text-right">Ações</th>
+                <th className="py-3 px-3 w-[35%] border-r border-slate-300">{t('pergunta')}</th>
+                <th className="py-3 px-3 border-r border-slate-300">{t('alternativas_a_b_c_d')}</th>
+                <th className="py-3 px-3 w-[15%] text-right">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -7361,8 +7293,8 @@ export default function QuestionarioView({
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex flex-col sm:flex-row gap-2 justify-end">
-                            <button onClick={saveVocEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                            <button onClick={cancelVocEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                            <button onClick={saveVocEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                            <button onClick={cancelVocEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                           </div>
                         </td>
                       </>
@@ -7371,15 +7303,15 @@ export default function QuestionarioView({
                         <td className="py-4 px-3 border-r border-slate-300 font-bold align-top">{q.ord}</td>
                         <td className="py-4 px-3 border-r border-slate-300 font-bold text-black align-top">{q.statement}</td>
                         <td className="py-4 px-3 border-r border-slate-300 text-xs text-slate-800 align-top space-y-0.5">
-                          <div><span className="font-black">A)</span> {q.optionA}</div>
-                          <div><span className="font-black">B)</span> {q.optionB}</div>
-                          <div><span className="font-black">C)</span> {q.optionC}</div>
-                          <div><span className="font-black">D)</span> {q.optionD}</div>
+                          <div><span className="font-black">{t('a')}</span> {q.optionA}</div>
+                          <div><span className="font-black">{t('b')}</span> {q.optionB}</div>
+                          <div><span className="font-black">{t('c')}</span> {q.optionC}</div>
+                          <div><span className="font-black">{t('d')}</span> {q.optionD}</div>
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex gap-2 justify-end">
-                            <button onClick={() => startVocEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
-                            <button onClick={() => setVocToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">Excluir</button>
+                            <button onClick={() => startVocEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
+                            <button onClick={() => setVocToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">{t('excluir')}</button>
                           </div>
                         </td>
                       </>
@@ -7394,11 +7326,11 @@ export default function QuestionarioView({
         {vocToDelete && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl max-w-md w-full p-4 sm:p-6 space-y-4">
-              <h4 className="text-lg font-black text-black">Excluir pergunta?</h4>
-              <p className="text-sm text-slate-700">Tem certeza que deseja excluir a pergunta <strong>&quot;{vocToDelete.statement}&quot;</strong>? Esta ação não pode ser desfeita.</p>
+              <h4 className="text-lg font-black text-black">{t('excluir_pergunta')}</h4>
+              <p className="text-sm text-slate-700">{t('tem_certeza_que_deseja_excluir_a_pergunta')}<strong>{'"'}{vocToDelete.statement}{'"'}</strong>{t('esta_acao_nao_pode_ser_desfeita_2')}</p>
               <div className="flex justify-end gap-2">
-                <button onClick={() => setVocToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">Cancelar</button>
-                <button onClick={confirmDeleteVoc} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">Excluir</button>
+                <button onClick={() => setVocToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">{t('cancelar')}</button>
+                <button onClick={confirmDeleteVoc} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">{t('excluir')}</button>
               </div>
             </div>
           </div>
@@ -7409,7 +7341,7 @@ export default function QuestionarioView({
 
   const addHealthQuestion = async () => {
     if (!healthNew.statement.trim()) {
-      alert("Preencha o enunciado da pergunta.");
+      alert(t('preencha_o_enunciado_da_pergunta'));
       return;
     }
     const nextOrd = healthQuestions.reduce((m, q) => Math.max(m, q.ord || 0), 0) + 1;
@@ -7421,7 +7353,7 @@ export default function QuestionarioView({
     };
     setHealthQuestions([...healthQuestions, newQ]);
     setHealthNew({ statement: "", reversed: false });
-    setSuccessMessage("Pergunta adicionada com sucesso!");
+    setSuccessMessage(t('pergunta_adicionada_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7430,13 +7362,13 @@ export default function QuestionarioView({
   const saveHealthEdit = () => {
     if (!healthEditData) return;
     if (!healthEditData.statement.trim()) {
-      alert("Preencha o enunciado da pergunta.");
+      alert(t('preencha_o_enunciado_da_pergunta'));
       return;
     }
     setHealthQuestions(healthQuestions.map(q => q.id === healthEditData.id ? healthEditData : q));
     setHealthEditingId(null);
     setHealthEditData(null);
-    setSuccessMessage("Pergunta atualizada com sucesso!");
+    setSuccessMessage(t('pergunta_atualizada_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
   const confirmDeleteHealth = () => {
@@ -7452,7 +7384,7 @@ export default function QuestionarioView({
         });
       }
     }
-    setSuccessMessage("Pergunta removida com sucesso!");
+    setSuccessMessage(t('pergunta_removida_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7482,16 +7414,16 @@ export default function QuestionarioView({
     );
     setM9ParecerEditingId(null);
     setM9ParecerEditData(null);
-    setSuccessMessage("Parecer atualizado com sucesso!");
+    setSuccessMessage(t('parecer_atualizado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
   const oralRuleLabel = (r: OralScoringRule) =>
-    r === 'agree' ? 'Pontua se Concordo' : r === 'disagree' ? 'Pontua se Discordo' : 'Não pontua';
+    r === 'agree' ? t('pontua_se_concordo') : r === 'disagree' ? t('pontua_se_discordo') : t('nao_pontua');
 
   const addOralQuestion = async () => {
     if (!oralNew.statement.trim()) {
-      alert("Preencha o enunciado da afirmação.");
+      alert(t('preencha_o_enunciado_da_afirmacao'));
       return;
     }
     const nextOrd = oralQuestions.reduce((m, q) => Math.max(m, q.ord || 0), 0) + 1;
@@ -7503,7 +7435,7 @@ export default function QuestionarioView({
     };
     setOralQuestions([...oralQuestions, newQ]);
     setOralNew({ statement: "", scoringRule: "none" });
-    setSuccessMessage("Afirmação adicionada com sucesso!");
+    setSuccessMessage(t('afirmacao_adicionada_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7512,13 +7444,13 @@ export default function QuestionarioView({
   const saveOralEdit = () => {
     if (!oralEditData) return;
     if (!oralEditData.statement.trim()) {
-      alert("Preencha o enunciado da afirmação.");
+      alert(t('preencha_o_enunciado_da_afirmacao'));
       return;
     }
     setOralQuestions(oralQuestions.map(q => q.id === oralEditData.id ? oralEditData : q));
     setOralEditingId(null);
     setOralEditData(null);
-    setSuccessMessage("Afirmação atualizada com sucesso!");
+    setSuccessMessage(t('afirmacao_atualizada_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
   const confirmDeleteOral = () => {
@@ -7534,7 +7466,7 @@ export default function QuestionarioView({
         });
       }
     }
-    setSuccessMessage("Afirmação removida com sucesso!");
+    setSuccessMessage(t('afirmacao_removida_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7564,13 +7496,13 @@ export default function QuestionarioView({
     );
     setM10ParecerEditingId(null);
     setM10ParecerEditData(null);
-    setSuccessMessage("Parecer atualizado com sucesso!");
+    setSuccessMessage(t('parecer_atualizado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
   const addAutoQuestion = async () => {
     if (!autoNew.statement.trim()) {
-      alert("Preencha a afirmação.");
+      alert(t('preencha_a_afirmacao'));
       return;
     }
     const nextOrd = autoQuestions.reduce((m, q) => Math.max(m, q.ord || 0), 0) + 1;
@@ -7582,7 +7514,7 @@ export default function QuestionarioView({
     };
     setAutoQuestions([...autoQuestions, newQ]);
     setAutoNew({ statement: "", itemType: "positive" });
-    setSuccessMessage("Afirmação adicionada com sucesso!");
+    setSuccessMessage(t('afirmacao_adicionada_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7591,13 +7523,13 @@ export default function QuestionarioView({
   const saveAutoEdit = () => {
     if (!autoEditData) return;
     if (!autoEditData.statement.trim()) {
-      alert("Preencha a afirmação.");
+      alert(t('preencha_a_afirmacao'));
       return;
     }
     setAutoQuestions(autoQuestions.map(q => q.id === autoEditData.id ? autoEditData : q));
     setAutoEditingId(null);
     setAutoEditData(null);
-    setSuccessMessage("Afirmação atualizada com sucesso!");
+    setSuccessMessage(t('afirmacao_atualizada_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
   const confirmDeleteAuto = () => {
@@ -7613,7 +7545,7 @@ export default function QuestionarioView({
         });
       }
     }
-    setSuccessMessage("Afirmação removida com sucesso!");
+    setSuccessMessage(t('afirmacao_removida_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7643,13 +7575,13 @@ export default function QuestionarioView({
     );
     setM11ParecerEditingId(null);
     setM11ParecerEditData(null);
-    setSuccessMessage("Parecer atualizado com sucesso!");
+    setSuccessMessage(t('parecer_atualizado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
   const addIasQuestion = async () => {
     if (!iasNew.statement.trim() || !iasNew.option1Text.trim() || !iasNew.option2Text.trim() || !iasNew.option3Text.trim()) {
-      alert("Preencha o componente e as 3 opções.");
+      alert(t('preencha_o_componente_e_as_3_opcoes'));
       return;
     }
     const nextOrd = iasQuestions.reduce((m, q) => Math.max(m, q.ord || 0), 0) + 1;
@@ -7663,7 +7595,7 @@ export default function QuestionarioView({
     };
     setIasQuestions([...iasQuestions, newQ]);
     setIasNew({ statement: "", option1Text: "", option1Points: 0, option2Text: "", option2Points: 0, option3Text: "", option3Points: 0 });
-    setSuccessMessage("Componente adicionado com sucesso!");
+    setSuccessMessage(t('componente_adicionado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7672,13 +7604,13 @@ export default function QuestionarioView({
   const saveIasEdit = () => {
     if (!iasEditData) return;
     if (!iasEditData.statement.trim() || !iasEditData.option1Text.trim() || !iasEditData.option2Text.trim() || !iasEditData.option3Text.trim()) {
-      alert("Preencha o componente e as 3 opções.");
+      alert(t('preencha_o_componente_e_as_3_opcoes'));
       return;
     }
     setIasQuestions(iasQuestions.map(q => q.id === iasEditData.id ? iasEditData : q));
     setIasEditingId(null);
     setIasEditData(null);
-    setSuccessMessage("Componente atualizado com sucesso!");
+    setSuccessMessage(t('componente_atualizado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
   const confirmDeleteIas = () => {
@@ -7694,7 +7626,7 @@ export default function QuestionarioView({
         });
       }
     }
-    setSuccessMessage("Componente removido com sucesso!");
+    setSuccessMessage(t('componente_removido_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7724,13 +7656,13 @@ export default function QuestionarioView({
     );
     setM12ParecerEditingId(null);
     setM12ParecerEditData(null);
-    setSuccessMessage("Parecer atualizado com sucesso!");
+    setSuccessMessage(t('parecer_atualizado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
   const addSnapQuestion = async () => {
     if (!snapNew.statement.trim()) {
-      alert("Preencha o item de comportamento.");
+      alert(t('preencha_o_item_de_comportamento'));
       return;
     }
     const nextOrd = snapQuestions.reduce((m, q) => Math.max(m, q.ord || 0), 0) + 1;
@@ -7742,7 +7674,7 @@ export default function QuestionarioView({
     };
     setSnapQuestions([...snapQuestions, newQ]);
     setSnapNew({ statement: "", subscale: "inattention" });
-    setSuccessMessage("Item adicionado com sucesso!");
+    setSuccessMessage(t('item_adicionado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7751,13 +7683,13 @@ export default function QuestionarioView({
   const saveSnapEdit = () => {
     if (!snapEditData) return;
     if (!snapEditData.statement.trim()) {
-      alert("Preencha o item de comportamento.");
+      alert(t('preencha_o_item_de_comportamento'));
       return;
     }
     setSnapQuestions(snapQuestions.map(q => q.id === snapEditData.id ? snapEditData : q));
     setSnapEditingId(null);
     setSnapEditData(null);
-    setSuccessMessage("Item atualizado com sucesso!");
+    setSuccessMessage(t('item_atualizado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
   const confirmDeleteSnap = () => {
@@ -7773,7 +7705,7 @@ export default function QuestionarioView({
         });
       }
     }
-    setSuccessMessage("Item removido com sucesso!");
+    setSuccessMessage(t('item_removido_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7803,13 +7735,13 @@ export default function QuestionarioView({
     );
     setM13ParecerEditingId(null);
     setM13ParecerEditData(null);
-    setSuccessMessage("Parecer atualizado com sucesso!");
+    setSuccessMessage(t('parecer_atualizado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
   const addAq10Question = async () => {
     if (!aq10New.statement.trim()) {
-      alert("Preencha o item do questionário.");
+      alert(t('preencha_o_item_do_questionario'));
       return;
     }
     const nextOrd = aq10Questions.filter(q => q.version === aq10New.version).reduce((m, q) => Math.max(m, q.ord || 0), 0) + 1;
@@ -7821,7 +7753,7 @@ export default function QuestionarioView({
     };
     setAq10Questions([...aq10Questions, newQ]);
     setAq10New({ statement: "", version: aq10New.version });
-    setSuccessMessage("Item adicionado com sucesso!");
+    setSuccessMessage(t('item_adicionado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7830,13 +7762,13 @@ export default function QuestionarioView({
   const saveAq10Edit = () => {
     if (!aq10EditData) return;
     if (!aq10EditData.statement.trim()) {
-      alert("Preencha o item do questionário.");
+      alert(t('preencha_o_item_do_questionario'));
       return;
     }
     setAq10Questions(aq10Questions.map(q => q.id === aq10EditData.id ? aq10EditData : q));
     setAq10EditingId(null);
     setAq10EditData(null);
-    setSuccessMessage("Item atualizado com sucesso!");
+    setSuccessMessage(t('item_atualizado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
   const confirmDeleteAq10 = () => {
@@ -7852,7 +7784,7 @@ export default function QuestionarioView({
         });
       }
     }
-    setSuccessMessage("Item removido com sucesso!");
+    setSuccessMessage(t('item_removido_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7882,7 +7814,7 @@ export default function QuestionarioView({
     );
     setM14ParecerEditingId(null);
     setM14ParecerEditData(null);
-    setSuccessMessage("Parecer atualizado com sucesso!");
+    setSuccessMessage(t('parecer_atualizado_com_sucesso'));
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
@@ -7895,8 +7827,8 @@ export default function QuestionarioView({
     ) => (
       <div className="space-y-3">
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-black text-black uppercase tracking-wider">Componente / Afirmação</label>
-          <input type="text" className={textInputCls} placeholder="Ex: Frutas Totais (incluindo sucos naturais)" value={data.statement} onChange={e => patch({ statement: e.target.value })} />
+          <label className="text-xs font-black text-black uppercase tracking-wider">{t('componente_afirmacao')}</label>
+          <input type="text" className={textInputCls} placeholder={t('ex_frutas_totais_incluindo_sucos_naturais')} value={data.statement} onChange={e => patch({ statement: e.target.value })} />
         </div>
         {[
           { n: 1, text: `option${1}Text` as const, pts: `option${1}Points` as const },
@@ -7904,9 +7836,9 @@ export default function QuestionarioView({
           { n: 3, text: `option${3}Text` as const, pts: `option${3}Points` as const },
         ].map(o => (
           <div key={o.n} className="flex gap-2 items-center">
-            <input type="text" className={textInputCls} placeholder={`Opção ${o.n}: texto da resposta`} value={data[o.text]} onChange={e => patch({ [o.text]: e.target.value } as Partial<typeof data>)} />
+            <input type="text" className={textInputCls} placeholder={t('placeholder_opcao_resposta', { letra: o.n })} value={data[o.text]} onChange={e => patch({ [o.text]: e.target.value } as Partial<typeof data>)} />
             <div className="flex flex-col gap-0.5">
-              <label className="text-[10px] font-black text-black uppercase">Pts</label>
+              <label className="text-[10px] font-black text-black uppercase">{t('pts')}</label>
               <input type="number" className={pointInputCls} value={data[o.pts]} onChange={e => patch({ [o.pts]: Number(e.target.value) || 0 } as Partial<typeof data>)} />
             </div>
           </div>
@@ -7916,13 +7848,13 @@ export default function QuestionarioView({
 
     return (
       <div className="p-6 bg-white rounded-xl shadow-md border border-slate-300">
-        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">Módulo 12: Índice de Alimentação Saudável (IAS)</h1>
+        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">{t('modulo_12_indice_de_alimentacao_saudavel_ias')}</h1>
 
         <div className="mb-8 p-6 bg-white border-4 border-black rounded-xl space-y-4 shadow-md">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">Adicionar novo componente</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">{t('adicionar_novo_componente')}</h3>
           {renderIasForm(iasNew, (p) => setIasNew(prev => ({ ...prev, ...p })))}
           <div className="flex justify-end pt-2">
-            <button onClick={addIasQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">Adicionar Componente</button>
+            <button onClick={addIasQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">{t('adicionar_componente')}</button>
           </div>
         </div>
 
@@ -7931,9 +7863,9 @@ export default function QuestionarioView({
             <thead>
               <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
                 <th className="py-3 px-3 w-[5%] border-r border-slate-300">#</th>
-                <th className="py-3 px-3 w-[30%] border-r border-slate-300">Componente</th>
-                <th className="py-3 px-3 border-r border-slate-300">Opções (pontuação)</th>
-                <th className="py-3 px-3 w-[15%] text-right">Ações</th>
+                <th className="py-3 px-3 w-[30%] border-r border-slate-300">{t('componente')}</th>
+                <th className="py-3 px-3 border-r border-slate-300">{t('opcoes_pontuacao')}</th>
+                <th className="py-3 px-3 w-[15%] text-right">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -7949,8 +7881,8 @@ export default function QuestionarioView({
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex flex-col sm:flex-row gap-2 justify-end">
-                            <button onClick={saveIasEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                            <button onClick={cancelIasEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                            <button onClick={saveIasEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                            <button onClick={cancelIasEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                           </div>
                         </td>
                       </>
@@ -7959,14 +7891,14 @@ export default function QuestionarioView({
                         <td className="py-4 px-3 border-r border-slate-300 font-bold align-top">{q.ord}</td>
                         <td className="py-4 px-3 border-r border-slate-300 font-bold text-black align-top">{q.statement}</td>
                         <td className="py-4 px-3 border-r border-slate-300 text-xs text-slate-800 align-top space-y-0.5">
-                          <div>• {q.option1Text} <span className="font-black text-emerald-700">({q.option1Points} pts)</span></div>
-                          <div>• {q.option2Text} <span className="font-black text-emerald-700">({q.option2Points} pts)</span></div>
-                          <div>• {q.option3Text} <span className="font-black text-emerald-700">({q.option3Points} pts)</span></div>
+                          <div>• {q.option1Text} <span className="font-black text-emerald-700">({q.option1Points} {t('pts_2')}</span></div>
+                          <div>• {q.option2Text} <span className="font-black text-emerald-700">({q.option2Points} {t('pts_2')}</span></div>
+                          <div>• {q.option3Text} <span className="font-black text-emerald-700">({q.option3Points} {t('pts_2')}</span></div>
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex gap-2 justify-end">
-                            <button onClick={() => startIasEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
-                            <button onClick={() => setIasToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">Excluir</button>
+                            <button onClick={() => startIasEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
+                            <button onClick={() => setIasToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">{t('excluir')}</button>
                           </div>
                         </td>
                       </>
@@ -7979,7 +7911,7 @@ export default function QuestionarioView({
         </div>
 
         <div className="mb-4">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">Parecer por faixa de qualidade (editável)</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">{t('parecer_por_faixa_de_qualidade_editavel')}</h3>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {IAS_CLASSIFICATIONS.map(cls => {
               const existing = m12Pareceres.find(p => p.classification === cls);
@@ -7989,19 +7921,19 @@ export default function QuestionarioView({
                   <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
                   {isEditing && m12ParecerEditData ? (
                     <div className="space-y-2">
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder="Dados básicos (faixa de pontos)" value={m12ParecerEditData.basicData} onChange={e => setM12ParecerEditData({ ...m12ParecerEditData, basicData: e.target.value })} />
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder="Reflexão / recomendação" value={m12ParecerEditData.reflection} onChange={e => setM12ParecerEditData({ ...m12ParecerEditData, reflection: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder={t('dados_basicos_faixa_de_pontos')} value={m12ParecerEditData.basicData} onChange={e => setM12ParecerEditData({ ...m12ParecerEditData, basicData: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder={t('reflexaoRecomendacao')} value={m12ParecerEditData.reflection} onChange={e => setM12ParecerEditData({ ...m12ParecerEditData, reflection: e.target.value })} />
                       <div className="flex gap-2 justify-end">
-                        <button onClick={saveM12ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                        <button onClick={cancelM12ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                        <button onClick={saveM12ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                        <button onClick={cancelM12ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <p className="text-xs text-slate-800"><span className="font-black">Faixa:</span> {existing?.basicData || "—"}</p>
-                      <p className="text-xs text-slate-800"><span className="font-black">Parecer:</span> {existing?.reflection || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('faixa')}</span> {existing?.basicData || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('parecer')}</span> {existing?.reflection || "—"}</p>
                       <div className="flex justify-end">
-                        <button onClick={() => startM12ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
+                        <button onClick={() => startM12ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
                       </div>
                     </div>
                   )}
@@ -8014,11 +7946,11 @@ export default function QuestionarioView({
         {iasToDelete && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl max-w-md w-full p-4 sm:p-6 space-y-4">
-              <h4 className="text-lg font-black text-black">Excluir componente?</h4>
-              <p className="text-sm text-slate-700">Tem certeza que deseja excluir o componente <strong>&quot;{iasToDelete.statement}&quot;</strong>? Esta ação não pode ser desfeita.</p>
+              <h4 className="text-lg font-black text-black">{t('excluir_componente')}</h4>
+              <p className="text-sm text-slate-700">{t('tem_certeza_que_deseja_excluir_o_componente')}<strong>{'"'}{iasToDelete.statement}{'"'}</strong>{t('esta_acao_nao_pode_ser_desfeita_2')}</p>
               <div className="flex justify-end gap-2">
-                <button onClick={() => setIasToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">Cancelar</button>
-                <button onClick={confirmDeleteIas} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">Excluir</button>
+                <button onClick={() => setIasToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">{t('cancelar')}</button>
+                <button onClick={confirmDeleteIas} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">{t('excluir')}</button>
               </div>
             </div>
           </div>
@@ -8030,21 +7962,21 @@ export default function QuestionarioView({
   if (activeTab === "questionario-m14") {
     const textInputCls = "p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none";
     const selectInputCls = "p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none";
-    const versionLabel = (v: Aq10Version) => (v === "crianca" ? "Criança (4-11)" : "Adolescente (12-15)");
+    const versionLabel = (v: Aq10Version) => (v === "crianca" ? t('crianca_4_11') : t('adolescente_12_15'));
     const renderAq10Form = (
       data: { statement: string; version: Aq10Version },
       patch: (p: Partial<typeof data>) => void
     ) => (
       <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
         <div className="flex-1 flex flex-col gap-1.5">
-          <label className="text-xs font-black text-black uppercase tracking-wider">Item do questionário</label>
-          <input type="text" className={textInputCls} placeholder="Ex: Ele(a) sempre percebe padrões/categorias nas coisas." value={data.statement} onChange={e => patch({ statement: e.target.value })} />
+          <label className="text-xs font-black text-black uppercase tracking-wider">{t('item_do_questionario')}</label>
+          <input type="text" className={textInputCls} placeholder={t('ex_ele_a_sempre_percebe_padroes_categorias_nas_coisas')} value={data.statement} onChange={e => patch({ statement: e.target.value })} />
         </div>
         <div className="sm:w-80 flex flex-col gap-1.5">
-          <label className="text-xs font-black text-black uppercase tracking-wider">Versão</label>
+          <label className="text-xs font-black text-black uppercase tracking-wider">{t('versao')}</label>
           <select className={selectInputCls} value={data.version} onChange={e => patch({ version: e.target.value as Aq10Version })}>
-            <option value="crianca">Criança (4-11)</option>
-            <option value="adolescente">Adolescente (12-15)</option>
+            <option value="crianca">{t('crianca_4_11')}</option>
+            <option value="adolescente">{t('adolescente_12_15')}</option>
           </select>
         </div>
       </div>
@@ -8052,22 +7984,22 @@ export default function QuestionarioView({
 
     return (
       <div className="p-6 bg-white rounded-xl shadow-md border border-slate-300">
-        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">Módulo 14: AQ-10 — Rastreamento Precoce do Transtorno do Espectro Autista (TEA)</h1>
+        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">{t('modulo_14_aq_10_rastreamento_precoce_do_transtorno_do_espectro_autista')}</h1>
 
         <div className="mb-8 p-6 bg-sky-50 border-2 border-sky-300 rounded-xl space-y-2 text-sm text-slate-800">
-          <p><span className="font-black">O que é:</span> o Quociente do Espectro Autista (AQ-10) é um questionário de triagem desenvolvido pelo Autism Research Centre (Universidade de Cambridge — Simon Baron-Cohen e colaboradores) para identificação precoce de traços de TEA em crianças e adolescentes, respondido por pais ou responsáveis (relato por terceiros).</p>
-          <p><span className="font-black">Formato:</span> duas versões — Criança (4 a 11 anos) e Adolescente (12 a 15 anos) — cada uma com 10 itens em escala de 4 pontos.</p>
-          <p><span className="font-black">Escala de resposta:</span> {AQ10_LIKERT_LABELS.join(" · ")}.</p>
-          <p><span className="font-black">Pontuação (chave SUBPAV/SMS-RJ):</span> soma 1 ponto para “Concordo Totalmente” ou “Concordo em Parte” nos itens 1, 5, 7 e 10; soma 1 ponto para “Discordo em Parte” ou “Discordo Totalmente” nos itens 2, 3, 4, 6, 8 e 9. Total de 0 a 10.</p>
-          <p><span className="font-black">Interpretação:</span> de 0 a {AQ10_ALERT_FROM - 1} pontos indicam traços comportamentais dentro da média da população geral; de {AQ10_ALERT_FROM} a 10 pontos indicam alerta de traços elevados de TEA, com encaminhamento prioritário para avaliação multidisciplinar especializada.</p>
-          <p className="text-xs font-bold text-rose-700">⚠️ ALERTA: o AQ-10 é exclusivamente uma ferramenta de RASTREAMENTO (triagem) e NÃO constitui diagnóstico. O diagnóstico formal de TEA exige avaliação clínica multidisciplinar por profissionais de saúde habilitados.</p>
+          <p><span className="font-black">{t('oQueE')}</span> {t('o_quociente_do_espectro_autista_aq_10_e_um_questionario_de_triagem_des')}</p>
+          <p><span className="font-black">{t('formato')}</span> {t('duas_versoes_crianca_4_a_11_anos_e_adolescente_12_a_15_anos_cada_uma_c')}</p>
+          <p><span className="font-black">{t('escalaResposta')}</span> {AQ10_LIKERT_LABELS.join(" · ")}.</p>
+          <p><span className="font-black">{t('pontuacao_chave_subpav_sms_rj')}</span> {t('soma_1_ponto_para_concordo_totalmente_ou_concordo_em_parte_nos_itens_1')}</p>
+          <p><span className="font-black">{t('interpretacao')}</span> {t('de_0_a')}{AQ10_ALERT_FROM - 1} {t('pontos_indicam_tracos_comportamentais_dentro_da_media_da_populacao_ger')}{AQ10_ALERT_FROM} {t('a_10_pontos_indicam_alerta_de_tracos_elevados_de_tea_com_encaminhament')}</p>
+          <p className="text-xs font-bold text-rose-700">{t('alerta_o_aq_10_e_exclusivamente_uma_ferramenta_de_rastreamento_triagem')}</p>
         </div>
 
         <div className="mb-8 p-6 bg-white border-4 border-black rounded-xl space-y-4 shadow-md">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">Adicionar novo item</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">{t('adicionar_novo_item')}</h3>
           {renderAq10Form(aq10New, (p) => setAq10New(prev => ({ ...prev, ...p })))}
           <div className="flex justify-end pt-2">
-            <button onClick={addAq10Question} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">Adicionar Item</button>
+            <button onClick={addAq10Question} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">{t('adicionar_item')}</button>
           </div>
         </div>
 
@@ -8076,9 +8008,9 @@ export default function QuestionarioView({
             <thead>
               <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
                 <th className="py-3 px-3 w-[6%] border-r border-slate-300">#</th>
-                <th className="py-3 px-3 border-r border-slate-300">Item de avaliação comportamental</th>
-                <th className="py-3 px-3 w-[28%] border-r border-slate-300">Versão</th>
-                <th className="py-3 px-3 w-[15%] text-right">Ações</th>
+                <th className="py-3 px-3 border-r border-slate-300">{t('item_de_avaliacao_comportamental')}</th>
+                <th className="py-3 px-3 w-[28%] border-r border-slate-300">{t('versao')}</th>
+                <th className="py-3 px-3 w-[15%] text-right">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -8094,8 +8026,8 @@ export default function QuestionarioView({
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex flex-col sm:flex-row gap-2 justify-end">
-                            <button onClick={saveAq10Edit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                            <button onClick={cancelAq10Edit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                            <button onClick={saveAq10Edit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                            <button onClick={cancelAq10Edit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                           </div>
                         </td>
                       </>
@@ -8108,8 +8040,8 @@ export default function QuestionarioView({
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex gap-2 justify-end">
-                            <button onClick={() => startAq10Edit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
-                            <button onClick={() => setAq10ToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">Excluir</button>
+                            <button onClick={() => startAq10Edit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
+                            <button onClick={() => setAq10ToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">{t('excluir')}</button>
                           </div>
                         </td>
                       </>
@@ -8122,7 +8054,7 @@ export default function QuestionarioView({
         </div>
 
         <div className="mb-4">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">Parecer por resultado do rastreamento (editável)</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">{t('parecer_por_resultado_do_rastreamento_editavel')}</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {AQ10_CLASSIFICATIONS.map(cls => {
               const existing = m14Pareceres.find(p => p.classification === cls);
@@ -8132,19 +8064,19 @@ export default function QuestionarioView({
                   <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
                   {isEditing && m14ParecerEditData ? (
                     <div className="space-y-2">
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder="Critério da pontuação" value={m14ParecerEditData.basicData} onChange={e => setM14ParecerEditData({ ...m14ParecerEditData, basicData: e.target.value })} />
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder="Reflexão / recomendação" value={m14ParecerEditData.reflection} onChange={e => setM14ParecerEditData({ ...m14ParecerEditData, reflection: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder={t('criterio_da_pontuacao')} value={m14ParecerEditData.basicData} onChange={e => setM14ParecerEditData({ ...m14ParecerEditData, basicData: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder={t('reflexaoRecomendacao')} value={m14ParecerEditData.reflection} onChange={e => setM14ParecerEditData({ ...m14ParecerEditData, reflection: e.target.value })} />
                       <div className="flex gap-2 justify-end">
-                        <button onClick={saveM14ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                        <button onClick={cancelM14ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                        <button onClick={saveM14ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                        <button onClick={cancelM14ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <p className="text-xs text-slate-800"><span className="font-black">Critério:</span> {existing?.basicData || "—"}</p>
-                      <p className="text-xs text-slate-800"><span className="font-black">Parecer:</span> {existing?.reflection || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('criterio')}</span> {existing?.basicData || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('parecer')}</span> {existing?.reflection || "—"}</p>
                       <div className="flex justify-end">
-                        <button onClick={() => startM14ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
+                        <button onClick={() => startM14ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
                       </div>
                     </div>
                   )}
@@ -8157,11 +8089,11 @@ export default function QuestionarioView({
         {aq10ToDelete && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl max-w-md w-full p-4 sm:p-6 space-y-4">
-              <h4 className="text-lg font-black text-black">Excluir item?</h4>
-              <p className="text-sm text-slate-700">Tem certeza que deseja excluir o item <strong>&quot;{aq10ToDelete.statement}&quot;</strong>? Esta ação não pode ser desfeita.</p>
+              <h4 className="text-lg font-black text-black">{t('excluir_item')}</h4>
+              <p className="text-sm text-slate-700">{t('tem_certeza_que_deseja_excluir_o_item')}<strong>{'"'}{aq10ToDelete.statement}{'"'}</strong>{t('esta_acao_nao_pode_ser_desfeita_2')}</p>
               <div className="flex justify-end gap-2">
-                <button onClick={() => setAq10ToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">Cancelar</button>
-                <button onClick={confirmDeleteAq10} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">Excluir</button>
+                <button onClick={() => setAq10ToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">{t('cancelar')}</button>
+                <button onClick={confirmDeleteAq10} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">{t('excluir')}</button>
               </div>
             </div>
           </div>
@@ -8173,21 +8105,21 @@ export default function QuestionarioView({
   if (activeTab === "questionario-m13") {
     const textInputCls = "p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none";
     const selectInputCls = "p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none";
-    const subscaleLabel = (s: SnapSubscale) => (s === "inattention" ? "Bloco I · Desatenção" : "Bloco II · Hiperatividade/Impulsividade");
+    const subscaleLabel = (s: SnapSubscale) => (s === "inattention" ? t('bloco_i_desatencao') : t('bloco_ii_hiperatividade_impulsividade'));
     const renderSnapForm = (
       data: { statement: string; subscale: SnapSubscale },
       patch: (p: Partial<typeof data>) => void
     ) => (
       <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
         <div className="flex-1 flex flex-col gap-1.5">
-          <label className="text-xs font-black text-black uppercase tracking-wider">Item de comportamento</label>
-          <input type="text" className={textInputCls} placeholder="Ex: Não consegue prestar muita atenção a detalhes..." value={data.statement} onChange={e => patch({ statement: e.target.value })} />
+          <label className="text-xs font-black text-black uppercase tracking-wider">{t('item_de_comportamento')}</label>
+          <input type="text" className={textInputCls} placeholder={t('ex_nao_consegue_prestar_muita_atencao_a_detalhes')} value={data.statement} onChange={e => patch({ statement: e.target.value })} />
         </div>
         <div className="sm:w-80 flex flex-col gap-1.5">
-          <label className="text-xs font-black text-black uppercase tracking-wider">Bloco</label>
+          <label className="text-xs font-black text-black uppercase tracking-wider">{t('bloco')}</label>
           <select className={selectInputCls} value={data.subscale} onChange={e => patch({ subscale: e.target.value as SnapSubscale })}>
-            <option value="inattention">Bloco I — Desatenção (itens 1-9)</option>
-            <option value="hyperactivity">Bloco II — Hiperatividade/Impulsividade (itens 10-18)</option>
+            <option value="inattention">{t('bloco_i_desatencao_itens_1_9')}</option>
+            <option value="hyperactivity">{t('bloco_ii_hiperatividade_impulsividade_itens_10_18')}</option>
           </select>
         </div>
       </div>
@@ -8195,23 +8127,23 @@ export default function QuestionarioView({
 
     return (
       <div className="p-6 bg-white rounded-xl shadow-md border border-slate-300">
-        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">Módulo 13: SNAP-IV — Rastreamento de Sintomas de TDAH</h1>
+        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">{t('modulo_13_snap_iv_rastreamento_de_sintomas_de_tdah')}</h1>
 
         <div className="mb-8 p-6 bg-sky-50 border-2 border-sky-300 rounded-xl space-y-2 text-sm text-slate-800">
-          <p><span className="font-black">O que é:</span> instrumento de triagem construído a partir dos critérios do DSM-5-TR (Associação Americana de Psiquiatria), com validação no Brasil pelo GEDA/UFRJ e Serviço de Psiquiatria da Infância e Adolescência da UFRGS.</p>
-          <p><span className="font-black">Formato:</span> 18 itens em escala ordinal de 4 pontos, divididos em dois blocos (Desatenção e Hiperatividade/Impulsividade). Relato por terceiros (pais, responsáveis ou professores).</p>
-          <p><span className="font-black">Público-alvo:</span> crianças e adolescentes de 5 a 17 anos.</p>
-          <p><span className="font-black">Escala de resposta:</span> {SNAP_LIKERT_LABELS.join(" · ")}.</p>
-          <p><span className="font-black">Pontuação:</span> um bloco fica indicativo quando ≥ {SNAP_CLINICAL_THRESHOLD} dos seus 9 itens são marcados como “Bastante” ou “Demais” (até 16 anos) ou ≥ {SNAP_CLINICAL_THRESHOLD_17} itens aos 17 anos.</p>
-          <p className="text-xs"><span className="font-black">Critérios complementares (DSM-5-TR):</span> além dos sintomas (Critério A) avaliados aqui, o diagnóstico exige B (sintomas antes dos 12 anos), C (prejuízo em ≥ 2 contextos), D (prejuízo evidente) e E (exclusão de outras causas). O DSM-5-TR permite o diagnóstico conjunto com TEA.</p>
-          <p className="text-xs font-bold text-rose-700">⚠️ ALERTA: o SNAP-IV é exclusivamente uma ferramenta de rastreamento inicial e NÃO constitui diagnóstico. O laudo de TDAH exige anamnese conduzida por médico especialista (psiquiatra, neurologista ou neuropediatra).</p>
+          <p><span className="font-black">{t('oQueE')}</span> {t('instrumento_de_triagem_construido_a_partir_dos_criterios_do_dsm_5_tr_a')}</p>
+          <p><span className="font-black">{t('formato')}</span> {t('18_itens_em_escala_ordinal_de_4_pontos_divididos_em_dois_blocos_desate')}</p>
+          <p><span className="font-black">{t('publico_alvo')}</span> {t('criancas_e_adolescentes_de_5_a_17_anos')}</p>
+          <p><span className="font-black">{t('escalaResposta')}</span> {SNAP_LIKERT_LABELS.join(" · ")}.</p>
+          <p><span className="font-black">{t('pontuacao')}</span> {t('um_bloco_fica_indicativo_quando')}{SNAP_CLINICAL_THRESHOLD} {t('dos_seus_9_itens_sao_marcados_como_bastante_ou_demais_ate_16_anos_ou')}{SNAP_CLINICAL_THRESHOLD_17} {t('itens_aos_17_anos')}</p>
+          <p className="text-xs"><span className="font-black">{t('criterios_complementares_dsm_5_tr')}</span> {t('alem_dos_sintomas_criterio_a_avaliados_aqui_o_diagnostico_exige_b_sint')}</p>
+          <p className="text-xs font-bold text-rose-700">{t('alerta_o_snap_iv_e_exclusivamente_uma_ferramenta_de_rastreamento_inici')}</p>
         </div>
 
         <div className="mb-8 p-6 bg-white border-4 border-black rounded-xl space-y-4 shadow-md">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">Adicionar novo item</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">{t('adicionar_novo_item')}</h3>
           {renderSnapForm(snapNew, (p) => setSnapNew(prev => ({ ...prev, ...p })))}
           <div className="flex justify-end pt-2">
-            <button onClick={addSnapQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">Adicionar Item</button>
+            <button onClick={addSnapQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">{t('adicionar_item')}</button>
           </div>
         </div>
 
@@ -8220,9 +8152,9 @@ export default function QuestionarioView({
             <thead>
               <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
                 <th className="py-3 px-3 w-[6%] border-r border-slate-300">#</th>
-                <th className="py-3 px-3 border-r border-slate-300">Item de avaliação comportamental</th>
-                <th className="py-3 px-3 w-[28%] border-r border-slate-300">Bloco</th>
-                <th className="py-3 px-3 w-[15%] text-right">Ações</th>
+                <th className="py-3 px-3 border-r border-slate-300">{t('item_de_avaliacao_comportamental')}</th>
+                <th className="py-3 px-3 w-[28%] border-r border-slate-300">{t('bloco')}</th>
+                <th className="py-3 px-3 w-[15%] text-right">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -8238,8 +8170,8 @@ export default function QuestionarioView({
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex flex-col sm:flex-row gap-2 justify-end">
-                            <button onClick={saveSnapEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                            <button onClick={cancelSnapEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                            <button onClick={saveSnapEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                            <button onClick={cancelSnapEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                           </div>
                         </td>
                       </>
@@ -8252,8 +8184,8 @@ export default function QuestionarioView({
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex gap-2 justify-end">
-                            <button onClick={() => startSnapEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
-                            <button onClick={() => setSnapToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">Excluir</button>
+                            <button onClick={() => startSnapEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
+                            <button onClick={() => setSnapToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">{t('excluir')}</button>
                           </div>
                         </td>
                       </>
@@ -8266,7 +8198,7 @@ export default function QuestionarioView({
         </div>
 
         <div className="mb-4">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">Parecer por resultado do rastreamento (editável)</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">{t('parecer_por_resultado_do_rastreamento_editavel')}</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {SNAP_CLASSIFICATIONS.map(cls => {
               const existing = m13Pareceres.find(p => p.classification === cls);
@@ -8276,19 +8208,19 @@ export default function QuestionarioView({
                   <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
                   {isEditing && m13ParecerEditData ? (
                     <div className="space-y-2">
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder="Critério do bloco" value={m13ParecerEditData.basicData} onChange={e => setM13ParecerEditData({ ...m13ParecerEditData, basicData: e.target.value })} />
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder="Reflexão / recomendação" value={m13ParecerEditData.reflection} onChange={e => setM13ParecerEditData({ ...m13ParecerEditData, reflection: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder={t('criterio_do_bloco')} value={m13ParecerEditData.basicData} onChange={e => setM13ParecerEditData({ ...m13ParecerEditData, basicData: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder={t('reflexaoRecomendacao')} value={m13ParecerEditData.reflection} onChange={e => setM13ParecerEditData({ ...m13ParecerEditData, reflection: e.target.value })} />
                       <div className="flex gap-2 justify-end">
-                        <button onClick={saveM13ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                        <button onClick={cancelM13ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                        <button onClick={saveM13ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                        <button onClick={cancelM13ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <p className="text-xs text-slate-800"><span className="font-black">Critério:</span> {existing?.basicData || "—"}</p>
-                      <p className="text-xs text-slate-800"><span className="font-black">Parecer:</span> {existing?.reflection || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('criterio')}</span> {existing?.basicData || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('parecer')}</span> {existing?.reflection || "—"}</p>
                       <div className="flex justify-end">
-                        <button onClick={() => startM13ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
+                        <button onClick={() => startM13ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
                       </div>
                     </div>
                   )}
@@ -8301,11 +8233,11 @@ export default function QuestionarioView({
         {snapToDelete && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl max-w-md w-full p-4 sm:p-6 space-y-4">
-              <h4 className="text-lg font-black text-black">Excluir item?</h4>
-              <p className="text-sm text-slate-700">Tem certeza que deseja excluir o item <strong>&quot;{snapToDelete.statement}&quot;</strong>? Esta ação não pode ser desfeita.</p>
+              <h4 className="text-lg font-black text-black">{t('excluir_item')}</h4>
+              <p className="text-sm text-slate-700">{t('tem_certeza_que_deseja_excluir_o_item')}<strong>{'"'}{snapToDelete.statement}{'"'}</strong>{t('esta_acao_nao_pode_ser_desfeita_2')}</p>
               <div className="flex justify-end gap-2">
-                <button onClick={() => setSnapToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">Cancelar</button>
-                <button onClick={confirmDeleteSnap} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">Excluir</button>
+                <button onClick={() => setSnapToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">{t('cancelar')}</button>
+                <button onClick={confirmDeleteSnap} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">{t('excluir')}</button>
               </div>
             </div>
           </div>
@@ -8317,23 +8249,23 @@ export default function QuestionarioView({
   if (activeTab === "questionario-m11") {
     return (
       <div className="p-6 bg-white rounded-xl shadow-md border border-slate-300">
-        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">Módulo 11: Autoconceito (Escala de Rosenberg)</h1>
+        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">{t('modulo_11_autoconceito_escala_de_rosenberg')}</h1>
 
         <div className="mb-8 p-6 bg-white border-4 border-black rounded-xl space-y-4 shadow-md">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">Adicionar nova afirmação</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">{t('adicionar_nova_afirmacao')}</h3>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-black uppercase tracking-wider">Afirmação</label>
-            <input type="text" placeholder="Ex: Sinto que sou uma pessoa de valor, pelo menos tanto quanto as outras." className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none" value={autoNew.statement} onChange={e => setAutoNew({ ...autoNew, statement: e.target.value })} />
+            <label className="text-xs font-black text-black uppercase tracking-wider">{t('afirmacao')}</label>
+            <input type="text" placeholder={t('ex_sinto_que_sou_uma_pessoa_de_valor_pelo_menos_tanto_quanto_as_outras')} className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none" value={autoNew.statement} onChange={e => setAutoNew({ ...autoNew, statement: e.target.value })} />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-black uppercase tracking-wider">Tipo do item</label>
+            <label className="text-xs font-black text-black uppercase tracking-wider">{t('tipo_do_item')}</label>
             <select className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none" value={autoNew.itemType} onChange={e => setAutoNew({ ...autoNew, itemType: e.target.value as AutoconceptItemType })}>
-              <option value="positive">Positivo (CT=3, C=2, D=1, DT=0)</option>
-              <option value="negative">Negativo (CT=0, C=1, D=2, DT=3)</option>
+              <option value="positive">{t('positivo_ct_3_c_2_d_1_dt_0')}</option>
+              <option value="negative">{t('negativo_ct_0_c_1_d_2_dt_3')}</option>
             </select>
           </div>
           <div className="flex justify-end pt-2">
-            <button onClick={addAutoQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">Adicionar Afirmação</button>
+            <button onClick={addAutoQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">{t('adicionar_afirmacao')}</button>
           </div>
         </div>
 
@@ -8342,9 +8274,9 @@ export default function QuestionarioView({
             <thead>
               <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
                 <th className="py-3 px-3 w-[5%] border-r border-slate-300">#</th>
-                <th className="py-3 px-3 border-r border-slate-300">Afirmação</th>
-                <th className="py-3 px-3 w-[15%] border-r border-slate-300">Tipo</th>
-                <th className="py-3 px-3 w-[15%] text-right">Ações</th>
+                <th className="py-3 px-3 border-r border-slate-300">{t('afirmacao')}</th>
+                <th className="py-3 px-3 w-[15%] border-r border-slate-300">{t('tipo')}</th>
+                <th className="py-3 px-3 w-[15%] text-right">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -8358,14 +8290,14 @@ export default function QuestionarioView({
                         <td className="py-4 px-3 border-r border-slate-300" colSpan={2}>
                           <input type="text" className="p-2 border-2 border-slate-500 bg-white text-black rounded text-sm w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" value={autoEditData.statement} onChange={e => setAutoEditData({ ...autoEditData, statement: e.target.value })} />
                           <select className="p-2 mt-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" value={autoEditData.itemType} onChange={e => setAutoEditData({ ...autoEditData, itemType: e.target.value as AutoconceptItemType })}>
-                            <option value="positive">Positivo</option>
-                            <option value="negative">Negativo</option>
+                            <option value="positive">{t('positivo')}</option>
+                            <option value="negative">{t('negativo')}</option>
                           </select>
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex flex-col sm:flex-row gap-2 justify-end">
-                            <button onClick={saveAutoEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                            <button onClick={cancelAutoEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                            <button onClick={saveAutoEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                            <button onClick={cancelAutoEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                           </div>
                         </td>
                       </>
@@ -8378,8 +8310,8 @@ export default function QuestionarioView({
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex gap-2 justify-end">
-                            <button onClick={() => startAutoEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
-                            <button onClick={() => setAutoToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">Excluir</button>
+                            <button onClick={() => startAutoEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
+                            <button onClick={() => setAutoToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">{t('excluir')}</button>
                           </div>
                         </td>
                       </>
@@ -8392,7 +8324,7 @@ export default function QuestionarioView({
         </div>
 
         <div className="mb-4">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">Parecer por faixa de autoestima (editável)</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">{t('parecer_por_faixa_de_autoestima_editavel')}</h3>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {AUTOCONCEPT_CLASSIFICATIONS.map(cls => {
               const existing = m11Pareceres.find(p => p.classification === cls);
@@ -8402,19 +8334,19 @@ export default function QuestionarioView({
                   <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
                   {isEditing && m11ParecerEditData ? (
                     <div className="space-y-2">
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder="Dados básicos (faixa de pontos)" value={m11ParecerEditData.basicData} onChange={e => setM11ParecerEditData({ ...m11ParecerEditData, basicData: e.target.value })} />
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder="Reflexão / recomendação" value={m11ParecerEditData.reflection} onChange={e => setM11ParecerEditData({ ...m11ParecerEditData, reflection: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder={t('dados_basicos_faixa_de_pontos')} value={m11ParecerEditData.basicData} onChange={e => setM11ParecerEditData({ ...m11ParecerEditData, basicData: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder={t('reflexaoRecomendacao')} value={m11ParecerEditData.reflection} onChange={e => setM11ParecerEditData({ ...m11ParecerEditData, reflection: e.target.value })} />
                       <div className="flex gap-2 justify-end">
-                        <button onClick={saveM11ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                        <button onClick={cancelM11ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                        <button onClick={saveM11ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                        <button onClick={cancelM11ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <p className="text-xs text-slate-800"><span className="font-black">Faixa:</span> {existing?.basicData || "—"}</p>
-                      <p className="text-xs text-slate-800"><span className="font-black">Parecer:</span> {existing?.reflection || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('faixa')}</span> {existing?.basicData || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('parecer')}</span> {existing?.reflection || "—"}</p>
                       <div className="flex justify-end">
-                        <button onClick={() => startM11ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
+                        <button onClick={() => startM11ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
                       </div>
                     </div>
                   )}
@@ -8427,11 +8359,11 @@ export default function QuestionarioView({
         {autoToDelete && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl max-w-md w-full p-4 sm:p-6 space-y-4">
-              <h4 className="text-lg font-black text-black">Excluir afirmação?</h4>
-              <p className="text-sm text-slate-700">Tem certeza que deseja excluir a afirmação <strong>&quot;{autoToDelete.statement}&quot;</strong>? Esta ação não pode ser desfeita.</p>
+              <h4 className="text-lg font-black text-black">{t('excluir_afirmacao')}</h4>
+              <p className="text-sm text-slate-700">{t('tem_certeza_que_deseja_excluir_a_afirmacao')}<strong>{'"'}{autoToDelete.statement}{'"'}</strong>{t('esta_acao_nao_pode_ser_desfeita_2')}</p>
               <div className="flex justify-end gap-2">
-                <button onClick={() => setAutoToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">Cancelar</button>
-                <button onClick={confirmDeleteAuto} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">Excluir</button>
+                <button onClick={() => setAutoToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">{t('cancelar')}</button>
+                <button onClick={confirmDeleteAuto} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">{t('excluir')}</button>
               </div>
             </div>
           </div>
@@ -8443,24 +8375,24 @@ export default function QuestionarioView({
   if (activeTab === "questionario-m10") {
     return (
       <div className="p-6 bg-white rounded-xl shadow-md border border-slate-300">
-        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">Módulo 10: Higiene Bucal (HU-DBI)</h1>
+        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">{t('modulo_10_higiene_bucal_hu_dbi')}</h1>
 
         <div className="mb-8 p-6 bg-white border-4 border-black rounded-xl space-y-4 shadow-md">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">Adicionar nova afirmação</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">{t('adicionar_nova_afirmacao')}</h3>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-black uppercase tracking-wider">Afirmação</label>
-            <input type="text" placeholder="Ex: Minha gengiva sangra quando escovo os dentes." className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none" value={oralNew.statement} onChange={e => setOralNew({ ...oralNew, statement: e.target.value })} />
+            <label className="text-xs font-black text-black uppercase tracking-wider">{t('afirmacao')}</label>
+            <input type="text" placeholder={t('ex_minha_gengiva_sangra_quando_escovo_os_dentes')} className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none" value={oralNew.statement} onChange={e => setOralNew({ ...oralNew, statement: e.target.value })} />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-black uppercase tracking-wider">Regra de pontuação</label>
+            <label className="text-xs font-black text-black uppercase tracking-wider">{t('regra_de_pontuacao')}</label>
             <select className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-bold focus:ring-2 focus:ring-black outline-none" value={oralNew.scoringRule} onChange={e => setOralNew({ ...oralNew, scoringRule: e.target.value as OralScoringRule })}>
-              <option value="none">Não pontua (perfil comportamental/estético)</option>
-              <option value="agree">Pontua se Concordo</option>
-              <option value="disagree">Pontua se Discordo</option>
+              <option value="none">{t('nao_pontua_perfil_comportamental_estetico')}</option>
+              <option value="agree">{t('pontua_se_concordo')}</option>
+              <option value="disagree">{t('pontua_se_discordo')}</option>
             </select>
           </div>
           <div className="flex justify-end pt-2">
-            <button onClick={addOralQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">Adicionar Afirmação</button>
+            <button onClick={addOralQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">{t('adicionar_afirmacao')}</button>
           </div>
         </div>
 
@@ -8469,9 +8401,9 @@ export default function QuestionarioView({
             <thead>
               <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
                 <th className="py-3 px-3 w-[5%] border-r border-slate-300">#</th>
-                <th className="py-3 px-3 border-r border-slate-300">Afirmação</th>
-                <th className="py-3 px-3 w-[22%] border-r border-slate-300">Pontuação</th>
-                <th className="py-3 px-3 w-[15%] text-right">Ações</th>
+                <th className="py-3 px-3 border-r border-slate-300">{t('afirmacao')}</th>
+                <th className="py-3 px-3 w-[22%] border-r border-slate-300">{t('pontuacao_2')}</th>
+                <th className="py-3 px-3 w-[15%] text-right">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -8485,15 +8417,15 @@ export default function QuestionarioView({
                         <td className="py-4 px-3 border-r border-slate-300" colSpan={2}>
                           <input type="text" className="p-2 border-2 border-slate-500 bg-white text-black rounded text-sm w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" value={oralEditData.statement} onChange={e => setOralEditData({ ...oralEditData, statement: e.target.value })} />
                           <select className="p-2 mt-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" value={oralEditData.scoringRule} onChange={e => setOralEditData({ ...oralEditData, scoringRule: e.target.value as OralScoringRule })}>
-                            <option value="none">Não pontua</option>
-                            <option value="agree">Pontua se Concordo</option>
-                            <option value="disagree">Pontua se Discordo</option>
+                            <option value="none">{t('nao_pontua')}</option>
+                            <option value="agree">{t('pontua_se_concordo')}</option>
+                            <option value="disagree">{t('pontua_se_discordo')}</option>
                           </select>
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex flex-col sm:flex-row gap-2 justify-end">
-                            <button onClick={saveOralEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                            <button onClick={cancelOralEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                            <button onClick={saveOralEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                            <button onClick={cancelOralEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                           </div>
                         </td>
                       </>
@@ -8506,8 +8438,8 @@ export default function QuestionarioView({
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex gap-2 justify-end">
-                            <button onClick={() => startOralEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
-                            <button onClick={() => setOralToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">Excluir</button>
+                            <button onClick={() => startOralEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
+                            <button onClick={() => setOralToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">{t('excluir')}</button>
                           </div>
                         </td>
                       </>
@@ -8520,7 +8452,7 @@ export default function QuestionarioView({
         </div>
 
         <div className="mb-4">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">Parecer por faixa de desempenho (editável)</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">{t('parecer_por_faixa_de_desempenho_editavel')}</h3>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {ORAL_CLASSIFICATIONS.map(cls => {
               const existing = m10Pareceres.find(p => p.classification === cls);
@@ -8530,19 +8462,19 @@ export default function QuestionarioView({
                   <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
                   {isEditing && m10ParecerEditData ? (
                     <div className="space-y-2">
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder="Dados básicos (faixa de pontos)" value={m10ParecerEditData.basicData} onChange={e => setM10ParecerEditData({ ...m10ParecerEditData, basicData: e.target.value })} />
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder="Reflexão / recomendação" value={m10ParecerEditData.reflection} onChange={e => setM10ParecerEditData({ ...m10ParecerEditData, reflection: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder={t('dados_basicos_faixa_de_pontos')} value={m10ParecerEditData.basicData} onChange={e => setM10ParecerEditData({ ...m10ParecerEditData, basicData: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder={t('reflexaoRecomendacao')} value={m10ParecerEditData.reflection} onChange={e => setM10ParecerEditData({ ...m10ParecerEditData, reflection: e.target.value })} />
                       <div className="flex gap-2 justify-end">
-                        <button onClick={saveM10ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                        <button onClick={cancelM10ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                        <button onClick={saveM10ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                        <button onClick={cancelM10ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <p className="text-xs text-slate-800"><span className="font-black">Faixa:</span> {existing?.basicData || "—"}</p>
-                      <p className="text-xs text-slate-800"><span className="font-black">Parecer:</span> {existing?.reflection || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('faixa')}</span> {existing?.basicData || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('parecer')}</span> {existing?.reflection || "—"}</p>
                       <div className="flex justify-end">
-                        <button onClick={() => startM10ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
+                        <button onClick={() => startM10ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
                       </div>
                     </div>
                   )}
@@ -8555,11 +8487,11 @@ export default function QuestionarioView({
         {oralToDelete && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl max-w-md w-full p-4 sm:p-6 space-y-4">
-              <h4 className="text-lg font-black text-black">Excluir afirmação?</h4>
-              <p className="text-sm text-slate-700">Tem certeza que deseja excluir a afirmação <strong>&quot;{oralToDelete.statement}&quot;</strong>? Esta ação não pode ser desfeita.</p>
+              <h4 className="text-lg font-black text-black">{t('excluir_afirmacao')}</h4>
+              <p className="text-sm text-slate-700">{t('tem_certeza_que_deseja_excluir_a_afirmacao')}<strong>{'"'}{oralToDelete.statement}{'"'}</strong>{t('esta_acao_nao_pode_ser_desfeita_2')}</p>
               <div className="flex justify-end gap-2">
-                <button onClick={() => setOralToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">Cancelar</button>
-                <button onClick={confirmDeleteOral} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">Excluir</button>
+                <button onClick={() => setOralToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">{t('cancelar')}</button>
+                <button onClick={confirmDeleteOral} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">{t('excluir')}</button>
               </div>
             </div>
           </div>
@@ -8571,20 +8503,19 @@ export default function QuestionarioView({
   if (activeTab === "questionario-m9") {
     return (
       <div className="p-6 bg-white rounded-xl shadow-md border border-slate-300">
-        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">Módulo 9: Saúde Global (KIDSCREEN-10)</h1>
+        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">{t('modulo_9_saude_global_kidscreen_10')}</h1>
 
         <div className="mb-8 p-6 bg-white border-4 border-black rounded-xl space-y-4 shadow-md">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">Adicionar nova pergunta</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">{t('adicionar_nova_pergunta')}</h3>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-black uppercase tracking-wider">Pergunta</label>
-            <input type="text" placeholder="Ex: Você tem se sentido bem e com energia?" className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none" value={healthNew.statement} onChange={e => setHealthNew({ ...healthNew, statement: e.target.value })} />
+            <label className="text-xs font-black text-black uppercase tracking-wider">{t('pergunta')}</label>
+            <input type="text" placeholder={t('ex_voce_tem_se_sentido_bem_e_com_energia')} className="p-3 border-2 border-black bg-white text-black rounded-lg text-sm w-full font-black focus:ring-2 focus:ring-black outline-none" value={healthNew.statement} onChange={e => setHealthNew({ ...healthNew, statement: e.target.value })} />
           </div>
           <label className="flex items-center gap-2 text-sm font-bold text-black">
             <input type="checkbox" className="w-4 h-4 accent-black" checked={healthNew.reversed} onChange={e => setHealthNew({ ...healthNew, reversed: e.target.checked })} />
-            Item invertido (pontuação 6 - resposta)
-          </label>
+            {t('item_invertido_pontuacao_6_resposta')}</label>
           <div className="flex justify-end pt-2">
-            <button onClick={addHealthQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">Adicionar Pergunta</button>
+            <button onClick={addHealthQuestion} className="bg-black hover:bg-slate-900 text-white px-8 py-3.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">{t('adicionar_pergunta')}</button>
           </div>
         </div>
 
@@ -8593,9 +8524,9 @@ export default function QuestionarioView({
             <thead>
               <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
                 <th className="py-3 px-3 w-[5%] border-r border-slate-300">#</th>
-                <th className="py-3 px-3 border-r border-slate-300">Pergunta</th>
-                <th className="py-3 px-3 w-[15%] border-r border-slate-300">Invertido</th>
-                <th className="py-3 px-3 w-[15%] text-right">Ações</th>
+                <th className="py-3 px-3 border-r border-slate-300">{t('pergunta')}</th>
+                <th className="py-3 px-3 w-[15%] border-r border-slate-300">{t('invertido')}</th>
+                <th className="py-3 px-3 w-[15%] text-right">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -8610,13 +8541,12 @@ export default function QuestionarioView({
                           <input type="text" className="p-2 border-2 border-slate-500 bg-white text-black rounded text-sm w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" value={healthEditData.statement} onChange={e => setHealthEditData({ ...healthEditData, statement: e.target.value })} />
                           <label className="flex items-center gap-2 text-xs font-bold text-black mt-2">
                             <input type="checkbox" className="w-4 h-4 accent-black" checked={healthEditData.reversed} onChange={e => setHealthEditData({ ...healthEditData, reversed: e.target.checked })} />
-                            Item invertido
-                          </label>
+                            {t('item_invertido')}</label>
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex flex-col sm:flex-row gap-2 justify-end">
-                            <button onClick={saveHealthEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                            <button onClick={cancelHealthEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                            <button onClick={saveHealthEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                            <button onClick={cancelHealthEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                           </div>
                         </td>
                       </>
@@ -8625,12 +8555,12 @@ export default function QuestionarioView({
                         <td className="py-4 px-3 border-r border-slate-300 font-bold align-top">{q.ord}</td>
                         <td className="py-4 px-3 border-r border-slate-300 font-bold text-black align-top">{q.statement}</td>
                         <td className="py-4 px-3 border-r border-slate-300 align-top">
-                          {q.reversed ? <span className="text-xs font-bold bg-amber-100 text-amber-800 px-2 py-1 rounded border border-amber-300">Sim</span> : <span className="text-xs font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded border border-slate-300">Não</span>}
+                          {q.reversed ? <span className="text-xs font-bold bg-amber-100 text-amber-800 px-2 py-1 rounded border border-amber-300">{t('sim')}</span> : <span className="text-xs font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded border border-slate-300">{t('nao')}</span>}
                         </td>
                         <td className="py-4 px-3 text-right align-top">
                           <div className="flex gap-2 justify-end">
-                            <button onClick={() => startHealthEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
-                            <button onClick={() => setHealthToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">Excluir</button>
+                            <button onClick={() => startHealthEdit(q)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
+                            <button onClick={() => setHealthToDelete(q)} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400">{t('excluir')}</button>
                           </div>
                         </td>
                       </>
@@ -8643,7 +8573,7 @@ export default function QuestionarioView({
         </div>
 
         <div className="mb-4">
-          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">Parecer por classificação (editável)</h3>
+          <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2 mb-4">{t('parecer_por_classificacao_editavel')}</h3>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {HEALTH_CLASSIFICATIONS.map(cls => {
               const existing = m9Pareceres.find(p => p.classification === cls);
@@ -8653,19 +8583,19 @@ export default function QuestionarioView({
                   <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
                   {isEditing && m9ParecerEditData ? (
                     <div className="space-y-2">
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={3} placeholder="Dados básicos" value={m9ParecerEditData.basicData} onChange={e => setM9ParecerEditData({ ...m9ParecerEditData, basicData: e.target.value })} />
-                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder="Reflexão / recomendação" value={m9ParecerEditData.reflection} onChange={e => setM9ParecerEditData({ ...m9ParecerEditData, reflection: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={3} placeholder={t('dados_basicos')} value={m9ParecerEditData.basicData} onChange={e => setM9ParecerEditData({ ...m9ParecerEditData, basicData: e.target.value })} />
+                      <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={5} placeholder={t('reflexaoRecomendacao')} value={m9ParecerEditData.reflection} onChange={e => setM9ParecerEditData({ ...m9ParecerEditData, reflection: e.target.value })} />
                       <div className="flex gap-2 justify-end">
-                        <button onClick={saveM9ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">Salvar</button>
-                        <button onClick={cancelM9ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">Cancelar</button>
+                        <button onClick={saveM9ParecerEdit} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs font-bold border border-green-700">{t('salvar')}</button>
+                        <button onClick={cancelM9ParecerEdit} className="bg-slate-500 hover:bg-slate-600 text-white px-3 py-2 rounded text-xs font-bold border border-slate-600">{t('cancelar')}</button>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <p className="text-xs text-slate-800"><span className="font-black">Dados:</span> {existing?.basicData || "—"}</p>
-                      <p className="text-xs text-slate-800"><span className="font-black">Parecer:</span> {existing?.reflection || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('dados')}</span> {existing?.basicData || "—"}</p>
+                      <p className="text-xs text-slate-800"><span className="font-black">{t('parecer')}</span> {existing?.reflection || "—"}</p>
                       <div className="flex justify-end">
-                        <button onClick={() => startM9ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">Editar</button>
+                        <button onClick={() => startM9ParecerEdit(cls)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400">{t('editar')}</button>
                       </div>
                     </div>
                   )}
@@ -8678,11 +8608,11 @@ export default function QuestionarioView({
         {healthToDelete && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl max-w-md w-full p-4 sm:p-6 space-y-4">
-              <h4 className="text-lg font-black text-black">Excluir pergunta?</h4>
-              <p className="text-sm text-slate-700">Tem certeza que deseja excluir a pergunta <strong>&quot;{healthToDelete.statement}&quot;</strong>? Esta ação não pode ser desfeita.</p>
+              <h4 className="text-lg font-black text-black">{t('excluir_pergunta')}</h4>
+              <p className="text-sm text-slate-700">{t('tem_certeza_que_deseja_excluir_a_pergunta')}<strong>{'"'}{healthToDelete.statement}{'"'}</strong>{t('esta_acao_nao_pode_ser_desfeita_2')}</p>
               <div className="flex justify-end gap-2">
-                <button onClick={() => setHealthToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">Cancelar</button>
-                <button onClick={confirmDeleteHealth} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">Excluir</button>
+                <button onClick={() => setHealthToDelete(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-200 text-slate-800">{t('cancelar')}</button>
+                <button onClick={confirmDeleteHealth} className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-600 text-white">{t('excluir')}</button>
               </div>
             </div>
           </div>
@@ -8702,48 +8632,48 @@ export default function QuestionarioView({
 
     return (
       <div className="p-6 bg-white rounded-xl shadow-md border border-slate-300">
-        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">Módulo 15: Qualidade Motora PCD — Protocolo de Avaliação da Capacidade Funcional do Aluno com Deficiência</h1>
+        <h1 className="text-2xl font-black mb-6 text-black tracking-tight border-b pb-3">{t('modulo_15_qualidade_motora_pcd_protocolo_de_avaliacao_da_capacidade_fu')}</h1>
 
         <div className="mb-8 p-6 bg-indigo-50 border-2 border-indigo-300 rounded-xl space-y-2 text-sm text-slate-800">
-          <p><span className="font-black">O que é:</span> bateria motora adaptada para alunos com deficiência (4 a 18 anos), com triagem clínica por grupo (física com locomoção independente, física em cadeira de rodas, paralisia cerebral/GMFCS, visual, auditiva e intelectual), adaptações por deficiência e matriz de compatibilidade com modalidades esportivas.</p>
-          <p><span className="font-black">Testes:</span> {PCD_TESTES.map(t => t.label).join(" · ")}. Notas relativas de 1 a 3 por teste, conforme as faixas de referência configuradas por grupo.</p>
-          <p><span className="font-black">Valências:</span> Velocidade/Agilidade (média das notas), Força Explosiva (salto), Força de Membros Superiores (flexão de braços) e Estabilidade de Tronco/Core (prancha). O Índice de Aptidão Relativa (IAR) por modalidade = Σ(Nota × Peso) da matriz (maior = mais compatível).</p>
-          <p className="text-xs font-bold text-indigo-700">💡 Configure abaixo os grupos de triagem, as adaptações por grupo, as faixas de nota por teste, a matriz de pesos por modalidade e o funil qualitativo. Estas telas alimentam a Avaliação PCD (aba Avaliações).</p>
+          <p><span className="font-black">{t('oQueE')}</span> {t('bateria_motora_adaptada_para_alunos_com_deficiencia_4_a_18_anos_com_tr')}</p>
+          <p><span className="font-black">{t('testes')}</span> {PCD_TESTES.map(t => t.label).join(" · ")}{t('notas_relativas_de_1_a_3_por_teste_conforme_as_faixas_de_referencia_co')}</p>
+          <p><span className="font-black">{t('valencias')}</span> {t('velocidade_agilidade_media_das_notas_forca_explosiva_salto_forca_de_me')}</p>
+          <p className="text-xs font-bold text-indigo-700">{t('configure_abaixo_os_grupos_de_triagem_as_adaptacoes_por_grupo_as_faixa')}</p>
         </div>
 
         <div className="mb-6 flex flex-wrap gap-2">
-          {tabBtn('grupos', '1 · Grupos de Triagem')}
-          {tabBtn('adaptacoes', '2 · Adaptação por Grupo')}
-          {tabBtn('faixas', '3 · Faixas de Nota')}
-          {tabBtn('matriz', '4 · Matriz de Pesos')}
-          {tabBtn('funil', '5 · Funil de Direcionamento')}
+          {tabBtn('grupos', t('aba_1_grupos_triagem'))}
+          {tabBtn('adaptacoes', t('aba_2_adaptacao_grupo'))}
+          {tabBtn('faixas', t('aba_3_faixas_nota'))}
+          {tabBtn('matriz', t('aba_4_matriz_pesos'))}
+          {tabBtn('funil', t('aba_5_funil_direcionamento'))}
         </div>
 
         {m15Tab === 'grupos' && (
           <div className="space-y-6">
             <div className="p-6 bg-white border-4 border-black rounded-xl space-y-4 shadow-md">
-              <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">Configurar grupo de triagem</h3>
+              <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">{t('configurar_grupo_de_triagem')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black text-black uppercase tracking-wider">Nº do grupo (1 a 6)</label>
+                  <label className="text-xs font-black text-black uppercase tracking-wider">{t('n_do_grupo_1_a_6')}</label>
                   <input type="number" min={1} max={6} className={textInputCls} value={m15GrupoEditing?.grupo ?? 1} onChange={e => setM15GrupoEditing(prev => ({ ...(prev ?? { id: '', grupo: 1, nome: '', descricao: '', laudo: '' }), grupo: Number(e.target.value) }))} />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black text-black uppercase tracking-wider">Nome do grupo</label>
-                  <input type="text" className={textInputCls} placeholder="Ex: Deficiência Auditiva" value={m15GrupoEditing?.nome ?? ''} onChange={e => setM15GrupoEditing(prev => ({ ...(prev ?? { id: '', grupo: 1, nome: '', descricao: '', laudo: '' }), nome: e.target.value }))} />
+                  <label className="text-xs font-black text-black uppercase tracking-wider">{t('nome_do_grupo')}</label>
+                  <input type="text" className={textInputCls} placeholder={t('ex_deficiencia_auditiva')} value={m15GrupoEditing?.nome ?? ''} onChange={e => setM15GrupoEditing(prev => ({ ...(prev ?? { id: '', grupo: 1, nome: '', descricao: '', laudo: '' }), nome: e.target.value }))} />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black text-black uppercase tracking-wider">Classificação (detalhes disponíveis)</label>
-                  <input type="text" className={textInputCls} placeholder="Ex: Surdez/Deficiência auditiva" value={m15GrupoEditing?.descricao ?? ''} onChange={e => setM15GrupoEditing(prev => ({ ...(prev ?? { id: '', grupo: 1, nome: '', descricao: '', laudo: '' }), descricao: e.target.value }))} />
+                  <label className="text-xs font-black text-black uppercase tracking-wider">{t('classificacao_detalhes_disponiveis')}</label>
+                  <input type="text" className={textInputCls} placeholder={t('ex_surdez_deficiencia_auditiva')} value={m15GrupoEditing?.descricao ?? ''} onChange={e => setM15GrupoEditing(prev => ({ ...(prev ?? { id: '', grupo: 1, nome: '', descricao: '', laudo: '' }), descricao: e.target.value }))} />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black text-black uppercase tracking-wider">Exigência de laudo (texto)</label>
-                  <input type="text" className={textInputCls} placeholder="Ex: Laudo médico/audiograma" value={m15GrupoEditing?.laudo ?? ''} onChange={e => setM15GrupoEditing(prev => ({ ...(prev ?? { id: '', grupo: 1, nome: '', descricao: '', laudo: '' }), laudo: e.target.value }))} />
+                  <label className="text-xs font-black text-black uppercase tracking-wider">{t('exigencia_de_laudo_texto')}</label>
+                  <input type="text" className={textInputCls} placeholder={t('ex_laudo_medico_audiograma')} value={m15GrupoEditing?.laudo ?? ''} onChange={e => setM15GrupoEditing(prev => ({ ...(prev ?? { id: '', grupo: 1, nome: '', descricao: '', laudo: '' }), laudo: e.target.value }))} />
                 </div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
-                {m15GrupoEditing?.id && <button onClick={() => setM15GrupoEditing(null)} className="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold border border-slate-600 cursor-pointer">Cancelar</button>}
-                <button onClick={() => saveM15Grupo(m15GrupoEditing ?? { id: '', grupo: 1, nome: '', descricao: '', laudo: '' })} className="bg-black hover:bg-slate-900 text-white px-8 py-2.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">Salvar Grupo</button>
+                {m15GrupoEditing?.id && <button onClick={() => setM15GrupoEditing(null)} className="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold border border-slate-600 cursor-pointer">{t('cancelar')}</button>}
+                <button onClick={() => saveM15Grupo(m15GrupoEditing ?? { id: '', grupo: 1, nome: '', descricao: '', laudo: '' })} className="bg-black hover:bg-slate-900 text-white px-8 py-2.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">{t('salvar_grupo')}</button>
               </div>
             </div>
 
@@ -8752,10 +8682,10 @@ export default function QuestionarioView({
                 <thead>
                   <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
                     <th className="py-3 px-3 w-[8%] border-r border-slate-300">#</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Nome do grupo</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Classificação</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Laudo exigido</th>
-                    <th className="py-3 px-3 w-[15%] text-right">Ações</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('nome_do_grupo')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('classificacao')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('laudo_exigido')}</th>
+                    <th className="py-3 px-3 w-[15%] text-right">{t('acoes')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -8767,7 +8697,7 @@ export default function QuestionarioView({
                       <td className="py-3 px-3 border-r border-slate-300">{g.laudo || "—"}</td>
                       <td className="py-3 px-3 text-right">
                         <div className="flex gap-2 justify-end">
-                          <button onClick={() => setM15GrupoEditing(g)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400 cursor-pointer">Editar</button>
+                          <button onClick={() => setM15GrupoEditing(g)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400 cursor-pointer">{t('editar')}</button>
                         </div>
                       </td>
                     </tr>
@@ -8782,29 +8712,29 @@ export default function QuestionarioView({
           <div className="space-y-6">
             <div className="flex flex-wrap items-end gap-3 p-6 bg-white border-4 border-black rounded-xl shadow-md">
               <div className="flex flex-col gap-1.5 sm:w-64">
-                <label className="text-xs font-black text-black uppercase tracking-wider">Grupo de triagem</label>
+                <label className="text-xs font-black text-black uppercase tracking-wider">{t('grupoTriagem')}</label>
                 <select className={selectInputCls} value={m15AdaptGrupoSel} onChange={e => setM15AdaptGrupoSel(Number(e.target.value))}>
-                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>Grupo {g.grupo} — {g.nome}</option>)}
+                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>{t('grupo')}{g.grupo} — {g.nome}</option>)}
                 </select>
               </div>
               <div className="flex flex-col gap-1.5 sm:w-80">
-                <label className="text-xs font-black text-black uppercase tracking-wider">Classificação / detalhe</label>
+                <label className="text-xs font-black text-black uppercase tracking-wider">{t('classificacaoDetalhe')}</label>
                 <select className={selectInputCls} value={m15AdaptDetalheSel} onChange={e => setM15AdaptDetalheSel(e.target.value)}>
-                  <option value="">(geral — todos os alunos do grupo)</option>
+                  <option value="">{t('geral_todos_os_alunos_do_grupo')}</option>
                   {(m15Detalhes ?? []).map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
-              <button onClick={() => ensureM15Adaptacoes(m15AdaptGrupoSel, m15AdaptDetalheSel)} className="bg-black hover:bg-slate-900 text-white px-5 py-3 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black">Aplicar adaptações de referência</button>
+              <button onClick={() => ensureM15Adaptacoes(m15AdaptGrupoSel, m15AdaptDetalheSel)} className="bg-black hover:bg-slate-900 text-white px-5 py-3 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black">{t('aplicar_adaptacoes_de_referencia')}</button>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse border border-slate-300 min-w-[640px]">
                 <thead>
                   <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
-                    <th className="py-3 px-3 border-r border-slate-300">Teste</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Status da adaptação</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Instrução adaptada</th>
-                    <th className="py-3 px-3 w-[12%] text-right">Ações</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('teste')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('statusAdaptacao')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('instrucaoAdaptada')}</th>
+                    <th className="py-3 px-3 w-[12%] text-right">{t('acoes')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -8817,15 +8747,15 @@ export default function QuestionarioView({
                         </select>
                       </td>
                       <td className="py-3 px-3 border-r border-slate-300">
-                        <input type="text" className={textInputCls} value={a.instrucao} placeholder="Instrução específica para o teste nesta deficiência" onChange={e => saveM15Adaptacao({ ...a, instrucao: e.target.value })} />
+                        <input type="text" className={textInputCls} value={a.instrucao} placeholder={t('instrucao_especifica_para_o_teste_nesta_deficiencia')} onChange={e => saveM15Adaptacao({ ...a, instrucao: e.target.value })} />
                       </td>
                       <td className="py-3 px-3 text-right">
-                        <button onClick={() => { deleteM15Row("m15_pcd_adaptacoes", a.id); setM15Adaptacoes(m15Adaptacoes.filter(row => row.id !== a.id)); }} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400 cursor-pointer">Remover</button>
+                        <button onClick={() => { deleteM15Row("m15_pcd_adaptacoes", a.id); setM15Adaptacoes(m15Adaptacoes.filter(row => row.id !== a.id)); }} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400 cursor-pointer">{t('remover')}</button>
                       </td>
                     </tr>
                   ))}
                   {m15Adaptacoes.filter(a => a.grupo === m15AdaptGrupoSel && (a.detalhe || "").trim() === (m15AdaptDetalheSel || "").trim()).length === 0 && (
-                    <tr><td colSpan={4} className="py-6 px-3 text-center text-sm text-slate-500">Nenhuma adaptação configurada. Clique em &quot;Aplicar adaptações de referência&quot; para popular com os padrões do protocolo.</td></tr>
+                    <tr><td colSpan={4} className="py-6 px-3 text-center text-sm text-slate-500">{t('nenhuma_adaptacao_configurada_clique_em_aplicar_adaptacoes_de_referenc')}</td></tr>
                   )}
                 </tbody>
               </table>
@@ -8837,36 +8767,36 @@ export default function QuestionarioView({
           <div className="space-y-6">
             <div className="flex flex-wrap items-end gap-3 p-6 bg-white border-4 border-black rounded-xl shadow-md">
               <div className="flex flex-col gap-1.5 sm:w-56">
-                <label className="text-xs font-black text-black uppercase tracking-wider">Grupo de triagem</label>
+                <label className="text-xs font-black text-black uppercase tracking-wider">{t('grupoTriagem')}</label>
                 <select className={selectInputCls} value={m15FaixasGrupoSel} onChange={e => setM15FaixasGrupoSel(Number(e.target.value))}>
-                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>Grupo {g.grupo} — {g.nome}</option>)}
+                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>{t('grupo')}{g.grupo} — {g.nome}</option>)}
                 </select>
               </div>
               <div className="flex flex-col gap-1.5 sm:w-64">
-                <label className="text-xs font-black text-black uppercase tracking-wider">Classificação / detalhe</label>
+                <label className="text-xs font-black text-black uppercase tracking-wider">{t('classificacaoDetalhe')}</label>
                 <select className={selectInputCls} value={m15FaixasDetalheSel} onChange={e => setM15FaixasDetalheSel(e.target.value)}>
-                  <option value="">(geral — todos os alunos do grupo)</option>
+                  <option value="">{t('geral_todos_os_alunos_do_grupo')}</option>
                   {(m15FaixaDetalhes ?? []).map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
               <div className="flex flex-col gap-1.5 sm:w-72">
-                <label className="text-xs font-black text-black uppercase tracking-wider">Teste</label>
+                <label className="text-xs font-black text-black uppercase tracking-wider">{t('teste')}</label>
                 <select className={selectInputCls} value={m15FaixasTesteSel} onChange={e => setM15FaixasTesteSel(e.target.value as PcdTesteKey)}>
-                  {PCD_TESTES.map(t => <option key={t.key} value={t.key}>{t.label} ({t.unidade})</option>)}
+                  {PCD_TESTES.map(t => <option key={t.key} value={t.key}>{displayValue(t.label)} ({t.unidade})</option>)}
                 </select>
               </div>
-              <button onClick={() => ensureM15Faixas(m15FaixasGrupoSel, m15FaixasDetalheSel, m15FaixasTesteSel)} className="bg-black hover:bg-slate-900 text-white px-5 py-3 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black">Aplicar faixas de referência</button>
+              <button onClick={() => ensureM15Faixas(m15FaixasGrupoSel, m15FaixasDetalheSel, m15FaixasTesteSel)} className="bg-black hover:bg-slate-900 text-white px-5 py-3 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black">{t('aplicar_faixas_de_referencia')}</button>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse border border-slate-300 min-w-[640px]">
                 <thead>
                   <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
-                    <th className="py-3 px-3 border-r border-slate-300">Nota</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Rótulo</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Valor mínimo</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Valor máximo</th>
-                    <th className="py-3 px-3 w-[10%] text-right">Ações</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('nota')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('rotulo')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('valorMinimo')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('valorMaximo')}</th>
+                    <th className="py-3 px-3 w-[10%] text-right">{t('acoes')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -8875,18 +8805,18 @@ export default function QuestionarioView({
                     if (!f) {
                       return (
                         <tr key={n} className="hover:bg-slate-50">
-                          <td className="py-3 px-3 border-r border-slate-300 font-bold">Nota {n}</td>
+                          <td className="py-3 px-3 border-r border-slate-300 font-bold">{t('nota')}{n}</td>
                           <td className="py-3 px-3 border-r border-slate-300 text-xs">{PCD_NOTAS_LABELS[n]}</td>
-                          <td className="py-3 px-3 border-r border-slate-300 text-slate-400" colSpan={2}>Não configurada</td>
+                          <td className="py-3 px-3 border-r border-slate-300 text-slate-400" colSpan={2}>{t('nao_configurada')}</td>
                           <td className="py-3 px-3 text-right">
-                            <button onClick={() => addM15Faixa(m15FaixasGrupoSel, m15FaixasDetalheSel, m15FaixasTesteSel, n)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400 cursor-pointer">Criar</button>
+                            <button onClick={() => addM15Faixa(m15FaixasGrupoSel, m15FaixasDetalheSel, m15FaixasTesteSel, n)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400 cursor-pointer">{t('criar')}</button>
                           </td>
                         </tr>
                       );
                     }
                     return (
                       <tr key={f.id} className="hover:bg-slate-50">
-                        <td className="py-3 px-3 border-r border-slate-300 font-bold">Nota {n}</td>
+                        <td className="py-3 px-3 border-r border-slate-300 font-bold">{t('nota')}{n}</td>
                         <td className="py-3 px-3 border-r border-slate-300 text-xs">{PCD_NOTAS_LABELS[n]}</td>
                         <td className="py-3 px-3 border-r border-slate-300">
                           <input type="number" step="0.01" className={textInputCls} placeholder="—" value={f.minVal ?? ''} onChange={e => saveM15Faixa({ ...f, minVal: e.target.value === '' ? null : Number(e.target.value) })} />
@@ -8895,7 +8825,7 @@ export default function QuestionarioView({
                           <input type="number" step="0.01" className={textInputCls} placeholder="—" value={f.maxVal ?? ''} onChange={e => saveM15Faixa({ ...f, maxVal: e.target.value === '' ? null : Number(e.target.value) })} />
                         </td>
                         <td className="py-3 px-3 text-right">
-                          <button onClick={() => { deleteM15Row("m15_pcd_faixas", f.id); setM15Faixas(m15Faixas.filter(row => row.id !== f.id)); }} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400 cursor-pointer">Remover</button>
+                          <button onClick={() => { deleteM15Row("m15_pcd_faixas", f.id); setM15Faixas(m15Faixas.filter(row => row.id !== f.id)); }} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400 cursor-pointer">{t('remover')}</button>
                         </td>
                       </tr>
                     );
@@ -8903,43 +8833,43 @@ export default function QuestionarioView({
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-slate-600">Regra de aplicação: nos testes <strong>maior-melhor</strong> (abdominal, salto, flexão) — Nota 1 = até o limite inferior, Nota 2 = faixa intermediária, Nota 3 = a partir do limite superior. Nos testes <strong>menor-melhor</strong> (velocidade, agilidade) a ordem se inverte: menor tempo = Nota 3.</p>
+            <p className="text-xs text-slate-600">{t('regra_de_aplicacao_nos_testes')}<strong>{t('maior_melhor')}</strong> {t('abdominal_salto_flexao_nota_1_ate_o_limite_inferior_nota_2_faixa_inter')}<strong>{t('menor_melhor')}</strong> {t('velocidade_agilidade_a_ordem_se_inverte_menor_tempo_nota_3')}</p>
           </div>
         )}
 
         {m15Tab === 'matriz' && (
           <div className="space-y-6">
             <div className="p-6 bg-white border-4 border-black rounded-xl space-y-4 shadow-md">
-              <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">Configurar modalidade da matriz</h3>
+              <h3 className="font-black text-xl text-black uppercase tracking-wide border-b-2 border-black pb-2">{t('configurar_modalidade_da_matriz')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black text-black uppercase tracking-wider">Modalidade</label>
-                  <input type="text" className={textInputCls} placeholder="Ex: Atletismo" value={m15MatrizEditing?.nome ?? ''} onChange={e => setM15MatrizEditing(prev => ({ ...(prev ?? { id: '', nome: '', pesoVelAgil: 1, pesoForcaExp: 1, pesoMembrosSup: 1, pesoCore: 1, descricao: '' }), nome: e.target.value }))} />
+                  <label className="text-xs font-black text-black uppercase tracking-wider">{t('modalidade')}</label>
+                  <input type="text" className={textInputCls} placeholder={t('ex_atletismo')} value={m15MatrizEditing?.nome ?? ''} onChange={e => setM15MatrizEditing(prev => ({ ...(prev ?? { id: '', nome: '', pesoVelAgil: 1, pesoForcaExp: 1, pesoMembrosSup: 1, pesoCore: 1, descricao: '' }), nome: e.target.value }))} />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black text-black uppercase tracking-wider">Descrição / exigência</label>
-                  <input type="text" className={textInputCls} placeholder="Ex: Sprint, saltos e arremessos" value={m15MatrizEditing?.descricao ?? ''} onChange={e => setM15MatrizEditing(prev => ({ ...(prev ?? { id: '', nome: '', pesoVelAgil: 1, pesoForcaExp: 1, pesoMembrosSup: 1, pesoCore: 1, descricao: '' }), descricao: e.target.value }))} />
+                  <label className="text-xs font-black text-black uppercase tracking-wider">{t('descricao_exigencia')}</label>
+                  <input type="text" className={textInputCls} placeholder={t('ex_sprint_saltos_e_arremessos')} value={m15MatrizEditing?.descricao ?? ''} onChange={e => setM15MatrizEditing(prev => ({ ...(prev ?? { id: '', nome: '', pesoVelAgil: 1, pesoForcaExp: 1, pesoMembrosSup: 1, pesoCore: 1, descricao: '' }), descricao: e.target.value }))} />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black text-black uppercase tracking-wider">Peso Core</label>
+                  <label className="text-xs font-black text-black uppercase tracking-wider">{t('peso_core')}</label>
                   <input type="number" min={0} max={3} className={textInputCls} value={m15MatrizEditing?.pesoCore ?? 1} onChange={e => setM15MatrizEditing(prev => ({ ...(prev ?? { id: '', nome: '', pesoVelAgil: 1, pesoForcaExp: 1, pesoMembrosSup: 1, pesoCore: 1, descricao: '' }), pesoCore: Number(e.target.value) }))} />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black text-black uppercase tracking-wider">Peso Velocidade/Agilidade</label>
+                  <label className="text-xs font-black text-black uppercase tracking-wider">{t('peso_velocidade_agilidade')}</label>
                   <input type="number" min={0} max={3} className={textInputCls} value={m15MatrizEditing?.pesoVelAgil ?? 1} onChange={e => setM15MatrizEditing(prev => ({ ...(prev ?? { id: '', nome: '', pesoVelAgil: 1, pesoForcaExp: 1, pesoMembrosSup: 1, pesoCore: 1, descricao: '' }), pesoVelAgil: Number(e.target.value) }))} />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black text-black uppercase tracking-wider">Peso Força Explosiva</label>
+                  <label className="text-xs font-black text-black uppercase tracking-wider">{t('peso_forca_explosiva')}</label>
                   <input type="number" min={0} max={3} className={textInputCls} value={m15MatrizEditing?.pesoForcaExp ?? 1} onChange={e => setM15MatrizEditing(prev => ({ ...(prev ?? { id: '', nome: '', pesoVelAgil: 1, pesoForcaExp: 1, pesoMembrosSup: 1, pesoCore: 1, descricao: '' }), pesoForcaExp: Number(e.target.value) }))} />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black text-black uppercase tracking-wider">Peso Membros Superiores</label>
+                  <label className="text-xs font-black text-black uppercase tracking-wider">{t('peso_membros_superiores')}</label>
                   <input type="number" min={0} max={3} className={textInputCls} value={m15MatrizEditing?.pesoMembrosSup ?? 1} onChange={e => setM15MatrizEditing(prev => ({ ...(prev ?? { id: '', nome: '', pesoVelAgil: 1, pesoForcaExp: 1, pesoMembrosSup: 1, pesoCore: 1, descricao: '' }), pesoMembrosSup: Number(e.target.value) }))} />
                 </div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
-                {m15MatrizEditing?.id && <button onClick={() => setM15MatrizEditing(null)} className="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold border border-slate-600 cursor-pointer">Cancelar</button>}
-                <button onClick={() => saveM15Matriz(m15MatrizEditing ?? { id: '', nome: '', pesoVelAgil: 1, pesoForcaExp: 1, pesoMembrosSup: 1, pesoCore: 1, descricao: '' })} className="bg-black hover:bg-slate-900 text-white px-8 py-2.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">Salvar Modalidade</button>
+                {m15MatrizEditing?.id && <button onClick={() => setM15MatrizEditing(null)} className="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold border border-slate-600 cursor-pointer">{t('cancelar')}</button>}
+                <button onClick={() => saveM15Matriz(m15MatrizEditing ?? { id: '', nome: '', pesoVelAgil: 1, pesoForcaExp: 1, pesoMembrosSup: 1, pesoCore: 1, descricao: '' })} className="bg-black hover:bg-slate-900 text-white px-8 py-2.5 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black uppercase tracking-wide">{t('salvar_modalidade')}</button>
               </div>
             </div>
 
@@ -8947,13 +8877,13 @@ export default function QuestionarioView({
               <table className="w-full text-left border-collapse border border-slate-300 min-w-[820px]">
                 <thead>
                   <tr className="bg-slate-100 border-b-2 border-slate-400 text-sm font-black text-black">
-                    <th className="py-3 px-3 border-r border-slate-300">Modalidade</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Vel/Agil</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Força Expl.</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Membros Sup.</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Core</th>
-                    <th className="py-3 px-3 border-r border-slate-300">Descrição</th>
-                    <th className="py-3 px-3 w-[16%] text-right">Ações</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('modalidade')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('vel_agil')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('forca_expl')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('membros_sup')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('core')}</th>
+                    <th className="py-3 px-3 border-r border-slate-300">{t('descricao')}</th>
+                    <th className="py-3 px-3 w-[16%] text-right">{t('acoes')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300 text-sm text-black">
@@ -8967,8 +8897,8 @@ export default function QuestionarioView({
                       <td className="py-3 px-3 border-r border-slate-300 text-xs">{m.descricao || "—"}</td>
                       <td className="py-3 px-3 text-right">
                         <div className="flex gap-2 justify-end">
-                          <button onClick={() => setM15MatrizEditing(m)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400 cursor-pointer">Editar</button>
-                          <button onClick={() => { deleteM15Row("m15_pcd_modalidades", m.id); setM15Modalidades(m15Modalidades.filter(row => row.id !== m.id)); }} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400 cursor-pointer">Excluir</button>
+                          <button onClick={() => setM15MatrizEditing(m)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400 cursor-pointer">{t('editar')}</button>
+                          <button onClick={() => { deleteM15Row("m15_pcd_modalidades", m.id); setM15Modalidades(m15Modalidades.filter(row => row.id !== m.id)); }} className="text-rose-700 hover:text-white font-bold text-xs bg-rose-100 hover:bg-rose-700 px-3 py-2 rounded-md border border-rose-400 cursor-pointer">{t('excluir')}</button>
                         </div>
                       </td>
                     </tr>
@@ -8983,12 +8913,12 @@ export default function QuestionarioView({
           <div className="space-y-6">
             <div className="flex flex-wrap items-end gap-3 p-6 bg-white border-4 border-black rounded-xl shadow-md">
               <div className="flex flex-col gap-1.5 sm:w-72">
-                <label className="text-xs font-black text-black uppercase tracking-wider">Grupo de triagem</label>
+                <label className="text-xs font-black text-black uppercase tracking-wider">{t('grupoTriagem')}</label>
                 <select className={selectInputCls} value={m15FunilGrupoSel} onChange={e => setM15FunilGrupoSel(Number(e.target.value))}>
-                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>Grupo {g.grupo} — {g.nome}</option>)}
+                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>{t('grupo')}{g.grupo} — {g.nome}</option>)}
                 </select>
               </div>
-              <button onClick={() => ensureM15Funil(m15FunilGrupoSel)} className="bg-black hover:bg-slate-900 text-white px-5 py-3 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black">Aplicar regras de referência</button>
+              <button onClick={() => ensureM15Funil(m15FunilGrupoSel)} className="bg-black hover:bg-slate-900 text-white px-5 py-3 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black">{t('aplicar_regras_de_referencia')}</button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -8996,10 +8926,10 @@ export default function QuestionarioView({
                 const f = m15Funil.find(f => f.grupo === m15FunilGrupoSel && f.momento === m);
                 return (
                   <div key={m} className="border-2 border-slate-300 rounded-xl p-4 bg-slate-50">
-                    <h4 className="font-black text-sm text-black mb-1">Momento {m}</h4>
-                    <input type="text" className="w-full p-2 border-2 border-slate-400 bg-white text-black rounded-lg text-xs font-bold mb-2 focus:ring-2 focus:ring-black outline-none" placeholder="Título do filtro" value={f?.titulo ?? ''} disabled={!f} onChange={e => f && saveM15Funil({ ...f, titulo: e.target.value })} />
-                    <textarea className="w-full p-2 border-2 border-slate-400 bg-white text-black rounded-lg text-xs font-bold focus:ring-2 focus:ring-black outline-none" rows={6} placeholder="Regra qualitativa / recomendações" value={f?.regra ?? ''} disabled={!f} onChange={e => f && saveM15Funil({ ...f, regra: e.target.value })} />
-                    {!f && <p className="text-xs text-slate-500">Configure este momento clicando em &quot;Aplicar regras de referência&quot;.</p>}
+                    <h4 className="font-black text-sm text-black mb-1">{t('momento')}{m}</h4>
+                    <input type="text" className="w-full p-2 border-2 border-slate-400 bg-white text-black rounded-lg text-xs font-bold mb-2 focus:ring-2 focus:ring-black outline-none" placeholder={t('titulo_do_filtro')} value={f?.titulo ?? ''} disabled={!f} onChange={e => f && saveM15Funil({ ...f, titulo: e.target.value })} />
+                    <textarea className="w-full p-2 border-2 border-slate-400 bg-white text-black rounded-lg text-xs font-bold focus:ring-2 focus:ring-black outline-none" rows={6} placeholder={t('regra_qualitativa_recomendacoes')} value={f?.regra ?? ''} disabled={!f} onChange={e => f && saveM15Funil({ ...f, regra: e.target.value })} />
+                    {!f && <p className="text-xs text-slate-500">{t('configure_este_momento_clicando_em_aplicar_regras_de_referencia')}</p>}
                   </div>
                 );
               })}
@@ -9019,7 +8949,7 @@ export default function QuestionarioView({
         row.basicData.toLowerCase().includes(q) ||
         row.reflection.toLowerCase().includes(q)
       );
-    }).sort((a, b) => a.profile.localeCompare(b.profile, 'pt-BR') || a.component.localeCompare(b.component, 'pt-BR'));
+    }).sort((a, b) => a.profile.localeCompare(b.profile, locale) || a.component.localeCompare(b.component, locale));
 
     const m7AddRow = async () => {
       if (!m7NewRow.basicData.trim() || !m7NewRow.reflection.trim()) {
@@ -9125,11 +9055,9 @@ export default function QuestionarioView({
           <div>
             <h1 className="text-2xl font-black text-black tracking-tight flex items-center gap-2">
               <ClipboardList className="w-7 h-7 text-[#5e2b97]" />
-              Módulo 7: Mapa de Perfis, Carreiras e Pareceres
-            </h1>
+              {t('modulo_7_mapa_de_perfis_carreiras_e_pareceres')}</h1>
             <p className="text-sm text-slate-600 font-bold mt-1">
-              Consulte e configure as diretrizes, habilidades e recomendações dos perfis profissionais
-            </p>
+              {t('consulte_e_configure_as_diretrizes_habilidades_e_recomendacoes_dos_per')}</p>
           </div>
           
           <div className="flex flex-wrap gap-2 items-center">
@@ -9140,7 +9068,7 @@ export default function QuestionarioView({
               <Search className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
               <input
                 type="text"
-                placeholder="Pesquisar..."
+                placeholder={t('pesquisar')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-slate-50 border-2 border-slate-300 rounded-lg py-2 pl-9 pr-4 text-xs text-black placeholder-slate-500 focus:outline-none focus:border-black font-semibold"
@@ -9153,41 +9081,40 @@ export default function QuestionarioView({
         <div className="mb-8 p-5 bg-slate-50 border-2 border-slate-300 rounded-xl">
           <h3 className="text-sm font-black text-black uppercase tracking-tight mb-4 flex items-center gap-2 border-b pb-2">
             <Plus className="w-4 h-4 text-blue-600" />
-            Adicionar Novo Componente de Perfil
-          </h3>
+            {t('adicionar_novo_componente_de_perfil')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="text-xs font-extrabold text-slate-800 block mb-1">Módulo / Perfil:</label>
+              <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('modulo_perfil')}</label>
               <select
                 value={m7NewRow.profile}
                 onChange={(e) => setM7NewRow({ ...m7NewRow, profile: e.target.value })}
                 className="w-full bg-white border-2 border-slate-300 rounded-lg p-2.5 text-xs text-black font-black focus:border-black focus:outline-none"
               >
-                <option value="Criativo e Tecnológico (Perfil Híbrido)">🧩 Criativo e Tecnológico (Perfil Híbrido)</option>
-                <option value="Negócios e Gestão">💼 Negócios e Gestão</option>
-                <option value="Biológicas e Criativas">🌱 Biológicas e Criativas</option>
-                <option value="Exatas e Tecnológicas">📐 Exatas e Tecnológicas</option>
-                <option value="Humanas e Sociais">👥 Humanas e Sociais</option>
+                <option value="Criativo e Tecnológico (Perfil Híbrido)">{t('criativo_e_tecnologico_perfil_hibrido')}</option>
+                <option value="Negócios e Gestão">{t('negocios_e_gestao')}</option>
+                <option value="Biológicas e Criativas">{t('biologicas_e_criativas')}</option>
+                <option value="Exatas e Tecnológicas">{t('exatas_e_tecnologicas')}</option>
+                <option value="Humanas e Sociais">{t('humanas_e_sociais')}</option>
               </select>
             </div>
             <div>
-              <label className="text-xs font-extrabold text-slate-800 block mb-1">Componente:</label>
+              <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('componente_2')}</label>
               <select
                 value={m7NewRow.component}
                 onChange={(e) => setM7NewRow({ ...m7NewRow, component: e.target.value })}
                 className="w-full bg-white border-2 border-slate-300 rounded-lg p-2.5 text-xs text-black font-black focus:border-black focus:outline-none"
               >
-                <option value="Mapa de Perfis e Carreiras">Mapa de Perfis e Carreiras</option>
-                <option value="Recomendações Pedagógicas">Recomendações Pedagógicas</option>
+                <option value="Mapa de Perfis e Carreiras">{t('mapa_de_perfis_e_carreiras')}</option>
+                <option value="Recomendações Pedagógicas">{t('recomendacoes_pedagogicas')}</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="text-xs font-extrabold text-slate-800 block mb-1">Dados Básicos / Carreiras / Ações:</label>
+              <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('dados_basicos_carreiras_acoes')}</label>
               <textarea
-                placeholder="Descreva as características básicas ou os projetos sugeridos..."
+                placeholder={t('descreva_as_caracteristicas_basicas_ou_os_projetos_sugeridos')}
                 value={m7NewRow.basicData}
                 onChange={(e) => setM7NewRow({ ...m7NewRow, basicData: e.target.value })}
                 rows={3}
@@ -9195,9 +9122,9 @@ export default function QuestionarioView({
               />
             </div>
             <div>
-              <label className="text-xs font-extrabold text-slate-800 block mb-1">Meu Parecer Reflexivo / Recomendações:</label>
+              <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('meu_parecer_reflexivo_recomendacoes')}</label>
               <textarea
-                placeholder="Insira o parecer técnico de orientação profissional..."
+                placeholder={t('insira_o_parecer_tecnico_de_orientacao_profissional')}
                 value={m7NewRow.reflection}
                 onChange={(e) => setM7NewRow({ ...m7NewRow, reflection: e.target.value })}
                 rows={3}
@@ -9208,9 +9135,9 @@ export default function QuestionarioView({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="text-xs font-extrabold text-slate-800 block mb-1">Área de Interesse (mostrada na avaliação):</label>
+              <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('area_de_interesse_mostrada_na_avaliacao')}</label>
               <textarea
-                placeholder="Ex: Você gosta de se comunicar, ajudar as pessoas e entender a sociedade."
+                placeholder={t('ex_voce_gosta_de_se_comunicar_ajudar_as_pessoas_e_entender_a_sociedade')}
                 value={m7NewRow.interestArea ?? ""}
                 onChange={(e) => setM7NewRow({ ...m7NewRow, interestArea: e.target.value })}
                 rows={2}
@@ -9218,9 +9145,9 @@ export default function QuestionarioView({
               />
             </div>
             <div>
-              <label className="text-xs font-extrabold text-slate-800 block mb-1">Carreiras Indicadas (mostradas na avaliação):</label>
+              <label className="text-xs font-extrabold text-slate-800 block mb-1">{t('carreiras_indicadas_mostradas_na_avaliacao')}</label>
               <textarea
-                placeholder="Ex: Direito, Letras, Pedagogia, Psicologia..."
+                placeholder={t('ex_direito_letras_pedagogia_psicologia')}
                 value={m7NewRow.careers ?? ""}
                 onChange={(e) => setM7NewRow({ ...m7NewRow, careers: e.target.value })}
                 rows={2}
@@ -9236,7 +9163,7 @@ export default function QuestionarioView({
               className="px-5 py-2.5 bg-black hover:bg-slate-800 text-white font-black rounded-lg text-xs tracking-wider uppercase transition-all shadow-md active:scale-95 cursor-pointer border border-black flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Adicionar Registro</span>
+              <span>{t('adicionarRegistro')}</span>
             </button>
           </div>
         </div>
@@ -9246,21 +9173,20 @@ export default function QuestionarioView({
           <table className="w-full border-collapse min-w-[820px]">
             <thead>
               <tr className="bg-slate-100 text-slate-800 uppercase text-xs font-black border-b-2 border-slate-300">
-                <th className="py-3 px-3 text-left border-r border-slate-300 w-[7%]">Módulo / Perfil</th>
-                <th className="py-3 px-3 text-left border-r border-slate-300 w-[7%]">Componente</th>
-                <th className="py-3 px-3 text-left border-r border-slate-300 w-[20%]">Dados Básicos</th>
-                <th className="py-3 px-3 text-left border-r border-slate-300 w-[30%]">Meu Parecer Reflexivo</th>
-                <th className="py-3 px-3 text-left border-r border-slate-300 w-[10%]">Área de Interesse</th>
-                <th className="py-3 px-3 text-left border-r border-slate-300 w-[10%]">Carreiras Indicadas</th>
-                <th className="py-3 px-3 text-center w-[6%]">Ações</th>
+                <th className="py-3 px-3 text-left border-r border-slate-300 w-[7%]">{t('moduloPerfil')}</th>
+                <th className="py-3 px-3 text-left border-r border-slate-300 w-[7%]">{t('componente')}</th>
+                <th className="py-3 px-3 text-left border-r border-slate-300 w-[20%]">{t('dadosBasicos')}</th>
+                <th className="py-3 px-3 text-left border-r border-slate-300 w-[30%]">{t('meu_parecer_reflexivo')}</th>
+                <th className="py-3 px-3 text-left border-r border-slate-300 w-[10%]">{t('area_de_interesse')}</th>
+                <th className="py-3 px-3 text-left border-r border-slate-300 w-[10%]">{t('carreiras_indicadas')}</th>
+                <th className="py-3 px-3 text-center w-[6%]">{t('acoes')}</th>
               </tr>
             </thead>
             <tbody>
               {filteredM7Rows.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500 font-bold italic bg-slate-50">
-                    Nenhum registro encontrado.
-                  </td>
+                    {t('nenhumRegistro')}</td>
                 </tr>
               ) : (
                 filteredM7Rows.map((row) => {
@@ -9299,11 +9225,11 @@ export default function QuestionarioView({
                               value={m7EditingData.profile}
                               onChange={(e) => setM7EditingData({ ...m7EditingData, profile: e.target.value })}
                             >
-                              <option value="Criativo e Tecnológico (Perfil Híbrido)">🧩 Criativo e Tecnológico</option>
-                              <option value="Negócios e Gestão">💼 Negócios e Gestão</option>
-                              <option value="Biológicas e Criativas">🌱 Biológicas e Criativas</option>
-                              <option value="Exatas e Tecnológicas">📐 Exatas e Tecnológicas</option>
-                              <option value="Humanas e Sociais">👥 Humanas e Sociais</option>
+                              <option value="Criativo e Tecnológico (Perfil Híbrido)">{t('criativo_e_tecnologico')}</option>
+                              <option value="Negócios e Gestão">{t('negocios_e_gestao')}</option>
+                              <option value="Biológicas e Criativas">{t('biologicas_e_criativas')}</option>
+                              <option value="Exatas e Tecnológicas">{t('exatas_e_tecnologicas')}</option>
+                              <option value="Humanas e Sociais">{t('humanas_e_sociais')}</option>
                             </select>
                           </td>
                           <td className="py-3 px-3 align-top border-r border-slate-300">
@@ -9312,8 +9238,8 @@ export default function QuestionarioView({
                               value={m7EditingData.component}
                               onChange={(e) => setM7EditingData({ ...m7EditingData, component: e.target.value })}
                             >
-                              <option value="Mapa de Perfis e Carreiras">Mapa de Perfis e Carreiras</option>
-                              <option value="Recomendações Pedagógicas">Recomendações Pedagógicas</option>
+                              <option value="Mapa de Perfis e Carreiras">{t('mapa_de_perfis_e_carreiras')}</option>
+                              <option value="Recomendações Pedagógicas">{t('recomendacoes_pedagogicas')}</option>
                             </select>
                           </td>
                           <td className="py-3 px-3 align-top border-r border-slate-300">
@@ -9350,14 +9276,12 @@ export default function QuestionarioView({
                                 onClick={m7SaveEditing}
                                 className="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1.5 rounded text-xs font-bold transition-all shadow-md active:scale-95 border border-green-700 cursor-pointer"
                               >
-                                Salvar
-                              </button>
+                                {t('salvar')}</button>
                               <button
                                 onClick={m7CancelEditing}
                                 className="bg-slate-500 hover:bg-slate-600 text-white px-2.5 py-1.5 rounded text-xs font-bold transition-all shadow-md active:scale-95 border border-slate-600 cursor-pointer"
                               >
-                                Cancelar
-                              </button>
+                                {t('cancelar')}</button>
                             </div>
                           </td>
                         </>
@@ -9385,18 +9309,18 @@ export default function QuestionarioView({
                               <button
                                 onClick={() => m7StartEditing(row)}
                                 className="text-blue-700 hover:text-white flex items-center justify-center gap-1 font-bold text-[10px] bg-blue-100 hover:bg-blue-700 px-2 py-1 rounded transition-all cursor-pointer border border-blue-400"
-                                title="Editar"
+                                title={t('editar')}
                               >
                                 <Edit className="w-3.5 h-3.5" />
-                                <span>Editar</span>
+                                <span>{t('editar')}</span>
                               </button>
                               <button
                                 onClick={() => m7DeleteRow(row.id)}
                                 className="text-red-700 hover:text-white flex items-center justify-center gap-1 font-bold text-[10px] bg-red-100 hover:bg-red-700 px-2 py-1 rounded transition-all cursor-pointer border border-red-400"
-                                title="Excluir"
+                                title={t('excluir')}
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
-                                <span>Excluir</span>
+                                <span>{t('excluir')}</span>
                               </button>
                             </div>
                           </td>
@@ -9416,30 +9340,26 @@ export default function QuestionarioView({
             <div className="bg-white border border-slate-300 w-full max-w-md rounded-xl shadow-2xl p-4 sm:p-6 relative animate-in fade-in zoom-in duration-150">
               <h4 className="text-lg font-black text-black uppercase tracking-tight mb-2 flex items-center gap-2 border-b pb-2">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
-                Confirmar Exclusão
-              </h4>
+                {t('confirmarExclusao')}</h4>
               <p className="text-sm text-slate-700 mb-6 leading-relaxed">
-                Tem certeza de que deseja excluir permanentemente o registro para o perfil{" "}
+                {t('tem_certeza_de_que_deseja_excluir_permanentemente_o_registro_para_o_pe')}{" "}
                 <span className="text-black font-extrabold font-mono bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
                   {m7RowToDelete.profile}
                 </span>{" "}
-                ({m7RowToDelete.component})? Esta ação não pode ser desfeita.
-              </p>
+                ({m7RowToDelete.component}{t('esta_acao_nao_pode_ser_desfeita')}</p>
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={() => setM7RowToDelete(null)}
                   className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-xs font-black text-slate-800 transition-colors cursor-pointer"
                 >
-                  Cancelar
-                </button>
+                  {t('cancelar')}</button>
                 <button
                   type="button"
                   onClick={handleConfirmDeleteM7}
                   className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black rounded-lg text-xs shadow-md transition-colors cursor-pointer border border-red-700"
                 >
-                  Confirmar Excluir
-                </button>
+                  {t('confirmarExcluir')}</button>
               </div>
             </div>
           </div>

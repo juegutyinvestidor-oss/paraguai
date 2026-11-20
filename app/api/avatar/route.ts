@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabaseAdmin";
 import { sessionFromRequest } from "../../../lib/session";
 import { uuid } from "../../../lib/idGenerator";
+import { getApiTranslator } from "../../../lib/apiI18n";
 
 export const dynamic = "force-dynamic";
 
@@ -15,21 +16,22 @@ const MIME_EXT: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
+  const t = getApiTranslator(req);
   try {
     const session = sessionFromRequest(req);
     if (!session) {
-      return NextResponse.json({ error: "Sessao invalida ou expirada. Faca login novamente." }, { status: 401 });
+      return NextResponse.json({ error: t("erroSessaoInvalidaOuExpirada") }, { status: 401 });
     }
     const admin = getSupabaseAdmin();
     if (!admin) {
-      return NextResponse.json({ error: "Servidor indisponivel." }, { status: 500 });
+      return NextResponse.json({ error: t("erroServidorIndisponivel") }, { status: 500 });
     }
 
     let form: FormData;
     try {
       form = await req.formData();
     } catch {
-      return NextResponse.json({ error: "Requisicao deve ser multipart/form-data." }, { status: 400 });
+      return NextResponse.json({ error: t("erroMultipartFormData") }, { status: 400 });
     }
 
     const action = String(form.get("action") || "");
@@ -37,13 +39,13 @@ export async function POST(req: NextRequest) {
     if (action === "upload") {
       const file = form.get("file");
       if (!(file instanceof File)) {
-        return NextResponse.json({ error: "Arquivo ausente." }, { status: 400 });
+        return NextResponse.json({ error: t("avatarArquivoAusente") }, { status: 400 });
       }
       if (file.size === 0 || file.size > MAX_SIZE) {
-        return NextResponse.json({ error: "Imagem muito grande (max 3MB)." }, { status: 413 });
+        return NextResponse.json({ error: t("avatarImagemMuitoGrande") }, { status: 413 });
       }
       if (!file.type.startsWith("image/")) {
-        return NextResponse.json({ error: "Somente imagens sao aceitas." }, { status: 415 });
+        return NextResponse.json({ error: t("avatarSomenteImagens") }, { status: 415 });
       }
       const ext = MIME_EXT[file.type] || "jpg";
       const rawPrefix = String(form.get("prefix") || "avatar");
@@ -58,7 +60,7 @@ export async function POST(req: NextRequest) {
       });
       if (error) {
         console.error("[Edukyne] Erro no upload via service_role:", error.message);
-        return NextResponse.json({ error: "Falha ao enviar a imagem." }, { status: 500 });
+        return NextResponse.json({ error: t("avatarFalhaEnviarImagem") }, { status: 500 });
       }
       const { data } = admin.storage.from("avatars").getPublicUrl(path);
       const base = data?.publicUrl || "";
@@ -69,19 +71,19 @@ export async function POST(req: NextRequest) {
     if (action === "delete") {
       const path = String(form.get("path") || "");
       if (!path || path.length > 300 || path.includes("..") || path.includes("/") || path.includes("\\")) {
-        return NextResponse.json({ error: "Caminho invalido." }, { status: 400 });
+        return NextResponse.json({ error: t("erroCaminhoInvalido") }, { status: 400 });
       }
       const { error } = await admin.storage.from("avatars").remove([path]);
       if (error) {
         console.error("[Edukyne] Erro ao excluir avatar via service_role:", error.message);
-        return NextResponse.json({ error: "Falha ao excluir a imagem." }, { status: 500 });
+        return NextResponse.json({ error: t("avatarFalhaExcluirImagem") }, { status: 500 });
       }
       return NextResponse.json({ ok: true });
     }
 
-    return NextResponse.json({ error: "Acao invalida." }, { status: 400 });
+    return NextResponse.json({ error: t("erroAcaoInvalida") }, { status: 400 });
   } catch (err) {
     console.error("Erro na API avatar:", err);
-    return NextResponse.json({ error: "Erro interno do servidor." }, { status: 500 });
+    return NextResponse.json({ error: t("erroInternoServidor") }, { status: 500 });
   }
 }

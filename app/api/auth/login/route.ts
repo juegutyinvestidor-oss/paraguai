@@ -1,22 +1,24 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../../lib/supabaseAdmin";
 import { createSessionToken } from "../../../../lib/session";
+import { getApiTranslator } from "../../../../lib/apiI18n";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  const t = getApiTranslator(req);
   try {
     const body = await req.json();
     const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
     const password = typeof body?.password === "string" ? body.password : "";
 
     if (!email.includes("@") || password.length < 4) {
-      return NextResponse.json({ error: "Credenciais invalidas." }, { status: 400 });
+      return NextResponse.json({ error: t("loginCredenciaisInvalidas") }, { status: 400 });
     }
 
     const admin = getSupabaseAdmin();
     if (!admin) {
-      return NextResponse.json({ error: "Servidor de autenticacao indisponivel." }, { status: 500 });
+      return NextResponse.json({ error: t("erroServidorAutenticacaoIndisponivel") }, { status: 500 });
     }
 
     const xff = req.headers.get("x-forwarded-for");
@@ -41,17 +43,17 @@ export async function POST(req: NextRequest) {
       const msg = error.message || "";
       if (/bloquead/i.test(msg)) {
         return NextResponse.json(
-          { error: "Conta temporariamente bloqueada devido a múltiplas tentativas. Aguarde 15 minutos." },
+          { error: t("loginContaBloqueadaTentativas") },
           { status: 423 }
         );
       }
       console.error("[Edukyne] Erro em validate_login_secure:", msg);
-      return NextResponse.json({ error: "Erro ao autenticar. Tente novamente." }, { status: 500 });
+      return NextResponse.json({ error: t("loginErroAutenticar") }, { status: 500 });
     }
 
     const user = Array.isArray(data) && data.length > 0 ? data[0] : null;
     if (!user || !user.id) {
-      return NextResponse.json({ error: "E-mail ou senha incorretos." }, { status: 401 });
+      return NextResponse.json({ error: t("loginEmailOuSenhaIncorretos") }, { status: 401 });
     }
 
     const token = createSessionToken({
@@ -76,6 +78,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ user, token });
   } catch (err) {
     console.error("Erro na API auth/login:", err);
-    return NextResponse.json({ error: "Erro inesperado ao autenticar." }, { status: 500 });
+    return NextResponse.json({ error: t("loginErroInesperado") }, { status: 500 });
   }
 }

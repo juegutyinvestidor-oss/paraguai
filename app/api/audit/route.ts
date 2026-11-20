@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabaseAdmin";
 import { sessionFromRequest } from "../../../lib/session";
+import { getApiTranslator } from "../../../lib/apiI18n";
 
 export const dynamic = "force-dynamic";
 
@@ -21,22 +22,23 @@ function cleanStr(val: unknown, max: number): string | null {
 }
 
 export async function POST(req: NextRequest) {
+  const t = getApiTranslator(req);
   try {
     const session = sessionFromRequest(req);
     if (!session) {
-      return NextResponse.json({ error: "Sessao invalida ou expirada." }, { status: 401 });
+      return NextResponse.json({ error: t("erroSessaoInvalida") }, { status: 401 });
     }
 
     const admin = getSupabaseAdmin();
     if (!admin) {
-      return NextResponse.json({ error: "Servidor indisponivel." }, { status: 500 });
+      return NextResponse.json({ error: t("erroServidorIndisponivel") }, { status: 500 });
     }
 
     const body = await req.json();
     const action = String(body?.action || "");
     const targetTable = String(body?.targetTable || "");
     if (!ACTIONS.includes(action) || !TABLES.includes(targetTable)) {
-      return NextResponse.json({ error: "Acao ou tabela de auditoria invalida." }, { status: 400 });
+      return NextResponse.json({ error: t("auditoriaAcaoTabelaInvalida") }, { status: 400 });
     }
 
     let details: Record<string, unknown> | null = null;
@@ -62,11 +64,11 @@ export async function POST(req: NextRequest) {
     });
     if (error) {
       console.error("[Edukyne] Erro ao gravar trilha de auditoria:", error.message);
-      return NextResponse.json({ error: "Falha ao registrar auditoria." }, { status: 500 });
+      return NextResponse.json({ error: t("auditoriaFalhaRegistrar") }, { status: 500 });
     }
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("Erro na API audit:", err);
-    return NextResponse.json({ error: "Erro interno do servidor." }, { status: 500 });
+    return NextResponse.json({ error: t("erroInternoServidor") }, { status: 500 });
   }
 }

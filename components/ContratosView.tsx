@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { nextContractId, uuid } from '../lib/idGenerator';
 import { 
   Plus, 
@@ -36,6 +37,7 @@ interface ContratosViewProps {
 }
 
 export default function ContratosView({ contratos, setContratos, runWithPermission, user, students }: ContratosViewProps) {
+  const t = useTranslations('contratos');
   const [search, setSearch] = useState('');
 
   const assignedContracts = React.useMemo(() => {
@@ -368,7 +370,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
     }).filter(es => es.name !== '');
 
     if (!editName || cleanStates.length === 0) {
-      alert('Por favor, preencha todos os campos obrigatórios e adicione ao menos um Estado.');
+      alert(t('erroCamposObrigatorios'));
       return;
     }
 
@@ -420,7 +422,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
     }).filter(es => es.name !== '');
 
     if (!newName || cleanStates.length === 0) {
-      alert('Por favor, preencha o nome do Contrato e configure a estrutura geográfica.');
+      alert(t('erroNomeEstrutura'));
       return;
     }
 
@@ -481,7 +483,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
       {/* Header view */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h3 className="text-2xl font-bold text-[#8ed5ff]">Gestão de Contratos</h3>
+          <h3 className="text-2xl font-bold text-[#8ed5ff]">{t('titulo')}</h3>
         </div>
 
         <button
@@ -489,7 +491,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
           className="flex items-center gap-2 px-4 py-2 bg-[#38bdf8] hover:bg-[#0ea5e9] text-[#001e2c] font-bold text-xs rounded-lg transition-all shadow-md shadow-[#38bdf8]/10 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Novo Contrato</span>
+          <span>{t('novoContrato')}</span>
         </button>
       </div>
 
@@ -498,7 +500,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
         <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-[#87929a]" />
         <input 
           type="text"
-          placeholder="Pesquisar por contrato, estado, região ou localidade..."
+          placeholder={t('pesquisar')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full bg-[#171f33] border border-[#3e484f]/60 rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#dae2fd] placeholder-[#bdc8d1]/50 outline-none focus:border-[#38bdf8] transition-all"
@@ -509,8 +511,8 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
       {filteredContratos.length === 0 ? (
         <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-12 text-center">
           <FileText className="w-12 h-12 text-[#3e484f] mx-auto mb-3" />
-          <p className="text-sm font-semibold text-[#bdc8d1]">Nenhum contrato cadastrado ou correspondente.</p>
-          <p className="text-xs text-[#bdc8d1]/60 mt-1">Clique em &quot;Novo Contrato&quot; para registrar a primeira estrutura.</p>
+          <p className="text-sm font-semibold text-[#bdc8d1]">{t('nenhumContrato')}</p>
+          <p className="text-xs text-[#bdc8d1]/60 mt-1">{t('cliqueNovoContrato', { botao: t('novoContrato') })}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -528,14 +530,14 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-[#dae2fd] group-hover:text-[#38bdf8] transition-colors">{item.name}</h4>
-                      <p className="text-[10px] text-[#bdc8d1]/50">ID: {item.id}</p>
+                      <p className="text-[10px] text-[#bdc8d1]/50">{t('idCurto')} {item.id}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Pipeline visual hierarchy representation */}
                 <div className="space-y-3 pt-2 border-t border-[#3e484f]/15">
-                  <span className="text-[10px] font-bold text-[#bdc8d1]/60 uppercase tracking-widest block mb-1 font-mono tracking-wider text-sky-400">Estrutura de Vínculos</span>
+                  <span className="text-[10px] font-bold text-[#bdc8d1]/60 uppercase tracking-widest block mb-1 font-mono tracking-wider text-sky-400">{t('estruturaVinculos')}</span>
                   
                   {item.structure && Array.isArray(item.structure.estados) ? (
                     <div className="space-y-3.5">
@@ -571,7 +573,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                                           ))}
                                         </div>
                                       ) : (
-                                        <p className="text-[9px] text-[#bdc8d1]/40 italic pl-3.5">Nenhuma série vinculada</p>
+                                        <p className="text-[9px] text-[#bdc8d1]/40 italic pl-3.5">{t('nenhumaSerieVinculada')}</p>
                                       )}
                                     </div>
                                   ))}
@@ -589,7 +591,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                       <div className="flex flex-col gap-1 text-xs">
                         <div className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-pink-400"></div>
-                          <span className="text-[#bdc8d1] font-medium text-[11px] shrink-0">Estados:</span>
+                          <span className="text-[#bdc8d1] font-medium text-[11px] shrink-0">{t('estadosCurto')}</span>
                         </div>
                         <div className="flex flex-wrap gap-1 pl-3.5">
                           {item.estado.split(',').map((est, idx) => (
@@ -604,7 +606,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                       <div className="flex flex-col gap-1 text-xs">
                         <div className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
-                          <span className="text-[#bdc8d1] font-medium text-[11px] shrink-0">Regiões:</span>
+                          <span className="text-[#bdc8d1] font-medium text-[11px] shrink-0">{t('regioesCurto')}</span>
                         </div>
                         <div className="flex flex-wrap gap-1 pl-3.5">
                           {item.regiao.split(',').map((reg, idx) => (
@@ -619,7 +621,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                       <div className="flex flex-col gap-1 text-xs">
                         <div className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-teal-400"></div>
-                          <span className="text-[#bdc8d1] font-medium text-[11px] shrink-0">Localidades:</span>
+                          <span className="text-[#bdc8d1] font-medium text-[11px] shrink-0">{t('localidadesCurto')}</span>
                         </div>
                         <div className="flex flex-wrap gap-1 pl-3.5">
                           {item.localidade.split(',').map((loc, idx) => (
@@ -634,7 +636,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                       <div className="flex flex-col gap-1 text-xs">
                         <div className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
-                          <span className="text-[#bdc8d1] font-medium text-[11px] shrink-0">Séries/Turmas:</span>
+                          <span className="text-[#bdc8d1] font-medium text-[11px] shrink-0">{t('seriesTurmasCurto')}</span>
                         </div>
                         <div className="flex flex-wrap gap-1 pl-3.5">
                           {item.grade ? (
@@ -644,7 +646,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                               </span>
                             ))
                           ) : (
-                            <span className="text-[10px] text-[#bdc8d1]/40 italic">Nenhuma vinculada</span>
+                            <span className="text-[10px] text-[#bdc8d1]/40 italic">{t('nenhumaVinculada')}</span>
                           )}
                         </div>
                       </div>
@@ -660,14 +662,14 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                   className="p-2 hover:bg-[#131b2e] rounded border border-[#3e484f]/20 hover:border-[#38bdf8]/40 text-xs text-[#bdc8d1] hover:text-[#dae2fd] transition-all flex items-center gap-1.5 font-semibold cursor-pointer"
                 >
                   <Edit className="w-3.5 h-3.5" />
-                  <span>Editar</span>
+                  <span>{t('editar')}</span>
                 </button>
                 <button
                   onClick={() => runWithPermission('delete:contrato', () => setContratoToDelete(item))}
                   className="p-2 hover:bg-rose-500/15 rounded border border-[#3e484f]/20 hover:border-rose-500/40 text-xs text-rose-400 hover:text-rose-300 transition-all flex items-center gap-1.5 font-semibold cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span>Excluir</span>
+                  <span>{t('excluir')}</span>
                 </button>
               </div>
             </div>
@@ -688,16 +690,16 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
 
             <h4 className="text-sm font-bold text-[#8ed5ff] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2 flex items-center gap-2">
               <ClipboardList className="w-4 h-4 text-sky-400" />
-              <span>Cadastrar Novo Contrato</span>
+              <span>{t('cadastrarNovoContrato')}</span>
             </h4>
 
             <form onSubmit={handleAddContrato} className="space-y-6">
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1.5">Nome / Descrição do Contrato: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1.5">{t('nomeDescricao')}</label>
                 <input 
                   type="text" 
                   required
-                  placeholder="Ex: Contrato Integral Escola Central"
+                  placeholder={t('nomeExemplo')}
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -707,14 +709,14 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
               {/* STATES NESTED BUILDER */}
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <label className="text-xs font-bold text-[#8ed5ff] uppercase tracking-wider">Estrutura Geográfica Dinâmica</label>
+                  <label className="text-xs font-bold text-[#8ed5ff] uppercase tracking-wider">{t('estruturaGeografica')}</label>
                   {newEstadosHierarchical.length < 2 && (
                     <button
                       type="button"
                       onClick={handleAddNewState}
                       className="text-xs text-[#38bdf8] hover:text-[#0ea5e9] bg-[#38bdf8]/10 hover:bg-[#38bdf8]/15 border border-[#38bdf8]/20 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 cursor-pointer transition-colors"
                     >
-                      <Plus className="w-3.5 h-3.5" /> Adicionar Estado
+                      <Plus className="w-3.5 h-3.5" /> {t('adicionarEstado')}
                     </button>
                   )}
                 </div>
@@ -729,7 +731,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                             {sIdx + 1}
                           </span>
                           <div className="flex-1">
-                            <label className="text-[10px] font-bold text-pink-400 block uppercase tracking-wider mb-1">Estado</label>
+                            <label className="text-[10px] font-bold text-pink-400 block uppercase tracking-wider mb-1">{t('estado')}</label>
                             <select 
                               value={stateNode.name}
                               onChange={(e) => handleUpdateNewStateName(sIdx, e.target.value)}
@@ -749,7 +751,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                             className="p-2 border border-rose-500/30 bg-rose-500/5 hover:bg-rose-500/15 text-rose-400 hover:text-rose-300 rounded-lg text-xs cursor-pointer flex items-center gap-1 transition-all"
                           >
                             <Trash2 className="w-3 h-3" />
-                            <span>Remover Estado</span>
+                            <span>{t('removerEstado')}</span>
                           </button>
                         )}
                       </div>
@@ -757,14 +759,14 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                       {/* REGIONS LIST */}
                       <div className="pl-4 border-l-2 border-pink-500/20 space-y-4">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Regiões (Máximo 5)</span>
+                          <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">{t('regioesMax')}</span>
                           {stateNode.regioes.length < 5 && (
                             <button
                               type="button"
                               onClick={() => handleAddNewRegion(sIdx)}
                               className="text-[11px] text-[#38bdf8] hover:underline font-bold flex items-center gap-1 cursor-pointer"
                             >
-                              <Plus className="w-3 h-3" /> Adicionar Região
+                              <Plus className="w-3 h-3" /> {t('adicionarRegiao')}
                             </button>
                           )}
                         </div>
@@ -777,7 +779,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                                   <input 
                                     type="text"
                                     required
-                                    placeholder="Nome da Região (Ex: Região Leste, Metropolitana)"
+                                    placeholder={t('nomeRegiaoExemplo')}
                                     value={regionNode.name}
                                     onChange={(e) => handleUpdateNewRegionName(sIdx, rIdx, e.target.value)}
                                     className="w-full bg-[#0b1326] border border-[#3e484f]/60 rounded-md px-2.5 py-1 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -788,7 +790,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                                     type="button"
                                     onClick={() => handleRemoveNewRegion(sIdx, rIdx)}
                                     className="p-2 border border-rose-500/20 text-rose-400 hover:text-rose-300 rounded cursor-pointer"
-                                    title="Remover Região"
+                                    title={t('removerRegiao')}
                                   >
                                     <X className="w-3.5 h-3.5" />
                                   </button>
@@ -798,14 +800,14 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                               {/* LOCALITIES LIST */}
                               <div className="pl-3 border-l-2 border-amber-500/20 space-y-3">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-[9px] font-bold text-teal-400 uppercase tracking-widest">Localidades (Máximo 10)</span>
+                                  <span className="text-[9px] font-bold text-teal-400 uppercase tracking-widest">{t('localidadesMax')}</span>
                                   {regionNode.localidades.length < 10 && (
                                     <button
                                       type="button"
                                       onClick={() => handleAddNewLocality(sIdx, rIdx)}
                                       className="text-[10px] text-teal-400 hover:underline font-bold flex items-center gap-1 cursor-pointer"
                                     >
-                                      <Plus className="w-2.5 h-2.5" /> Adicionar Localidade
+                                      <Plus className="w-2.5 h-2.5" /> {t('adicionarLocalidade')}
                                     </button>
                                   )}
                                 </div>
@@ -817,7 +819,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                                         <input 
                                           type="text"
                                           required
-                                          placeholder="Nome da Localidade (Ex: Unidade Centro, Penha)"
+                                          placeholder={t('nomeLocalidadeExemplo')}
                                           value={localityNode.name}
                                           onChange={(e) => handleUpdateNewLocalityName(sIdx, rIdx, lIdx, e.target.value)}
                                           className="flex-1 bg-[#171f33] border border-[#3e484f]/40 rounded px-2 py-0.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -835,7 +837,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
 
                                       {/* GRADES ATTACHED TO THIS LOCALITY */}
                                       <div className="space-y-1 pt-1.5 border-t border-[#3e484f]/15">
-                                        <span className="text-[9px] font-bold text-indigo-400 block uppercase tracking-wider">Séries vinculadas nesta Localidade:</span>
+                                        <span className="text-[9px] font-bold text-indigo-400 block uppercase tracking-wider">{t('seriesVinculadasLocalidade')}</span>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 bg-[#171f33]/40 p-2 rounded border border-[#3e484f]/20 max-h-24 overflow-y-auto scrollbar-thin">
                                           {allGrades.map(grade => {
                                             const checked = (localityNode.grades || []).includes(grade);
@@ -872,13 +874,13 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                   onClick={() => setShowAddForm(false)} 
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1] cursor-pointer"
                 >
-                  Cancelar
+                  {t('cancelar')}
                 </button>
                 <button 
                   type="submit" 
                   className="px-5 py-2 bg-[#38bdf8] text-[#001e2c] font-bold rounded-lg text-xs shadow-md shadow-[#38bdf8]/10 cursor-pointer"
                 >
-                  Salvar Contrato
+                  {t('salvarContrato')}
                 </button>
               </div>
             </form>
@@ -899,12 +901,12 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
 
             <h4 className="text-sm font-bold text-[#8ed5ff] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2 flex items-center gap-2">
               <Edit className="w-4 h-4 text-[#38bdf8]" />
-              <span>Editar Cadastro de Contrato</span>
+              <span>{t('editarCadastro')}</span>
             </h4>
 
             <form onSubmit={handleSaveEdit} className="space-y-6">
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1.5">Nome / Descrição do Contrato: *</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1.5">{t('nomeDescricao')}</label>
                 <input 
                   type="text" 
                   required
@@ -917,14 +919,14 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
               {/* STATES NESTED BUILDER EDIT */}
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <label className="text-xs font-bold text-[#8ed5ff] uppercase tracking-wider">Estrutura Geográfica Dinâmica</label>
+                  <label className="text-xs font-bold text-[#8ed5ff] uppercase tracking-wider">{t('estruturaGeografica')}</label>
                   {editEstadosHierarchical.length < 2 && (
                     <button
                       type="button"
                       onClick={handleAddEditState}
                       className="text-xs text-[#38bdf8] hover:text-[#0ea5e9] bg-[#38bdf8]/10 hover:bg-[#38bdf8]/15 border border-[#38bdf8]/20 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 cursor-pointer transition-colors"
                     >
-                      <Plus className="w-3.5 h-3.5" /> Adicionar Estado
+                      <Plus className="w-3.5 h-3.5" /> {t('adicionarEstado')}
                     </button>
                   )}
                 </div>
@@ -939,7 +941,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                             {sIdx + 1}
                           </span>
                           <div className="flex-1">
-                            <label className="text-[10px] font-bold text-pink-400 block uppercase tracking-wider mb-1">Estado</label>
+                            <label className="text-[10px] font-bold text-pink-400 block uppercase tracking-wider mb-1">{t('estado')}</label>
                             <select 
                               value={stateNode.name}
                               onChange={(e) => handleUpdateEditStateName(sIdx, e.target.value)}
@@ -959,7 +961,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                             className="p-2 border border-rose-500/30 bg-rose-500/5 hover:bg-rose-500/15 text-rose-400 hover:text-rose-300 rounded-lg text-xs cursor-pointer flex items-center gap-1 transition-all"
                           >
                             <Trash2 className="w-3 h-3" />
-                            <span>Remover Estado</span>
+                            <span>{t('removerEstado')}</span>
                           </button>
                         )}
                       </div>
@@ -967,14 +969,14 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                       {/* REGIONS LIST */}
                       <div className="pl-4 border-l-2 border-pink-500/20 space-y-4">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Regiões (Máximo 5)</span>
+                          <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">{t('regioesMax')}</span>
                           {stateNode.regioes.length < 5 && (
                             <button
                               type="button"
                               onClick={() => handleAddEditRegion(sIdx)}
                               className="text-[11px] text-[#38bdf8] hover:underline font-bold flex items-center gap-1 cursor-pointer"
                             >
-                              <Plus className="w-3 h-3" /> Adicionar Região
+                              <Plus className="w-3 h-3" /> {t('adicionarRegiao')}
                             </button>
                           )}
                         </div>
@@ -987,7 +989,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                                   <input 
                                     type="text"
                                     required
-                                    placeholder="Nome da Região (Ex: Região Leste, Metropolitana)"
+                                    placeholder={t('nomeRegiaoExemplo')}
                                     value={regionNode.name}
                                     onChange={(e) => handleUpdateEditRegionName(sIdx, rIdx, e.target.value)}
                                     className="w-full bg-[#0b1326] border border-[#3e484f]/60 rounded-md px-2.5 py-1 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -998,7 +1000,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                                     type="button"
                                     onClick={() => handleRemoveEditRegion(sIdx, rIdx)}
                                     className="p-2 border border-rose-500/20 text-rose-400 hover:text-rose-300 rounded cursor-pointer"
-                                    title="Remover Região"
+                                    title={t('removerRegiao')}
                                   >
                                     <X className="w-3.5 h-3.5" />
                                   </button>
@@ -1008,14 +1010,14 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                               {/* LOCALITIES LIST */}
                               <div className="pl-3 border-l-2 border-amber-500/20 space-y-3">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-[9px] font-bold text-teal-400 uppercase tracking-widest">Localidades (Máximo 10)</span>
+                                  <span className="text-[9px] font-bold text-teal-400 uppercase tracking-widest">{t('localidadesMax')}</span>
                                   {regionNode.localidades.length < 10 && (
                                     <button
                                       type="button"
                                       onClick={() => handleAddEditLocality(sIdx, rIdx)}
                                       className="text-[10px] text-teal-400 hover:underline font-bold flex items-center gap-1 cursor-pointer"
                                     >
-                                      <Plus className="w-2.5 h-2.5" /> Adicionar Localidade
+                                      <Plus className="w-2.5 h-2.5" /> {t('adicionarLocalidade')}
                                     </button>
                                   )}
                                 </div>
@@ -1027,7 +1029,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                                         <input 
                                           type="text"
                                           required
-                                          placeholder="Nome da Localidade (Ex: Unidade Centro, Penha)"
+                                          placeholder={t('nomeLocalidadeExemplo')}
                                           value={localityNode.name}
                                           onChange={(e) => handleUpdateEditLocalityName(sIdx, rIdx, lIdx, e.target.value)}
                                           className="flex-1 bg-[#171f33] border border-[#3e484f]/40 rounded px-2 py-0.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
@@ -1045,7 +1047,7 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
 
                                       {/* GRADES ATTACHED TO THIS LOCALITY */}
                                       <div className="space-y-1 pt-1.5 border-t border-[#3e484f]/15">
-                                        <span className="text-[9px] font-bold text-indigo-400 block uppercase tracking-wider">Séries vinculadas nesta Localidade:</span>
+                                        <span className="text-[9px] font-bold text-indigo-400 block uppercase tracking-wider">{t('seriesVinculadasLocalidade')}</span>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 bg-[#171f33]/40 p-2 rounded border border-[#3e484f]/20 max-h-24 overflow-y-auto scrollbar-thin">
                                           {allGrades.map(grade => {
                                             const checked = (localityNode.grades || []).includes(grade);
@@ -1082,13 +1084,13 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                   onClick={() => setContratoToEdit(null)} 
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1] cursor-pointer"
                 >
-                  Cancelar
+                  {t('cancelar')}
                 </button>
                 <button 
                   type="submit" 
                   className="px-5 py-2 bg-[#38bdf8] text-[#001e2c] font-bold rounded-lg text-xs shadow-md shadow-[#38bdf8]/10 cursor-pointer"
                 >
-                  Salvar Alterações
+                  {t('salvarAlteracoes')}
                 </button>
               </div>
             </form>
@@ -1105,9 +1107,9 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-[#dae2fd] uppercase tracking-wider">Confirmar Exclusão</h4>
+              <h4 className="text-sm font-bold text-[#dae2fd] uppercase tracking-wider">{t('confirmarExclusao')}</h4>
               <p className="text-xs text-[#bdc8d1]/80 mt-1">
-                Você tem certeza que deseja remover o contrato <strong>{contratoToDelete.name}</strong> contendo os vínculos de localidade e região?
+                {t('confirmarExclusaoPrefixo')} <strong>{contratoToDelete.name}</strong> {t('confirmarExclusaoSufixo')}
               </p>
             </div>
 
@@ -1116,13 +1118,13 @@ export default function ContratosView({ contratos, setContratos, runWithPermissi
                 onClick={() => setContratoToDelete(null)}
                 className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-[#bdc8d1] font-semibold cursor-pointer"
               >
-                Voltar
+                {t('voltar')}
               </button>
               <button
                 onClick={() => handleDeleteContrato(contratoToDelete.id)}
                 className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg shadow-lg shadow-rose-600/10 cursor-pointer"
               >
-                Sim, Remover
+                {t('simRemover')}
               </button>
             </div>
           </div>

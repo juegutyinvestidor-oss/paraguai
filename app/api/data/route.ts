@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabaseAdmin";
 import { sessionFromRequest, type SessionPayload } from "../../../lib/session";
 import { normalizeRole, hasPermissionDynamic, ROLE_PERMISSIONS, type Permission, type UserRole } from "../../../lib/rbac";
+import { getApiTranslator } from "../../../lib/apiI18n";
 
 export const dynamic = "force-dynamic";
 
@@ -143,79 +144,80 @@ function allowed(rule: Rule, session: SessionPayload, map: Record<UserRole, Perm
   return rule.perms.some(p => hasPermissionDynamic(map, norm, p));
 }
 
-function sanitizeRows(val: unknown): { rows: Record<string, unknown>[] | null; error?: string } {
+function sanitizeRows(val: unknown, t: ReturnType<typeof getApiTranslator>): { rows: Record<string, unknown>[] | null; error?: string } {
   const rows = Array.isArray(val) ? val : [val];
-  if (rows.length === 0 || rows.length > MAX_ROWS) return { rows: null, error: "Payload de linhas invalido." };
+  if (rows.length === 0 || rows.length > MAX_ROWS) return { rows: null, error: t("dadosPayloadLinhasInvalido") };
   for (const r of rows) {
-    if (!r || typeof r !== "object" || Array.isArray(r)) return { rows: null, error: "Linhas devem ser objetos." };
+    if (!r || typeof r !== "object" || Array.isArray(r)) return { rows: null, error: t("dadosLinhasDevemSerObjetos") };
     const row = r as Record<string, unknown>;
     if (typeof row.id !== "string" || row.id.length === 0 || row.id.length > 300) {
-      return { rows: null, error: "Cada linha precisa de um campo id (texto) valido." };
+      return { rows: null, error: t("dadosLinhaIdTextoValido") };
     }
   }
   return { rows: rows as Record<string, unknown>[] };
 }
 
 export async function POST(req: NextRequest) {
+  const t = getApiTranslator(req);
   try {
     const session = sessionFromRequest(req);
     if (!session) {
-      return NextResponse.json({ error: "Sessao invalida ou expirada. Faca login novamente." }, { status: 401 });
+      return NextResponse.json({ error: t("erroSessaoInvalidaOuExpirada") }, { status: 401 });
     }
 
     const text = await req.text();
     if (text.length > MAX_BODY_BYTES) {
-      return NextResponse.json({ error: "Payload muito grande." }, { status: 413 });
+      return NextResponse.json({ error: t("erroPayloadMuitoGrande") }, { status: 413 });
     }
     let body: Record<string, unknown>;
     try {
       body = JSON.parse(text);
     } catch {
-      return NextResponse.json({ error: "JSON invalido." }, { status: 400 });
+      return NextResponse.json({ error: t("erroJsonInvalido") }, { status: 400 });
     }
 
     const table = String(body?.table || "");
     const op = String(body?.op || "");
     const rule = TABLE_RULES[table];
     if (!rule || (op !== "upsert" && op !== "insert" && op !== "delete")) {
-      return NextResponse.json({ error: "Tabela ou operacao nao permitidas." }, { status: 404 });
+      return NextResponse.json({ error: t("dadosTabelaOuOperacaoNaoPermitidas") }, { status: 404 });
     }
 
     const admin = getSupabaseAdmin();
     if (!admin) {
-      return NextResponse.json({ error: "Servidor indisponivel." }, { status: 500 });
+      return NextResponse.json({ error: t("erroServidorIndisponivel") }, { status: 500 });
     }
 
     const map = await loadRolePermissions(admin);
     if (!allowed(op === "delete" ? rule.delete : rule.upsert, session, map)) {
-      return NextResponse.json({ error: "Seu cargo nao tem permissao para esta operacao." }, { status: 403 });
+      return NextResponse.json({ error: t("dadosCargoSemPermissaoOperacao") }, { status: 403 });
     }
 
     if (op === "delete") {
       const ids = body?.ids;
       if (!Array.isArray(ids) || ids.length === 0 || ids.length > MAX_ROWS || !ids.every(i => typeof i === "string" && i.length > 0 && i.length <= 300)) {
-        return NextResponse.json({ error: "Lista de ids invalida." }, { status: 400 });
+        return NextResponse.json({ error: t("dadosListaIdsInvalida") }, { status: 400 });
       }
       const { error } = await admin.from(table).delete().in("id", ids as string[]);
       if (error) {
         console.error(`[Edukyne] /api/data delete ${table}:`, error.message);
-        return NextResponse.json({ error: "Falha ao excluir registros." }, { status: 500 });
+        return NextResponse.json({ error: t("dadosFalhaExcluirRegistros") }, { status: 500 });
       }
       return NextResponse.json({ ok: true });
     }
 
-    const { rows, error } = sanitizeRows(body?.rows);
+    const { rows, error } = sanitizeRows(body?.rows, t);
     if (!rows) {
       return NextResponse.json({ error }, { status: 400 });
     }
     const { error: upErr } = await admin.from(table).upsert(rows);
     if (upErr) {
       console.error(`[Edukyne] /api/data upsert ${table}:`, upErr.message);
-      return NextResponse.json({ error: "Falha ao gravar registros." }, { status: 500 });
+      return NextResponse.json({ error: t("dadosFalhaGravarRegistros") }, { status: 500 });
     }
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("Erro na API data:", err);
-    return NextResponse.json({ error: "Erro interno do servidor." }, { status: 500 });
+    return NextResponse.json({ error: t("erroInternoServidor") }, { status: 500 });
   }
 }

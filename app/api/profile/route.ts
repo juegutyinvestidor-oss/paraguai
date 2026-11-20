@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabaseAdmin";
 import { sessionFromRequest } from "../../../lib/session";
 import { normalizeRole } from "../../../lib/rbac";
+import { getApiTranslator } from "../../../lib/apiI18n";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,7 @@ function cleanStr(val: unknown, fallback = ""): string {
 }
 
 export async function POST(req: NextRequest) {
+  const t = getApiTranslator(req);
   try {
     const body = await req.json();
 
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest) {
     if (body?.action === "delete_mirrors") {
       const session = sessionFromRequest(req);
       if (!session) {
-        return NextResponse.json({ error: "Sessao invalida ou expirada. Faca login novamente." }, { status: 401 });
+        return NextResponse.json({ error: t("erroSessaoInvalidaOuExpirada") }, { status: 401 });
       }
       const rawIds = Array.isArray(body?.ids) ? body.ids : [];
       const ids = rawIds.map((i: unknown) => cleanStr(i)).filter(Boolean).slice(0, 200);
@@ -35,12 +37,12 @@ export async function POST(req: NextRequest) {
       if (ids.length === 0 && entries.length === 0) return NextResponse.json({ ok: true });
       const adminSvc = getSupabaseAdmin();
       if (!adminSvc) {
-        return NextResponse.json({ error: "Servidor indisponivel." }, { status: 500 });
+        return NextResponse.json({ error: t("erroServidorIndisponivel") }, { status: 500 });
       }
       const { error: delErr } = await adminSvc.from("profiles").delete().in("id", ids).is("password_hash", null);
       if (delErr) {
         console.error("[Edukyne] Erro ao apagar espelhos em profiles:", delErr.message);
-        return NextResponse.json({ error: "Falha ao limpar espelhos de perfil." }, { status: 500 });
+        return NextResponse.json({ error: t("perfilFalhaLimparEspelhos") }, { status: 500 });
       }
       // Ghosts com hash: exige par id+email, ausencia de dono vivo e nunca o Admin (id '1')
       for (const entry of entries) {
@@ -71,12 +73,12 @@ export async function POST(req: NextRequest) {
     const email = cleanStr(body?.email);
 
     if (!id || !name || !email || !email.includes("@")) {
-      return NextResponse.json({ error: "Dados de perfil invalidos." }, { status: 400 });
+      return NextResponse.json({ error: t("perfilDadosInvalidos") }, { status: 400 });
     }
 
     const admin = getSupabaseAdmin();
     if (!admin) {
-      return NextResponse.json({ error: "Servidor indisponivel." }, { status: 500 });
+      return NextResponse.json({ error: t("erroServidorIndisponivel") }, { status: 500 });
     }
 
     const session = sessionFromRequest(req);
@@ -96,14 +98,14 @@ export async function POST(req: NextRequest) {
         // Auto-escrita: cargo sempre vem da sessao validada (anti-privilege escalation)
         record.role = session.role;
       } else {
-        return NextResponse.json({ error: "Voce so pode atualizar o seu proprio perfil." }, { status: 403 });
+        return NextResponse.json({ error: t("perfilSoProprioPerfil") }, { status: 403 });
       }
     } else {
       // Sem sessao valida: permite apenas criar um perfil inexistente (auto-cura
       // de bases zeradas). Nunca permite sobrescrever registro alheio.
       const { data: existing } = await admin.from("profiles").select("id").eq("id", id).maybeSingle();
       if (existing) {
-        return NextResponse.json({ error: "Sessao invalida ou expirada. Faca login novamente." }, { status: 401 });
+        return NextResponse.json({ error: t("erroSessaoInvalidaOuExpirada") }, { status: 401 });
       }
       record.role = cleanStr(body?.role) || "Gestor";
     }
@@ -111,12 +113,12 @@ export async function POST(req: NextRequest) {
     const { error } = await admin.from("profiles").upsert(record);
     if (error) {
       console.error("[Edukyne] Erro ao gravar perfil:", error.message);
-      return NextResponse.json({ error: "Falha ao gravar perfil." }, { status: 500 });
+      return NextResponse.json({ error: t("perfilFalhaGravar") }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("Erro na API profile:", err);
-    return NextResponse.json({ error: "Erro interno do servidor." }, { status: 500 });
+    return NextResponse.json({ error: t("erroInternoServidor") }, { status: 500 });
   }
 }

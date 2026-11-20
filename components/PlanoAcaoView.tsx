@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Folder,
   FolderOpen,
@@ -86,6 +87,8 @@ function formatDate(date?: string | null): string {
 }
 
 export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoViewProps) {
+  const t = useTranslations('planoAcao');
+  const ta = useTranslations('alunos');
   const [folders, setFolders] = React.useState<PlanoAcaoFolder[]>([]);
   const [files, setFiles] = React.useState<PlanoAcaoFile[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -119,7 +122,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
     const data = await planoAcaoFetch(buildForm('list'));
     setLoading(false);
     if (!data) {
-      setLoadError('Servidor indisponivel ou modo offline.');
+      setLoadError(t('servidorIndisponivel'));
       return;
     }
     if (data.error) {
@@ -128,7 +131,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
     }
     setFolders(data.folders || []);
     setFiles(data.files || []);
-  }, []);
+  }, [t]);
 
   React.useEffect(() => {
     void loadData();
@@ -155,13 +158,13 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
       const data = await planoAcaoFetch(form);
       setCreatingFolder(false);
       if (!data || data.error || !data.folder) {
-        setNotice(data?.error || 'Falha ao criar pasta.');
+        setNotice(data?.error || t('falhaCriarPasta'));
         return;
       }
       setFolders((prev) => [data.folder!, ...prev]);
       setNewFolderName('');
       setShowNewFolderModal(false);
-      setNotice('Pasta criada com sucesso.');
+      setNotice(t('pastaCriada'));
     });
   };
 
@@ -175,7 +178,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
       const data = await planoAcaoFetch(form);
       setUploading(false);
       if (!data) {
-        setUploadErrors(['Servidor indisponivel.']);
+        setUploadErrors([t('servidorIndisponivelCurto')]);
         return;
       }
       if (data.error) {
@@ -187,7 +190,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
       if ((data.errors || []).length === 0) {
         setUploadingFiles([]);
         setShowUploadModal(false);
-        setNotice('PDF(s) enviado(s) com sucesso.');
+        setNotice(t('pdfsEnviados'));
       }
     });
   };
@@ -203,7 +206,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
       const data = await planoAcaoFetch(form);
       setDeleting(false);
       if (!data || data.error) {
-        setNotice(data?.error || 'Falha ao excluir.');
+        setNotice(data?.error || t('falhaExcluir'));
         setDeleteTarget(null);
         return;
       }
@@ -215,7 +218,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
         setFiles((prev) => prev.filter((f) => f.id !== deleteTarget.id));
       }
       setDeleteTarget(null);
-      setNotice('Excluido com sucesso.');
+      setNotice(t('excluido'));
     });
   };
 
@@ -241,7 +244,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
       URL.revokeObjectURL(objectUrl);
     } catch (err) {
       console.error('[Edukyne] Falha ao baixar PDF:', err);
-      setNotice('Falha ao baixar o arquivo.');
+      setNotice(t('falhaDownload'));
     }
   };
 
@@ -256,8 +259,8 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
               <FolderOpen className="w-5 h-5 text-[#38bdf8]" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">Plano de Ação</h1>
-              <p className="text-xs text-[#bdc8d1]/80">Pastas com arquivos PDF de plano de ação do sistema</p>
+              <h1 className="text-xl font-bold tracking-tight">{t('titulo')}</h1>
+              <p className="text-xs text-[#bdc8d1]/80">{t('subtitulo')}</p>
             </div>
           </div>
 
@@ -267,7 +270,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                 onClick={() => setSelectedFolder(null)}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#3e484f]/40 bg-[#0b1326] hover:bg-[#131b2e] text-xs font-bold text-[#8ed5ff] transition-colors"
               >
-                <ChevronLeft className="w-4 h-4" /> Voltar
+                <ChevronLeft className="w-4 h-4" /> {t('voltar')}
               </button>
               {canManage && (
                 <button
@@ -277,7 +280,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                   }}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#0b1326] text-xs font-bold transition-colors"
                 >
-                  <Upload className="w-4 h-4" /> Enviar PDF(s)
+                  <Upload className="w-4 h-4" /> {t('enviarPdfs')}
                 </button>
               )}
             </div>
@@ -288,7 +291,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                   onClick={() => setShowNewFolderModal(true)}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#0b1326] text-xs font-bold transition-colors"
                 >
-                  <Plus className="w-4 h-4" /> Nova Pasta
+                  <Plus className="w-4 h-4" /> {t('novaPasta')}
                 </button>
               )}
             </div>
@@ -304,7 +307,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <Loader2 className="w-8 h-8 text-[#38bdf8] animate-spin" />
-            <p className="text-xs text-[#bdc8d1]/70 font-mono tracking-widest uppercase">Carregando Planos de Ação...</p>
+            <p className="text-xs text-[#bdc8d1]/70 font-mono tracking-widest uppercase">{t('carregando')}</p>
           </div>
         ) : loadError ? (
           <div className="bg-[#171f33] border border-amber-500/30 rounded-2xl p-10 text-center space-y-4">
@@ -314,7 +317,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
               onClick={() => void loadData()}
               className="px-5 py-2 bg-[#1a2b4b] hover:bg-[#1a2b4b]/80 border border-[#3e484f]/40 text-xs font-bold text-[#8ed5ff] rounded-lg transition-colors"
             >
-              Tentar novamente
+              {t('tentarNovamente')}
             </button>
           </div>
         ) : selectedFolder ? (
@@ -325,7 +328,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                 <div className="min-w-0">
                   <h3 className="text-sm font-bold text-[#dae2fd] truncate">{selectedFolder.name}</h3>
                   <p className="text-[10px] text-[#bdc8d1]/70">
-                    {folderFiles.length} arquivo(s) · criada em {formatDate(selectedFolder.created_at)}
+                    {t('arquivosCriada', { total: folderFiles.length, data: formatDate(selectedFolder.created_at) })}
                   </p>
                 </div>
               </div>
@@ -334,7 +337,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                   onClick={() => setDeleteTarget({ type: 'folder', id: selectedFolder.id, name: selectedFolder.name })}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[#ffb4ab] hover:bg-[#93000a]/20 text-[10px] font-bold transition-colors"
                 >
-                  <Trash2 className="w-3.5 h-3.5" /> Excluir pasta
+                  <Trash2 className="w-3.5 h-3.5" /> {t('excluirPasta')}
                 </button>
               )}
             </div>
@@ -342,7 +345,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
             {folderFiles.length === 0 ? (
               <div className="py-16 text-center space-y-3">
                 <FileCheck2 className="w-10 h-10 text-[#38bdf8]/40 mx-auto" />
-                <p className="text-xs text-[#bdc8d1]/70">Nenhum PDF nesta pasta ainda.</p>
+                <p className="text-xs text-[#bdc8d1]/70">{t('nenhumPdf')}</p>
                 {canManage && (
                   <button
                     onClick={() => {
@@ -351,7 +354,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                     }}
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#0b1326] text-xs font-bold transition-colors"
                   >
-                    <Upload className="w-4 h-4" /> Enviar primeiro PDF
+                    <Upload className="w-4 h-4" /> {t('enviarPrimeiroPdf')}
                   </button>
                 )}
               </div>
@@ -360,10 +363,10 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                 <table className="w-full border-collapse min-w-[640px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-[#8ed5ff]">Arquivo</th>
-                      <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-[#8ed5ff]">Tamanho</th>
-                      <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-[#8ed5ff]">Enviado em</th>
-                      <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-[#8ed5ff] text-right">Ações</th>
+                      <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-[#8ed5ff]">{t('colunaArquivo')}</th>
+                      <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-[#8ed5ff]">{t('colunaTamanho')}</th>
+                      <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-[#8ed5ff]">{t('colunaEnviadoEm')}</th>
+                      <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-[#8ed5ff] text-right">{t('colunaAcoes')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#3e484f]/30">
@@ -381,14 +384,14 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                           <div className="flex items-center justify-end gap-1.5">
                             <button
                               onClick={() => setPreviewFile(file)}
-                              title="Visualizar"
+                              title={t('visualizar')}
                               className="p-2 rounded-lg hover:bg-[#1a2b4b] text-[#8ed5ff] transition-colors"
                             >
                               <Eye className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => void downloadFile(file)}
-                              title="Baixar"
+                              title={t('baixar')}
                               className="p-2 rounded-lg hover:bg-[#1a2b4b] text-[#8ed5ff] transition-colors"
                             >
                               <Download className="w-4 h-4" />
@@ -396,7 +399,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                             {canManage && (
                               <button
                                 onClick={() => setDeleteTarget({ type: 'file', id: file.id, name: file.name })}
-                                title="Excluir"
+                                title={t('excluir')}
                                 className="p-2 rounded-lg hover:bg-[#93000a]/20 text-[#ffb4ab] transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -416,18 +419,16 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
             {folders.length === 0 ? (
               <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-2xl py-20 text-center space-y-3 shadow-2xl">
                 <FolderOpen className="w-12 h-12 text-[#38bdf8]/40 mx-auto" />
-                <p className="text-sm font-semibold text-[#bdc8d1]">Nenhuma pasta criada ainda</p>
+                <p className="text-sm font-semibold text-[#bdc8d1]">{t('nenhumaPasta')}</p>
                 <p className="text-xs text-[#bdc8d1]/60">
-                  {canManage
-                    ? 'Crie uma pasta para começar a organizar os PDFs de plano de ação.'
-                    : 'Aguarde a equipe disponibilizar os planos de ação.'}
+                  {canManage ? t('criePasta') : t('aguardeEquipe')}
                 </p>
                 {canManage && (
                   <button
                     onClick={() => setShowNewFolderModal(true)}
                     className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#0b1326] text-xs font-bold transition-colors mt-2"
                   >
-                    <Plus className="w-4 h-4" /> Nova Pasta
+                    <Plus className="w-4 h-4" /> {t('novaPasta')}
                   </button>
                 )}
               </div>
@@ -467,9 +468,9 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                       </div>
                       <h3 className="mt-4 text-sm font-bold text-[#dae2fd] truncate">{folder.name}</h3>
                       <p className="mt-1 text-[11px] text-[#bdc8d1]/70">
-                        {count} arquivo(s) · {formatDate(folder.created_at)}
+                        {t('arquivosData', { total: count, data: formatDate(folder.created_at) })}
                       </p>
-                      <p className="mt-3 text-[10px] font-semibold text-[#38bdf8] group-hover:underline">Abrir pasta →</p>
+                      <p className="mt-3 text-[10px] font-semibold text-[#38bdf8] group-hover:underline">{t('abrirPasta')}</p>
                     </button>
                   );
                 })}
@@ -479,8 +480,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
         )}
 
         <footer className="pb-6 text-center text-[10px] text-[#bdc8d1]/40">
-          Documentos hospedados em armazenamento seguro · Plano de Ação · {folders.length} pasta(s) ·{' '}
-          {files.length} arquivo(s)
+          {t('rodape', { pastas: folders.length, arquivos: files.length })}
         </footer>
       </div>
 
@@ -499,13 +499,13 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1a2b4b] hover:bg-[#1a2b4b]/80 text-[#8ed5ff] text-[10px] font-bold transition-colors"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" /> Nova aba
+                  <ExternalLink className="w-3.5 h-3.5" /> {t('novaAba')}
                 </a>
                 <button
                   onClick={() => void downloadFile(previewFile)}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1a2b4b] hover:bg-[#1a2b4b]/80 text-[#8ed5ff] text-[10px] font-bold transition-colors"
                 >
-                  <Download className="w-3.5 h-3.5" /> Baixar
+                  <Download className="w-3.5 h-3.5" /> {t('baixar')}
                 </button>
                 <button
                   onClick={() => setPreviewFile(null)}
@@ -524,7 +524,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
             </div>
             <div className="px-4 sm:px-5 py-2 border-t border-[#3e484f]/30 flex flex-wrap items-center justify-between gap-2">
               <p className="text-[10px] text-[#bdc8d1]/60 min-w-0">
-                Use a barra do visualizador de PDF para dar zoom e navegar entre páginas.
+                {t('dicaVisualizador')}
               </p>
               {previewFile.name && (
                 <p className="text-[10px] text-[#bdc8d1]/60 font-mono truncate">{previewFile.name}</p>
@@ -543,7 +543,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
             >
               <X className="w-5 h-5" />
             </button>
-            <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider">Nova Pasta de Plano de Ação</h4>
+            <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider">{t('novaPastaTitulo')}</h4>
             <form
               className="mt-5 space-y-4"
               onSubmit={(e) => {
@@ -552,12 +552,12 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
               }}
             >
               <div>
-                <label className="block text-xs font-semibold text-[#bdc8d1] mb-1.5">Nome da pasta</label>
+                <label className="block text-xs font-semibold text-[#bdc8d1] mb-1.5">{t('nomePasta')}</label>
                 <input
                   type="text"
                   value={newFolderName}
                   onChange={(e) => setNewFolderName(e.target.value)}
-                  placeholder="Ex.: 2026 · Anual, Matrícula, Cobranças..."
+                  placeholder={t('nomePastaExemplo')}
                   className="w-full bg-[#0b1326] border border-[#3e484f]/40 rounded-lg px-4 py-2.5 text-sm text-[#dae2fd] placeholder:text-[#bdc8d1]/40 focus:outline-none focus:border-[#38bdf8] transition-colors"
                   autoFocus
                 />
@@ -568,7 +568,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                   onClick={() => setShowNewFolderModal(false)}
                   className="px-4 py-2 rounded-lg border border-[#3e484f]/40 bg-[#0b1326] hover:bg-[#131b2e] text-xs font-bold text-[#bdc8d1] transition-colors"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button
                   type="submit"
@@ -576,7 +576,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#38bdf8] hover:bg-[#38bdf8]/90 disabled:opacity-50 disabled:cursor-not-allowed text-[#0b1326] text-xs font-bold transition-colors"
                 >
                   {creatingFolder && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Criar pasta
+                  {t('criarPasta')}
                 </button>
               </div>
             </form>
@@ -597,8 +597,8 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
             >
               <X className="w-5 h-5" />
             </button>
-            <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider">Enviar PDFs — {selectedFolder.name}</h4>
-            <p className="mt-1 text-[11px] text-[#bdc8d1]/70">Apenas arquivos PDF, até 20MB cada.</p>
+            <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider">{t('enviarPdfsTitulo', { pasta: selectedFolder.name })}</h4>
+            <p className="mt-1 text-[11px] text-[#bdc8d1]/70">{t('apenasPdf')}</p>
             <div className="mt-5 space-y-4">
               <label className="block cursor-pointer bg-[#0b1326] border-2 border-dashed border-[#3e484f]/40 rounded-xl px-4 py-8 text-center hover:border-[#38bdf8]/60 transition-colors">
                 <input
@@ -609,8 +609,8 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                   onChange={(e) => handleFileChange(e.currentTarget)}
                 />
                 <Upload className="w-8 h-8 text-[#38bdf8] mx-auto mb-2" />
-                <p className="text-xs font-semibold text-[#dae2fd]">Clique para selecionar os PDFs</p>
-                <p className="text-[10px] text-[#bdc8d1]/60 mt-1">É possível selecionar vários de uma vez.</p>
+                <p className="text-xs font-semibold text-[#dae2fd]">{t('cliqueSelecionar')}</p>
+                <p className="text-[10px] text-[#bdc8d1]/60 mt-1">{t('variosDeVez')}</p>
               </label>
 
               {uploadingFiles.length > 0 && (
@@ -649,7 +649,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                   }}
                   className="px-4 py-2 rounded-lg border border-[#3e484f]/40 bg-[#0b1326] hover:bg-[#131b2e] text-xs font-bold text-[#bdc8d1] transition-colors"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button
                   onClick={handleUpload}
@@ -657,7 +657,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#38bdf8] hover:bg-[#38bdf8]/90 disabled:opacity-50 disabled:cursor-not-allowed text-[#0b1326] text-xs font-bold transition-colors"
                 >
                   {uploading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {uploading ? 'Enviando...' : 'Enviar arquivos'}
+                  {uploading ? t('enviando') : t('enviarArquivos')}
                 </button>
               </div>
             </div>
@@ -670,18 +670,18 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
           <div className="bg-[#171f33] border border-[#93000a]/40 w-full max-w-md rounded-xl shadow-2xl p-4 sm:p-6 text-center">
             <AlertTriangle className="w-10 h-10 text-[#ffb4ab] mx-auto mb-3" />
             <h4 className="text-sm font-bold text-[#dae2fd]">
-              Excluir {deleteTarget.type === 'folder' ? 'pasta' : 'arquivo'}?
+              {t('excluirTitulo', { tipo: deleteTarget.type === 'folder' ? t('tipoPasta') : t('tipoArquivo') })}
             </h4>
             <p className="mt-2 text-xs text-[#bdc8d1]/80 break-words">
-              &quot;{deleteTarget.name}&quot; será removido permanentemente
-              {deleteTarget.type === 'folder' ? ' junto com todos os PDFs contidos nele' : ''}.
+              {t('removidoPermanentemente', { nome: deleteTarget.name })}
+              {deleteTarget.type === 'folder' ? t('removidoComPdf') : ''}.
             </p>
             <div className="mt-6 flex items-center justify-center gap-3">
               <button
                 onClick={() => setDeleteTarget(null)}
                 className="px-4 py-2 rounded-lg border border-[#3e484f]/40 bg-[#0b1326] hover:bg-[#131b2e] text-xs font-bold text-[#bdc8d1] transition-colors"
               >
-                Cancelar
+                {ta('cancelar')}
               </button>
               <button
                 onClick={handleDelete}
@@ -689,7 +689,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                 className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#93000a] hover:bg-[#93000a]/80 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold transition-colors"
               >
                 {deleting && <Loader2 className="w-4 h-4 animate-spin" />}
-                {deleting ? 'Excluindo...' : 'Excluir'}
+                {deleting ? t('excluindo') : t('excluir')}
               </button>
             </div>
           </div>

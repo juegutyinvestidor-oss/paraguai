@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
 } from 'recharts';
@@ -14,7 +15,7 @@ import type {
 import { normalizeRole } from '../lib/rbac';
 import { logExport } from '../lib/auditLog';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
-import { buildComparativeAnalysis, ANALYSIS_CONFIG } from '../lib/comparativeAnalysis';
+import { buildComparativeAnalysis, ANALYSIS_CONFIG, type AnalysisTranslator } from '../lib/comparativeAnalysis';
 
 interface M2Modality {
   id: string;
@@ -98,19 +99,15 @@ interface MatrixRow {
 }
 
 const LEVEL_ORDER: LevelKey[] = ['contract', 'state', 'region', 'locality', 'grade'];
-const LEVEL_LABELS: Record<LevelKey, string> = {
-  contract: 'Contrato', state: 'Estado', region: 'Região', locality: 'Localidade', grade: 'Turma',
-};
 const RECORTE_PALETTE = ['A', 'B', 'C', 'D'];
 const RECORTE_COLORS = ['#38bdf8', '#a78bfa', '#34d399', '#fbbf24'];
 
 const splitCsv = (v?: string) => (v || '').split(',').map(s => s.trim()).filter(Boolean);
-const uniqueSorted = (vals: string[]) => Array.from(new Set(vals.filter(Boolean))).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+const uniqueSorted = (vals: string[], locale: string) => Array.from(new Set(vals.filter(Boolean))).sort((a, b) => a.localeCompare(b, locale));
 const includesSel = (sel: string, values: string[]) => sel === 'Todos' || sel === 'Todas' || values.includes(sel);
 const safeTs = (d?: string) => { const t = d ? new Date(d).getTime() : 0; return Number.isNaN(t) ? 0 : t; };
 const normTxt = (s: string) => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 const fmtPct = (v: number) => `${Math.round(v)}%`;
-const fmtNum = (v: number, dec = 1) => v.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
 
 const GOOD_LABELS = new Set([
   'excelente', 'bom', 'peso normal', 'peso ideal', 'qualidade de vida alta',
@@ -128,19 +125,19 @@ const polarityOf = (label: string) => {
   return 0;
 };
 
-const statesOf = (c: ContratoItem): string[] =>
-  c.structure?.estados?.length ? c.structure.estados.map(st => st.name) : splitCsv(c.estado);
-const regionsOf = (c: ContratoItem): string[] =>
+const statesOf = (c: ContratoItem, locale: string): string[] =>
+  c.structure?.estados?.length ? uniqueSorted(c.structure.estados.map(st => st.name), locale) : splitCsv(c.estado);
+const regionsOf = (c: ContratoItem, locale: string): string[] =>
   c.structure?.estados?.length
-    ? uniqueSorted(c.structure.estados.flatMap(st => st.regioes.map(r => r.name)))
+    ? uniqueSorted(c.structure.estados.flatMap(st => st.regioes.map(r => r.name)), locale)
     : splitCsv(c.regiao);
-const localitiesOf = (c: ContratoItem): string[] =>
+const localitiesOf = (c: ContratoItem, locale: string): string[] =>
   c.structure?.estados?.length
-    ? uniqueSorted(c.structure.estados.flatMap(st => st.regioes.flatMap(r => r.localidades.map(l => l.name))))
+    ? uniqueSorted(c.structure.estados.flatMap(st => st.regioes.flatMap(r => r.localidades.map(l => l.name))), locale)
     : splitCsv(c.localidade);
-const gradesOf = (c: ContratoItem): string[] =>
+const gradesOf = (c: ContratoItem, locale: string): string[] =>
   c.structure?.estados?.length
-    ? uniqueSorted(c.structure.estados.flatMap(st => st.regioes.flatMap(r => r.localidades.flatMap(l => l.grades || []))))
+    ? uniqueSorted(c.structure.estados.flatMap(st => st.regioes.flatMap(r => r.localidades.flatMap(l => l.grades || []))), locale)
     : splitCsv(c.grade || '');
 
 export default function ComparativeStudyView({
@@ -148,6 +145,20 @@ export default function ComparativeStudyView({
   imcRecords, motorRecords, sportRecords, vocationalRecords,
 healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Records, pcdRecords,
 }: ComparativeStudyViewProps) {
+  const locale = useLocale();
+  const t = useTranslations('comparativo');
+  const trAnalise = useCallback<AnalysisTranslator>(
+    (key, values) => t(`analise.${key}`, values as never),
+    [t],
+  );
+  const fmtNum = (v: number, dec = 1) => v.toLocaleString(locale, { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  const levelLabels = useMemo<Record<LevelKey, string>>(() => ({
+    contract: t('nivelContrato'),
+    state: t('nivelEstado'),
+    region: t('nivelRegiao'),
+    locality: t('nivelLocalidade'),
+    grade: t('nivelTurma'),
+  }), [t]);
   const [recortes, setRecortes] = useState<Recorte[]>(() => [
     { id: 'A', color: RECORTE_COLORS[0], contract: 'Todos', state: 'Todos', region: 'Todos', locality: 'Todos', grade: 'Todos' },
     { id: 'B', color: RECORTE_COLORS[1], contract: 'Todos', state: 'Todos', region: 'Todos', locality: 'Todos', grade: 'Todos' },
@@ -245,21 +256,21 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
       : availableContracts;
     const acc: string[] = [];
     list.forEach(c => {
-      if (!includesSel(r.state, statesOf(c))) return;
-      if (level === 'state') { acc.push(...statesOf(c)); return; }
-      if (!includesSel(r.region, regionsOf(c))) return;
-      if (level === 'region') { acc.push(...regionsOf(c)); return; }
-      if (!includesSel(r.locality, localitiesOf(c))) return;
-      if (level === 'locality') { acc.push(...localitiesOf(c)); return; }
-      acc.push(...gradesOf(c));
+      if (!includesSel(r.state, statesOf(c, locale))) return;
+      if (level === 'state') { acc.push(...statesOf(c, locale)); return; }
+      if (!includesSel(r.region, regionsOf(c, locale))) return;
+      if (level === 'region') { acc.push(...regionsOf(c, locale)); return; }
+      if (!includesSel(r.locality, localitiesOf(c, locale))) return;
+      if (level === 'locality') { acc.push(...localitiesOf(c, locale)); return; }
+      acc.push(...gradesOf(c, locale));
     });
     if (level === 'grade') {
       (students || []).forEach(s => {
         if (matchesRecorte(s, { ...r, grade: 'Todos' }) && s.grade) acc.push(s.grade);
       });
     }
-    return restrict(uniqueSorted(acc), level);
-  }, [availableContracts, students, matchesRecorte, restrict]);
+    return restrict(uniqueSorted(acc, locale), level);
+  }, [availableContracts, students, matchesRecorte, restrict, locale]);
 
   const updateRecorte = (rid: string, level: LevelKey, value: string) => {
     setRecortes(prev => prev.map(r => {
@@ -311,7 +322,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
       });
       const dist = new Map<string, number>();
       by.forEach(rr => {
-        const k = (valueOf(rr) || '').toString().trim() || 'Não informado';
+        const k = (valueOf(rr) || '').toString().trim() || t('naoInformado');
         dist.set(k, (dist.get(k) || 0) + 1);
       });
       return {
@@ -339,25 +350,25 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
       return matched || 'Aprimorar Habilidades Motoras';
     };
     const dims: DimStat[] = [
-      { key: 'imc', label: 'IMC / Desempenho Corporal', total, ...tally(imcRecords, r => r.classification || '') },
-      { key: 'motor', label: 'Capacidades Físicas', total, ...tally(motorRecords, r => r.generalClass || '') },
-      { key: 'sport', label: 'Esporte Indicado', total, ...tally(sportRecords, sportValueOf) },
-      { key: 'voc', label: 'Perfil Vocacional', total, ...tally(vocationalRecords, r => r.profile || '') },
-      { key: 'health', label: 'Saúde Global', total, ...tally(healthRecords, r => r.classification || '') },
-      { key: 'oral', label: 'Higiene Bucal', total, ...tally(oralRecords, r => r.classification || '') },
-      { key: 'auto', label: 'Autoconceito', total, ...tally(autoconceptRecords, r => r.classification || '') },
-      { key: 'ias', label: 'Índice Alimentar', total, ...tally(iasRecords, r => r.classification || '') },
-      { key: 'snap', label: 'Rastreamento TDAH', total, ...tally(snapRecords, r => r.classification || '') },
-      { key: 'aq10', label: 'Rastreamento TEA', total, ...tally(aq10Records, r => r.classification || '') },
-      { key: 'pcd', label: 'Qualidade Motora PCD', total, ...tally(pcdRecords, r => r.classificacaoPerfil || '') },
-      { key: 'pcdGrupo', label: 'Grupos PCD', total, ...tally(pcdRecords, r => {
+      { key: 'imc', label: t('dimImc'), total, ...tally(imcRecords, r => r.classification || '') },
+      { key: 'motor', label: t('dimMotor'), total, ...tally(motorRecords, r => r.generalClass || '') },
+      { key: 'sport', label: t('dimSport'), total, ...tally(sportRecords, sportValueOf) },
+      { key: 'voc', label: t('dimVoc'), total, ...tally(vocationalRecords, r => r.profile || '') },
+      { key: 'health', label: t('dimHealth'), total, ...tally(healthRecords, r => r.classification || '') },
+      { key: 'oral', label: t('dimOral'), total, ...tally(oralRecords, r => r.classification || '') },
+      { key: 'auto', label: t('dimAuto'), total, ...tally(autoconceptRecords, r => r.classification || '') },
+      { key: 'ias', label: t('dimIas'), total, ...tally(iasRecords, r => r.classification || '') },
+      { key: 'snap', label: t('dimSnap'), total, ...tally(snapRecords, r => r.classification || '') },
+      { key: 'aq10', label: t('dimAq10'), total, ...tally(aq10Records, r => r.classification || '') },
+      { key: 'pcd', label: t('dimPcd'), total, ...tally(pcdRecords, r => r.classificacaoPerfil || '') },
+      { key: 'pcdGrupo', label: t('dimPcdGrupo'), total, ...tally(pcdRecords, r => {
         const nome = (r.grupoNome || '').trim();
-        return nome || `Grupo ${r.grupo ?? ''}`.trim();
+        return nome || t('grupo', { grupo: r.grupo ?? '' }).trim();
       }) },
-      { key: 'pcdMod', label: 'Modalidades Sugeridas PCD', total, ...tally(pcdRecords, r => {
+      { key: 'pcdMod', label: t('dimPcdMod'), total, ...tally(pcdRecords, r => {
         const comp = Array.isArray(r.compatibilidade) ? r.compatibilidade : [];
-        if (comp.length === 0) return 'Não definida';
-        return [...comp].sort((a, b) => (b.iar ?? 0) - (a.iar ?? 0))[0]?.modalidade || 'Não definida';
+        if (comp.length === 0) return t('naoDefinida');
+        return [...comp].sort((a, b) => (b.iar ?? 0) - (a.iar ?? 0))[0]?.modalidade || t('naoDefinida');
       }) },
     ];
     let fSum = 0, fN = 0, exc = 0, reg = 0, cri = 0, nod = 0;
@@ -372,7 +383,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
     const covered = dims.filter(d => d.coverage > 0);
     const coverageAvg = covered.length ? Math.round(covered.reduce((s, d) => s + d.coveragePct, 0) / covered.length) : 0;
     return { n: total, freq, dims, coverageAvg };
-  }, [attendanceByStudent, imcRecords, motorRecords, sportRecords, vocationalRecords, healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Records, pcdRecords, m2Modalidades]);
+  }, [attendanceByStudent, imcRecords, motorRecords, sportRecords, vocationalRecords, healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Records, pcdRecords, m2Modalidades, t]);
 
   const statsList = useMemo<RecorteStats[]>(
     () => recortes.map(r => computeStats((students || []).filter(s => matchesRecorte(s, r)))),
@@ -381,19 +392,19 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
 
   const matrixRows = useMemo<MatrixRow[]>(() => {
     const rows: MatrixRow[] = [];
-    rows.push({ group: 'Amostra', cat: 'Alunos ativos no recorte (N)', kind: 'num', values: statsList.map(s => s.n), polarity: 0 });
-    rows.push({ group: 'Amostra', cat: 'Cobertura média das avaliações', kind: 'pct', values: statsList.map(s => s.coverageAvg), polarity: 1 });
-    rows.push({ group: 'Presença', cat: 'Frequência média (%)', kind: 'num', values: statsList.map(s => s.freq.avg), polarity: 1 });
+    rows.push({ group: t('grupoAmostra'), cat: t('catAlunosAtivos'), kind: 'num', values: statsList.map(s => s.n), polarity: 0 });
+    rows.push({ group: t('grupoAmostra'), cat: t('catCoberturaAvaliacoes'), kind: 'pct', values: statsList.map(s => s.coverageAvg), polarity: 1 });
+    rows.push({ group: t('grupoPresenca'), cat: t('catFrequenciaMedia'), kind: 'num', values: statsList.map(s => s.freq.avg), polarity: 1 });
     (
       [
-        ['Excelente (≥75%)', (f: FreqStat) => f.excellent, 1],
-        ['Regular (50–74%)', (f: FreqStat) => f.regular, 0],
-        ['Crítico (<50%)', (f: FreqStat) => f.critical, -1],
-        ['Sem dados de presença', (f: FreqStat) => f.noData, 0],
+        [t('freqExcelente'), (f: FreqStat) => f.excellent, 1],
+        [t('freqRegular'), (f: FreqStat) => f.regular, 0],
+        [t('freqCritico'), (f: FreqStat) => f.critical, -1],
+        [t('freqSemDados'), (f: FreqStat) => f.noData, 0],
       ] as [string, (f: FreqStat) => number, number][]
     ).forEach(([cat, pick, pol]) => {
       rows.push({
-        group: 'Presença', cat, kind: 'pct', polarity: pol,
+        group: t('grupoPresenca'), cat, kind: 'pct', polarity: pol,
         values: statsList.map(s => (s.n ? Math.round((pick(s.freq) / s.n) * 100) : null)),
         counts: statsList.map(s => (s.n ? pick(s.freq) : null)),
       });
@@ -402,7 +413,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
     for (let d = 0; d < dimCount; d++) {
       const label = statsList[0].dims[d].label;
       rows.push({
-        group: label, cat: 'Cobertura (avaliados / N)', kind: 'pct', polarity: 1,
+        group: label, cat: t('catCobertura'), kind: 'pct', polarity: 1,
         values: statsList.map(s => s.dims[d].coveragePct),
         counts: statsList.map(s => s.dims[d].coverage),
       });
@@ -428,7 +439,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
         });
     }
     return rows;
-  }, [statsList]);
+  }, [statsList, t]);
 
   const deltaColor = (delta: number, polarity: number) => {
     if (!delta || polarity === 0) return '#87929a';
@@ -438,39 +449,43 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
   const describeRecorte = useCallback((r: Recorte) => {
     const cName = r.contract && r.contract !== 'Todos'
       ? (availableContracts.find(c => c.id === r.contract)?.name || r.contract)
-      : 'Todos';
+      : t('todos');
     return [
-      `${LEVEL_LABELS.contract}: ${cName}`,
-      `${LEVEL_LABELS.state}: ${r.state}`,
-      `${LEVEL_LABELS.region}: ${r.region}`,
-      `${LEVEL_LABELS.locality}: ${r.locality}`,
-      `${LEVEL_LABELS.grade}: ${r.grade}`,
+      `${levelLabels.contract}: ${cName}`,
+      `${levelLabels.state}: ${r.state}`,
+      `${levelLabels.region}: ${r.region}`,
+      `${levelLabels.locality}: ${r.locality}`,
+      `${levelLabels.grade}: ${r.grade}`,
     ].join(' · ');
-  }, [availableContracts]);
+  }, [availableContracts, levelLabels, t]);
 
   // Análise automática por regras — mesma saída na tela e no PDF.
   const analysisBlocks = useMemo(() => {
     return buildComparativeAnalysis(
       recortes.map(r => ({ id: r.id, label: describeRecorte(r) })),
       statsList,
+      trAnalise,
     );
-  }, [recortes, statsList, describeRecorte]);
+  }, [recortes, statsList, describeRecorte, trAnalise]);
 
   const handleDownloadPdf = () => {
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
     doc.setFontSize(15); doc.setTextColor(11, 19, 38);
-    doc.text('Estudo Comparativo — Edukyne', 40, 42);
+    doc.text(t('tituloPdf'), 40, 42);
     doc.setFontSize(9); doc.setTextColor(90);
-    doc.text(`Emitido em ${new Date().toLocaleDateString('pt-BR')} por ${user?.name || 'Sistema'}`, 40, 56);
+    doc.text(t('emitidoEm', {
+      data: new Date().toLocaleDateString(locale),
+      usuario: user?.name || t('sistema'),
+    }), 40, 56);
     let y = 72;
     recortes.forEach((r, idx) => {
       const st = statsList[idx];
       doc.setFontSize(9); doc.setTextColor(11, 19, 38);
-      doc.text(`Recorte ${r.id} (N=${st?.n ?? 0}) — ${describeRecorte(r)}`, 40, y);
+      doc.text(`${t('recorte', { id: r.id })} (N=${st?.n ?? 0}) — ${describeRecorte(r)}`, 40, y);
       y += 12;
     });
     y += 6;
-    const head = [['Indicador', 'Categoria', ...recortes.map(r => r.id), ...recortes.slice(1).map(r => `Δ ${r.id}`)]];
+    const head = [[t('pdfIndicador'), t('pdfCategoria'), ...recortes.map(r => r.id), ...recortes.slice(1).map(r => `Δ ${r.id}`)]];
     const body = matrixRows.map(row => {
       const cells = row.values.map((v, j) => {
         if (v === null) return '—';
@@ -504,7 +519,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
         : tableEnd + 24;
       if (py > 560) { doc.addPage(); py = 40; }
       doc.setFontSize(12); doc.setTextColor(11, 19, 38);
-      doc.text('Análise Automática do Estudo Comparativo', 40, py);
+      doc.text(t('pdfAnaliseTitulo'), 40, py);
       py += 16;
       analysisBlocks.forEach(block => {
         doc.setFontSize(10); doc.setTextColor(11, 19, 38);
@@ -521,7 +536,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
         py += 6;
       });
       doc.setFontSize(7.5); doc.setTextColor(120);
-      doc.text('Nota: análise gerada por regras automáticas sobre dados agregados. Categoria com valores baixos citada mesmo assim para ancorar a decisão do profissional.', 44, py);
+      doc.text(t('pdfNota'), 44, py);
     }
 
     doc.save(`Estudo_Comparativo_${new Date().toISOString().slice(0, 10)}.pdf`);
@@ -531,7 +546,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
   if (isAlunoRole) {
     return (
       <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-6 text-center">
-        <p className="text-sm text-[#bdc8d1] font-semibold">⚠ Estudo Comparativo indisponível para o perfil Aluno.</p>
+        <p className="text-sm text-[#bdc8d1] font-semibold">⚠ {t('indisponivelAluno')}</p>
       </div>
     );
   }
@@ -541,10 +556,10 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
       <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h2 className="text-[#dae2fd] text-xl font-extrabold flex items-center gap-2">
-            <span className="text-[#8ed5ff]">📊</span> Estudo Comparativo de Recortes
+            <span className="text-[#8ed5ff]">📊</span> {t('titulo')}
           </h2>
           <p className="text-sm text-[#87929a] mt-1">
-            Compare coortes lado a lado (alunos ativos, frequência, cobertura e distribuição por dimensão) com deltas coloridos.
+            {t('subtitulo')}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -554,14 +569,14 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
             disabled={recortes.length >= 4}
             className="flex items-center gap-1.5 px-4 py-2.5 bg-[#38bdf8]/10 hover:bg-[#38bdf8]/20 border border-[#38bdf8]/30 rounded-lg text-[#8ed5ff] text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Plus className="w-4 h-4" /> Adicionar Recorte
+            <Plus className="w-4 h-4" /> {t('adicionarRecorte')}
           </button>
           <button
             type="button"
             onClick={handleDownloadPdf}
             className="flex items-center gap-1.5 px-5 py-2.5 bg-[#38bdf8]/15 hover:bg-[#38bdf8]/25 border border-[#38bdf8]/40 rounded-lg text-[#38bdf8] text-sm font-bold transition-all cursor-pointer"
           >
-            <Download className="w-4 h-4" /> Baixar PDF
+            <Download className="w-4 h-4" /> {t('baixarPdf')}
           </button>
         </div>
       </div>
@@ -573,16 +588,16 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
             <div key={r.id} className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 space-y-4" style={{ borderTopColor: r.color, borderTopWidth: 4 }}>
               <div className="flex items-center justify-between gap-2">
                 <p className="text-base font-extrabold uppercase tracking-wider" style={{ color: r.color }}>
-                  {r.id === 'A' ? '◀' : r.id === 'B' ? '▶' : '◆'} Recorte {r.id}
+                  {r.id === 'A' ? '◀' : r.id === 'B' ? '▶' : '◆'} {t('recorte', { id: r.id })}
                 </p>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-[#87929a] font-semibold">{st?.n ?? 0} alunos</span>
+                  <span className="text-xs text-[#87929a] font-semibold">{st?.n ?? 0} {t('alunos')}</span>
                   {idx >= 2 && (
                     <button
                       type="button"
                       onClick={() => removeRecorte(r.id)}
                       className="p-2 rounded hover:bg-[#93000a]/20 text-[#87929a] hover:text-[#ffb4ab] transition-colors"
-                      title="Remover recorte"
+                      title={t('removerRecorte')}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -592,14 +607,14 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {LEVEL_ORDER.map(lv => (
                   <label key={lv} className="flex flex-col gap-1">
-                    <span className="text-[11px] font-bold text-[#87929a] uppercase tracking-wider">{LEVEL_LABELS[lv]}</span>
+                    <span className="text-[11px] font-bold text-[#87929a] uppercase tracking-wider">{levelLabels[lv]}</span>
                     {lv === 'contract' ? (
                       <select
                         value={r.contract}
                         onChange={e => updateRecorte(r.id, lv, e.target.value)}
                         className="bg-[#0b1326] border border-[#3e484f]/50 rounded-md px-3 py-2 text-sm text-[#dae2fd] focus:outline-none focus:border-[#38bdf8]/60"
                       >
-                        <option value="Todos">Todos</option>
+                        <option value="Todos">{t('todos')}</option>
                         {availableContracts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                       </select>
                     ) : (
@@ -608,7 +623,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
                         onChange={e => updateRecorte(r.id, lv, e.target.value)}
                         className="bg-[#0b1326] border border-[#3e484f]/50 rounded-md px-3 py-2 text-sm text-[#dae2fd] focus:outline-none focus:border-[#38bdf8]/60"
                       >
-                        <option value="Todos">Todos</option>
+                        <option value="Todos">{t('todos')}</option>
                         {buildOptions(r, lv).map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
                     )}
@@ -618,21 +633,21 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
               {st && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="p-3 bg-[#0b1326]/60 border border-[#3e484f]/30 rounded-lg text-center">
-                    <p className="text-[11px] text-[#87929a] font-bold uppercase">Frequência média</p>
+                    <p className="text-[11px] text-[#87929a] font-bold uppercase">{t('freqMedia')}</p>
                     <p className="text-2xl font-extrabold" style={{ color: r.color }}>{fmtNum(st.freq.avg)}%</p>
                   </div>
                   <div className="p-3 bg-[#0b1326]/60 border border-[#3e484f]/30 rounded-lg text-center">
-                    <p className="text-[11px] text-[#87929a] font-bold uppercase">Cobertura média</p>
+                    <p className="text-[11px] text-[#87929a] font-bold uppercase">{t('coberturaMedia')}</p>
                     <p className="text-2xl font-extrabold" style={{ color: r.color }}>{st.coverageAvg}%</p>
                   </div>
                   <div className="p-3 bg-[#0b1326]/60 border border-[#3e484f]/30 rounded-lg text-center">
-                    <p className="text-[11px] text-[#87929a] font-bold uppercase">Presença crítica</p>
+                    <p className="text-[11px] text-[#87929a] font-bold uppercase">{t('presencaCritica')}</p>
                     <p className="text-2xl font-extrabold text-[#fb7185]">{st.freq.critical}</p>
                   </div>
                 </div>
               )}
               {(st?.n ?? 0) === 0 && (
-                <p className="text-xs text-[#ffb4ab] font-semibold">⚠ Nenhum aluno ativo neste recorte — os indicadores ficarão vazios.</p>
+                <p className="text-xs text-[#ffb4ab] font-semibold">⚠ {t('semAlunosRecorte')}</p>
               )}
             </div>
           );
@@ -653,14 +668,14 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
 
       <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 space-y-4">
         <p className="text-xs font-bold text-[#8ed5ff] uppercase tracking-wider">
-          Matriz comparativa — valores entre parênteses são o total de alunos; Δ compara cada recorte com o A
+          {t('matrizLegenda')}
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse min-w-[640px]">
             <thead>
               <tr className="text-left text-[#87929a] uppercase tracking-wider text-[11px] border-b border-[#3e484f]/40">
-                <th className="py-2.5 pr-3 font-bold">Dimensão</th>
-                <th className="py-2.5 pr-3 font-bold">Categoria</th>
+                <th className="py-2.5 pr-3 font-bold">{t('dimensao')}</th>
+                <th className="py-2.5 pr-3 font-bold">{t('categoria')}</th>
                 {recortes.map(r => (
                   <th key={r.id} className="py-2.5 px-3 font-bold text-center" style={{ color: r.color }}>{r.id}</th>
                 ))}
@@ -704,7 +719,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
 
       <details className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 space-y-4" open>
         <summary className="text-xs font-bold text-[#8ed5ff] uppercase tracking-wider cursor-pointer select-none">
-          Análise Automática — diagnóstico gerado sobre os dados da matriz
+          {t('analiseUiTitulo')}
         </summary>
         <div className="mt-3 space-y-5">
           {analysisBlocks.map(block => (
@@ -728,7 +743,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
           ))}
         </div>
         <p className="text-[10px] text-[#87929a]/70 italic">
-          Δ mínimo citado: {ANALYSIS_CONFIG.minDeltaPp} p.p. · todas as categorias são citadas mesmo com valores baixos.
+          {t('deltaMinimo', { minimo: ANALYSIS_CONFIG.minDeltaPp })}
         </p>
       </details>
     </div>
@@ -741,6 +756,7 @@ function ComparisonChart({ title, recortes, statsList, dimIdx }: {
   statsList: RecorteStats[];
   dimIdx: number;
 }) {
+  const t = useTranslations('comparativo');
   const cats = useMemo(() => {
     const unionCounts = new Map<string, number>();
     statsList.forEach(s => {
@@ -794,7 +810,7 @@ function ComparisonChart({ title, recortes, statsList, dimIdx }: {
           {recortes.map((r, i) => (
             <span key={r.id} className="flex items-center gap-1.5 text-xs font-bold text-[#bdc8d1]">
               <span className="w-3 h-3 rounded-full" style={{ background: r.color }} />
-              {r.id}: {statsList[i]?.dims[dimIdx]?.coverage ?? 0}/{statsList[i]?.n ?? 0} avaliados
+              {r.id}: {statsList[i]?.dims[dimIdx]?.coverage ?? 0}/{statsList[i]?.n ?? 0} {t('avaliados')}
             </span>
           ))}
         </div>
@@ -840,13 +856,13 @@ function ComparisonChart({ title, recortes, statsList, dimIdx }: {
                 formatter={((value: number | string) => [`${value}%`, '']) as never}
               />
               {recortes.map(r => (
-                <Bar key={r.id} dataKey={r.id} name={`Recorte ${r.id}`} fill={r.color} radius={[0, 3, 3, 0]} maxBarSize={22} />
+                <Bar key={r.id} dataKey={r.id} name={t('recorte', { id: r.id })} fill={r.color} radius={[0, 3, 3, 0]} maxBarSize={22} />
               ))}
             </BarChart>
           </ResponsiveContainer>
         </div>
       ) : (
-        <p className="text-xs text-[#87929a] italic py-6 text-center">Nenhuma avaliação registrada nos recortes atuais.</p>
+        <p className="text-xs text-[#87929a] italic py-6 text-center">{t('nenhumaAvaliacao')}</p>
       )}
     </div>
   );

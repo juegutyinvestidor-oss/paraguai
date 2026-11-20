@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { ShieldCheck, RefreshCw, AlertTriangle, X } from 'lucide-react';
 import { getSupabase } from '../lib/supabase';
 import { apiCall } from '../lib/sessionClient';
@@ -8,15 +9,35 @@ import { normalizeRole } from '../lib/rbac';
 import { type LgpdRequest } from '../types/edukyne';
 import { Link } from '../i18n/navigation';
 
-const LGPD_REQUEST_LABELS: Record<string, string> = {
-  copia: 'Cópia de dados',
-  correcao: 'Correção',
-  exclusao: 'Exclusão',
-  portabilidade: 'Portabilidade',
-  revogacao: 'Revogação',
-};
-
 export default function ConfiguracoesView() {
+  const t = useTranslations('configuracoes');
+  const ta = useTranslations('alunos');
+  const locale = useLocale();
+
+  const requestLabels: Record<string, string> = {
+    copia: t('tipoCopia'),
+    correcao: t('tipoCorrecao'),
+    exclusao: t('tipoExclusao'),
+    portabilidade: t('tipoPortabilidade'),
+    revogacao: t('tipoRevogacao'),
+  };
+
+  const statusLabels: Record<string, string> = {
+    pendente: t('statusPendente'),
+    resolvida: t('statusResolvida'),
+    recusada: t('statusRecusada'),
+  };
+
+  const richTags = {
+    strong: (chunks: React.ReactNode) => <strong className="text-[#8ed5ff]">{chunks}</strong>,
+    email: (chunks: React.ReactNode) => <span className="text-[#8ed5ff] font-mono">{chunks}</span>,
+    link: (chunks: React.ReactNode) => (
+      <Link href="/politica-privacidade" className="text-[#38bdf8] underline hover:text-[#8ed5ff]">
+        {chunks}
+      </Link>
+    ),
+  };
+
   // --- LGPD Art.18 requests console (DPO / Administrador) ---
   const [lgpdRequests, setLgpdRequests] = useState<LgpdRequest[]>([]);
   const [lgpdLoading, setLgpdLoading] = useState(false);
@@ -57,11 +78,11 @@ export default function ConfiguracoesView() {
       setLgpdRequests((data as LgpdRequest[]) || []);
     } catch (err) {
       console.error('Erro ao carregar solicitacoes LGPD:', err);
-      setLgpdError('Não foi possível carregar as solicitações. A tabela lgpd_requests pode não existir ainda (execute a migração 20260909_004 no SQL Editor).');
+      setLgpdError(t('erroCarregar'));
     } finally {
       setLgpdLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadLgpdRequests();
@@ -81,22 +102,22 @@ export default function ConfiguracoesView() {
           id: p.id,
           name: p.name,
           email: p.email || '',
-          role: p.role || 'Profissional',
+          role: p.role || t('profissional'),
         }));
       setTitulares(opts);
     } catch (err) {
       console.error('Erro ao carregar titulares:', err);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadTitulares();
   }, [loadTitulares]);
 
   const handleCreateForTitular = async () => {
-    const t = titulares.find(o => o.key === lgpdForForm.titularKey);
-    if (!t) {
-      setLgpdError('Selecione o titular da solicitacao.');
+    const titularSelecionado = titulares.find(o => o.key === lgpdForForm.titularKey);
+    if (!titularSelecionado) {
+      setLgpdError(t('erroSelecionarTitular'));
       return;
     }
     setLgpdForBusy(true);
@@ -105,15 +126,18 @@ export default function ConfiguracoesView() {
     const res = await apiCall('/api/lgpd', {
       action: 'create_for',
       requestType: lgpdForForm.requestType,
-      titular: { id: t.id, email: t.email, role: t.role },
+      titular: { id: titularSelecionado.id, email: titularSelecionado.email, role: titularSelecionado.role },
       notes: lgpdForForm.notes || undefined,
     });
     setLgpdForBusy(false);
     if (!res.ok) {
-      setLgpdError(res.error || 'Falha ao registrar a solicitacao.');
+      setLgpdError(res.error || t('erroRegistrar'));
       return;
     }
-    setLgpdInfo(`Solicitacao registrada para ${t.name} - Protocolo: ${res.data?.protocol || ''}`);
+    setLgpdInfo(t('solicitacaoRegistrada', {
+      nome: titularSelecionado.name,
+      protocolo: String(res.data?.protocol ?? ''),
+    }));
     setLgpdForForm({ titularKey: '', requestType: 'copia', notes: '' });
     loadLgpdRequests();
   };
@@ -124,7 +148,7 @@ export default function ConfiguracoesView() {
     const res = await apiCall('/api/lgpd', { action: 'resolve', id, status });
     setLgpdBusyId(null);
     if (!res.ok) {
-      setLgpdError(res.error || 'Falha ao atualizar a solicitação.');
+      setLgpdError(res.error || t('erroAtualizar'));
       return;
     }
     setLgpdRequests(prev => prev.map(r => (r.id === id ? { ...r, status } : r)));
@@ -139,17 +163,17 @@ export default function ConfiguracoesView() {
             <div>
               <h4 className="text-xs font-bold text-[#bdc8d1] uppercase tracking-wider flex items-center gap-1.5 font-mono">
                 <ShieldCheck className="w-4 h-4 text-[#38bdf8]" />
-                <span>Solicitações LGPD dos Titulares (Art. 18)</span>
+                <span>{t('titulo')}</span>
               </h4>
               <p className="text-[11px] text-[#bdc8d1]/75 mt-1">
-                Console do encarregado: pedidos de cópia, correção e exclusão recebidos pelo sistema ou por canal externo. Prazo legal: 15 dias.
+                {t('subtitulo')}
               </p>
             </div>
             <button
               type="button"
               onClick={loadLgpdRequests}
               className="shrink-0 p-2 bg-[#0a0f1d] border border-[#3e484f]/40 rounded-lg hover:border-[#38bdf8]/60 text-[#8ed5ff] cursor-pointer"
-              title="Recarregar solicitações"
+              title={t('recarregar')}
             >
               <RefreshCw className={`w-3.5 h-3.5 ${lgpdLoading ? 'animate-spin' : ''}`} />
             </button>
@@ -158,7 +182,7 @@ export default function ConfiguracoesView() {
           {canResolveLgpd && (
             <div className="p-4 bg-[#0a0f1d]/70 border border-[#3e484f]/25 rounded-xl space-y-3">
               <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">
-                Registrar solicitação recebida por canal externo (e-mail/telefone) — titulares: Gestores e Professores
+                {t('registrarExterno')}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <select
@@ -166,9 +190,9 @@ export default function ConfiguracoesView() {
                   onChange={(e) => setLgpdForForm(f => ({ ...f, titularKey: e.target.value }))}
                   className="bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-[11px] text-[#dae2fd] outline-none focus:border-[#38bdf8] cursor-pointer"
                 >
-                  <option value="">Titular do pedido...</option>
-                  {titulares.map(t => (
-                    <option key={t.key} value={t.key}>{t.name} ({t.role})</option>
+                  <option value="">{t('titularPedido')}</option>
+                  {titulares.map(op => (
+                    <option key={op.key} value={op.key}>{op.name} ({op.role})</option>
                   ))}
                 </select>
                 <select
@@ -176,15 +200,15 @@ export default function ConfiguracoesView() {
                   onChange={(e) => setLgpdForForm(f => ({ ...f, requestType: e.target.value }))}
                   className="bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-[11px] text-[#dae2fd] outline-none focus:border-[#38bdf8] cursor-pointer"
                 >
-                  <option value="copia">Cópia dos dados</option>
-                  <option value="correcao">Correção de dados</option>
-                  <option value="exclusao">Exclusão de dados</option>
-                  <option value="portabilidade">Portabilidade</option>
-                  <option value="revogacao">Revogação de consentimento</option>
+                  <option value="copia">{t('formCopia')}</option>
+                  <option value="correcao">{t('formCorrecao')}</option>
+                  <option value="exclusao">{t('formExclusao')}</option>
+                  <option value="portabilidade">{t('formPortabilidade')}</option>
+                  <option value="revogacao">{t('formRevogacao')}</option>
                 </select>
                 <input
                   type="text"
-                  placeholder="Observações (opcional)"
+                  placeholder={t('observacoes')}
                   maxLength={500}
                   value={lgpdForForm.notes}
                   onChange={(e) => setLgpdForForm(f => ({ ...f, notes: e.target.value }))}
@@ -198,7 +222,7 @@ export default function ConfiguracoesView() {
                   onClick={handleCreateForTitular}
                   className="px-4 py-2 rounded-lg bg-[#38bdf8] text-[#001e2c] hover:bg-[#38bdf8]/90 text-[11px] font-extrabold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {lgpdForBusy ? 'Registrando...' : 'Registrar Solicitação'}
+                  {lgpdForBusy ? t('registrando') : t('registrarSolicitacao')}
                 </button>
               </div>
             </div>
@@ -218,18 +242,18 @@ export default function ConfiguracoesView() {
           )}
 
           {lgpdRequests.length === 0 && !lgpdLoading && !lgpdError ? (
-            <p className="text-[11px] text-[#bdc8d1]/60">Nenhuma solicitação registrada.</p>
+            <p className="text-[11px] text-[#bdc8d1]/60">{t('nenhumaSolicitacao')}</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-[11px] border-collapse min-w-[820px]">
                 <thead>
                   <tr className="text-[#8ed5ff] uppercase tracking-wider text-[9px] border-b border-[#3e484f]/30">
-                    <th className="py-2 pr-3 font-bold">Protocolo</th>
-                    <th className="py-2 pr-3 font-bold">Titular</th>
-                    <th className="py-2 pr-3 font-bold">Tipo</th>
-                    <th className="py-2 pr-3 font-bold">Data</th>
-                    <th className="py-2 pr-3 font-bold">Status</th>
-                    {canResolveLgpd && <th className="py-2 font-bold text-right">Ações</th>}
+                    <th className="py-2 pr-3 font-bold">{t('protocolo')}</th>
+                    <th className="py-2 pr-3 font-bold">{t('titular')}</th>
+                    <th className="py-2 pr-3 font-bold">{t('tipo')}</th>
+                    <th className="py-2 pr-3 font-bold">{t('data')}</th>
+                    <th className="py-2 pr-3 font-bold">{ta('status')}</th>
+                    {canResolveLgpd && <th className="py-2 font-bold text-right">{ta('acoes')}</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -240,8 +264,8 @@ export default function ConfiguracoesView() {
                         <span className="block font-semibold text-[#dae2fd]">{r.requester_email}</span>
                         <span className="text-[10px] text-[#bdc8d1]/55">{r.requester_role || '-'}</span>
                       </td>
-                      <td className="py-2 pr-3 capitalize">{LGPD_REQUEST_LABELS[r.request_type] || r.request_type}</td>
-                      <td className="py-2 pr-3 whitespace-nowrap">{r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR') : '-'}</td>
+                      <td className="py-2 pr-3 capitalize">{requestLabels[r.request_type] || r.request_type}</td>
+                      <td className="py-2 pr-3 whitespace-nowrap">{r.created_at ? new Date(r.created_at).toLocaleDateString(locale) : '-'}</td>
                       <td className="py-2 pr-3">
                         <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wide ${
                           r.status === 'pendente'
@@ -251,7 +275,7 @@ export default function ConfiguracoesView() {
                             : 'bg-rose-500/10 text-rose-400 border border-rose-500/25'
                         }`}
                         >
-                          {r.status}
+                          {statusLabels[r.status] || r.status}
                         </span>
                       </td>
                       {canResolveLgpd && (
@@ -264,7 +288,7 @@ export default function ConfiguracoesView() {
                                 onClick={() => handleResolveLgpd(r.id, 'resolvida')}
                                 className="px-2.5 py-1 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25 font-bold cursor-pointer disabled:opacity-50"
                               >
-                                {lgpdBusyId === r.id ? '...' : 'Resolver'}
+                                {lgpdBusyId === r.id ? '...' : t('resolver')}
                               </button>
                               <button
                                 type="button"
@@ -273,12 +297,14 @@ export default function ConfiguracoesView() {
                                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 font-bold cursor-pointer disabled:opacity-50"
                               >
                                 <X className="w-3 h-3" />
-                                <span>Recusar</span>
+                                  <span>{t('recusar')}</span>
                               </button>
                             </span>
                           ) : (
                             <span className="text-[10px] text-[#bdc8d1]/45">
-                              {r.resolved_at ? `tratada em ${new Date(r.resolved_at).toLocaleDateString('pt-BR')}` : 'concluída'}
+                              {r.resolved_at
+                                ? t('tratadaEm', { data: new Date(r.resolved_at).toLocaleDateString(locale) })
+                                : t('concluida')}
                             </span>
                           )}
                         </td>
@@ -292,13 +318,7 @@ export default function ConfiguracoesView() {
 
           <div className="bg-[#0b1326]/50 border border-[#3e484f]/25 rounded-xl p-4">
             <p className="text-[10px] text-[#bdc8d1]/80 leading-relaxed">
-              <strong className="text-[#8ed5ff]">Encarregado de Proteção de Dados (DPO):</strong>{' '}
-              Para revogar consentimento, solicitar portabilidade ou esclarecer dúvidas,
-              entre em contato pelo e-mail <span className="text-[#8ed5ff] font-mono">lgpd@edukyne.com.br</span>.
-              Consulte também nossa{' '}
-              <Link href="/politica-privacidade" className="text-[#38bdf8] underline hover:text-[#8ed5ff]">
-                Política de Privacidade
-              </Link>.
+              {t.rich('contatoDpo', richTags)}
             </p>
           </div>
         </div>

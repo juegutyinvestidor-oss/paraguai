@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabaseAdmin";
 import { sessionFromRequest } from "../../../lib/session";
 import { normalizeRole } from "../../../lib/rbac";
+import { getApiTranslator } from "../../../lib/apiI18n";
 
 export const dynamic = "force-dynamic";
 
@@ -23,15 +24,16 @@ function cleanNotes(val: unknown): string | null {
 }
 
 export async function POST(req: NextRequest) {
+  const t = getApiTranslator(req);
   try {
     const session = sessionFromRequest(req);
     if (!session) {
-      return NextResponse.json({ error: "Sessao invalida ou expirada. Faca login novamente." }, { status: 401 });
+      return NextResponse.json({ error: t("erroSessaoInvalidaOuExpirada") }, { status: 401 });
     }
 
     const admin = getSupabaseAdmin();
     if (!admin) {
-      return NextResponse.json({ error: "Servidor indisponivel." }, { status: 500 });
+      return NextResponse.json({ error: t("erroServidorIndisponivel") }, { status: 500 });
     }
 
     const body = await req.json();
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest) {
     if (action === "create") {
       const requestType = String(body?.requestType || "");
       if (!REQUEST_TYPES.includes(requestType)) {
-        return NextResponse.json({ error: "Tipo de solicitacao invalido." }, { status: 400 });
+        return NextResponse.json({ error: t("lgpdTipoSolicitacaoInvalido") }, { status: 400 });
       }
       const protocol = makeProtocol();
       const { error } = await admin.from("lgpd_requests").insert({
@@ -54,7 +56,7 @@ export async function POST(req: NextRequest) {
       });
       if (error) {
         console.error("[Edukyne] Erro ao registrar solicitacao LGPD:", error.message);
-        return NextResponse.json({ error: "Falha ao registrar a solicitacao." }, { status: 500 });
+        return NextResponse.json({ error: t("lgpdFalhaRegistrarSolicitacao") }, { status: 500 });
       }
       return NextResponse.json({ ok: true, protocol });
     }
@@ -62,18 +64,18 @@ export async function POST(req: NextRequest) {
     if (action === "create_for") {
       // Console do DPO: registra pedido recebido por canal externo em nome do titular.
       if (normalizeRole(session.role) !== "Administrador") {
-        return NextResponse.json({ error: "Apenas Administradores podem registrar em nome de terceiros." }, { status: 403 });
+        return NextResponse.json({ error: t("lgpdApenasAdminRegistrarTerceiros") }, { status: 403 });
       }
       const requestType = String(body?.requestType || "");
       if (!REQUEST_TYPES.includes(requestType)) {
-        return NextResponse.json({ error: "Tipo de solicitacao invalido." }, { status: 400 });
+        return NextResponse.json({ error: t("lgpdTipoSolicitacaoInvalido") }, { status: 400 });
       }
       const titular = body?.titular as Record<string, unknown> | undefined;
       const tId = typeof titular?.id === "string" ? titular.id.trim() : "";
       const tEmail = typeof titular?.email === "string" ? titular.email.trim().toLowerCase() : "";
       const tRole = typeof titular?.role === "string" ? titular.role.trim().slice(0, 60) : "";
       if (!tId || !tEmail || !tEmail.includes("@")) {
-        return NextResponse.json({ error: "Titular invalido (id e email obrigatorios)." }, { status: 400 });
+        return NextResponse.json({ error: t("lgpdTitularInvalido") }, { status: 400 });
       }
       const protocol = makeProtocol();
       const { error } = await admin.from("lgpd_requests").insert({
@@ -87,19 +89,19 @@ export async function POST(req: NextRequest) {
       });
       if (error) {
         console.error("[Edukyne] Erro ao registrar solicitacao LGPD em nome de terceiro:", error.message);
-        return NextResponse.json({ error: "Falha ao registrar a solicitacao." }, { status: 500 });
+        return NextResponse.json({ error: t("lgpdFalhaRegistrarSolicitacao") }, { status: 500 });
       }
       return NextResponse.json({ ok: true, protocol });
     }
 
     if (action === "resolve") {
       if (normalizeRole(session.role) !== "Administrador") {
-        return NextResponse.json({ error: "Apenas Administradores podem resolver solicitacoes." }, { status: 403 });
+        return NextResponse.json({ error: t("lgpdApenasAdminResolverSolicitacoes") }, { status: 403 });
       }
       const id = String(body?.id || "");
       const status = String(body?.status || "");
       if (!id || !RESOLVE_STATUSES.includes(status)) {
-        return NextResponse.json({ error: "Payload de resolucao invalido." }, { status: 400 });
+        return NextResponse.json({ error: t("lgpdPayloadResolucaoInvalido") }, { status: 400 });
       }
       const { error } = await admin
         .from("lgpd_requests")
@@ -112,14 +114,14 @@ export async function POST(req: NextRequest) {
         .eq("id", id);
       if (error) {
         console.error("[Edukyne] Erro ao resolver solicitacao LGPD:", error.message);
-        return NextResponse.json({ error: "Falha ao atualizar a solicitacao." }, { status: 500 });
+        return NextResponse.json({ error: t("lgpdFalhaAtualizarSolicitacao") }, { status: 500 });
       }
       return NextResponse.json({ ok: true });
     }
 
-    return NextResponse.json({ error: "Acao invalida." }, { status: 400 });
+    return NextResponse.json({ error: t("erroAcaoInvalida") }, { status: 400 });
   } catch (err) {
     console.error("Erro na API lgpd:", err);
-    return NextResponse.json({ error: "Erro interno do servidor." }, { status: 500 });
+    return NextResponse.json({ error: t("erroInternoServidor") }, { status: 500 });
   }
 }

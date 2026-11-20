@@ -1,8 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { getApiTranslator } from "../../../lib/apiI18n";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  const t = getApiTranslator(req);
   try {
     const data = await req.json();
 
@@ -466,6 +468,6 @@ on conflict (id) do update set name = excluded.name, role = excluded.role, email
   } catch (err) {
     console.error("Erro na API migration-schema:", err);
     const message = err instanceof Error ? err.message : (typeof err === 'object' && err !== null && 'message' in err ? String((err as { message: unknown }).message) : "");
-    return NextResponse.json({ error: message || "Erro interno do servidor." }, { status: 500 });
+    return NextResponse.json({ error: message || t("erroInternoServidor") }, { status: 500 });
   }
 }

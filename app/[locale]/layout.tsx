@@ -1,13 +1,19 @@
 import type {Metadata, Viewport} from 'next';
 import {NextIntlClientProvider, hasLocale} from 'next-intl';
+import {getTranslations} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {routing} from '../../i18n/routing';
 import '../globals.css';
 
-export const metadata: Metadata = {
-  title: 'EDUKYNE',
-  description: 'Executive portal for student management, attendance control, academic performance, and modal activities.'
-};
+export async function generateMetadata({params}: {params: Promise<{locale: string}>}): Promise<Metadata> {
+  const {locale} = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
+  const t = await getTranslations({locale, namespace: 'appShell'});
+  return {
+    title: t('metadadosTitulo'),
+    description: t('metadadosDescricao')
+  };
+}
 
 export const viewport: Viewport = {
   width: 'device-width',

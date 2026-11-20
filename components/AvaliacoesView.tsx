@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { 
   Plus, 
   Trash2, 
@@ -41,6 +42,559 @@ import * as XLSX from 'xlsx';
 import { logExport } from '../lib/auditLog';
 import { ensurePerformanceReport } from '../lib/autoReport';
 import type { Permission } from '../lib/rbac';
+
+const DISPLAY_KEYS: Record<string, string> = {
+  "Módulo de Avaliações": "moduloTitulo",
+  "Filtro Unificado - Avaliações por Localidade e Série": "filtroTitulo",
+  "Filtrar Alunos por Contrato / Região": "filtrarAlunosTitulo",
+  "Vínculo permanente do registro do usuário": "vinculoPermanenteUsuario",
+  "Olá,": "ola",
+  "Abaixo estão listados todos os resultados consolidados das suas avaliações cadastrados em sua ficha de estudante.": "boasVindasTexto",
+  "Exportar Todas as Avaliações para PDF": "exportarTodasPdfTitle",
+  "Exportar PDF Completo": "exportarPdfCompleto",
+  "Pesquisar por aluno...": "pesquisarAluno",
+  "Selecione o Contrato...": "selecioneContrato",
+  "Selecione o Estado...": "selecioneEstado",
+  "Selecione a Região...": "selecioneRegiao",
+  "Selecione a Localidade...": "selecioneLocalidade",
+  "Selecione o Aluno:": "selecioneAlunoColuna",
+  "Selecione o Aluno...": "selecioneAluno",
+  "Mapear para Aluno:": "mapearAluno",
+  "Grupo de Triagem:": "grupoTriagem",
+  "Classificação / Detalhe:": "classificacaoDetalhe",
+  "(geral)": "geralParenteses",
+  "Versão do Instrumento:": "versaoInstrumento",
+  "Quem preencheu este relato?": "quemPreenheu",
+  "Nenhum registro de IMC cadastrado para você até o momento.": "vazioImcUsuario",
+  "Nenhuma avaliação de capacidade motora cadastrada para você.": "vazioMotorUsuario",
+  "Nenhuma indicação de modalidade esportiva encontrada para você.": "vazioEsporteUsuario",
+  "Nenhum parecer vocacional disponível para você até o momento.": "vazioVocacionalUsuario",
+  "Nenhuma avaliação de Saúde Global disponível para você até o momento.": "vazioSaudeUsuario",
+  "Nenhuma avaliação de Higiene Bucal disponível para você até o momento.": "vazioOralUsuario",
+  "Nenhuma avaliação de Autoconceito disponível para você até o momento.": "vazioAutoUsuario",
+  "Nenhuma avaliação de Índice Alimentar disponível para você até o momento.": "vazioIasUsuario",
+  "Nenhuma avaliação de Rastreamento do TDAH disponível para você até o momento.": "vazioSnapUsuario",
+  "Nenhuma avaliação de Rastreamento Precoce do TEA disponível para você até o momento.": "vazioAq10Usuario",
+  "Nenhum registro de IMC encontrado.": "vazioImcTabela",
+  "Nenhuma avaliação de capacidade motora cadastrada.": "vazioMotorTabela",
+  "Nenhuma indicação de esporte recomendada neste painel.": "vazioEsporteTabela",
+  "Nenhum laudo vocacional disponível no catálogo.": "vazioVocCatalogo",
+  "Nenhum parecer vocacional disponível.": "vazioVocPdf",
+  "Nenhuma avaliação de Saúde Global disponível no catálogo.": "vazioSaudeCatalogo",
+  "Nenhuma avaliação de Higiene Bucal disponível no catálogo.": "vazioOralCatalogo",
+  "Nenhuma avaliação de Autoconceito disponível no catálogo.": "vazioAutoCatalogo",
+  "Nenhuma avaliação de Índice Alimentar disponível no catálogo.": "vazioIasCatalogo",
+  "Nenhuma avaliação de Rastreamento do TDAH disponível no catálogo.": "vazioSnapCatalogo",
+  "Nenhuma avaliação de Rastreamento Precoce do TEA disponível no catálogo.": "vazioAq10Catalogo",
+  "Nenhuma avaliação PCD disponível no catálogo.": "vazioPcdCatalogo",
+  "Nenhuma indicação de modalidade esportiva encontrada.": "vazioEsportePdf",
+  "Sem dados para calcular a matriz de compatibilidade.": "vazioMatriz",
+  "Índice de Massa Corporal (IMC)": "tituloImc",
+  "Qualidade Motora": "tituloMotor",
+  "Esporte Indicado": "tituloEsporte",
+  "Vocacionamento": "tituloVocacional",
+  "Saúde Global": "tituloSaude",
+  "Higiene Bucal": "tituloOral",
+  "Autoconceito": "tituloAuto",
+  "Índice Alimentar": "tituloIas",
+  "Rastreamento do TDAH (SNAP-IV)": "tituloSnap",
+  "Rastreamento Precoce do TEA (AQ-10)": "tituloAq10",
+  "Avaliação PCD": "tituloPcd",
+  "Rastreamento TDAH": "tituloSnapCurto",
+  "Rastreamento TEA": "tituloAq10Curto",
+  "Data do Registro": "colunaDataRegistro",
+  "Data da Indicação": "colunaDataIndicacao",
+  "Peso": "colunaPeso",
+  "Altura": "colunaAltura",
+  "IMC": "colunaImc",
+  "IMC Calculado": "colunaImcCalculado",
+  "Classificação": "colunaClassificacao",
+  "Classificação:": "campoClassificacao",
+  "Aferido em": "colunaAferidoEm",
+  "Impulsão": "colunaImpulsao",
+  "Abdômen": "colunaAbdomen",
+  "Agilidade": "colunaAgilidade",
+  "Força Muscular": "colunaForcaMuscular",
+  "Velocidade": "colunaVelocidade",
+  "Geral": "colunaGeral",
+  "Índice Corporal": "colunaIndiceCorporal",
+  "Físico Motor": "colunaFisicoMotor",
+  "Esporte Sugerido": "colunaEsporteSugerido",
+  "Recomendações": "colunaRecomendacoes",
+  "Perfil Dominante": "colunaPerfilDominante",
+  "Área de Interesse": "colunaAreaInteresse",
+  "Carreira Indicada": "colunaCarreiraIndicada",
+  "Parecer do Orientador": "colunaParecerOrientador",
+  "Escore Bruto": "colunaEscoreBruto",
+  "Escore Bruto:": "campoEscoreBruto",
+  "Escore T": "colunaEscoreT",
+  "Escore T:": "campoEscoreT",
+  "Parecer": "colunaParecer",
+  "Pontuação (0-12)": "colunaPontuacao12",
+  "Pontuação (0-12):": "campoPontuacao12",
+  "Pontuação (0-30)": "colunaPontuacao30",
+  "Pontuação (0-30):": "campoPontuacao30",
+  "Pontuação (0-100)": "colunaPontuacao100",
+  "Pontuação (0-100):": "campoPontuacao100",
+  "Pontuação (0-10)": "colunaPontuacao10",
+  "Pontuação (0-10):": "campoPontuacao10",
+  "Desatenção (0-9)": "colunaDesatencao",
+  "Hiper/Impulsividade (0-9)": "colunaHiperImpulsividade",
+  "Hiper/Impuls. (0-9)": "colunaHiperImpulsCurta",
+  "Relato de": "colunaRelatoDe",
+  "Versão": "colunaVersao",
+  "Grupo": "colunaGrupo",
+  "Perfil": "colunaPerfil",
+  "Modalidade Sugerida": "colunaModalidadeSugerida",
+  "Data": "colunaData",
+  "Última aferição": "colunaUltimaAfericao",
+  "Última atualização": "colunaUltimaAtualizacao",
+  "kg": "unidadeKg",
+  "Medir IMC": "botaoMedirImc",
+  "Avaliar Qualidade Motora": "botaoAvaliarMotor",
+  "Nova Indicação Esportiva": "botaoNovaIndicacao",
+  "Gerar Vocacionamento": "botaoGerarVocacional",
+  "Avaliar Saúde Global": "botaoAvaliarSaude",
+  "Avaliar PCD": "botaoAvaliarPcd",
+  "Avaliar Higiene Bucal": "botaoAvaliarOral",
+  "Avaliar Autoconceito": "botaoAvaliarAuto",
+  "Avaliar Índice Alimentar": "botaoAvaliarIas",
+  "Avaliar Rastreamento TDAH": "botaoAvaliarSnap",
+  "Avaliar Rastreamento TEA": "botaoAvaliarAq10",
+  "Editar Avaliação": "titleEditarAvaliacao",
+  "Excluir Medição": "titleExcluirMedicao",
+  "Excluir Cadastro": "titleExcluirCadastro",
+  "Editar Esporte": "titleEditarEsporte",
+  "Excluir Registro": "titleExcluirRegistro",
+  "Editar Parecer": "titleEditarParecer",
+  "Excluir Parecer": "titleExcluirParecer",
+  "Excluir Avaliação": "titleExcluirAvaliacao",
+  "Ajustar Medição de IMC": "tituloAjustarImc",
+  "Novo Lançamento Fisiológico (IMC)": "tituloNovoImc",
+  "Editar Avaliação Motora": "tituloEditarMotor",
+  "Nova Avaliação de Qualidade Motora": "tituloNovoMotor",
+  "Salvar Edições": "botaoSalvarEdicoes",
+  "Salvar Recomendações": "botaoSalvarRecomendacoes",
+  "Diligenciar Vocação": "botaoDiligenciar",
+  "Salvar Diligência": "botaoSalvarDiligencia",
+  "Revisar Avaliação de Saúde Global": "tituloRevisarSaude",
+  "Nova Avaliação de Saúde Global": "tituloNovoSaude",
+  "Revisar Avaliação PCD": "tituloRevisarPcd",
+  "Nova Avaliação PCD": "tituloNovoPcd",
+  "Revisar Avaliação de Higiene Bucal": "tituloRevisarOral",
+  "Nova Avaliação de Higiene Bucal": "tituloNovoOral",
+  "Revisar Avaliação de Autoconceito": "tituloRevisarAuto",
+  "Nova Avaliação de Autoconceito": "tituloNovoAuto",
+  "Revisar Índice Alimentar": "tituloRevisarIas",
+  "Novo Índice Alimentar": "tituloNovoIas",
+  "Salvar Revisão": "botaoSalvarRevisao",
+  "Entregar Avaliação": "botaoEntregarAvaliacao",
+  "Peso (kg):": "campoPeso",
+  "Altura (metros):": "campoAltura",
+  "Visualização do IMC Estimado": "tituloImcEstimado",
+  "Impulsão:": "campoImpulsao",
+  "Abdômen:": "campoAbdomen",
+  "Agilidade:": "campoAgilidade",
+  "Força Muscular:": "campoForcaMuscular",
+  "Velocidade:": "campoVelocidade",
+  "Classificação Geral (automática):": "campoClassificacaoGeral",
+  "Sem dados de IMC": "placeholderSemImc",
+  "Sem dados motores": "placeholderSemMotor",
+  "Selecione um aluno com perfil motor e biometria avaliados": "placeholderSemPerfilMotor",
+  "Índice Corporal:": "campoIndiceCorporal",
+  "Físico Motor:": "campoFisicoMotor",
+  "Esporte Indicado:": "campoEsporteIndicado",
+  "Ex: 3h por semana em dias alternados": "placeholderRecomendacoes",
+  "Recomendações:": "campoRecomendacoes",
+  "Questionário de Mapeamento (12 Perguntas)": "tituloQuestionario",
+  "Auto-calculado...": "calculadoAutomatico",
+  "Auto-calculado se vazio...": "calculadoSeVazio",
+  "Auto-calculado a partir da classificação...": "calculadoDaClassificacao",
+  "Auto...": "placeholderAuto",
+  "Perfil Psicológico:": "campoPerfilPsicologico",
+  "Gostos / Interesses:": "campoGostos",
+  "Carreira Sugerida:": "campoSugerida",
+  "Parecer Técnico Detalhado:": "campoParecerTecnico",
+  "Avaliar Aluno:": "botaoAvaliarAluno",
+  "(invertido)": "marcadorInvertido",
+  "(negativo)": "marcadorNegativo",
+  "Perfil e Valências (auto):": "tituloPerfilValencias",
+  "Vel/Agil": "colunaVelAgil",
+  "Força Expl.": "colunaForcaExpl",
+  "Membros Sup.": "colunaMembrosSup",
+  "Core": "colunaCore",
+  "Perfil:": "campoPerfil",
+  "Direcionamento:": "campoDirecionamento",
+  "Preencha ao menos um teste para calcular.": "dicaPreenchaTeste",
+  "Radar de Valências:": "tituloRadar",
+  "Matriz de Compatibilidade Esportiva (Ranking por IAR bruto):": "tituloMatriz",
+  "IAR": "colunaIar",
+  "· norm.": "iarNormalizado",
+  "IAR bruto = Σ(Nota × Peso) do protocolo (Etapa D). O valor normalizado (1–3) permite comparar modalidades quando há testes não aplicáveis no grupo; o ranking usa o IAR bruto.": "notaIar",
+  "Funil Qualitativo de Decisão (Etapa E):": "tituloFunil",
+  "Somente após a análise conjunta dos três filtros deve ser realizado o direcionamento esportivo inicial.": "notaFunil",
+  "Bateria de Testes Motores": "tituloBateria",
+  "Valor inválido: em teste de tempo, 0 não é aceito. Deixe vazio se não realizou.": "avisoValorInvalido",
+  "Testes marcados como &quot;Não aplicável&quot; no Módulo 15 são ignorados no cálculo. Notas variam de 1 (inicial) a 3 (avançado).": "avisoTestesNaoAplicaveis",
+  "Testes adaptados/substituídos neste grupo:": "tituloTestesAdaptados",
+  "Na ausência de referência específica validada para o teste alternativo, o resultado deve ser interpretado de forma descritiva e funcional (Etapa B), sem criação de normas artificiais.": "notaTesteAlternativo",
+  "Substituído": "statusSubstituido",
+  "Preencher a Avaliação de Qualidade motora.": "erroPreencherMotor",
+  "Selecione um aluno válido antes de salvar.": "erroSelecionarAluno",
+  "Peso e Altura devem ser valores positivos.": "erroPesoAltura",
+  "Responda todas as perguntas do questionário antes de entregar o parecer.": "erroResponderVoc",
+  "Preenha ao menos um teste válido para calcular o parecer.": "erroPreencherPcd",
+  "Cadastre a data de nascimento do aluno para aplicar o HU-DBI.": "erroNascimentoOral",
+  "O HU-DBI é aplicável a partir de 11 anos.": "erroIdadeOral",
+  "Responda todas as afirmações (Concordo/Discordo) antes de entregar o parecer.": "erroResponderOral",
+  "Responda todas as afirmações antes de entregar o parecer.": "erroResponderAuto",
+  "Responda todas as perguntas antes de entregar o parecer.": "erroResponderIas",
+  "Cadastre a data de nascimento do aluno para aplicar o SNAP-IV.": "erroNascimentoSnap",
+  "O SNAP-IV é aplicável a alunos de 5 a 17 anos.": "erroIdadeSnap",
+  "Selecione quem preencheu o relato (Pai, Mãe, Responsável ou Professor).": "erroRespondenteSnap",
+  "Responda todos os 18 itens antes de entregar o parecer.": "erroItensSnap",
+  "Selecione quem preencheu o relato (Pai, Mãe ou Responsável).": "erroRespondenteAq10",
+  "Responda todos os 10 itens antes de entregar o parecer.": "erroItensAq10",
+  "Por favor, cadastre o Índice de Massa Corporal (IMC) deste aluno antes de indicar um esporte.": "erroImcAntesEsporte",
+  "Tem certeza de que deseja remover permanentemente": "confirmarRemoverPrefixo",
+  "de": "confirmarRemoverDe",
+  "a medição de IMC": "tipoExclusaoImc",
+  "a avaliação de qualidade motora": "tipoExclusaoMotor",
+  "o registro de esporte indicado": "tipoExclusaoEsporte",
+  "o parecer de vocacionamento": "tipoExclusaoVoc",
+  "a avaliação de saúde global": "tipoExclusaoSaude",
+  "a avaliação de higiene bucal": "tipoExclusaoOral",
+  "a avaliação de autoconceito": "tipoExclusaoAuto",
+  "a avaliação de índice alimentar": "tipoExclusaoIas",
+  "a avaliação de rastreamento do TDAH": "tipoExclusaoSnap",
+  "a avaliação de rastreamento precoce do TEA": "tipoExclusaoAq10",
+  "a avaliação de qualidade motora PCD": "tipoExclusaoPcd",
+  "? Esta ação não pode ser desfeita.": "confirmarRemoverSufixo",
+  "1. Índice de Massa Corporal (IMC)": "relatorioSecaoImc",
+  "1º Ano Médio - A": "ano1A",
+  "2º Ano Médio - B": "ano2B",
+  "3º Ano Médio - A": "ano3A",
+  "A estética e a criatividade do resultado final.": "vocQ7C",
+  "A maior parte dos meus cereais diários são integrais (2 ou mais porções/dia).": "iasQ5O3",
+  "A)": "opcaoA",
+  "Administração, Economia, Ciências Contábeis, Marketing, Logística e Gestão de Recursos Humanos.": "carreiraNegocios",
+  "Administrar recursos e organizar doações.": "vocQ9D",
+  "afirmações)": "unidadeAfirmacoes",
+  "Alcançar sucesso financeiro e cargo de chefia.": "vocQ12D",
+  "Alerta – Uso exclusivo para rastreamento inicial": "alertaRastreamento",
+  "Alimentação muito baixa em gordura saturada (priorizo carnes magras e grelhados).": "iasQ10O3",
+  "aluno(s) sem data de nascimento cadastrada ficam fora da seleção deste teste.": "alunosSemNascimentoNota",
+  "AQ-10 -": "aq10Header",
+  "Às vezes, me sinto inútil.": "autoQ9",
+  "Às vezes, penso que não sirvo para nada.": "autoQ8",
+  "Avaliações de Autoconceito (Rosenberg)": "tituloAvaliacoesAuto",
+  "Avaliações de Higiene Bucal (HU-DBI)": "tituloAvaliacoesOral",
+  "Avaliações de IMC (Índice de Massa Corporal)": "tituloAvaliacoesImc",
+  "Avaliações de Indicação Esportiva": "tituloAvaliacoesEsporte",
+  "Avaliações de Perfil Vocacional": "tituloAvaliacoesVoc",
+  "Avaliações de Qualidade Motora": "tituloAvaliacoesMotor",
+  "Avaliações de Qualidade Motora PCD": "tituloAvaliacoesPcd",
+  "Avaliações de Saúde Global (KIDSCREEN-10)": "tituloAvaliacoesSaude",
+  "B)": "opcaoB",
+  "Baixíssimo consumo de proteínas ao longo do dia.": "iasQ7O1",
+  "Basquete e Vôlei": "sugeridoBasqueteVolei",
+  "Biologia, Educação Física ou Artes.": "vocQ3C",
+  "Biológicas e Criativas": "perfilBioCriativo",
+  "Boa memória para dados e facilidade com números.": "vocQ11B",
+  "C)": "opcaoC",
+  "Calorias de Fontes Vazias (açúcar de adição, doces, refrigerantes, álcool e gorduras sólidas)": "iasQ11Titulo",
+  "Carnes, Ovos e Leguminosas (fontes de proteína em geral)": "iasQ7Titulo",
+  "Cereais Integrais (arroz integral, aveia, pão integral, linhaça, chia)": "iasQ5Titulo",
+  "Como ele foi construído e sua estrutura lógica.": "vocQ7B",
+  "Como feijão e/ou vegetais verde-escuros praticamente todos os dias.": "iasQ4O3",
+  "Como feijão ou vegetais escuros de 3 a 4 vezes por semana.": "iasQ4O2",
+  "Como você costuma resolver um problema difícil?": "vocQ4",
+  "Como você descreveria suas habilidades?": "vocQ11",
+  "componentes)": "unidadeComponentes",
+  "Consumo 1 porção por dia (ex: 1 fatia de melancia ou 1 maçã).": "iasQ1O2",
+  "Consumo 2 ou mais porções de frutas todos os dias.": "iasQ1O3",
+  "Consumo 3 porções por dia (recomendação padrão de cálcio).": "iasQ6O3",
+  "Consumo de 1 a 2 porções por dia.": "iasQ6O2",
+  "Consumo doces, refrigerantes ou bebidas açucaradas/alcoólicas todos os dias.": "iasQ11O1",
+  "Consumo fontes saudáveis distribuídas no almoço, jantar e lanches.": "iasQ7O3",
+  "Consumo pelo menos 1 porção de cereal integral ou sementes por dia.": "iasQ5O2",
+  "Consumo proteínas em apenas uma das grandes refeições.": "iasQ7O2",
+  "Consumo vegetais apenas em 1 refeição (só almoço ou só jantar).": "iasQ3O2",
+  "Consumo vegetais no almoço e no jantar todos os dias.": "iasQ3O3",
+  "Corre de um lado para outro ou sobe demais nas coisas em situações em que isto é inapropriado.": "snapQ12",
+  "Criança (4-11)": "crianca4a11",
+  "Criando uma solução prática e inovadora.": "vocQ4C",
+  "Criativo e Tecnológico": "perfilCriativoTecnologico",
+  "D)": "opcaoD",
+  "Desatenção": "subescalaDesatencao",
+  "Desenhar, pintar ou cuidar da apresentação visual.": "vocQ1C",
+  "Direito, Letras, Pedagogia, Psicologia, História, Jornalismo e Relações Internacionais.": "carreiraHumanas",
+  "Distrai-se com estímulos externos.": "snapQ8",
+  "Durante a leitura de uma história, ele/a tem dificuldades em perceber as intenções e as emoções das personagens.": "aq10Q7",
+  "É curiosa sobre como as coisas funcionam e operam.": "vocQ5B",
+  "É esquecido em atividades do dia-a-dia.": "snapQ9",
+  "É organizada, prática e gosta de dar ordens.": "vocQ5D",
+  "EDUKYNE - Relatório Consolidado de Avaliações": "relatorioTitulo",
+  "Ele(a) acha situações sociais fáceis.": "aq10Q19",
+  "Ele(a) geralmente foca mais na imagem ou situação como um todo, do que nos pequenos detalhes.": "aq10Q12",
+  "Ele(a) sempre percebe padrões/categorias nas coisas.": "aq10Q11",
+  "Ele/a não sabe como manter uma conversa com os seus pares.": "aq10Q5",
+  "Ele/a nota muitas vezes pequenos ruídos que passam despercebidos às outras pessoas.": "aq10Q1",
+  "Ele/a percebe facilmente o que alguém está a pensar ou a sentir, apenas olhando para a sua cara.": "aq10Q9",
+  "Em caso de interrupção, ele(a) consegue voltar rapidamente ao que estava fazendo.": "aq10Q14",
+  "Em um trabalho de grupo na escola, você prefere:": "vocQ1",
+  "Engenharias, Ciência da Computação, Matemática, Física, Arquitetura e Tecnologia da Informação.": "carreiraExatas",
+  "Entre estas opções de leitura, qual você prefere?": "vocQ10",
+  "Escala: Concordo Totalmente (0) • Concordo em Parte (1) • Discordo em Parte (2) • Discordo Totalmente (3)": "escalaConcordo",
+  "Escala: Nem um pouco (0) • Só um pouco (1) • Bastante (2) • Demais (3)": "escalaFrequencia",
+  "Estudante com forte inclinação humanística, gosto evidente pela comunicação verbal e escrita, além de alto potencial de empatia.": "perfilTextoHumanas",
+  "Eu acho que é impossível evitar problemas na gengiva apenas escovando os dentes.": "oralQ6",
+  "Eu costumo escovar meus dentes logo após cada refeição.": "oralQ7",
+  "Eu escovo a minha língua com frequência.": "oralQ16",
+  "Eu examino meus dentes detalhadamente no espelho após a escovação.": "oralQ12",
+  "Eu sinto que escovo meus dentes com muita força.": "oralQ18",
+  "Eu sinto que já limpo bem os meus dentes sem precisar usar o fio dental.": "oralQ8",
+  "Eu sinto que meus dentes estão piorando, mesmo escovando todos os dias.": "oralQ10",
+  "Eu só vou ao dentista quando estou sentindo alguma dor.": "oralQ20",
+  "Eu uso uma técnica de escovação recomendada pelo meu dentista.": "oralQ9",
+  "Evita, não gosta ou se envolve contra a vontade em tarefas que exigem esforço mental prolongado.": "snapQ6",
+  "Exatas e Tecnológicas": "perfilExatas",
+  "Exista liderança, metas claras e decisões rápidas.": "vocQ8D",
+  "Fazer a diferença na sociedade e no mundo.": "vocQ12A",
+  "Fazer os cálculos ou criar gráficos para os dados.": "vocQ1B",
+  "Força": "areaForca",
+  "Força Explosiva": "habilidadeForcaExplosiva",
+  "Frequentemente, ele(a) percebe que não sabe como manter uma conversa.": "aq10Q15",
+  "Frutas Integrais (apenas fruta inteira/pedaços, sem sucos)": "iasQ2Titulo",
+  "Geografia, Redação ou Sociologia.": "vocQ3D",
+  "Ginástica": "modalidadeGinastica",
+  "Gordura Saturada (carnes gordas, pele de frango, manteiga, óleo de coco, queijos amarelos)": "iasQ10Titulo",
+  "Habitualmente, ele/a concentra-se mais na imagem ou situação no seu todo, do que nos seus pequenos detalhes.": "aq10Q2",
+  "História, Literatura ou Filosofia.": "vocQ3A",
+  "HU-DBI (": "oralHeader",
+  "IAS (": "iasHeader",
+  "idade não cadastrada": "idadeNaoCadastrada",
+  "Índice de Alimentação Saudável (IAS)": "tituloIasCompleto",
+  "Itens clínicos – Desatenção (0-9):": "itensDesatencao",
+  "Itens clínicos – Hiper/Impulsividade (0-9):": "itensHiperImpulsividade",
+  "itens)": "unidadeItens",
+  "Já me disseram que tenho bom hálito.": "oralQ11",
+  "KIDSCREEN-10 (": "saudeHeader",
+  "Laticínios (leite, queijo, iogurte - preferencialmente menos gordura)": "iasQ6Titulo",
+  "Livros sobre economia, finanças ou administração.": "vocQ10D",
+  "Matemática, Física ou Química.": "vocQ3B",
+  "Medicina, Biologia, Design, Publicidade, Artes Visuais, Educação Física e Veterinária.": "carreiraBioCriativa",
+  "Mexe com as mãos ou pés ou se remexe na cadeira.": "snapQ10",
+  "Montando um plano de ação passo a passo.": "vocQ4D",
+  "Montar ou consertar coisas, ou jogar jogos de lógica.": "vocQ2B",
+  "Muita imaginação, criatividade e intuição.": "vocQ11C",
+  "não cadastrado": "naoCadastrado",
+  "Não cadastrado": "NaoCadastrado",
+  "Não consegue prestar muita atenção a detalhes ou comete erros por descuido nos trabalhos da escola ou tarefas.": "snapQ1",
+  "Não consumo esses alimentos ou uso apenas óleos vegetais comuns.": "iasQ8O1",
+  "Não consumo laticínios (ou equivalentes vegetais fortificados com cálcio).": "iasQ6O1",
+  "Não informada": "NaoInformada",
+  "Não me preocupo muito em ir ao dentista.": "oralQ1",
+  "Não pára ou freqüentemente está a “mil por hora”.": "snapQ14",
+  "Não se aplica": "NaoSeAplica",
+  "Não segue instruções até o fim e não termina deveres de escola, tarefas ou obrigações.": "snapQ4",
+  "Natação": "modalidadeNatacao",
+  "Negócios e Gestão": "perfilNegocios",
+  "Nenhum aluno com idade compatível para teste (": "semAlunoCompativel",
+  "No pré-escolar, ele/a gostava de brincar a jogos de faz-de-conta com as outras crianças.": "aq10Q8",
+  "No seu tempo livre, o que você mais gosta de fazer?": "vocQ2",
+  "O AQ-10 é um instrumento de rastreamento (triagem) e não confirma o diagnóstico de TEA.\n                  A pontuação avalia apenas sinais de alerta relatados pelos pais/responsáveis para os itens\n                  de comunicação social e flexibilidade comportamental. Para o diagnóstico formal, é obrigatória\n                  a avaliação multidisciplinar especializada (neuropediatra ou psiquiatra infantil e neuropsicólogo).": "notaAq10Longa",
+  "O AQ-10 é um instrumento de rastreamento (triagem) e não substitui o diagnóstico formal de TEA.": "notaAq10Curta",
+  "O estudante apresenta um perfil dinâmico correspondente às ciências Biológicas e Criativas. Observa-se uma combinação única entre a sensibilidade artística e o fascínio pelo bem-estar, pela saúde e pela preservação da vida em suas diversas formas. Este perfil é movido pelo desejo de inventar, expressar ideias visualmente ou cuidar de organismos vivos.": "perfilTextoBioCriativo",
+  "O estudante demonstra interesse voltado para a análise crítica da sociedade, mediação de conflitos e transmissão de conhecimento. Suas competências se alinham perfeitamente a profissões que exigem escuta ativa, escrita fluida e pensamento humanístico.": "perfilTextoHumanasLongo",
+  "O estudante manifesta um raciocínio lógico altamente estruturado, facilidade para lidar com dados abstratos e numéricos, além de uma curiosidade natural para entender o funcionamento de sistemas complexos e novas tecnologias. Trata-se de um perfil focado na resolução prática de problemas, otimização de processos e inovação técnica.": "perfilTextoExatas",
+  "O estudante não se limita a apenas um campo do saber; ele utiliza a criatividade para dar forma à tecnologia, solucionando problemas de interface, interatividade e experiência do usuário de maneira inovadora.": "perfilTextoCriativoTecnologico",
+  "O impacto que ele terá na vida das pessoas.": "vocQ7A",
+  "O que é mais importante em uma futura profissão para você?": "vocQ12",
+  "O que mais chama sua atenção em um projeto?": "vocQ7",
+  "O resultado indica um perfil predominantemente voltado para Negócios e Gestão. O avaliado demonstra traços natos de liderança, visão estratégica, pragmatismo e uma aptidão natural para organizar rotinas, gerenciar recursos e liderar equipes em direção a metas comuns.": "perfilTextoNegocios",
+  "O SNAP-IV é uma ferramenta de rastreamento de sintomas e não confirma o diagnóstico de TDAH.\n                  A classificação considera apenas os sintomas (critério A do DSM-5-TR) relatados para os últimos seis meses.\n                  Para o diagnóstico formal, é obrigatório avaliar também os critérios B-E do DSM-5-TR:\n                  início dos sintomas antes dos 12 anos (B), presença em pelo menos dois contextos (C),\n                  prejuízo clinicamente significativo (D) e exclusão de outras causas (E). O DSM-5-TR permite o diagnóstico conjunto com TEA.": "notaSnapLonga",
+  "O SNAP-IV é uma ferramenta de rastreamento inicial e não substitui o diagnóstico médico de TDAH.": "notaSnapCurta",
+  "Os seus pais têm tratado você com justiça?": "healthQ6",
+  "Ótimo para design de jogos ou desenvolvimento web.": "textoExatasWeb",
+  "Ouvir, aconselhar e cuidar da saúde ou direitos.": "vocQ9A",
+  "Parece não estar ouvindo quando se fala diretamente com ele.": "snapQ3",
+  "Perde coisas necessárias para atividades (p. ex: brinquedos, deveres da escola, lápis ou livros).": "snapQ7",
+  "perguntas)": "unidadePerguntas",
+  "pts)": "unidadePontos",
+  "Qual destas matérias escolares você acha mais interessante?": "vocQ3",
+  "Quando era mais novo(a), ele(a) gostava de brincar de faz-de-conta com outras crianças.": "aq10Q17",
+  "Quando está em um grupo social, ele(a) consegue facilmente acompanhar conversas de várias pessoas.": "aq10Q13",
+  "Quando está num grupo social, ele/a consegue facilmente seguir conversas de várias pessoas.": "aq10Q3",
+  "Quando o assunto é ajudar os outros, você prefere:": "vocQ9",
+  "Raramente consumo (menos de 1 vez por semana) açúcar refinado, refrigerantes ou álcool.": "iasQ11O3",
+  "Revistas científicas ou livros de tecnologia e inovação.": "vocQ10B",
+  "Revistas de decoração, design ou histórias em quadrinhos.": "vocQ10C",
+  "Rosenberg (": "autoHeader",
+  "Sai do lugar na sala de aula ou em outras situações em que se espera que fique sentado.": "snapQ11",
+  "SNAP-IV (": "snapHeader",
+  "Só consumo cereais refinados (arroz branco, pão francês, macarrão normal).": "iasQ5O1",
+  "Só tomo suco ou não como frutas.": "iasQ2O1",
+  "Socialmente, ele(a) é um(a) bom(boa) conversador(a).": "aq10Q16",
+  "Socialmente, ele/a é bom/boa conversador/a.": "aq10Q6",
+  "Sódio (Sal de cozinha e alimentos salgados)": "iasQ9Titulo",
+  "Sou capaz de fazer as coisas tão bem quanto a maioria das outras pessoas.": "autoQ4",
+  "Tem dificuldade de manter a atenção em tarefas ou atividades de lazer.": "snapQ2",
+  "Tenho uma atitude positiva em relação a mim mesmo(a).": "autoQ2",
+  "Um centro de alta tecnologia ou uma feira de ciências.": "vocQ6B",
+  "Uma cidade histórica cheia de museus e cultura.": "vocQ6A",
+  "Uma grande metrópole de negócios e comércio.": "vocQ6D",
+  "Uma reserva ecológica ou um centro de artes.": "vocQ6C",
+  "Usando números, dados e fatos exatos.": "vocQ4B",
+  "Vegetais Escuros e Leguminosas (brócolis, couve, espinafre, feijão, lentilha...)": "iasQ4Titulo",
+  "Você é movido pela criatividade, gosta de inventar, inovar ou tem forte interesse pela vida e saúde.": "perfilCurtoBioCriativo",
+  "Você gosta de resolver problemas lógicos, lidar com números e entender como as tecnologias funcionam.": "perfilCurtoExatas",
+  "Você gosta de se comunicar, ajudar as pessoas e entender a sociedade.": "perfilCurtoHumanas",
+  "Você prefere um ambiente de trabalho onde:": "vocQ8",
+  "Você se considera uma pessoa que:": "vocQ5",
+  "Você tem espírito de liderança, gosta de organizar, gerenciar recursos e traçar estratégias.": "perfilCurtoNegocios",
+  "Você tem podido fazer as coisas que quer no seu tempo livre?": "healthQ5",
+  "Você tem se divertido com os seus amigos?": "healthQ7",
+  "Você tem se saído bem na escola/estudos?": "healthQ8",
+  "Você tem se sentido bem e com energia?": "healthQ1",
+  "Você tem se sentido deprimido(a) ou sem esperança?": "healthQ10",
+  "Você tem se sentido sozinho(a)?": "healthQ3",
+  "Você tem se sentido triste?": "healthQ2",
+  "Você tem sido capaz de prestar atenção/se concentrar?": "healthQ9",
+  "Você tem tido tempo suficiente para si mesmo(a)?": "healthQ4",
+  "Vôlei": "modalidadeVolei",
+  "Sinto que não tenho muito do que me orgulhar.": "autoQ5",
+  "anos": "unidadeAnos",
+  "Adolescente (12-15)": "adolescente12a15",
+  "Criança (4 a 11 anos)": "aq10CriancaLabel",
+  "Adolescente (12 a 15 anos)": "aq10AdolescenteLabel",
+  "Nunca": "labelNunca",
+  "Raramente": "labelRaramente",
+  "Às vezes": "labelAsVezes",
+  "Frequentemente": "labelFrequentemente",
+  "Sempre": "labelSempre",
+  "Concordo": "labelConcordo",
+  "Discordo": "labelDiscordo",
+  "Concordo Totalmente": "labelConcordoTotalmente",
+  "Concordo em Parte": "labelConcordoEmParte",
+  "Discordo em Parte": "labelDiscordoEmParte",
+  "Discordo Totalmente": "labelDiscordoTotalmente",
+  "Nem um pouco": "labelNemUmPouco",
+  "Só um pouco": "labelSoUmPouco",
+  "Bastante": "labelBastante",
+  "Demais": "labelDemais",
+  "Pai": "labelPai",
+  "Mãe": "labelMae",
+  "Responsável": "labelResponsavel",
+  "Professor(a)": "labelProfessor",
+  "Qualidade de Vida Baixa": "classSaudeBaixa",
+  "Qualidade de Vida Normal": "classSaudeNormal",
+  "Qualidade de Vida Alta": "classSaudeAlta",
+  "Autoestima Baixa": "classAutoBaixa",
+  "Autoestima Equilibrada": "classAutoEquilibrada",
+  "Autoestima Alta": "classAutoAlta",
+  "Alto Desempenho": "classOralAlta",
+  "Desempenho Moderado": "classOralModerada",
+  "Baixo Desempenho": "classOralBaixa",
+  "Dieta de Má Qualidade": "classIasBaixa",
+  "Necessita de Modificações": "classIasModificacoes",
+  "Boa Qualidade (Saudável)": "classIasBoa",
+  "Sinais de Desatenção": "classSnapDesatencao",
+  "Sinais de Hiperatividade/Impulsividade": "classSnapHiper",
+  "Sinais Combinados": "classSnapCombinados",
+  "Sem Indícios Significativos": "classSnapSemIndicios",
+  "Traços comportamentais dentro da média da população geral": "classAq10Media",
+  "Pontuação Indicativa (Alerta de Traços Elevados de TEA)": "classAq10Alerta",
+  "Não aplicável": "NaoAplicavel",
+  "Padrão": "statusPadrao",
+  "Adaptado": "statusAdaptado",
+  "Limitações Agudas": "notaPcd1",
+  "Desempenho Mediano": "notaPcd2",
+  "Desempenho Elevado": "notaPcd3",
+  "Mesomorfo": "biotipoMesomorfo",
+  "Ectomorfo": "biotipoEctomorfo",
+  "Endomorfo": "biotipoEndomorfo",
+  "3h por semana": "pratica3h",
+  "Regular": "classRegular",
+  "Bom": "classBom",
+  "Excelente": "classExcelente",
+  "Insuficiente": "classInsuficiente",
+  "Precisa de Treino": "classPrecisaTreino",
+  "Masculino": "sexoMasculino",
+  "Feminino": "sexoFeminino",
+  "Todos": "todos",
+  "Todas": "todas",
+  "14-18 anos": "faixa14a18",
+  "8-18 anos": "faixa8a18",
+  "4-15 anos": "faixa4a15",
+  "11+ anos": "faixa11mais",
+  "5-17 anos": "faixa5a17",
+  "Aprimorar Habilidades Motoras": "sugeridoAprimorar",
+  "fora da faixa": "foraDaFaixa",
+  "Aguardando Dados": "classAguardando",
+  "Abaixo do peso": "classAbaixoPeso",
+  "Peso normal": "classPesoNormal",
+  "Sobrepeso": "classSobrepeso",
+  "Obesidade": "classObesidade",
+  "Todas as idades": "todasIdades",
+  "Todos os sexos": "todosSexos",
+  "ou mais": "ouMais",
+  "ou menos": "ouMenos",
+  "a": "conectorIntervalo",
+  "2. Qualidade Motora": "relatorioSecaoMotor",
+  "3. Esporte Indicado": "relatorioSecaoEsporte",
+  "4. Perfil Vocacional": "relatorioSecaoVoc",
+  "5. Saúde Global (KIDSCREEN-10)": "relatorioSecaoSaude",
+  "6. Higiene Bucal (HU-DBI)": "relatorioSecaoOral",
+  "7. Autoconceito (Rosenberg)": "relatorioSecaoAuto",
+  "8. Índice Alimentar (IAS)": "relatorioSecaoIas",
+  "9. Rastreamento de Sintomas de TDAH (SNAP-IV)": "relatorioSecaoSnap",
+  "10. Rastreamento Precoce do Autismo (AQ-10)": "relatorioSecaoAq10",
+  "Rastreamento de Sintomas de TDAH (SNAP-IV)": "tituloSnapCompleto",
+  "Rastreamento Precoce do Autismo (AQ-10)": "tituloAq10Completo",
+  "Altura (m)": "colunaAlturaM",
+  "Peso (kg)": "colunaPesoKg",
+  "Nome do Aluno": "colunaNomeAluno",
+  "Carreira": "colunaCarreira",
+  "Respondente": "colunaRespondente",
+  "Sugerido": "colunaSugerido",
+  "Compatibilidade": "colunaCompatibilidade",
+  "Estudante": "palavraEstudante",
+  "Turno Desconhecido": "turnoDesconhecido",
+  "Hibrido": "biotipoHibrido",
+  "Humanas e Sociais": "perfilHumanasSociais",
+  "Hiperatividade/Impulsividade": "subescalaHiperatividade",
+  "Zona Sul": "zonaSul",
+  "Zona Norte": "zonaNorte",
+  "Zona Leste": "zonaLeste",
+  "Centro": "centro",
+  "eutrofia": "classEutrofia",
+  "magreza": "classMagreza",
+  "peso ideal": "classPesoIdeal",
+  "sobrepeso": "classSobrepesoMin",
+  "obeso": "classObeso",
+  "baixo": "classBaixo",
+  "Indicar Esporte": "botaoIndicarEsporte",
+  "Indicar Novo Esporte": "botaoIndicarNovoEsporte",
+  "Atualizar Esporte Recomendado": "botaoAtualizarEsporte",
+  "Cadastrar Parecer": "botaoCadastrarParecer",
+  "Entregar Parecer": "botaoEntregarParecer",
+  "Salvar Ajustes": "botaoSalvarAjustes",
+  "Salvar Registro": "botaoSalvarRegistro",
+  "Mapear Novo Perfil Vocacional": "botaoMapearNovoPerfil",
+  "Novo Rastreamento do TDAH": "botaoNovoSnap",
+  "Novo Rastreamento Precoce do TEA": "botaoNovoAq10",
+  "Revisar Rastreamento do TDAH": "botaoRevisarSnap",
+  "Revisar Rastreamento Precoce do TEA": "botaoRevisarAq10",
+  "__confirmarRemoverFrase__": "confirmarRemoverFrase",
+  "m": "unidadeM",
+  "Filtros:": "filtrosLabel",
+  "Turma:": "turmaLabel",
+  "Unidade:": "unidadeLabel",
+  "Gerado em:": "geradoEmLabel",
+  "Data de Emissão:": "dataEmissaoLabel",
+  "Aluno:": "alunoLabel",
+};
 
 interface UserData {
   id?: string;
@@ -154,7 +708,7 @@ const getImcClass = (weight: number, height: number) => {
 // Map grade helper
 const getStudentGrade = (students: Student[], sId: string) => {
   const std = students.find(s => s.id === sId);
-  return std ? std.grade : '3º Ano Médio - A';
+  return std ? std.grade : "3º Ano Médio - A";
 };
 
 const calculateStudentAge = (birthDateStr?: string): number => {
@@ -206,11 +760,11 @@ const getStudentAgeYears = (birthDate?: string): number | null => {
 // (ex.: KIDSCREEN 8-18 => precisou completar 8 e ainda nao completou 19).
 type AgeRuledSubTab = 'vocational' | 'health' | 'aq10' | 'oral' | 'snap';
 const ASSESSMENT_AGE_RULES: Record<AgeRuledSubTab, { min: number; max: number; label: string }> = {
-  vocational: { min: 14, max: 18, label: '14-18 anos' },
-  health: { min: 8, max: 18, label: '8-18 anos' },
-  aq10: { min: 4, max: 15, label: '4-15 anos' },
-  oral: { min: 11, max: 120, label: '11+ anos' },
-  snap: { min: 5, max: 17, label: '5-17 anos' },
+  vocational: { min: 14, max: 18, label: "14-18 anos" },
+  health: { min: 8, max: 18, label: "8-18 anos" },
+  aq10: { min: 4, max: 15, label: "4-15 anos" },
+  oral: { min: 11, max: 120, label: "11+ anos" },
+  snap: { min: 5, max: 17, label: "5-17 anos" },
 };
 
 const safeGetTimestamp = (dateStr?: string): number => {
@@ -415,7 +969,7 @@ const DEFAULT_M2_MODALIDADES: M2Modality[] = [
   },
   {
     id: 'm2-2',
-    name: 'Natação',
+    name: "Natação",
     requirements: {
       imc: ['Regular', 'Bom', 'Excelente'],
       v20m: ['Regular', 'Bom', 'Excelente'],
@@ -463,7 +1017,7 @@ const DEFAULT_M2_MODALIDADES: M2Modality[] = [
   },
   {
     id: 'm2-6',
-    name: 'Vôlei',
+    name: "Vôlei",
     requirements: {
       imc: ['Regular', 'Bom', 'Excelente'],
       v20m: ['Regular', 'Bom', 'Excelente'],
@@ -475,7 +1029,7 @@ const DEFAULT_M2_MODALIDADES: M2Modality[] = [
   },
   {
     id: 'm2-7',
-    name: 'Ginástica',
+    name: "Ginástica",
     requirements: {
       imc: ['Bom', 'Excelente'],
       v20m: ['Regular', 'Bom', 'Excelente'],
@@ -510,18 +1064,18 @@ type VocQuestion = {
 };
 
 const DEFAULT_VOC_QUESTIONS: VocQuestion[] = [
-  { id: 'q1', ord: 1, statement: 'Em um trabalho de grupo na escola, você prefere:', optionA: 'Escrever o texto e pesquisar os temas.', optionB: 'Fazer os cálculos ou criar gráficos para os dados.', optionC: 'Desenhar, pintar ou cuidar da apresentação visual.', optionD: 'Organizar o grupo, os prazos e quem vai falar.' },
-  { id: 'q2', ord: 2, statement: 'No seu tempo livre, o que você mais gosta de fazer?', optionA: 'Ler livros, ver filmes ou discutir ideias com amigos.', optionB: 'Montar ou consertar coisas, ou jogar jogos de lógica.', optionC: 'Praticar esportes, cuidar de plantas ou animais.', optionD: 'Planejar eventos, liderar times ou negociar acordos.' },
-  { id: 'q3', ord: 3, statement: 'Qual destas matérias escolares você acha mais interessante?', optionA: 'História, Literatura ou Filosofia.', optionB: 'Matemática, Física ou Química.', optionC: 'Biologia, Educação Física ou Artes.', optionD: 'Geografia, Redação ou Sociologia.' },
-  { id: 'q4', ord: 4, statement: 'Como você costuma resolver um problema difícil?', optionA: 'Conversando e tentando entender o lado das pessoas.', optionB: 'Usando números, dados e fatos exatos.', optionC: 'Criando uma solução prática e inovadora.', optionD: 'Montando um plano de ação passo a passo.' },
-  { id: 'q5', ord: 5, statement: 'Você se considera uma pessoa que:', optionA: 'Gosta de ajudar os outros e se expressar bem.', optionB: 'É curiosa sobre como as coisas funcionam e operam.', optionC: 'Tem muita energia e gosta de criar coisas novas.', optionD: 'É organizada, prática e gosta de dar ordens.' },
-  { id: 'q6', ord: 6, statement: 'Se pudesse viajar para um desses lugares, qual escolheria?', optionA: 'Uma cidade histórica cheia de museus e cultura.', optionB: 'Um centro de alta tecnologia ou uma feira de ciências.', optionC: 'Uma reserva ecológica ou um centro de artes.', optionD: 'Uma grande metrópole de negócios e comércio.' },
-  { id: 'q7', ord: 7, statement: 'O que mais chama sua atenção em um projeto?', optionA: 'O impacto que ele terá na vida das pessoas.', optionB: 'Como ele foi construído e sua estrutura lógica.', optionC: 'A estética e a criatividade do resultado final.', optionD: 'Os resultados financeiros e o sucesso do projeto.' },
-  { id: 'q8', ord: 8, statement: 'Você prefere um ambiente de trabalho onde:', optionA: 'Possa debater ideias e escrever.', optionB: 'Haja rotinas claras, pesquisa e muita tecnologia.', optionC: 'Possa expressar sua criatividade e agir livremente.', optionD: 'Exista liderança, metas claras e decisões rápidas.' },
-  { id: 'q9', ord: 9, statement: 'Quando o assunto é ajudar os outros, você prefere:', optionA: 'Ouvir, aconselhar e cuidar da saúde ou direitos.', optionB: 'Ensinar exatas ou criar novas tecnologias para a vida.', optionC: 'Usar a arte ou o esporte para alegrar o dia.', optionD: 'Administrar recursos e organizar doações.' },
-  { id: 'q10', ord: 10, statement: 'Entre estas opções de leitura, qual você prefere?', optionA: 'Biografias, romances ou artigos de comportamento.', optionB: 'Revistas científicas ou livros de tecnologia e inovação.', optionC: 'Revistas de decoração, design ou histórias em quadrinhos.', optionD: 'Livros sobre economia, finanças ou administração.' },
-  { id: 'q11', ord: 11, statement: 'Como você descreveria suas habilidades?', optionA: 'Facilidade para falar, escrever e argumentar.', optionB: 'Boa memória para dados e facilidade com números.', optionC: 'Muita imaginação, criatividade e intuição.', optionD: 'Talento para convencer, liderar e planejar.' },
-  { id: 'q12', ord: 12, statement: 'O que é mais importante em uma futura profissão para você?', optionA: 'Fazer a diferença na sociedade e no mundo.', optionB: 'Descobrir como as coisas funcionam e resolver desafios.', optionC: 'Ter liberdade para criar e inovar sempre.', optionD: 'Alcançar sucesso financeiro e cargo de chefia.' },
+  { id: 'q1', ord: 1, statement: "Em um trabalho de grupo na escola, você prefere:", optionA: 'Escrever o texto e pesquisar os temas.', optionB: "Fazer os cálculos ou criar gráficos para os dados.", optionC: "Desenhar, pintar ou cuidar da apresentação visual.", optionD: 'Organizar o grupo, os prazos e quem vai falar.' },
+  { id: 'q2', ord: 2, statement: "No seu tempo livre, o que você mais gosta de fazer?", optionA: 'Ler livros, ver filmes ou discutir ideias com amigos.', optionB: "Montar ou consertar coisas, ou jogar jogos de lógica.", optionC: 'Praticar esportes, cuidar de plantas ou animais.', optionD: 'Planejar eventos, liderar times ou negociar acordos.' },
+  { id: 'q3', ord: 3, statement: "Qual destas matérias escolares você acha mais interessante?", optionA: "História, Literatura ou Filosofia.", optionB: "Matemática, Física ou Química.", optionC: "Biologia, Educação Física ou Artes.", optionD: "Geografia, Redação ou Sociologia." },
+  { id: 'q4', ord: 4, statement: "Como você costuma resolver um problema difícil?", optionA: 'Conversando e tentando entender o lado das pessoas.', optionB: "Usando números, dados e fatos exatos.", optionC: "Criando uma solução prática e inovadora.", optionD: "Montando um plano de ação passo a passo." },
+  { id: 'q5', ord: 5, statement: "Você se considera uma pessoa que:", optionA: 'Gosta de ajudar os outros e se expressar bem.', optionB: "É curiosa sobre como as coisas funcionam e operam.", optionC: 'Tem muita energia e gosta de criar coisas novas.', optionD: "É organizada, prática e gosta de dar ordens." },
+  { id: 'q6', ord: 6, statement: 'Se pudesse viajar para um desses lugares, qual escolheria?', optionA: "Uma cidade histórica cheia de museus e cultura.", optionB: "Um centro de alta tecnologia ou uma feira de ciências.", optionC: "Uma reserva ecológica ou um centro de artes.", optionD: "Uma grande metrópole de negócios e comércio." },
+  { id: 'q7', ord: 7, statement: "O que mais chama sua atenção em um projeto?", optionA: "O impacto que ele terá na vida das pessoas.", optionB: "Como ele foi construído e sua estrutura lógica.", optionC: "A estética e a criatividade do resultado final.", optionD: 'Os resultados financeiros e o sucesso do projeto.' },
+  { id: 'q8', ord: 8, statement: "Você prefere um ambiente de trabalho onde:", optionA: 'Possa debater ideias e escrever.', optionB: 'Haja rotinas claras, pesquisa e muita tecnologia.', optionC: 'Possa expressar sua criatividade e agir livremente.', optionD: "Exista liderança, metas claras e decisões rápidas." },
+  { id: 'q9', ord: 9, statement: "Quando o assunto é ajudar os outros, você prefere:", optionA: "Ouvir, aconselhar e cuidar da saúde ou direitos.", optionB: 'Ensinar exatas ou criar novas tecnologias para a vida.', optionC: 'Usar a arte ou o esporte para alegrar o dia.', optionD: "Administrar recursos e organizar doações." },
+  { id: 'q10', ord: 10, statement: "Entre estas opções de leitura, qual você prefere?", optionA: 'Biografias, romances ou artigos de comportamento.', optionB: "Revistas científicas ou livros de tecnologia e inovação.", optionC: "Revistas de decoração, design ou histórias em quadrinhos.", optionD: "Livros sobre economia, finanças ou administração." },
+  { id: 'q11', ord: 11, statement: "Como você descreveria suas habilidades?", optionA: 'Facilidade para falar, escrever e argumentar.', optionB: "Boa memória para dados e facilidade com números.", optionC: "Muita imaginação, criatividade e intuição.", optionD: 'Talento para convencer, liderar e planejar.' },
+  { id: 'q12', ord: 12, statement: "O que é mais importante em uma futura profissão para você?", optionA: "Fazer a diferença na sociedade e no mundo.", optionB: 'Descobrir como as coisas funcionam e resolver desafios.', optionC: 'Ter liberdade para criar e inovar sempre.', optionD: "Alcançar sucesso financeiro e cargo de chefia." },
 ];
 
 type HealthQuestion = {
@@ -532,16 +1086,16 @@ type HealthQuestion = {
 };
 
 const DEFAULT_HEALTH_QUESTIONS: HealthQuestion[] = [
-  { id: 'hq1', ord: 1, statement: 'Você tem se sentido bem e com energia?', reversed: false },
-  { id: 'hq2', ord: 2, statement: 'Você tem se sentido triste?', reversed: true },
-  { id: 'hq3', ord: 3, statement: 'Você tem se sentido sozinho(a)?', reversed: true },
-  { id: 'hq4', ord: 4, statement: 'Você tem tido tempo suficiente para si mesmo(a)?', reversed: false },
-  { id: 'hq5', ord: 5, statement: 'Você tem podido fazer as coisas que quer no seu tempo livre?', reversed: false },
-  { id: 'hq6', ord: 6, statement: 'Os seus pais têm tratado você com justiça?', reversed: false },
-  { id: 'hq7', ord: 7, statement: 'Você tem se divertido com os seus amigos?', reversed: false },
-  { id: 'hq8', ord: 8, statement: 'Você tem se saído bem na escola/estudos?', reversed: false },
-  { id: 'hq9', ord: 9, statement: 'Você tem sido capaz de prestar atenção/se concentrar?', reversed: false },
-  { id: 'hq10', ord: 10, statement: 'Você tem se sentido deprimido(a) ou sem esperança?', reversed: true },
+  { id: 'hq1', ord: 1, statement: "Você tem se sentido bem e com energia?", reversed: false },
+  { id: 'hq2', ord: 2, statement: "Você tem se sentido triste?", reversed: true },
+  { id: 'hq3', ord: 3, statement: "Você tem se sentido sozinho(a)?", reversed: true },
+  { id: 'hq4', ord: 4, statement: "Você tem tido tempo suficiente para si mesmo(a)?", reversed: false },
+  { id: 'hq5', ord: 5, statement: "Você tem podido fazer as coisas que quer no seu tempo livre?", reversed: false },
+  { id: 'hq6', ord: 6, statement: "Os seus pais têm tratado você com justiça?", reversed: false },
+  { id: 'hq7', ord: 7, statement: "Você tem se divertido com os seus amigos?", reversed: false },
+  { id: 'hq8', ord: 8, statement: "Você tem se saído bem na escola/estudos?", reversed: false },
+  { id: 'hq9', ord: 9, statement: "Você tem sido capaz de prestar atenção/se concentrar?", reversed: false },
+  { id: 'hq10', ord: 10, statement: "Você tem se sentido deprimido(a) ou sem esperança?", reversed: true },
 ];
 
 type OralQuestion = {
@@ -551,26 +1105,26 @@ type OralQuestion = {
 };
 
 const DEFAULT_ORAL_QUESTIONS: OralQuestion[] = [
-  { id: 'oq1', ord: 1, statement: 'Não me preocupo muito em ir ao dentista.' },
+  { id: 'oq1', ord: 1, statement: "Não me preocupo muito em ir ao dentista." },
   { id: 'oq2', ord: 2, statement: 'Minha gengiva sangra quando escovo os dentes.' },
   { id: 'oq3', ord: 3, statement: 'Eu me preocupo muito com a cor dos meus dentes.' },
   { id: 'oq4', ord: 4, statement: 'Eu percebo uma gosma/sujeira (placa) nos meus dentes.' },
   { id: 'oq5', ord: 5, statement: 'Eu uso uma escova de dentes com cerdas duras.' },
-  { id: 'oq6', ord: 6, statement: 'Eu acho que é impossível evitar problemas na gengiva apenas escovando os dentes.' },
-  { id: 'oq7', ord: 7, statement: 'Eu costumo escovar meus dentes logo após cada refeição.' },
-  { id: 'oq8', ord: 8, statement: 'Eu sinto que já limpo bem os meus dentes sem precisar usar o fio dental.' },
-  { id: 'oq9', ord: 9, statement: 'Eu uso uma técnica de escovação recomendada pelo meu dentista.' },
-  { id: 'oq10', ord: 10, statement: 'Eu sinto que meus dentes estão piorando, mesmo escovando todos os dias.' },
-  { id: 'oq11', ord: 11, statement: 'Já me disseram que tenho bom hálito.' },
-  { id: 'oq12', ord: 12, statement: 'Eu examino meus dentes detalhadamente no espelho após a escovação.' },
+  { id: 'oq6', ord: 6, statement: "Eu acho que é impossível evitar problemas na gengiva apenas escovando os dentes." },
+  { id: 'oq7', ord: 7, statement: "Eu costumo escovar meus dentes logo após cada refeição." },
+  { id: 'oq8', ord: 8, statement: "Eu sinto que já limpo bem os meus dentes sem precisar usar o fio dental." },
+  { id: 'oq9', ord: 9, statement: "Eu uso uma técnica de escovação recomendada pelo meu dentista." },
+  { id: 'oq10', ord: 10, statement: "Eu sinto que meus dentes estão piorando, mesmo escovando todos os dias." },
+  { id: 'oq11', ord: 11, statement: "Já me disseram que tenho bom hálito." },
+  { id: 'oq12', ord: 12, statement: "Eu examino meus dentes detalhadamente no espelho após a escovação." },
   { id: 'oq13', ord: 13, statement: 'Eu me preocupo com o alinhamento ou formato dos meus dentes.' },
   { id: 'oq14', ord: 14, statement: 'Eu tenho medo de sentir dor no dentista.' },
   { id: 'oq15', ord: 15, statement: 'Eu sinto que meus dentes nunca ficam totalmente limpos.' },
-  { id: 'oq16', ord: 16, statement: 'Eu escovo a minha língua com frequência.' },
+  { id: 'oq16', ord: 16, statement: "Eu escovo a minha língua com frequência." },
   { id: 'oq17', ord: 17, statement: 'Eu uso enxaguante bucal quase todos os dias.' },
-  { id: 'oq18', ord: 18, statement: 'Eu sinto que escovo meus dentes com muita força.' },
+  { id: 'oq18', ord: 18, statement: "Eu sinto que escovo meus dentes com muita força." },
   { id: 'oq19', ord: 19, statement: 'Eu uso o fio dental pelo menos uma vez por dia.' },
-  { id: 'oq20', ord: 20, statement: 'Eu só vou ao dentista quando estou sentindo alguma dor.' },
+  { id: 'oq20', ord: 20, statement: "Eu só vou ao dentista quando estou sentindo alguma dor." },
 ];
 
 type AutoconceptQuestion = {
@@ -583,29 +1137,29 @@ type AutoconceptQuestion = {
 // Ordem classica de Rosenberg: positivos 1,2,4,6,7; negativos 3,5,8,9,10.
 const DEFAULT_AUTOCONCEPT_QUESTIONS: AutoconceptQuestion[] = [
   { id: 'aq1', ord: 1, statement: 'Sinto que sou uma pessoa de valor, pelo menos tanto quanto as outras.', itemType: 'positive' },
-  { id: 'aq2', ord: 2, statement: 'Tenho uma atitude positiva em relação a mim mesmo(a).', itemType: 'positive' },
+  { id: 'aq2', ord: 2, statement: "Tenho uma atitude positiva em relação a mim mesmo(a).", itemType: 'positive' },
   { id: 'aq3', ord: 3, statement: 'No geral, estou inclinado(a) a pensar que sou um(a) fracassado(a).', itemType: 'negative' },
-  { id: 'aq4', ord: 4, statement: 'Sou capaz de fazer as coisas tão bem quanto a maioria das outras pessoas.', itemType: 'positive' },
-  { id: 'aq5', ord: 5, statement: 'Sinto que não tenho muito do que me orgulhar.', itemType: 'negative' },
+  { id: 'aq4', ord: 4, statement: "Sou capaz de fazer as coisas tão bem quanto a maioria das outras pessoas.", itemType: 'positive' },
+  { id: 'aq5', ord: 5, statement: "Sinto que não tenho muito do que me orgulhar.", itemType: 'negative' },
   { id: 'aq6', ord: 6, statement: 'Sinto que tenho qualidades positivas.', itemType: 'positive' },
   { id: 'aq7', ord: 7, statement: 'No geral, estou satisfeito(a) comigo mesmo(a).', itemType: 'positive' },
-  { id: 'aq8', ord: 8, statement: 'Às vezes, penso que não sirvo para nada.', itemType: 'negative' },
-  { id: 'aq9', ord: 9, statement: 'Às vezes, me sinto inútil.', itemType: 'negative' },
+  { id: 'aq8', ord: 8, statement: "Às vezes, penso que não sirvo para nada.", itemType: 'negative' },
+  { id: 'aq9', ord: 9, statement: "Às vezes, me sinto inútil.", itemType: 'negative' },
   { id: 'aq10', ord: 10, statement: 'Gostaria de ter mais respeito por mim mesmo(a).', itemType: 'negative' },
 ];
 
 const DEFAULT_IAS_QUESTIONS: IasQuestion[] = [
-  { id: 'iq1', ord: 1, statement: 'Frutas Totais (incluindo sucos naturais)', option1Text: 'Raramente ou nunca consumo frutas.', option1Points: 0, option2Text: 'Consumo 1 porção por dia (ex: 1 fatia de melancia ou 1 maçã).', option2Points: 3, option3Text: 'Consumo 2 ou mais porções de frutas todos os dias.', option3Points: 5 },
-  { id: 'iq2', ord: 2, statement: 'Frutas Integrais (apenas fruta inteira/pedaços, sem sucos)', option1Text: 'Só tomo suco ou não como frutas.', option1Points: 0, option2Text: 'Consumo pelo menos 1 fruta inteira na maioria dos dias.', option2Points: 3, option3Text: 'Consumo 2 ou mais frutas inteiras todos os dias (garante fibras).', option3Points: 5 },
-  { id: 'iq3', ord: 3, statement: 'Vegetais Totais (verduras e legumes crus ou cozidos)', option1Text: 'Raramente ou nunca como vegetais.', option1Points: 0, option2Text: 'Consumo vegetais apenas em 1 refeição (só almoço ou só jantar).', option2Points: 3, option3Text: 'Consumo vegetais no almoço e no jantar todos os dias.', option3Points: 5 },
-  { id: 'iq4', ord: 4, statement: 'Vegetais Escuros e Leguminosas (brócolis, couve, espinafre, feijão, lentilha...)', option1Text: 'Raramente ou nunca consumo esses alimentos.', option1Points: 0, option2Text: 'Como feijão ou vegetais escuros de 3 a 4 vezes por semana.', option2Points: 3, option3Text: 'Como feijão e/ou vegetais verde-escuros praticamente todos os dias.', option3Points: 5 },
-  { id: 'iq5', ord: 5, statement: 'Cereais Integrais (arroz integral, aveia, pão integral, linhaça, chia)', option1Text: 'Só consumo cereais refinados (arroz branco, pão francês, macarrão normal).', option1Points: 0, option2Text: 'Consumo pelo menos 1 porção de cereal integral ou sementes por dia.', option2Points: 5, option3Text: 'A maior parte dos meus cereais diários são integrais (2 ou mais porções/dia).', option3Points: 10 },
-  { id: 'iq6', ord: 6, statement: 'Laticínios (leite, queijo, iogurte - preferencialmente menos gordura)', option1Text: 'Não consumo laticínios (ou equivalentes vegetais fortificados com cálcio).', option1Points: 0, option2Text: 'Consumo de 1 a 2 porções por dia.', option2Points: 5, option3Text: 'Consumo 3 porções por dia (recomendação padrão de cálcio).', option3Points: 10 },
-  { id: 'iq7', ord: 7, statement: 'Carnes, Ovos e Leguminosas (fontes de proteína em geral)', option1Text: 'Baixíssimo consumo de proteínas ao longo do dia.', option1Points: 0, option2Text: 'Consumo proteínas em apenas uma das grandes refeições.', option2Points: 5, option3Text: 'Consumo fontes saudáveis distribuídas no almoço, jantar e lanches.', option3Points: 10 },
-  { id: 'iq8', ord: 8, statement: 'Peixes e Fontes de Gorduras Boas (sardinha/atum, azeite, castanhas, abacate)', option1Text: 'Não consumo esses alimentos ou uso apenas óleos vegetais comuns.', option1Points: 0, option2Text: 'Uso azeite de oliva regularmente, ou como castanhas/abacate algumas vezes na semana.', option2Points: 5, option3Text: 'Como peixe pelo menos 2 vezes por semana E uso gorduras boas diariamente.', option3Points: 10 },
-  { id: 'iq9', ord: 9, statement: 'Sódio (Sal de cozinha e alimentos salgados)', option1Text: 'Uso muito sal, uso temperos prontos (cubos) e como muitos embutidos/salgadinhos.', option1Points: 0, option2Text: 'Uso sal moderadamente, mas ainda consumo alguns industrializados salgados.', option2Points: 5, option3Text: 'Comida baixa em sal, priorizo temperos naturais e evito ultraprocessados.', option3Points: 10 },
-  { id: 'iq10', ord: 10, statement: 'Gordura Saturada (carnes gordas, pele de frango, manteiga, óleo de coco, queijos amarelos)', option1Text: 'Consumo carnes muito gordas, frituras e queijos gordos quase diariamente.', option1Points: 0, option2Text: 'Consumo moderado; alterno carnes magras/gordas, controlo o uso de manteiga.', option2Points: 5, option3Text: 'Alimentação muito baixa em gordura saturada (priorizo carnes magras e grelhados).', option3Points: 10 },
-  { id: 'iq11', ord: 11, statement: 'Calorias de Fontes Vazias (açúcar de adição, doces, refrigerantes, álcool e gorduras sólidas)', option1Text: 'Consumo doces, refrigerantes ou bebidas açucaradas/alcoólicas todos os dias.', option1Points: 0, option2Text: 'Consumo esses itens de forma moderada (2 a 3 vezes por semana).', option2Points: 10, option3Text: 'Raramente consumo (menos de 1 vez por semana) açúcar refinado, refrigerantes ou álcool.', option3Points: 20 },
+  { id: 'iq1', ord: 1, statement: 'Frutas Totais (incluindo sucos naturais)', option1Text: 'Raramente ou nunca consumo frutas.', option1Points: 0, option2Text: "Consumo 1 porção por dia (ex: 1 fatia de melancia ou 1 maçã).", option2Points: 3, option3Text: "Consumo 2 ou mais porções de frutas todos os dias.", option3Points: 5 },
+  { id: 'iq2', ord: 2, statement: "Frutas Integrais (apenas fruta inteira/pedaços, sem sucos)", option1Text: "Só tomo suco ou não como frutas.", option1Points: 0, option2Text: 'Consumo pelo menos 1 fruta inteira na maioria dos dias.', option2Points: 3, option3Text: 'Consumo 2 ou mais frutas inteiras todos os dias (garante fibras).', option3Points: 5 },
+  { id: 'iq3', ord: 3, statement: 'Vegetais Totais (verduras e legumes crus ou cozidos)', option1Text: 'Raramente ou nunca como vegetais.', option1Points: 0, option2Text: "Consumo vegetais apenas em 1 refeição (só almoço ou só jantar).", option2Points: 3, option3Text: "Consumo vegetais no almoço e no jantar todos os dias.", option3Points: 5 },
+  { id: 'iq4', ord: 4, statement: "Vegetais Escuros e Leguminosas (brócolis, couve, espinafre, feijão, lentilha...)", option1Text: 'Raramente ou nunca consumo esses alimentos.', option1Points: 0, option2Text: "Como feijão ou vegetais escuros de 3 a 4 vezes por semana.", option2Points: 3, option3Text: "Como feijão e/ou vegetais verde-escuros praticamente todos os dias.", option3Points: 5 },
+  { id: 'iq5', ord: 5, statement: "Cereais Integrais (arroz integral, aveia, pão integral, linhaça, chia)", option1Text: "Só consumo cereais refinados (arroz branco, pão francês, macarrão normal).", option1Points: 0, option2Text: "Consumo pelo menos 1 porção de cereal integral ou sementes por dia.", option2Points: 5, option3Text: "A maior parte dos meus cereais diários são integrais (2 ou mais porções/dia).", option3Points: 10 },
+  { id: 'iq6', ord: 6, statement: "Laticínios (leite, queijo, iogurte - preferencialmente menos gordura)", option1Text: "Não consumo laticínios (ou equivalentes vegetais fortificados com cálcio).", option1Points: 0, option2Text: "Consumo de 1 a 2 porções por dia.", option2Points: 5, option3Text: "Consumo 3 porções por dia (recomendação padrão de cálcio).", option3Points: 10 },
+  { id: 'iq7', ord: 7, statement: "Carnes, Ovos e Leguminosas (fontes de proteína em geral)", option1Text: "Baixíssimo consumo de proteínas ao longo do dia.", option1Points: 0, option2Text: "Consumo proteínas em apenas uma das grandes refeições.", option2Points: 5, option3Text: "Consumo fontes saudáveis distribuídas no almoço, jantar e lanches.", option3Points: 10 },
+  { id: 'iq8', ord: 8, statement: 'Peixes e Fontes de Gorduras Boas (sardinha/atum, azeite, castanhas, abacate)', option1Text: "Não consumo esses alimentos ou uso apenas óleos vegetais comuns.", option1Points: 0, option2Text: 'Uso azeite de oliva regularmente, ou como castanhas/abacate algumas vezes na semana.', option2Points: 5, option3Text: 'Como peixe pelo menos 2 vezes por semana E uso gorduras boas diariamente.', option3Points: 10 },
+  { id: 'iq9', ord: 9, statement: "Sódio (Sal de cozinha e alimentos salgados)", option1Text: 'Uso muito sal, uso temperos prontos (cubos) e como muitos embutidos/salgadinhos.', option1Points: 0, option2Text: 'Uso sal moderadamente, mas ainda consumo alguns industrializados salgados.', option2Points: 5, option3Text: 'Comida baixa em sal, priorizo temperos naturais e evito ultraprocessados.', option3Points: 10 },
+  { id: 'iq10', ord: 10, statement: "Gordura Saturada (carnes gordas, pele de frango, manteiga, óleo de coco, queijos amarelos)", option1Text: 'Consumo carnes muito gordas, frituras e queijos gordos quase diariamente.', option1Points: 0, option2Text: 'Consumo moderado; alterno carnes magras/gordas, controlo o uso de manteiga.', option2Points: 5, option3Text: "Alimentação muito baixa em gordura saturada (priorizo carnes magras e grelhados).", option3Points: 10 },
+  { id: 'iq11', ord: 11, statement: "Calorias de Fontes Vazias (açúcar de adição, doces, refrigerantes, álcool e gorduras sólidas)", option1Text: "Consumo doces, refrigerantes ou bebidas açucaradas/alcoólicas todos os dias.", option1Points: 0, option2Text: 'Consumo esses itens de forma moderada (2 a 3 vezes por semana).', option2Points: 10, option3Text: "Raramente consumo (menos de 1 vez por semana) açúcar refinado, refrigerantes ou álcool.", option3Points: 20 },
 ];
 
 type SnapQuestion = {
@@ -617,20 +1171,20 @@ type SnapQuestion = {
 
 // SNAP-IV: Bloco I (1-9) Desatencao; Bloco II (10-18) Hiperatividade/Impulsividade.
 const DEFAULT_SNAP_QUESTIONS: SnapQuestion[] = [
-  { id: 'sq1', ord: 1, statement: 'Não consegue prestar muita atenção a detalhes ou comete erros por descuido nos trabalhos da escola ou tarefas.', subscale: 'inattention' },
-  { id: 'sq2', ord: 2, statement: 'Tem dificuldade de manter a atenção em tarefas ou atividades de lazer.', subscale: 'inattention' },
-  { id: 'sq3', ord: 3, statement: 'Parece não estar ouvindo quando se fala diretamente com ele.', subscale: 'inattention' },
-  { id: 'sq4', ord: 4, statement: 'Não segue instruções até o fim e não termina deveres de escola, tarefas ou obrigações.', subscale: 'inattention' },
+  { id: 'sq1', ord: 1, statement: "Não consegue prestar muita atenção a detalhes ou comete erros por descuido nos trabalhos da escola ou tarefas.", subscale: 'inattention' },
+  { id: 'sq2', ord: 2, statement: "Tem dificuldade de manter a atenção em tarefas ou atividades de lazer.", subscale: 'inattention' },
+  { id: 'sq3', ord: 3, statement: "Parece não estar ouvindo quando se fala diretamente com ele.", subscale: 'inattention' },
+  { id: 'sq4', ord: 4, statement: "Não segue instruções até o fim e não termina deveres de escola, tarefas ou obrigações.", subscale: 'inattention' },
   { id: 'sq5', ord: 5, statement: 'Tem dificuldade para organizar tarefas e atividades.', subscale: 'inattention' },
-  { id: 'sq6', ord: 6, statement: 'Evita, não gosta ou se envolve contra a vontade em tarefas que exigem esforço mental prolongado.', subscale: 'inattention' },
-  { id: 'sq7', ord: 7, statement: 'Perde coisas necessárias para atividades (p. ex: brinquedos, deveres da escola, lápis ou livros).', subscale: 'inattention' },
-  { id: 'sq8', ord: 8, statement: 'Distrai-se com estímulos externos.', subscale: 'inattention' },
-  { id: 'sq9', ord: 9, statement: 'É esquecido em atividades do dia-a-dia.', subscale: 'inattention' },
-  { id: 'sq10', ord: 10, statement: 'Mexe com as mãos ou pés ou se remexe na cadeira.', subscale: 'hyperactivity' },
-  { id: 'sq11', ord: 11, statement: 'Sai do lugar na sala de aula ou em outras situações em que se espera que fique sentado.', subscale: 'hyperactivity' },
-  { id: 'sq12', ord: 12, statement: 'Corre de um lado para outro ou sobe demais nas coisas em situações em que isto é inapropriado.', subscale: 'hyperactivity' },
+  { id: 'sq6', ord: 6, statement: "Evita, não gosta ou se envolve contra a vontade em tarefas que exigem esforço mental prolongado.", subscale: 'inattention' },
+  { id: 'sq7', ord: 7, statement: "Perde coisas necessárias para atividades (p. ex: brinquedos, deveres da escola, lápis ou livros).", subscale: 'inattention' },
+  { id: 'sq8', ord: 8, statement: "Distrai-se com estímulos externos.", subscale: 'inattention' },
+  { id: 'sq9', ord: 9, statement: "É esquecido em atividades do dia-a-dia.", subscale: 'inattention' },
+  { id: 'sq10', ord: 10, statement: "Mexe com as mãos ou pés ou se remexe na cadeira.", subscale: 'hyperactivity' },
+  { id: 'sq11', ord: 11, statement: "Sai do lugar na sala de aula ou em outras situações em que se espera que fique sentado.", subscale: 'hyperactivity' },
+  { id: 'sq12', ord: 12, statement: "Corre de um lado para outro ou sobe demais nas coisas em situações em que isto é inapropriado.", subscale: 'hyperactivity' },
   { id: 'sq13', ord: 13, statement: 'Tem dificuldade em brincar ou envolver-se em atividades de lazer de forma calma.', subscale: 'hyperactivity' },
-  { id: 'sq14', ord: 14, statement: 'Não pára ou freqüentemente está a “mil por hora”.', subscale: 'hyperactivity' },
+  { id: 'sq14', ord: 14, statement: "Não pára ou freqüentemente está a “mil por hora”.", subscale: 'hyperactivity' },
   { id: 'sq15', ord: 15, statement: 'Fala em excesso.', subscale: 'hyperactivity' },
   { id: 'sq16', ord: 16, statement: 'Responde as perguntas de forma precipitada antes delas terem sido terminadas.', subscale: 'hyperactivity' },
   { id: 'sq17', ord: 17, statement: 'Tem dificuldade de esperar sua vez.', subscale: 'hyperactivity' },
@@ -646,25 +1200,25 @@ type Aq10Question = {
 
 // AQ-10: versao Crianca (4-11) = itens 1-10; versao Adolescente (12-15) = itens 11-20.
 const DEFAULT_AQ10_QUESTIONS: Aq10Question[] = [
-  { id: 'aq10q1', ord: 1, statement: 'Ele/a nota muitas vezes pequenos ruídos que passam despercebidos às outras pessoas.', version: 'crianca' },
-  { id: 'aq10q2', ord: 2, statement: 'Habitualmente, ele/a concentra-se mais na imagem ou situação no seu todo, do que nos seus pequenos detalhes.', version: 'crianca' },
-  { id: 'aq10q3', ord: 3, statement: 'Quando está num grupo social, ele/a consegue facilmente seguir conversas de várias pessoas.', version: 'crianca' },
+  { id: 'aq10q1', ord: 1, statement: "Ele/a nota muitas vezes pequenos ruídos que passam despercebidos às outras pessoas.", version: 'crianca' },
+  { id: 'aq10q2', ord: 2, statement: "Habitualmente, ele/a concentra-se mais na imagem ou situação no seu todo, do que nos seus pequenos detalhes.", version: 'crianca' },
+  { id: 'aq10q3', ord: 3, statement: "Quando está num grupo social, ele/a consegue facilmente seguir conversas de várias pessoas.", version: 'crianca' },
   { id: 'aq10q4', ord: 4, statement: 'Ele/a consegue facilmente fazer mais do que uma coisa ao mesmo tempo.', version: 'crianca' },
-  { id: 'aq10q5', ord: 5, statement: 'Ele/a não sabe como manter uma conversa com os seus pares.', version: 'crianca' },
-  { id: 'aq10q6', ord: 6, statement: 'Socialmente, ele/a é bom/boa conversador/a.', version: 'crianca' },
-  { id: 'aq10q7', ord: 7, statement: 'Durante a leitura de uma história, ele/a tem dificuldades em perceber as intenções e as emoções das personagens.', version: 'crianca' },
-  { id: 'aq10q8', ord: 8, statement: 'No pré-escolar, ele/a gostava de brincar a jogos de faz-de-conta com as outras crianças.', version: 'crianca' },
-  { id: 'aq10q9', ord: 9, statement: 'Ele/a percebe facilmente o que alguém está a pensar ou a sentir, apenas olhando para a sua cara.', version: 'crianca' },
+  { id: 'aq10q5', ord: 5, statement: "Ele/a não sabe como manter uma conversa com os seus pares.", version: 'crianca' },
+  { id: 'aq10q6', ord: 6, statement: "Socialmente, ele/a é bom/boa conversador/a.", version: 'crianca' },
+  { id: 'aq10q7', ord: 7, statement: "Durante a leitura de uma história, ele/a tem dificuldades em perceber as intenções e as emoções das personagens.", version: 'crianca' },
+  { id: 'aq10q8', ord: 8, statement: "No pré-escolar, ele/a gostava de brincar a jogos de faz-de-conta com as outras crianças.", version: 'crianca' },
+  { id: 'aq10q9', ord: 9, statement: "Ele/a percebe facilmente o que alguém está a pensar ou a sentir, apenas olhando para a sua cara.", version: 'crianca' },
   { id: 'aq10q10', ord: 10, statement: 'Ele/a tem dificuldades em fazer novos amigos.', version: 'crianca' },
-  { id: 'aq10q11', ord: 1, statement: 'Ele(a) sempre percebe padrões/categorias nas coisas.', version: 'adolescente' },
-  { id: 'aq10q12', ord: 2, statement: 'Ele(a) geralmente foca mais na imagem ou situação como um todo, do que nos pequenos detalhes.', version: 'adolescente' },
-  { id: 'aq10q13', ord: 3, statement: 'Quando está em um grupo social, ele(a) consegue facilmente acompanhar conversas de várias pessoas.', version: 'adolescente' },
-  { id: 'aq10q14', ord: 4, statement: 'Em caso de interrupção, ele(a) consegue voltar rapidamente ao que estava fazendo.', version: 'adolescente' },
-  { id: 'aq10q15', ord: 5, statement: 'Frequentemente, ele(a) percebe que não sabe como manter uma conversa.', version: 'adolescente' },
-  { id: 'aq10q16', ord: 6, statement: 'Socialmente, ele(a) é um(a) bom(boa) conversador(a).', version: 'adolescente' },
-  { id: 'aq10q17', ord: 7, statement: 'Quando era mais novo(a), ele(a) gostava de brincar de faz-de-conta com outras crianças.', version: 'adolescente' },
+  { id: 'aq10q11', ord: 1, statement: "Ele(a) sempre percebe padrões/categorias nas coisas.", version: 'adolescente' },
+  { id: 'aq10q12', ord: 2, statement: "Ele(a) geralmente foca mais na imagem ou situação como um todo, do que nos pequenos detalhes.", version: 'adolescente' },
+  { id: 'aq10q13', ord: 3, statement: "Quando está em um grupo social, ele(a) consegue facilmente acompanhar conversas de várias pessoas.", version: 'adolescente' },
+  { id: 'aq10q14', ord: 4, statement: "Em caso de interrupção, ele(a) consegue voltar rapidamente ao que estava fazendo.", version: 'adolescente' },
+  { id: 'aq10q15', ord: 5, statement: "Frequentemente, ele(a) percebe que não sabe como manter uma conversa.", version: 'adolescente' },
+  { id: 'aq10q16', ord: 6, statement: "Socialmente, ele(a) é um(a) bom(boa) conversador(a).", version: 'adolescente' },
+  { id: 'aq10q17', ord: 7, statement: "Quando era mais novo(a), ele(a) gostava de brincar de faz-de-conta com outras crianças.", version: 'adolescente' },
   { id: 'aq10q18', ord: 8, statement: 'Ele(a) tem dificuldades em imaginar como seria ser outra pessoa.', version: 'adolescente' },
-  { id: 'aq10q19', ord: 9, statement: 'Ele(a) acha situações sociais fáceis.', version: 'adolescente' },
+  { id: 'aq10q19', ord: 9, statement: "Ele(a) acha situações sociais fáceis.", version: 'adolescente' },
   { id: 'aq10q20', ord: 10, statement: 'Ele(a) tem dificuldades em fazer novos amigos.', version: 'adolescente' },
 ];
 
@@ -697,6 +1251,20 @@ export default function AvaliacoesView({
   user
 }: AvaliacoesViewProps) {
   const isHydrating = user?.id === 'loading';
+  const locale = useLocale();
+  const t = useTranslations('avaliacoes');
+  const ta = useTranslations('alunos');
+
+  const displayValue = (value: unknown): string => {
+    if (value == null) return '';
+    const raw = String(value);
+    const key = DISPLAY_KEYS[raw];
+    if (key) return t(key);
+    return raw
+      .replace(/ a /g, ` ${t('conectorIntervalo')} `)
+      .replace(/ ou mais/g, ` ${t('ouMais')}`)
+      .replace(/ ou menos/g, ` ${t('ouMenos')}`);
+  };
 
   const loggedInStudentObj = useMemo(() => {
     if (user?.role !== 'Aluno') return null;
@@ -1273,14 +1841,14 @@ export default function AvaliacoesView({
   // Sport inputs
   const [biotype, setBiotype] = useState<string>('Mesomorfo');
   const [mainSkill, setMainSkill] = useState<string>('Força Explosiva');
-  const [suggestedSport, setSuggestedSport] = useState('Basquete e Vôlei');
+  const [suggestedSport, setSuggestedSport] = useState(t('sugeridoBasqueteVolei'));
   const [recommendedPractice, setRecommendedPractice] = useState('3h por semana');
 
   // Vocational inputs
   const [vocationalProfile, setVocationalProfile] = useState<string>('Humanas e Sociais');
-  const [interestArea, setInterestArea] = useState<string>('Você gosta de se comunicar, ajudar as pessoas e entender a sociedade.');
-  const [suggestedCareer, setSuggestedCareer] = useState('Direito, Letras, Pedagogia, Psicologia, História, Jornalismo e Relações Internacionais.');
-  const [technicalOpinion, setTechnicalOpinion] = useState('O estudante demonstra interesse voltado para a análise crítica da sociedade, mediação de conflitos e transmissão de conhecimento. Suas competências se alinham perfeitamente a profissões que exigem escuta ativa, escrita fluida e pensamento humanístico.');
+  const [interestArea, setInterestArea] = useState<string>(t('perfilCurtoHumanas'));
+  const [suggestedCareer, setSuggestedCareer] = useState(t('carreiraHumanas'));
+  const [technicalOpinion, setTechnicalOpinion] = useState(t('perfilTextoHumanasLongo'));
 
   // 12 Vocational questions answers
   const [vocQuestions, setVocQuestions] = useState<VocQuestion[]>(DEFAULT_VOC_QUESTIONS);
@@ -1367,7 +1935,7 @@ export default function AvaliacoesView({
     setPcdResult(res);
   }, [showPcdModal, pcdGrupo, pcdDetalhe, pcdAbdominal, pcdVelocidade, pcdAgilidade, pcdSalto, pcdFlexao, pcdConfigs]);
 
-  const autoSuggestProfileAndCareer = (answers: string[]) => {
+  const autoSuggestProfileAndCareer = useCallback((answers: string[]) => {
     const list = answers;
     const counts = { A: 0, B: 0, C: 0, D: 0 };
     list.forEach(val => {
@@ -1387,32 +1955,32 @@ export default function AvaliacoesView({
     let opinion = '';
 
     if (isTie) {
-      profile = 'Criativo e Tecnológico';
+      profile = t('perfilCriativoTecnologico');
       career = 'Hibrido';
-      area = 'Ótimo para design de jogos ou desenvolvimento web.';
-      opinion = 'O estudante não se limita a apenas um campo do saber; ele utiliza a criatividade para dar forma à tecnologia, solucionando problemas de interface, interatividade e experiência do usuário de maneira inovadora.';
+      area = t('textoExatasWeb');
+      opinion = t('perfilTextoCriativoTecnologico');
     } else {
       const maxType = tiedOptions[0];
       if (maxType === 'A') {
         profile = 'Humanas e Sociais';
-        career = 'Direito, Letras, Pedagogia, Psicologia, História, Jornalismo e Relações Internacionais.';
-        area = 'Você gosta de se comunicar, ajudar as pessoas e entender a sociedade.';
-        opinion = 'O estudante demonstra interesse voltado para a análise crítica da sociedade, mediação de conflitos e transmissão de conhecimento. Suas competências se alinham perfeitamente a profissões que exigem escuta ativa, escrita fluida e pensamento humanístico.';
+        career = t('carreiraHumanas');
+        area = t('perfilCurtoHumanas');
+        opinion = t('perfilTextoHumanasLongo');
       } else if (maxType === 'B') {
-        profile = 'Exatas e Tecnológicas';
-        career = 'Engenharias, Ciência da Computação, Matemática, Física, Arquitetura e Tecnologia da Informação.';
-        area = 'Você gosta de resolver problemas lógicos, lidar com números e entender como as tecnologias funcionam.';
-        opinion = 'O estudante manifesta um raciocínio lógico altamente estruturado, facilidade para lidar com dados abstratos e numéricos, além de uma curiosidade natural para entender o funcionamento de sistemas complexos e novas tecnologias. Trata-se de um perfil focado na resolução prática de problemas, otimização de processos e inovação técnica.';
+        profile = t('perfilExatas');
+        career = t('carreiraExatas');
+        area = t('perfilCurtoExatas');
+        opinion = t('perfilTextoExatas');
       } else if (maxType === 'C') {
-        profile = 'Biológicas e Criativas';
-        career = 'Medicina, Biologia, Design, Publicidade, Artes Visuais, Educação Física e Veterinária.';
-        area = 'Você é movido pela criatividade, gosta de inventar, inovar ou tem forte interesse pela vida e saúde.';
-        opinion = 'O estudante apresenta um perfil dinâmico correspondente às ciências Biológicas e Criativas. Observa-se uma combinação única entre a sensibilidade artística e o fascínio pelo bem-estar, pela saúde e pela preservação da vida em suas diversas formas. Este perfil é movido pelo desejo de inventar, expressar ideias visualmente ou cuidar de organismos vivos.';
+        profile = t('perfilBioCriativo');
+        career = t('carreiraBioCriativa');
+        area = t('perfilCurtoBioCriativo');
+        opinion = t('perfilTextoBioCriativo');
       } else {
-        profile = 'Negócios e Gestão';
-        career = 'Administração, Economia, Ciências Contábeis, Marketing, Logística e Gestão de Recursos Humanos.';
-        area = 'Você tem espírito de liderança, gosta de organizar, gerenciar recursos e traçar estratégias.';
-        opinion = 'O resultado indica um perfil predominantemente voltado para Negócios e Gestão. O avaliado demonstra traços natos de liderança, visão estratégica, pragmatismo e uma aptidão natural para organizar rotinas, gerenciar recursos e liderar equipes em direção a metas comuns.';
+        profile = t('perfilNegocios');
+        career = t('carreiraNegocios');
+        area = t('perfilCurtoNegocios');
+        opinion = t('perfilTextoNegocios');
       }
     }
 
@@ -1427,7 +1995,7 @@ export default function AvaliacoesView({
     }
 
     return { profile, area, career, opinion };
-  };
+  }, [t]);
 
   // Synchronize vocational profile, interest area, suggested career, and technical opinion whenever choices change or the modal opens
   useEffect(() => {
@@ -1451,7 +2019,7 @@ export default function AvaliacoesView({
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [vocAnswers, showVocationalModal, vocQuestions, editingVocational]);
+  }, [vocAnswers, showVocationalModal, vocQuestions, editingVocational, autoSuggestProfileAndCareer]);
 
   // Synchronize Saude Global result (bruto/T/classificacao + parecer) when answers change or modal opens
   useEffect(() => {
@@ -1703,11 +2271,11 @@ export default function AvaliacoesView({
     return getFilteredModalStudents().map(s => {
       const outside = rule && (s.age == null || !s.eligible);
       const keepSelected = s.id === selectedStudentId;
-      const ageLabel = s.age != null ? `${s.age} anos` : 'idade não cadastrada';
+      const ageLabel = s.age != null ? `${s.age} ${t('unidadeAnos')}` : t('idadeNaoCadastrada');
       return (
         <option key={s.id} value={s.id} disabled={outside && !keepSelected}>
           {s.name} - {ageLabel}
-          {outside ? ` (fora da faixa ${rule.label})` : ''}
+          {outside ? ` (${t('foraDaFaixa')} ${displayValue(rule.label)})` : ''}
         </option>
       );
     });
@@ -1723,12 +2291,12 @@ export default function AvaliacoesView({
       <>
         {noneEligible && (
           <p className="mt-1 text-[10px] text-amber-300/80 font-bold">
-            Nenhum aluno com idade compatível para teste ({rule.label}).
+            {t('semAlunoCompativel')} ({displayValue(rule.label)}).
           </p>
         )}
         {!noneEligible && withoutBirth > 0 && (
           <p className="mt-1 text-[10px] text-[#bdc8d1]/60">
-            {withoutBirth} aluno(s) sem data de nascimento cadastrada ficam fora da seleção deste teste.
+            {withoutBirth} {t('alunosSemNascimentoNota')}
           </p>
         )}
       </>
@@ -1737,7 +2305,7 @@ export default function AvaliacoesView({
 
   const autoSuggestSportForStudent = (resolvedId: string) => {
     if (!resolvedId) {
-      setSuggestedSport('Aprimorar Habilidades Motoras');
+      setSuggestedSport(t('sugeridoAprimorar'));
       return;
     }
 
@@ -1767,7 +2335,7 @@ export default function AvaliacoesView({
     const latestMotor = studentMotors.sort((a, b) => safeGetTimestamp(b.date) - safeGetTimestamp(a.date))[0];
 
     if (!latestMotor) {
-      setSuggestedSport('Aprimorar Habilidades Motoras');
+      setSuggestedSport(t('sugeridoAprimorar'));
       return;
     }
 
@@ -1814,7 +2382,7 @@ export default function AvaliacoesView({
     if (matchingModalities.length > 0) {
       setSuggestedSport(matchingModalities.join(', '));
     } else {
-      setSuggestedSport('Aprimorar Habilidades Motoras');
+      setSuggestedSport(t('sugeridoAprimorar'));
     }
   };
 
@@ -1879,9 +2447,9 @@ export default function AvaliacoesView({
     setRecommendedPractice('3h por semana');
     setVocAnswers(Array(vocQuestions.length).fill(''));
     setVocationalProfile('Humanas e Sociais');
-    setInterestArea('Você gosta de se comunicar, ajudar as pessoas e entender a sociedade.');
-    setSuggestedCareer('Direito, Letras, Pedagogia, Psicologia, História, Jornalismo e Relações Internacionais.');
-    setTechnicalOpinion('Estudante com forte inclinação humanística, gosto evidente pela comunicação verbal e escrita, além de alto potencial de empatia.');
+    setInterestArea(t('perfilCurtoHumanas'));
+    setSuggestedCareer(t('carreiraHumanas'));
+    setTechnicalOpinion(t('perfilTextoHumanas'));
     
     // Set modal filters with current dashboard filter values
     setModalContract(contract || '');
@@ -1911,17 +2479,17 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
-    const sGrade = targetStudentObj ? targetStudentObj.grade : 'Turno Desconhecido';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
+    const sGrade = targetStudentObj ? targetStudentObj.grade : t('turnoDesconhecido');
     
     const w = parseFloat(weightInput) || 0;
     const h = parseFloat(heightInput) || 0;
     if (w <= 0 || h <= 0) {
-      alert('Peso e Altura devem ser valores positivos.');
+      alert(t('erroPesoAltura'));
       return;
     }
     const computedImc = parseFloat((w / (h * h)).toFixed(1));
@@ -1995,11 +2563,11 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
     const geralCalculada = computeGeneralClass([impulsao, abdomen, agility, strength, speed]);
 
     runWithPermission('edit:avaliacoes', async () => {
@@ -2070,18 +2638,18 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
 
     const isMotorNotRegistered = (editingSport ? mainSkill : computedMainSkill) === 'Não cadastrado';
     if (isMotorNotRegistered) {
-      alert('Preencher a Avaliação de Qualidade motora.');
+      alert(t('erroPreencherMotor'));
       return;
     }
 
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
 
     runWithPermission('edit:avaliacoes', async () => {
       if (editingSport) {
@@ -2154,17 +2722,17 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
 
     const allAnswered = vocQuestions.length > 0
       && vocAnswers.length === vocQuestions.length
       && vocAnswers.every((a) => a === 'A' || a === 'B' || a === 'C' || a === 'D');
     if (!allAnswered) {
-      alert('Responda todas as perguntas do questionário antes de entregar o parecer.');
+      alert(t('erroResponderVoc'));
       return;
     }
 
@@ -2243,15 +2811,15 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
     if (healthQuestions.length === 0 || healthAnswers.length !== healthQuestions.length || !isCompleteHealthAnswers(healthAnswers)) {
-      alert('Responda todas as perguntas do questionário antes de entregar o parecer.');
+      alert(t('erroResponderVoc'));
       return;
     }
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
     const result = scoreHealth(healthAnswers);
 
     runWithPermission('edit:avaliacoes', async () => {
@@ -2327,13 +2895,13 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
     if (!pcdResult) {
-      alert('Preenha ao menos um teste válido para calcular o parecer.');
+      alert(t('erroPreencherPcd'));
       return;
     }
     const grupoNome = pcdConfigs.grupos.find(g => g.grupo === pcdGrupo)?.nome || PCD_GRUPO_NOMES[pcdGrupo] || `Grupo ${pcdGrupo}`;
@@ -2426,26 +2994,26 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
     if (!editingOral) {
       const age = targetStudentObj ? getStudentAgeYears(targetStudentObj.birthDate) : null;
       if (age == null) {
-        alert('Cadastre a data de nascimento do aluno para aplicar o HU-DBI.');
+        alert(t('erroNascimentoOral'));
         return;
       }
       if (age < 11) {
-        alert('O HU-DBI é aplicável a partir de 11 anos.');
+        alert(t('erroIdadeOral'));
         return;
       }
     }
     if (oralQuestions.length === 0 || oralAnswers.length !== oralQuestions.length || !isCompleteOralAnswers(oralAnswers)) {
-      alert('Responda todas as afirmações (Concordo/Discordo) antes de entregar o parecer.');
+      alert(t('erroResponderOral'));
       return;
     }
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
     const result = scoreOral(oralAnswers as boolean[]);
 
     runWithPermission('edit:avaliacoes', async () => {
@@ -2515,15 +3083,15 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
     if (autoQuestions.length === 0 || autoAnswers.length !== autoQuestions.length || !isCompleteAutoconceptAnswers(autoAnswers)) {
-      alert('Responda todas as afirmações antes de entregar o parecer.');
+      alert(t('erroResponderAuto'));
       return;
     }
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
     const types = autoQuestions.map(q => q.itemType);
     const result = scoreAutoconcept(autoAnswers, types);
 
@@ -2594,15 +3162,15 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
     if (!isCompleteIasAnswers(iasAnswers, iasQuestions)) {
-      alert('Responda todas as perguntas antes de entregar o parecer.');
+      alert(t('erroResponderIas'));
       return;
     }
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
     const result = scoreIas(iasAnswers, iasQuestions);
 
     runWithPermission('edit:avaliacoes', async () => {
@@ -2674,30 +3242,30 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
     const snapAge = targetStudentObj ? getStudentAgeYears(targetStudentObj.birthDate) : null;
     if (!editingSnap) {
       if (snapAge == null) {
-        alert('Cadastre a data de nascimento do aluno para aplicar o SNAP-IV.');
+        alert(t('erroNascimentoSnap'));
         return;
       }
       if (snapAge < 5 || snapAge > 17) {
-        alert('O SNAP-IV é aplicável a alunos de 5 a 17 anos.');
+        alert(t('erroIdadeSnap'));
         return;
       }
     }
     if (!snapRespondent) {
-      alert('Selecione quem preencheu o relato (Pai, Mãe, Responsável ou Professor).');
+      alert(t('erroRespondenteSnap'));
       return;
     }
     if (!isCompleteSnapAnswers(snapAnswers)) {
-      alert('Responda todos os 18 itens antes de entregar o parecer.');
+      alert(t('erroItensSnap'));
       return;
     }
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
     const result = scoreSnap(snapAnswers, snapThresholdForAge(snapAge));
 
     runWithPermission('edit:avaliacoes', async () => {
@@ -2775,19 +3343,19 @@ export default function AvaliacoesView({
     e.preventDefault();
     const resolvedStudentId = selectedStudentId;
     if (!resolvedStudentId) {
-      alert('Selecione um aluno válido antes de salvar.');
+      alert(t('erroSelecionarAluno'));
       return;
     }
     if (!aq10Respondent) {
-      alert('Selecione quem preencheu o relato (Pai, Mãe ou Responsável).');
+      alert(t('erroRespondenteAq10'));
       return;
     }
     if (!isCompleteAq10Answers(aq10Answers)) {
-      alert('Responda todos os 10 itens antes de entregar o parecer.');
+      alert(t('erroItensAq10'));
       return;
     }
     const targetStudentObj = students.find(s => s.id === resolvedStudentId);
-    const sName = targetStudentObj ? targetStudentObj.name : 'Aluno';
+    const sName = targetStudentObj ? targetStudentObj.name : ta('colunaAluno');
     const result = scoreAq10(aq10Answers);
     const resolvedVersion = aq10Version;
 
@@ -2948,10 +3516,10 @@ export default function AvaliacoesView({
     }
     if (selectedGrade && selectedGrade !== 'Todos') {
       const sGrade = student?.grade || (
-        studentName.toLowerCase().includes('arthur') ? '3º Ano Médio - A' :
-        studentName.toLowerCase().includes('beatriz') ? '2º Ano Médio - B' :
-        studentName.toLowerCase().includes('gabriel') ? '3º Ano Médio - A' :
-        studentName.toLowerCase().includes('elena') ? '1º Ano Médio - A' : '3º Ano Médio - A'
+        studentName.toLowerCase().includes('arthur') ? t('ano3A') :
+        studentName.toLowerCase().includes('beatriz') ? t('ano2B') :
+        studentName.toLowerCase().includes('gabriel') ? t('ano3A') :
+        studentName.toLowerCase().includes('elena') ? t('ano1A') : t('ano3A')
       );
       if (sGrade !== selectedGrade) {
         return false;
@@ -2998,122 +3566,122 @@ export default function AvaliacoesView({
         const itemImc = item as ImcRecord;
         const cls = getImcClass(itemImc.weight, itemImc.height);
         return {
-          'Nome do Aluno': itemImc.studentName,
-          'Turma': itemImc.classGroup || getStudentGrade(students, itemImc.studentId),
-          'Peso (kg)': itemImc.weight,
-          'Altura (m)': itemImc.height,
-          'IMC': itemImc.imc,
-          'Classificação': cls.label,
-          'Data': itemImc.date ? itemImc.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemImc.studentName,
+          [ta('turma')]: displayValue(itemImc.classGroup || getStudentGrade(students, itemImc.studentId)),
+          [t('colunaPesoKg')]: itemImc.weight,
+          [t('colunaAlturaM')]: itemImc.height,
+          [t('colunaImc')]: itemImc.imc,
+          [t('colunaClassificacao')]: displayValue(cls.label),
+          [t('colunaData')]: itemImc.date ? itemImc.date.split('-').reverse().join('/') : ''
         };
       });
     } else if (activeSubTab === 'motor') {
       data = list.map(item => {
         const itemMotor = item as MotorRecord;
         return {
-          'Nome do Aluno': itemMotor.studentName,
-          'Impulsão': itemMotor.impulsao || itemMotor.flexibility,
-          'Abdômen': itemMotor.abdomen || itemMotor.coordination,
-          'Agilidade': itemMotor.agility,
-          'Força': itemMotor.strength,
-          'Velocidade': itemMotor.speed || 'Excelente',
-          'Classificação Geral': itemMotor.generalClass,
-          'Data': itemMotor.date ? itemMotor.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemMotor.studentName,
+          [t('colunaImpulsao')]: itemMotor.impulsao || itemMotor.flexibility,
+          [t('colunaAbdomen')]: itemMotor.abdomen || itemMotor.coordination,
+          [t('colunaAgilidade')]: itemMotor.agility,
+          [t('areaForca')]: itemMotor.strength,
+          [t('colunaVelocidade')]: displayValue(itemMotor.speed || 'Excelente'),
+          [t('colunaClassificacaoGeral')]: displayValue(itemMotor.generalClass),
+          [t('colunaData')]: itemMotor.date ? itemMotor.date.split('-').reverse().join('/') : ''
         };
       });
     } else if (activeSubTab === 'sport') {
       data = list.map(item => {
         const itemSport = item as SportRecord;
         return {
-          'Nome do Aluno': itemSport.studentName,
-          'Índice Corporal': itemSport.biotype,
-          'Físico Motor': itemSport.mainSkill,
-          'Esporte Sugerido': itemSport.suggestedSport,
-          'Recomendações': itemSport.recommendedPractice,
-          'Data': itemSport.date ? itemSport.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemSport.studentName,
+          [t('colunaIndiceCorporal')]: displayValue(itemSport.biotype),
+          [t('colunaFisicoMotor')]: displayValue(itemSport.mainSkill),
+          [t('colunaEsporteSugerido')]: itemSport.suggestedSport,
+          [t('colunaRecomendacoes')]: displayValue(itemSport.recommendedPractice),
+          [t('colunaData')]: itemSport.date ? itemSport.date.split('-').reverse().join('/') : ''
         };
       });
     } else if (activeSubTab === 'vocational') {
       data = list.map(item => {
         const itemVoc = item as VocationalRecord;
         return {
-          'Nome do Aluno': itemVoc.studentName,
-          'Perfil Vocacional': itemVoc.profile,
-          'Área de Interesse': itemVoc.interestArea,
-          'Carreira Sugerida': itemVoc.suggestedCareer,
-          'Opinião Técnica': itemVoc.technicalOpinion,
-          'Data': itemVoc.date ? itemVoc.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemVoc.studentName,
+          [t('colunaPerfilVocacional')]: displayValue(itemVoc.profile),
+          [t('colunaAreaInteresse')]: displayValue(itemVoc.interestArea),
+          [t('colunaCarreiraSugerida')]: displayValue(itemVoc.suggestedCareer),
+          [t('colunaOpiniaoTecnica')]: displayValue(itemVoc.technicalOpinion),
+          [t('colunaData')]: itemVoc.date ? itemVoc.date.split('-').reverse().join('/') : ''
         };
       });
     } else if (activeSubTab === 'health') {
       data = list.map(item => {
         const itemH = item as HealthRecord;
         return {
-          'Nome do Aluno': itemH.studentName,
-          'Escore Bruto': itemH.rawScore,
-          'Escore T': itemH.tScore,
-          'Classificação': itemH.classification,
-          'Parecer': itemH.technicalOpinion,
-          'Data': itemH.date ? itemH.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemH.studentName,
+          [t('colunaEscoreBruto')]: itemH.rawScore,
+          [t('colunaEscoreT')]: itemH.tScore,
+          [t('colunaClassificacao')]: displayValue(itemH.classification),
+          [t('colunaParecer')]: displayValue(itemH.technicalOpinion),
+          [t('colunaData')]: itemH.date ? itemH.date.split('-').reverse().join('/') : ''
         };
       });
     } else if (activeSubTab === 'oral') {
       data = list.map(item => {
         const itemO = item as OralRecord;
         return {
-          'Nome do Aluno': itemO.studentName,
-          'Pontuação (0-12)': itemO.score,
-          'Classificação': itemO.classification,
-          'Parecer': itemO.technicalOpinion,
-          'Data': itemO.date ? itemO.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemO.studentName,
+          [t('colunaPontuacao12')]: itemO.score,
+          [t('colunaClassificacao')]: displayValue(itemO.classification),
+          [t('colunaParecer')]: displayValue(itemO.technicalOpinion),
+          [t('colunaData')]: itemO.date ? itemO.date.split('-').reverse().join('/') : ''
         };
       });
     } else if (activeSubTab === 'autoconcept') {
       data = list.map(item => {
         const itemA = item as AutoconceptRecord;
         return {
-          'Nome do Aluno': itemA.studentName,
-          'Pontuação (0-30)': itemA.score,
-          'Classificação': itemA.classification,
-          'Parecer': itemA.technicalOpinion,
-          'Data': itemA.date ? itemA.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemA.studentName,
+          [t('colunaPontuacao30')]: itemA.score,
+          [t('colunaClassificacao')]: displayValue(itemA.classification),
+          [t('colunaParecer')]: displayValue(itemA.technicalOpinion),
+          [t('colunaData')]: itemA.date ? itemA.date.split('-').reverse().join('/') : ''
         };
       });
     } else if (activeSubTab === 'ias') {
       data = list.map(item => {
         const itemI = item as IasRecord;
         return {
-          'Nome do Aluno': itemI.studentName,
-          'Pontuação (0-100)': itemI.totalScore,
-          'Classificação': itemI.classification,
-          'Parecer': itemI.technicalOpinion,
-          'Data': itemI.date ? itemI.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemI.studentName,
+          [t('colunaPontuacao100')]: itemI.totalScore,
+          [t('colunaClassificacao')]: displayValue(itemI.classification),
+          [t('colunaParecer')]: displayValue(itemI.technicalOpinion),
+          [t('colunaData')]: itemI.date ? itemI.date.split('-').reverse().join('/') : ''
         };
       });
     } else if (activeSubTab === 'snap') {
       data = list.map(item => {
         const itemS = item as SnapRecord;
         return {
-          'Nome do Aluno': itemS.studentName,
-          'Itens Clínicos Desatenção (0-9)': itemS.inattentionScore,
-          'Itens Clínicos Hiperatividade/Impulsividade (0-9)': itemS.hyperactivityScore,
-          'Classificação': itemS.classification,
-          'Respondente': itemS.respondent || '',
-          'Parecer': itemS.technicalOpinion,
-          'Data': itemS.date ? itemS.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemS.studentName,
+          [t('colunaItensClinicosDesatencao')]: itemS.inattentionScore,
+          [t('colunaItensClinicosHiperatividade')]: itemS.hyperactivityScore,
+          [t('colunaClassificacao')]: displayValue(itemS.classification),
+          [t('colunaRespondente')]: displayValue(itemS.respondent || ''),
+          [t('colunaParecer')]: displayValue(itemS.technicalOpinion),
+          [t('colunaData')]: itemS.date ? itemS.date.split('-').reverse().join('/') : ''
         };
       });
     } else if (activeSubTab === 'aq10') {
       data = list.map(item => {
         const itemA = item as Aq10Record;
         return {
-          'Nome do Aluno': itemA.studentName,
-          'Versão': itemA.version === 'adolescente' ? 'Adolescente (12-15)' : 'Criança (4-11)',
-          'Pontuação (0-10)': itemA.totalScore,
-          'Classificação': itemA.classification,
-          'Respondente': itemA.respondent || '',
-          'Parecer': itemA.technicalOpinion,
-          'Data': itemA.date ? itemA.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemA.studentName,
+          [t('colunaVersao')]: itemA.version === 'adolescente' ? t('adolescente12a15') : t('crianca4a11'),
+          [t('colunaPontuacao10')]: itemA.totalScore,
+          [t('colunaClassificacao')]: displayValue(itemA.classification),
+          [t('colunaRespondente')]: displayValue(itemA.respondent || ''),
+          [t('colunaParecer')]: displayValue(itemA.technicalOpinion),
+          [t('colunaData')]: itemA.date ? itemA.date.split('-').reverse().join('/') : ''
         };
       });
     } else if (activeSubTab === 'pcd') {
@@ -3121,25 +3689,25 @@ export default function AvaliacoesView({
         const itemP = item as PcdRecord;
         const top = itemP.compatibilidade && itemP.compatibilidade.length > 0 ? itemP.compatibilidade[0].modalidade : '';
         return {
-          'Nome do Aluno': itemP.studentName,
-          'Grupo de Triagem': itemP.grupoNome,
-          'Classificação': itemP.detalheClassificacao || '-',
-          'Perfil': itemP.classificacaoPerfil,
-          'Velocidade/Agilidade (nota)': itemP.notaVelAgil,
-          'Força Explosiva (nota)': itemP.notaForcaExplosiva,
-          'Força Membros Sup. (nota)': itemP.notaMembrosSup,
-          'Core (nota)': itemP.notaCore,
-          'Modalidade sugerida': top,
-          'Direcionamento': itemP.direcionamento,
-          'Parecer': itemP.technicalOpinion,
-          'Data': itemP.date ? itemP.date.split('-').reverse().join('/') : ''
+          [t('colunaNomeAluno')]: itemP.studentName,
+          [t('colunaGrupoTriagem')]: displayValue(itemP.grupoNome),
+          [t('colunaClassificacao')]: displayValue(itemP.detalheClassificacao || '-'),
+          [t('colunaPerfil')]: displayValue(itemP.classificacaoPerfil),
+          [t('colunaVelocidadeAgilidadeNota')]: itemP.notaVelAgil,
+          [t('colunaForcaExplosivaNota')]: itemP.notaForcaExplosiva,
+          [t('colunaForcaMembrosSupNota')]: itemP.notaMembrosSup,
+          [t('colunaCoreNota')]: itemP.notaCore,
+          [t('colunaModalidadeSugerida')]: displayValue(top),
+          [t('colunaDirecionamento')]: displayValue(itemP.direcionamento),
+          [t('colunaParecer')]: displayValue(itemP.technicalOpinion),
+          [t('colunaData')]: itemP.date ? itemP.date.split('-').reverse().join('/') : ''
         };
       });
     }
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, `Avaliações ${activeSubTab.toUpperCase()}`);
+    XLSX.utils.book_append_sheet(workbook, worksheet, `${t('avaliacoesLabel')} ${activeSubTab.toUpperCase()}`);
     XLSX.writeFile(workbook, `Avaliacoes_${activeSubTab}_${selectedGrade}.xlsx`);
     const exportTarget: 'imc_assessments' | 'motor_assessments' | 'sport_assessments' | 'vocational_assessments' | 'health_assessments' | 'oral_assessments' | 'autoconcept_assessments' | 'ias_assessments' | 'snap_assessments' | 'aq10_assessments' | 'pcd_assessments' =
       activeSubTab === 'imc' ? 'imc_assessments' :
@@ -3165,17 +3733,17 @@ export default function AvaliacoesView({
     doc.setTextColor(11, 19, 38);
     
     const displayTitles = {
-      imc: "Avaliações de IMC (Índice de Massa Corporal)",
-      motor: "Avaliações de Qualidade Motora",
-      sport: "Avaliações de Indicação Esportiva",
-      vocational: "Avaliações de Perfil Vocacional",
-      health: "Avaliações de Saúde Global (KIDSCREEN-10)",
-      oral: "Avaliações de Higiene Bucal (HU-DBI)",
-      autoconcept: "Avaliações de Autoconceito (Rosenberg)",
-      ias: "Índice de Alimentação Saudável (IAS)",
-      snap: "Rastreamento de Sintomas de TDAH (SNAP-IV)",
-      aq10: "Rastreamento Precoce do Autismo (AQ-10)",
-      pcd: "Avaliações de Qualidade Motora PCD"
+      imc: t('tituloAvaliacoesImc'),
+      motor: t('tituloAvaliacoesMotor'),
+      sport: t('tituloAvaliacoesEsporte'),
+      vocational: t('tituloAvaliacoesVoc'),
+      health: t('tituloAvaliacoesSaude'),
+      oral: t('tituloAvaliacoesOral'),
+      autoconcept: t('tituloAvaliacoesAuto'),
+      ias: t('tituloIasCompleto'),
+      snap: t('tituloSnapCompleto'),
+      aq10: t('tituloAq10Completo'),
+      pcd: t('tituloAvaliacoesPcd')
     };
 
     doc.text(`EDUKYNE - ${displayTitles[activeSubTab]}`, 14, 15);
@@ -3183,28 +3751,28 @@ export default function AvaliacoesView({
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(100, 100, 100);
-    doc.text(`Filtros: Turma: ${selectedGrade} | Unidade: ${localityFilter} | Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, 21);
+    doc.text(`${t('filtrosLabel')} ${t('turmaLabel')} ${selectedGrade} | ${t('unidadeLabel')} ${localityFilter} | ${t('geradoEmLabel')} ${new Date().toLocaleDateString(locale)}`, 14, 21);
     
     let tableColumn: string[] = [];
     let tableRows: string[][] = [];
 
     if (activeSubTab === 'imc') {
-      tableColumn = ["Nome do Aluno", "Turma", "Peso (kg)", "Altura (m)", "IMC", "Classificação", "Data"];
+      tableColumn = [t('colunaNomeAluno'), ta('turma'), t('colunaPesoKg'), t('colunaAlturaM'), t('colunaImc'), t('colunaClassificacao'), t('colunaData')];
       tableRows = list.map(item => {
         const itemImc = item as ImcRecord;
         const cls = getImcClass(itemImc.weight, itemImc.height);
         return [
           itemImc.studentName,
-          itemImc.classGroup || getStudentGrade(students, itemImc.studentId),
+          displayValue(itemImc.classGroup || getStudentGrade(students, itemImc.studentId)),
           itemImc.weight.toString(),
           itemImc.height.toString(),
           itemImc.imc.toString(),
-          cls.label,
+          displayValue(cls.label),
           itemImc.date ? itemImc.date.split('-').reverse().join('/') : ''
         ];
       });
     } else if (activeSubTab === 'motor') {
-      tableColumn = ["Nome do Aluno", "Impulsão", "Abdômen", "Agilidade", "Força", "Velocidade", "Geral", "Data"];
+      tableColumn = [t('colunaNomeAluno'), t('colunaImpulsao'), t('colunaAbdomen'), t('colunaAgilidade'), t('areaForca'), t('colunaVelocidade'), t('colunaGeral'), t('colunaData')];
       tableRows = list.map(item => {
         const itemMotor = item as MotorRecord;
         return [
@@ -3212,27 +3780,27 @@ export default function AvaliacoesView({
           itemMotor.impulsao || itemMotor.flexibility || '',
           itemMotor.abdomen || itemMotor.coordination || '',
           itemMotor.agility ?? '',
-          itemMotor.strength ?? '',
-          itemMotor.speed || 'Excelente',
-          itemMotor.generalClass ?? '',
+          displayValue(itemMotor.strength ?? ''),
+          displayValue(itemMotor.speed || 'Excelente'),
+          displayValue(itemMotor.generalClass ?? ''),
           itemMotor.date ? itemMotor.date.split('-').reverse().join('/') : ''
         ];
       });
     } else if (activeSubTab === 'sport') {
-      tableColumn = ["Nome do Aluno", "Índice Corporal", "Físico Motor", "Sugerido", "Recomendações", "Data"];
+      tableColumn = [t('colunaNomeAluno'), t('colunaIndiceCorporal'), t('colunaFisicoMotor'), t('colunaSugerido'), t('colunaRecomendacoes'), t('colunaData')];
       tableRows = list.map(item => {
         const itemSport = item as SportRecord;
         return [
           itemSport.studentName,
-          itemSport.biotype,
-          itemSport.mainSkill,
+          displayValue(itemSport.biotype),
+          displayValue(itemSport.mainSkill),
           itemSport.suggestedSport,
-          itemSport.recommendedPractice,
+          displayValue(itemSport.recommendedPractice),
           itemSport.date ? itemSport.date.split('-').reverse().join('/') : ''
         ];
       });
     } else if (activeSubTab === 'vocational') {
-      tableColumn = ["Nome do Aluno", "Perfil", "Área de Interesse", "Carreira", "Data"];
+      tableColumn = [t('colunaNomeAluno'), t('colunaPerfil'), t('colunaAreaInteresse'), t('colunaCarreira'), t('colunaData')];
       tableRows = list.map(item => {
         const itemVoc = item as VocationalRecord;
         return [
@@ -3244,85 +3812,85 @@ export default function AvaliacoesView({
         ];
       });
     } else if (activeSubTab === 'health') {
-      tableColumn = ["Nome do Aluno", "Escore Bruto", "Escore T", "Classificação", "Data"];
+      tableColumn = [t('colunaNomeAluno'), t('colunaEscoreBruto'), t('colunaEscoreT'), t('colunaClassificacao'), t('colunaData')];
       tableRows = list.map(item => {
         const itemH = item as HealthRecord;
         return [
           itemH.studentName,
           String(itemH.rawScore),
           String(itemH.tScore),
-          itemH.classification,
+          displayValue(itemH.classification),
           itemH.date ? itemH.date.split('-').reverse().join('/') : ''
         ];
       });
     } else if (activeSubTab === 'oral') {
-      tableColumn = ["Nome do Aluno", "Pontuação (0-12)", "Classificação", "Data"];
+      tableColumn = [t('colunaNomeAluno'), t('colunaPontuacao12'), t('colunaClassificacao'), t('colunaData')];
       tableRows = list.map(item => {
         const itemO = item as OralRecord;
         return [
           itemO.studentName,
           String(itemO.score),
-          itemO.classification,
+          displayValue(itemO.classification),
           itemO.date ? itemO.date.split('-').reverse().join('/') : ''
         ];
       });
     } else if (activeSubTab === 'autoconcept') {
-      tableColumn = ["Nome do Aluno", "Pontuação (0-30)", "Classificação", "Data"];
+      tableColumn = [t('colunaNomeAluno'), t('colunaPontuacao30'), t('colunaClassificacao'), t('colunaData')];
       tableRows = list.map(item => {
         const itemA = item as AutoconceptRecord;
         return [
           itemA.studentName,
           String(itemA.score),
-          itemA.classification,
+          displayValue(itemA.classification),
           itemA.date ? itemA.date.split('-').reverse().join('/') : ''
         ];
       });
     } else if (activeSubTab === 'ias') {
-      tableColumn = ["Nome do Aluno", "Pontuação (0-100)", "Classificação", "Data"];
+      tableColumn = [t('colunaNomeAluno'), t('colunaPontuacao100'), t('colunaClassificacao'), t('colunaData')];
       tableRows = list.map(item => {
         const itemI = item as IasRecord;
         return [
           itemI.studentName,
           String(itemI.totalScore),
-          itemI.classification,
+          displayValue(itemI.classification),
           itemI.date ? itemI.date.split('-').reverse().join('/') : ''
         ];
       });
     } else if (activeSubTab === 'snap') {
-      tableColumn = ["Nome do Aluno", "Desatenção (0-9)", "Hiper/Impulsividade (0-9)", "Classificação", "Respondente", "Data"];
+      tableColumn = [t('colunaNomeAluno'), t('colunaDesatencao'), t('colunaHiperImpulsividade'), t('colunaClassificacao'), t('colunaRespondente'), t('colunaData')];
       tableRows = list.map(item => {
         const itemS = item as SnapRecord;
         return [
           itemS.studentName,
           String(itemS.inattentionScore),
           String(itemS.hyperactivityScore),
-          itemS.classification,
-          itemS.respondent || '',
+          displayValue(itemS.classification),
+          displayValue(itemS.respondent || ''),
           itemS.date ? itemS.date.split('-').reverse().join('/') : ''
         ];
       });
     } else if (activeSubTab === 'aq10') {
-      tableColumn = ["Nome do Aluno", "Versão", "Pontuação (0-10)", "Classificação", "Respondente", "Data"];
+      tableColumn = [t('colunaNomeAluno'), t('colunaVersao'), t('colunaPontuacao10'), t('colunaClassificacao'), t('colunaRespondente'), t('colunaData')];
       tableRows = list.map(item => {
         const itemA = item as Aq10Record;
         return [
           itemA.studentName,
-          itemA.version === 'adolescente' ? 'Adolescente (12-15)' : 'Criança (4-11)',
+          itemA.version === 'adolescente' ? t('adolescente12a15') : t('crianca4a11'),
           String(itemA.totalScore),
-          itemA.classification,
-          itemA.respondent || '',
+          displayValue(itemA.classification),
+          displayValue(itemA.respondent || ''),
           itemA.date ? itemA.date.split('-').reverse().join('/') : ''
         ];
       });
     } else if (activeSubTab === 'pcd') {
-      tableColumn = ["Nome do Aluno", "Grupo", "Perfil", "Vel/Agil", "Força Expl.", "Membros Sup.", "Core", "Modalidade Sugerida", "Data"];
+      tableColumn = [t('colunaNomeAluno'), t('colunaGrupo'), t('colunaPerfil'), t('colunaVelAgil'), t('colunaForcaExpl'), t('colunaMembrosSup'), t('colunaCore'), t('colunaModalidadeSugerida'), t('colunaData')];
       tableRows = list.map(item => {
         const itemP = item as PcdRecord;
         const top = itemP.compatibilidade && itemP.compatibilidade.length > 0 ? itemP.compatibilidade[0].modalidade : '';
         return [
           itemP.studentName,
-          itemP.grupoNome || `Grupo ${itemP.grupo}`,
-          itemP.classificacaoPerfil,
+          displayValue(itemP.grupoNome) || `${t('colunaGrupo')} ${itemP.grupo}`,
+          displayValue(itemP.classificacaoPerfil),
           String(itemP.notaVelAgil),
           String(itemP.notaForcaExplosiva),
           String(itemP.notaMembrosSup),
@@ -3365,23 +3933,23 @@ export default function AvaliacoesView({
   const exportAllStudentDataToPDF = () => {
     const doc = new jsPDF();
     addReportBackground(doc);
-    const studentName = loggedInStudentObj?.name || user?.name || "Estudante";
-    const studentGrade = loggedInStudentObj?.grade || "Não informada";
-    const schoolUnit = loggedInStudentObj?.locality || "Não informada";
+    const studentName = loggedInStudentObj?.name || user?.name || t('palavraEstudante');
+    const studentGrade = displayValue(loggedInStudentObj?.grade || t('NaoInformada'));
+    const schoolUnit = displayValue(loggedInStudentObj?.locality || t('NaoInformada'));
     
     // Header Title
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.setTextColor(11, 19, 38);
-    doc.text("EDUKYNE - Relatório Consolidado de Avaliações", 14, 20);
+    doc.text(t('relatorioTitulo'), 14, 20);
     
     // Sub-header details
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(100, 100, 100);
-    doc.text(`Aluno: ${studentName}`, 14, 28);
-    doc.text(`Turma: ${studentGrade} | Unidade: ${schoolUnit}`, 14, 34);
-    doc.text(`Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`, 14, 40);
+    doc.text(`${t('alunoLabel')} ${studentName}`, 14, 28);
+    doc.text(`${t('turmaLabel')} ${studentGrade} | ${t('unidadeLabel')} ${schoolUnit}`, 14, 34);
+    doc.text(`${t('dataEmissaoLabel')} ${new Date().toLocaleDateString(locale)}`, 14, 40);
     
     let currentY = 46;
 
@@ -3390,24 +3958,24 @@ export default function AvaliacoesView({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.setTextColor(56, 189, 248);
-    doc.text("1. Índice de Massa Corporal (IMC)", 14, currentY);
+    doc.text(t('relatorioSecaoImc'), 14, currentY);
     currentY += 4;
 
-    const imcColumns = ["Data do Registro", "Peso (kg)", "Altura (m)", "IMC Calculado", "Classificação"];
+    const imcColumns = [t('colunaDataRegistro'), t('colunaPesoKg'), t('colunaAlturaM'), t('colunaImcCalculado'), t('colunaClassificacao')];
     const imcRows = studentImc.map(rec => {
       const statusVal = getImcClass(rec.weight, rec.height);
       return [
         rec.date || '',
-        `${rec.weight} kg`,
-        `${rec.height} m`,
+        `${rec.weight} ${t('unidadeKg')}`,
+        `${rec.height} ${t('unidadeM')}`,
         rec.imc?.toString() || '',
-        statusVal.label
+        displayValue(statusVal.label)
       ];
     });
 
     autoTable(doc, {
       head: [imcColumns],
-      body: imcRows.length > 0 ? imcRows : [["Nenhum registro de IMC cadastrado.", "", "", "", ""]],
+      body: imcRows.length > 0 ? imcRows : [[t('vazioImcTabela'), "", "", "", ""]],
       startY: currentY,
       styles: { fontSize: 8.5, cellPadding: 3 },
       headStyles: { fillColor: [56, 189, 248], textColor: [0, 30, 44], fontStyle: 'bold' },
@@ -3432,23 +4000,23 @@ export default function AvaliacoesView({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.setTextColor(56, 189, 248);
-    doc.text("2. Qualidade Motora", 14, currentY);
+    doc.text(t('relatorioSecaoMotor'), 14, currentY);
     currentY += 4;
 
-    const motorColumns = ["Aferido em", "Impulsão", "Abdômen", "Agilidade", "Força Muscular", "Velocidade", "Geral"];
+    const motorColumns = [t('colunaAferidoEm'), t('colunaImpulsao'), t('colunaAbdomen'), t('colunaAgilidade'), t('colunaForcaMuscular'), t('colunaVelocidade'), t('colunaGeral')];
     const motorRows = studentMotor.map(rec => [
       rec.date || '',
       rec.impulsao || rec.flexibility || '',
       rec.abdomen || rec.coordination || '',
       rec.agility || '',
-      rec.strength || '',
-      rec.speed || 'Excelente',
-      rec.generalClass || ''
+      displayValue(rec.strength || ''),
+      displayValue(rec.speed || 'Excelente'),
+      displayValue(rec.generalClass || '')
     ]);
 
     autoTable(doc, {
       head: [motorColumns],
-      body: motorRows.length > 0 ? motorRows : [["Nenhuma avaliação de capacidade motora cadastrada.", "", "", "", "", "", ""]],
+      body: motorRows.length > 0 ? motorRows : [[t('vazioMotorTabela'), "", "", "", "", "", ""]],
       startY: currentY,
       styles: { fontSize: 8.5, cellPadding: 3 },
       headStyles: { fillColor: [56, 189, 248], textColor: [0, 30, 44], fontStyle: 'bold' },
@@ -3473,21 +4041,21 @@ export default function AvaliacoesView({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.setTextColor(56, 189, 248);
-    doc.text("3. Esporte Indicado", 14, currentY);
+    doc.text(t('relatorioSecaoEsporte'), 14, currentY);
     currentY += 4;
 
-    const sportColumns = ["Data da Indicação", "Índice Corporal", "Físico Motor", "Esporte Sugerido", "Recomendações"];
+    const sportColumns = [t('colunaDataIndicacao'), t('colunaIndiceCorporal'), t('colunaFisicoMotor'), t('colunaEsporteSugerido'), t('colunaRecomendacoes')];
     const sportRows = studentSport.map(rec => [
       rec.date || '',
-      rec.biotype || '',
-      rec.mainSkill || '',
+      displayValue(rec.biotype || ''),
+      displayValue(rec.mainSkill || ''),
       rec.suggestedSport || '',
-      rec.recommendedPractice || ''
+      displayValue(rec.recommendedPractice || '')
     ]);
 
     autoTable(doc, {
       head: [sportColumns],
-      body: sportRows.length > 0 ? sportRows : [["Nenhuma indicação de modalidade esportiva encontrada.", "", "", "", ""]],
+      body: sportRows.length > 0 ? sportRows : [[t('vazioEsportePdf'), "", "", "", ""]],
       startY: currentY,
       styles: { fontSize: 8.5, cellPadding: 3 },
       headStyles: { fillColor: [56, 189, 248], textColor: [0, 30, 44], fontStyle: 'bold' },
@@ -3512,21 +4080,21 @@ export default function AvaliacoesView({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.setTextColor(56, 189, 248);
-    doc.text("4. Perfil Vocacional", 14, currentY);
+    doc.text(t('relatorioSecaoVoc'), 14, currentY);
     currentY += 4;
 
-    const vocationalColumns = ["Aferido em", "Perfil Dominante", "Área de Interesse", "Carreira Indicada", "Parecer do Orientador"];
+    const vocationalColumns = [t('colunaAferidoEm'), t('colunaPerfilDominante'), t('colunaAreaInteresse'), t('colunaCarreiraIndicada'), t('colunaParecerOrientador')];
     const vocationalRows = studentVocational.map(rec => [
       rec.date || '',
-      rec.profile || '',
-      rec.interestArea || '',
-      rec.suggestedCareer || '',
-      rec.technicalOpinion || ''
+      displayValue(rec.profile || ''),
+      displayValue(rec.interestArea || ''),
+      displayValue(rec.suggestedCareer || ''),
+      displayValue(rec.technicalOpinion || '')
     ]);
 
     autoTable(doc, {
       head: [vocationalColumns],
-      body: vocationalRows.length > 0 ? vocationalRows : [["Nenhum parecer vocacional disponível.", "", "", "", ""]],
+      body: vocationalRows.length > 0 ? vocationalRows : [[t('vazioVocPdf'), "", "", "", ""]],
       startY: currentY,
       styles: { fontSize: 8.5, cellPadding: 3 },
       headStyles: { fillColor: [56, 189, 248], textColor: [0, 30, 44], fontStyle: 'bold' },
@@ -3549,7 +4117,7 @@ export default function AvaliacoesView({
       <section className="bg-[#171f33]/60 border border-[#3e484f]/20 rounded-xl p-6 text-center shadow-lg backdrop-blur-md relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-[#38bdf8]/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
         <Award className="w-8 h-8 text-[#38bdf8] mx-auto mb-2.5 animate-pulse" />
-        <h2 className="text-xl font-bold text-[#dae2fd]">Módulo de Avaliações</h2>
+        <h2 className="text-xl font-bold text-[#dae2fd]">{t('moduloTitulo')}</h2>
       </section>
 
       {/* FILTER PANEL - MATCHING DASHBOARD EXACTLY */}
@@ -3557,7 +4125,7 @@ export default function AvaliacoesView({
         <section className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 shadow-lg space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#3e484f]/25 pb-2">
             <h4 className="text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">
-              Filtro Unificado - Avaliações por Localidade e Série
+              {t('filtroTitulo')}
             </h4>
           </div>
           
@@ -3565,7 +4133,7 @@ export default function AvaliacoesView({
             {/* Contrato */}
             <div className="flex flex-col gap-1.5 font-sans">
               <div className="flex items-center gap-1">
-                <label className="text-xs font-semibold text-[#bdc8d1]/90">Contrato:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1]/90">{ta('contrato')}</label>
                 {!isUserAdmin && assignedContracts.length === 1 && (
                   <Lock className="w-2.5 h-2.5 text-amber-400 ml-1" />
                 )}
@@ -3582,7 +4150,7 @@ export default function AvaliacoesView({
                 disabled={isHydrating || isContractLocked}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed font-sans"
               >
-                <option value="Todos">Todos os Contratos</option>
+                <option value="Todos">{ta('todosContratos')}</option>
                 {availableContracts.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
@@ -3592,9 +4160,9 @@ export default function AvaliacoesView({
             {/* Estado */}
             <div className="flex flex-col gap-1.5 font-sans">
               <div className="flex items-center gap-1">
-                <label className="text-xs font-semibold text-[#bdc8d1]/90">Estado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1]/90">{ta('estado')}</label>
                 {!isUserAdmin && assignedStates.length === 1 && (
-                  <span title="Vínculo permanente do registro do usuário">
+                  <span title={t('vinculoPermanenteUsuario')}>
                     <Lock className="w-2.5 h-2.5 text-amber-400 ml-1" />
                   </span>
                 )}
@@ -3610,7 +4178,7 @@ export default function AvaliacoesView({
                 disabled={isHydrating || isStateLocked}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed font-sans"
               >
-                <option value="Todos">Todos os Estados</option>
+                <option value="Todos">{ta('todosEstados')}</option>
                 {availableStates.map(st => (
                   <option key={st} value={st}>{st}</option>
                 ))}
@@ -3620,7 +4188,7 @@ export default function AvaliacoesView({
             {/* Região */}
             <div className="flex flex-col gap-1.5 font-sans">
               <div className="flex items-center gap-1">
-                <label className="text-xs font-semibold text-[#bdc8d1]/90">Região:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1]/90">{ta('regiao')}</label>
                 {!isUserAdmin && assignedRegions.length === 1 && (
                   <Lock className="w-2.5 h-2.5 text-amber-400 ml-1" />
                 )}
@@ -3635,7 +4203,7 @@ export default function AvaliacoesView({
                 disabled={isHydrating || isRegionLocked}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed font-sans"
               >
-                <option value="Todos">Todas as Regiões</option>
+                <option value="Todos">{ta('todasRegioes')}</option>
                 {availableRegions.map(reg => (
                   <option key={reg} value={reg}>{reg}</option>
                 ))}
@@ -3645,7 +4213,7 @@ export default function AvaliacoesView({
             {/* Localidade */}
             <div className="flex flex-col gap-1.5 font-sans">
               <div className="flex items-center gap-1">
-                <label className="text-xs font-semibold text-[#bdc8d1]/90">Localidade:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1]/90">{ta('localidade')}</label>
                 {!isUserAdmin && assignedLocalities.length === 1 && (
                   <Lock className="w-2.5 h-2.5 text-amber-400 ml-1" />
                 )}
@@ -3659,7 +4227,7 @@ export default function AvaliacoesView({
                 disabled={isHydrating || isLocalityLocked}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed font-sans"
               >
-                <option value="Todos">Todas as Localidades</option>
+                <option value="Todos">{ta('todasLocalidades')}</option>
                 {availableLocalities.map(loc => (
                   <option key={loc} value={loc}>{loc}</option>
                 ))}
@@ -3669,7 +4237,7 @@ export default function AvaliacoesView({
             {/* Série/Turma */}
             <div className="flex flex-col gap-1.5 font-sans">
               <div className="flex items-center gap-1">
-                <label className="text-xs font-semibold text-[#bdc8d1]/90">Série/Turma:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1]/90">{ta('serieTurma')}</label>
                 {!isUserAdmin && assignedGrades.length === 1 && (
                   <Lock className="w-2.5 h-2.5 text-amber-400 ml-1" />
                 )}
@@ -3680,7 +4248,7 @@ export default function AvaliacoesView({
                 disabled={isHydrating || isGradeLocked}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed font-sans"
               >
-                <option value="Todos">Todas as Turmas</option>
+                <option value="Todos">{ta('todasTurmas')}</option>
                 {availableGrades.map(g => (
                   <option key={g} value={g}>{g}</option>
                 ))}
@@ -3695,19 +4263,19 @@ export default function AvaliacoesView({
           {/* Welcome Alert banner */}
           <div className="p-5 bg-[#38bdf8]/10 border border-[#38bdf8]/20 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
-              <h4 className="text-xs font-bold text-[#dae2fd]">Olá, {loggedInStudentObj?.name || user?.name || "Estudante"}!</h4>
+              <h4 className="text-xs font-bold text-[#dae2fd]">{t('ola')} {loggedInStudentObj?.name || user?.name || t('palavraEstudante')}!</h4>
               <p className="text-xs text-[#bdc8d1]/80 leading-relaxed">
-                Abaixo estão listados todos os resultados consolidados das suas avaliações cadastrados em sua ficha de estudante.
+                {t('boasVindasTexto')}
               </p>
             </div>
 
             <button
               onClick={exportAllStudentDataToPDF}
               className="px-4 py-2 bg-[#f43f5e] hover:bg-[#e11d48] text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer text-center shrink-0 self-start sm:self-center"
-              title="Exportar Todas as Avaliações para PDF"
+              title={t('exportarTodasPdfTitle')}
             >
               <FileText className="w-4 h-4" />
-              <span>Exportar PDF Completo</span>
+              <span>{t('exportarPdfCompleto')}</span>
             </button>
           </div>
 
@@ -3715,25 +4283,25 @@ export default function AvaliacoesView({
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl overflow-hidden shadow-xl space-y-4 p-5">
             <div className="flex items-center gap-2 border-b border-[#3e484f]/25 pb-3">
               <Heart className="w-5 h-5 text-rose-400" />
-              <h3 className="text-sm font-bold text-[#dae2fd]">Índice de Massa Corporal (IMC)</h3>
+              <h3 className="text-sm font-bold text-[#dae2fd]">{t('tituloImc')}</h3>
             </div>
             
             <div className="overflow-x-auto">
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Data do Registro</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Peso</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Altura</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">IMC</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Classificação</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaDataRegistro')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaPeso')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaAltura')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaImc')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaClassificacao')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#3e484f]/20">
                   {imcRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-8 text-center text-[#bdc8d1]/50 text-xs">
-                        Nenhum registro de IMC cadastrado para você até o momento.
+                        {t('vazioImcUsuario')}
                       </td>
                     </tr>
                   ) : (
@@ -3742,12 +4310,12 @@ export default function AvaliacoesView({
                       return (
                         <tr key={rec.id} className="hover:bg-[#131b2e]/40 transition-all text-xs">
                           <td className="px-6 py-3.5 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
-                          <td className="px-6 py-3.5 text-center text-white font-semibold">{rec.weight} kg</td>
-                          <td className="px-6 py-3.5 text-center text-white font-semibold">{rec.height} m</td>
+                          <td className="px-6 py-3.5 text-center text-white font-semibold">{rec.weight} {t('unidadeKg')}</td>
+                          <td className="px-6 py-3.5 text-center text-white font-semibold">{rec.height} {t('unidadeM')}</td>
                           <td className="px-6 py-3.5 text-center font-bold text-[#38bdf8] font-mono">{rec.imc}</td>
                           <td className="px-6 py-3.5">
                             <span className={`text-[10px] font-bold ${statusVal.color}`}>
-                              {statusVal.label}
+                              {displayValue(statusVal.label)}
                             </span>
                           </td>
                         </tr>
@@ -3763,27 +4331,27 @@ export default function AvaliacoesView({
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl overflow-hidden shadow-xl space-y-4 p-5">
             <div className="flex items-center gap-2 border-b border-[#3e484f]/25 pb-3">
               <Award className="w-5 h-5 text-[#38bdf8]" />
-              <h3 className="text-sm font-bold text-[#dae2fd]">Qualidade Motora</h3>
+              <h3 className="text-sm font-bold text-[#dae2fd]">{t('tituloMotor')}</h3>
             </div>
             
             <div className="overflow-x-auto">
               <table className="w-full border-collapse min-w-[820px]">
                 <thead>
                   <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aferido em</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Impulsão</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Abdômen</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Agilidade</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Força Muscular</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Velocidade</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Geral</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaAferidoEm')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaImpulsao')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaAbdomen')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaAgilidade')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaForcaMuscular')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaVelocidade')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaGeral')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#3e484f]/20">
                   {motorRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                     <tr>
                       <td colSpan={7} className="px-6 py-8 text-center text-[#bdc8d1]/50 text-xs">
-                        Nenhuma avaliação de capacidade motora cadastrada para você.
+                        {t('vazioMotorUsuario')}
                       </td>
                     </tr>
                   ) : (
@@ -3801,7 +4369,7 @@ export default function AvaliacoesView({
                           <td className="px-6 py-3.5 text-center text-white">{rec.abdomen || rec.coordination}</td>
                           <td className="px-6 py-3.5 text-center text-white">{rec.agility}</td>
                           <td className="px-6 py-3.5 text-center text-white">{rec.strength}</td>
-                          <td className="px-6 py-3.5 text-center text-white">{rec.speed || 'Excelente'}</td>
+                          <td className="px-6 py-3.5 text-center text-white">{displayValue(rec.speed || 'Excelente')}</td>
                           <td className="px-6 py-3.5">
                             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${motorBadgeColor}`}>
                               {rec.generalClass}
@@ -3820,25 +4388,25 @@ export default function AvaliacoesView({
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl overflow-hidden shadow-xl space-y-4 p-5">
             <div className="flex items-center gap-2 border-b border-[#3e484f]/25 pb-3">
               <Target className="w-5 h-5 text-amber-500" />
-              <h3 className="text-sm font-bold text-[#dae2fd]">Esporte Indicado</h3>
+              <h3 className="text-sm font-bold text-[#dae2fd]">{t('tituloEsporte')}</h3>
             </div>
             
             <div className="overflow-x-auto">
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Data da Indicação</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Índice Corporal</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Físico Motor</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Esporte Sugerido</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Recomendações</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaDataIndicacao')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaIndiceCorporal')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaFisicoMotor')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaEsporteSugerido')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaRecomendacoes')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#3e484f]/20">
                   {sportRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-8 text-center text-[#bdc8d1]/50 text-xs">
-                        Nenhuma indicação de modalidade esportiva encontrada para você.
+                        {t('vazioEsporteUsuario')}
                       </td>
                     </tr>
                   ) : (
@@ -3847,15 +4415,15 @@ export default function AvaliacoesView({
                         <td className="px-6 py-3.5 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
                         <td className="px-6 py-3.5">
                           <span className="px-2 py-0.5 rounded bg-[#1e293b] border border-[#3e484f]/30 text-[#dae2fd] font-medium">
-                            {rec.biotype}
+                            {displayValue(rec.biotype)}
                           </span>
                         </td>
-                        <td className="px-6 py-3.5 text-[#bdc8d1] font-medium">{rec.mainSkill}</td>
+                        <td className="px-6 py-3.5 text-[#bdc8d1] font-medium">{displayValue(rec.mainSkill)}</td>
                         <td className="px-6 py-3.5 font-bold text-[#38bdf8] flex items-center gap-1.5">
                           <Activity className="w-3.5 h-3.5 text-[#38bdf8]" />
                           <span>{rec.suggestedSport}</span>
                         </td>
-                        <td className="px-6 py-3.5 text-[#dae2fd]">{rec.recommendedPractice}</td>
+                        <td className="px-6 py-3.5 text-[#dae2fd]">{displayValue(rec.recommendedPractice)}</td>
                       </tr>
                     ))
                   )}
@@ -3868,35 +4436,35 @@ export default function AvaliacoesView({
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl overflow-hidden shadow-xl space-y-4 p-5">
             <div className="flex items-center gap-2 border-b border-[#3e484f]/25 pb-3">
               <Compass className="w-5 h-5 text-emerald-400" />
-              <h3 className="text-sm font-bold text-[#dae2fd]">Vocacionamento</h3>
+              <h3 className="text-sm font-bold text-[#dae2fd]">{t('tituloVocacional')}</h3>
             </div>
             
             <div className="overflow-x-auto">
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aferido em</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Perfil Dominante</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Área de Interesse</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Carreira Indicada</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Parecer do Orientador</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaAferidoEm')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaPerfilDominante')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaAreaInteresse')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaCarreiraIndicada')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaParecerOrientador')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#3e484f]/20">
                   {vocationalRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-8 text-center text-[#bdc8d1]/50 text-xs">
-                        Nenhum parecer vocacional disponível para você até o momento.
+                        {t('vazioVocacionalUsuario')}
                       </td>
                     </tr>
                   ) : (
                     vocationalRecords.filter(r => matchesFilters(r.studentName, r.studentId)).map((rec) => (
                       <tr key={rec.id} className="hover:bg-[#131b2e]/40 transition-all text-xs">
                         <td className="px-6 py-3.5 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
-                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{rec.profile}</td>
-                        <td className="px-6 py-3.5 text-[#dae2fd]">{rec.interestArea}</td>
+                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{displayValue(rec.profile)}</td>
+                        <td className="px-6 py-3.5 text-[#dae2fd]">{displayValue(rec.interestArea)}</td>
                         <td className="px-6 py-3.5 font-bold text-[#8ed5ff]">{rec.suggestedCareer}</td>
-                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{rec.technicalOpinion}</td>
+                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{displayValue(rec.technicalOpinion)}</td>
                       </tr>
                     ))
                   )}
@@ -3909,25 +4477,25 @@ export default function AvaliacoesView({
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl overflow-hidden shadow-xl space-y-4 p-5">
             <div className="flex items-center gap-2 border-b border-[#3e484f]/25 pb-3">
               <HeartPulse className="w-5 h-5 text-rose-400" />
-              <h3 className="text-sm font-bold text-[#dae2fd]">Saúde Global</h3>
+              <h3 className="text-sm font-bold text-[#dae2fd]">{t('tituloSaude')}</h3>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aferido em</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Escore Bruto</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Escore T</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Classificação</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Parecer</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaAferidoEm')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaEscoreBruto')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaEscoreT')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaClassificacao')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaParecer')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#3e484f]/20">
                   {healthRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-8 text-center text-[#bdc8d1]/50 text-xs">
-                        Nenhuma avaliação de Saúde Global disponível para você até o momento.
+                        {t('vazioSaudeUsuario')}
                       </td>
                     </tr>
                   ) : (
@@ -3936,8 +4504,8 @@ export default function AvaliacoesView({
                         <td className="px-6 py-3.5 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
                         <td className="px-6 py-3.5 text-[#dae2fd]">{rec.rawScore}</td>
                         <td className="px-6 py-3.5 text-[#dae2fd]">{Number(rec.tScore).toFixed(2)}</td>
-                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{rec.technicalOpinion}</td>
+                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{displayValue(rec.technicalOpinion)}</td>
                       </tr>
                     ))
                   )}
@@ -3950,24 +4518,24 @@ export default function AvaliacoesView({
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl overflow-hidden shadow-xl space-y-4 p-5">
             <div className="flex items-center gap-2 border-b border-[#3e484f]/25 pb-3">
               <Smile className="w-5 h-5 text-sky-400" />
-              <h3 className="text-sm font-bold text-[#dae2fd]">Higiene Bucal</h3>
+              <h3 className="text-sm font-bold text-[#dae2fd]">{t('tituloOral')}</h3>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aferido em</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Pontuação (0-12)</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Classificação</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Parecer</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaAferidoEm')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaPontuacao12')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaClassificacao')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaParecer')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#3e484f]/20">
                   {oralRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-8 text-center text-[#bdc8d1]/50 text-xs">
-                        Nenhuma avaliação de Higiene Bucal disponível para você até o momento.
+                        {t('vazioOralUsuario')}
                       </td>
                     </tr>
                   ) : (
@@ -3975,8 +4543,8 @@ export default function AvaliacoesView({
                       <tr key={rec.id} className="hover:bg-[#131b2e]/40 transition-all text-xs">
                         <td className="px-6 py-3.5 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
                         <td className="px-6 py-3.5 text-[#dae2fd]">{rec.score}</td>
-                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{rec.technicalOpinion}</td>
+                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{displayValue(rec.technicalOpinion)}</td>
                       </tr>
                     ))
                   )}
@@ -3989,24 +4557,24 @@ export default function AvaliacoesView({
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl overflow-hidden shadow-xl space-y-4 p-5">
             <div className="flex items-center gap-2 border-b border-[#3e484f]/25 pb-3">
               <Sparkles className="w-5 h-5 text-violet-400" />
-              <h3 className="text-sm font-bold text-[#dae2fd]">Autoconceito</h3>
+              <h3 className="text-sm font-bold text-[#dae2fd]">{t('tituloAuto')}</h3>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aferido em</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Pontuação (0-30)</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Classificação</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Parecer</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaAferidoEm')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaPontuacao30')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaClassificacao')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaParecer')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#3e484f]/20">
                   {autoconceptRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-8 text-center text-[#bdc8d1]/50 text-xs">
-                        Nenhuma avaliação de Autoconceito disponível para você até o momento.
+                        {t('vazioAutoUsuario')}
                       </td>
                     </tr>
                   ) : (
@@ -4014,8 +4582,8 @@ export default function AvaliacoesView({
                       <tr key={rec.id} className="hover:bg-[#131b2e]/40 transition-all text-xs">
                         <td className="px-6 py-3.5 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
                         <td className="px-6 py-3.5 text-[#dae2fd]">{rec.score}</td>
-                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{rec.technicalOpinion}</td>
+                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{displayValue(rec.technicalOpinion)}</td>
                       </tr>
                     ))
                   )}
@@ -4028,24 +4596,24 @@ export default function AvaliacoesView({
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl overflow-hidden shadow-xl space-y-4 p-5">
             <div className="flex items-center gap-2 border-b border-[#3e484f]/25 pb-3">
               <Apple className="w-5 h-5 text-emerald-400" />
-              <h3 className="text-sm font-bold text-[#dae2fd]">Índice Alimentar</h3>
+              <h3 className="text-sm font-bold text-[#dae2fd]">{t('tituloIas')}</h3>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aferido em</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Pontuação (0-100)</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Classificação</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Parecer</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaAferidoEm')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaPontuacao100')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaClassificacao')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaParecer')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#3e484f]/20">
                   {iasRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-8 text-center text-[#bdc8d1]/50 text-xs">
-                        Nenhuma avaliação de Índice Alimentar disponível para você até o momento.
+                        {t('vazioIasUsuario')}
                       </td>
                     </tr>
                   ) : (
@@ -4053,8 +4621,8 @@ export default function AvaliacoesView({
                       <tr key={rec.id} className="hover:bg-[#131b2e]/40 transition-all text-xs">
                         <td className="px-6 py-3.5 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
                         <td className="px-6 py-3.5 text-[#dae2fd]">{rec.totalScore}</td>
-                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{rec.technicalOpinion}</td>
+                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{displayValue(rec.technicalOpinion)}</td>
                       </tr>
                     ))
                   )}
@@ -4067,26 +4635,26 @@ export default function AvaliacoesView({
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl overflow-hidden shadow-xl space-y-4 p-5">
             <div className="flex items-center gap-2 border-b border-[#3e484f]/25 pb-3">
               <Brain className="w-5 h-5 text-violet-400" />
-              <h3 className="text-sm font-bold text-[#dae2fd]">Rastreamento do TDAH (SNAP-IV)</h3>
+              <h3 className="text-sm font-bold text-[#dae2fd]">{t('tituloSnap')}</h3>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse min-w-[820px]">
                 <thead>
                   <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aferido em</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Desatenção (0-9)</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Hiper/Impulsividade (0-9)</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Relato de</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Classificação</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Parecer</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaAferidoEm')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaDesatencao')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaHiperImpulsividade')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaRelatoDe')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaClassificacao')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaParecer')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#3e484f]/20">
                   {snapRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-8 text-center text-[#bdc8d1]/50 text-xs">
-                        Nenhuma avaliação de Rastreamento do TDAH disponível para você até o momento.
+                        {t('vazioSnapUsuario')}
                       </td>
                     </tr>
                   ) : (
@@ -4096,41 +4664,41 @@ export default function AvaliacoesView({
                         <td className="px-6 py-3.5 text-[#dae2fd]">{rec.inattentionScore}</td>
                         <td className="px-6 py-3.5 text-[#dae2fd]">{rec.hyperactivityScore}</td>
                         <td className="px-6 py-3.5 text-[#bdc8d1]">{rec.respondent || '—'}</td>
-                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{rec.technicalOpinion}</td>
+                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{displayValue(rec.technicalOpinion)}</td>
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
             </div>
-            <p className="text-[10px] text-[#bdc8d1]/50 italic">O SNAP-IV é uma ferramenta de rastreamento inicial e não substitui o diagnóstico médico de TDAH.</p>
+            <p className="text-[10px] text-[#bdc8d1]/50 italic">{t('notaSnapCurta')}</p>
           </div>
 
           {/* 10. Rastreamento Precoce do TEA (AQ-10) */}
           <div className="bg-[#171f33] border border-[#3e484f]/40 rounded-xl overflow-hidden shadow-xl space-y-4 p-5">
             <div className="flex items-center gap-2 border-b border-[#3e484f]/25 pb-3">
               <Brain className="w-5 h-5 text-fuchsia-400" />
-              <h3 className="text-sm font-bold text-[#dae2fd]">Rastreamento Precoce do TEA (AQ-10)</h3>
+              <h3 className="text-sm font-bold text-[#dae2fd]">{t('tituloAq10')}</h3>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse min-w-[820px]">
                 <thead>
                   <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aferido em</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Versão</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Pontuação (0-10)</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Relato de</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Classificação</th>
-                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Parecer</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaAferidoEm')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaVersao')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaPontuacao10')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaRelatoDe')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaClassificacao')}</th>
+                    <th className="px-6 py-3 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaParecer')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#3e484f]/20">
                   {aq10Records.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-8 text-center text-[#bdc8d1]/50 text-xs">
-                        Nenhuma avaliação de Rastreamento Precoce do TEA disponível para você até o momento.
+                        {t('vazioAq10Usuario')}
                       </td>
                     </tr>
                   ) : (
@@ -4140,15 +4708,15 @@ export default function AvaliacoesView({
                         <td className="px-6 py-3.5 text-[#dae2fd]">{AQ10_VERSION_LABELS[rec.version]}</td>
                         <td className="px-6 py-3.5 text-center text-[#dae2fd]">{rec.totalScore}</td>
                         <td className="px-6 py-3.5 text-[#bdc8d1]">{rec.respondent || '—'}</td>
-                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{rec.technicalOpinion}</td>
+                        <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                        <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{displayValue(rec.technicalOpinion)}</td>
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
             </div>
-            <p className="text-[10px] text-[#bdc8d1]/50 italic">O AQ-10 é um instrumento de rastreamento (triagem) e não substitui o diagnóstico formal de TEA.</p>
+            <p className="text-[10px] text-[#bdc8d1]/50 italic">{t('notaAq10Curta')}</p>
           </div>
         </div>
       ) : (
@@ -4163,7 +4731,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Índice de Massa Corporal (IMC)
+              {t('tituloImc')}
             </button>
 
             <button
@@ -4174,7 +4742,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Qualidade Motora
+              {t('tituloMotor')}
             </button>
 
             <button
@@ -4185,7 +4753,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Esporte Indicado
+              {t('tituloEsporte')}
             </button>
 
             <button
@@ -4196,7 +4764,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Vocacionamento
+              {t('tituloVocacional')}
             </button>
 
             <button
@@ -4207,7 +4775,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Saúde Global
+              {t('tituloSaude')}
             </button>
 
             <button
@@ -4218,7 +4786,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Avaliação PCD
+              {t('tituloPcd')}
             </button>
 
             <button
@@ -4229,7 +4797,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Higiene Bucal
+              {t('tituloOral')}
             </button>
 
             <button
@@ -4240,7 +4808,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Autoconceito
+              {t('tituloAuto')}
             </button>
 
             <button
@@ -4251,7 +4819,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Índice Alimentar
+              {t('tituloIas')}
             </button>
 
             <button
@@ -4262,7 +4830,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Rastreamento TDAH
+              {t('tituloSnapCurto')}
             </button>
 
             <button
@@ -4273,7 +4841,7 @@ export default function AvaliacoesView({
                   : 'text-[#bdc8d1]/70 hover:text-[#dae2fd] border-transparent hover:bg-[#131b2e]/40'
               }`}
             >
-              Rastreamento TEA
+              {t('tituloAq10Curto')}
             </button>
           </div>
 
@@ -4285,7 +4853,7 @@ export default function AvaliacoesView({
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#87929a]" />
                   <input 
                     type="text"
-                    placeholder="Pesquisar por aluno..."
+                    placeholder={t('pesquisarAluno')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-[#0b1326] border border-[#3e484f]/60 rounded-xl pl-9 pr-4 py-2 text-xs text-[#dae2fd] placeholder-[#87929a] focus:ring-1 focus:ring-[#38bdf8] outline-none"
@@ -4298,20 +4866,20 @@ export default function AvaliacoesView({
                   onClick={exportToExcel}
                   disabled={getSubTabMatchedRecords().length === 0}
                   className="w-full sm:w-auto px-3 py-2 bg-[#10b981] hover:bg-[#059669] disabled:opacity-50 disabled:cursor-not-allowed text-xs text-white font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer text-center"
-                  title="Exportar para Excel"
+                  title={ta('exportarExcel')}
                 >
                   <FileSpreadsheet className="w-3.5 h-3.5" />
-                  <span>Excel</span>
+                  <span>{ta('excel')}</span>
                 </button>
 
                 <button 
                   onClick={exportToPDF}
                   disabled={getSubTabMatchedRecords().length === 0}
                   className="w-full sm:w-auto px-3 py-2 bg-[#f43f5e] hover:bg-[#e11d48] disabled:opacity-50 disabled:cursor-not-allowed text-xs text-white font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer text-center"
-                  title="Exportar para PDF"
+                  title={ta('exportarPdf')}
                 >
                   <FileText className="w-3.5 h-3.5" />
-                  <span>PDF</span>
+                  <span>{ta('pdf')}</span>
                 </button>
               </div>
             </div>
@@ -4322,7 +4890,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Medir IMC</span>
+                <span>{t('botaoMedirImc')}</span>
               </button>
             )}
 
@@ -4332,7 +4900,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Avaliar Qualidade Motora</span>
+                <span>{t('botaoAvaliarMotor')}</span>
               </button>
             )}
 
@@ -4342,7 +4910,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Nova Indicação Esportiva</span>
+                <span>{t('botaoNovaIndicacao')}</span>
               </button>
             )}
 
@@ -4352,7 +4920,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Gerar Vocacionamento</span>
+                <span>{t('botaoGerarVocacional')}</span>
               </button>
             )}
 
@@ -4362,7 +4930,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Avaliar Saúde Global</span>
+                <span>{t('botaoAvaliarSaude')}</span>
               </button>
             )}
 
@@ -4372,7 +4940,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Avaliar PCD</span>
+                <span>{t('botaoAvaliarPcd')}</span>
               </button>
             )}
 
@@ -4382,7 +4950,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Avaliar Higiene Bucal</span>
+                <span>{t('botaoAvaliarOral')}</span>
               </button>
             )}
 
@@ -4392,7 +4960,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Avaliar Autoconceito</span>
+                <span>{t('botaoAvaliarAuto')}</span>
               </button>
             )}
 
@@ -4402,7 +4970,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Avaliar Índice Alimentar</span>
+                <span>{t('botaoAvaliarIas')}</span>
               </button>
             )}
 
@@ -4412,7 +4980,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Avaliar Rastreamento TDAH</span>
+                <span>{t('botaoAvaliarSnap')}</span>
               </button>
             )}
 
@@ -4422,7 +4990,7 @@ export default function AvaliacoesView({
                 className="w-full sm:w-auto px-4 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Avaliar Rastreamento TEA</span>
+                <span>{t('botaoAvaliarAq10')}</span>
               </button>
             )}
           </div>
@@ -4434,15 +5002,15 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[820px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aluno</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Turma</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Peso</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Altura</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">IMC Calculado</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Classificação</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Data do Registro</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{ta('colunaAluno')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{ta('turma')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaPeso')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaAltura')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaImcCalculado')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaClassificacao')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaDataRegistro')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4450,7 +5018,7 @@ export default function AvaliacoesView({
                     {imcRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 7 : 8} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhum registro de IMC encontrado.
+                          {t('vazioImcTabela')}
                         </td>
                       </tr>
                     ) : (
@@ -4460,22 +5028,22 @@ export default function AvaliacoesView({
                           <tr key={rec.id} className="hover:bg-[#131b2e]/60 transition-all font-sans text-xs">
                             <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
                             <td className="px-6 py-4 text-[#bdc8d1]">{rec.classGroup}</td>
-                            <td className="px-6 py-4 text-center text-[#dae2fd]">{rec.weight} kg</td>
-                            <td className="px-6 py-4 text-center text-[#dae2fd]">{rec.height} m</td>
+                            <td className="px-6 py-4 text-center text-[#dae2fd]">{rec.weight} {t('unidadeKg')}</td>
+                            <td className="px-6 py-4 text-center text-[#dae2fd]">{rec.height} {t('unidadeM')}</td>
                             <td className="px-6 py-4 text-center font-bold text-[#38bdf8] font-mono">{rec.imc}</td>
                             <td className="px-6 py-4">
                               <span className={`text-[10px] font-bold ${statusVal.color}`}>
-                                {statusVal.label}
+                                {displayValue(statusVal.label)}
                               </span>
                             </td>
                             <td className="px-6 py-4 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
                             {user?.role !== 'Aluno' && (
                               <td className="px-6 py-4 text-right">
                                 <div className="flex items-center justify-end gap-2">
-                                  <button onClick={() => handleEditImc(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Avaliação">
+                                  <button onClick={() => handleEditImc(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarAvaliacao')}>
                                     <Edit3 className="w-3.5 h-3.5" />
                                   </button>
-                                  <button onClick={() => handleDeleteImc(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Medição">
+                                  <button onClick={() => handleDeleteImc(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirMedicao')}>
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
                                 </div>
@@ -4495,16 +5063,16 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[1024px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aluno</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Impulsão</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Abdômen</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Agilidade</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Força Muscular</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">Velocidade</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Geral</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Última aferição</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{ta('colunaAluno')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaImpulsao')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaAbdomen')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaAgilidade')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaForcaMuscular')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-center">{t('colunaVelocidade')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaGeral')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaUltimaAfericao')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4512,7 +5080,7 @@ export default function AvaliacoesView({
                     {motorRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 8 : 9} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhuma avaliação de capacidade motora cadastrada.
+                          {t('vazioMotorTabela')}
                         </td>
                       </tr>
                     ) : (
@@ -4530,7 +5098,7 @@ export default function AvaliacoesView({
                             <td className="px-6 py-4 text-center">{rec.abdomen || rec.coordination}</td>
                             <td className="px-6 py-4 text-center">{rec.agility}</td>
                             <td className="px-6 py-4 text-center">{rec.strength}</td>
-                            <td className="px-6 py-4 text-center">{rec.speed || 'Excelente'}</td>
+                            <td className="px-6 py-4 text-center">{displayValue(rec.speed || 'Excelente')}</td>
                             <td className="px-6 py-4">
                               <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${motorBadgeColor}`}>
                                 {rec.generalClass}
@@ -4540,10 +5108,10 @@ export default function AvaliacoesView({
                             {user?.role !== 'Aluno' && (
                               <td className="px-6 py-4 text-right">
                                 <div className="flex items-center justify-end gap-2">
-                                  <button onClick={() => handleEditMotor(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Avaliação">
+                                  <button onClick={() => handleEditMotor(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarAvaliacao')}>
                                     <Edit3 className="w-3.5 h-3.5" />
                                   </button>
-                                  <button onClick={() => handleDeleteMotor(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Cadastro">
+                                  <button onClick={() => handleDeleteMotor(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirCadastro')}>
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
                                 </div>
@@ -4563,14 +5131,14 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[820px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Aluno</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Índice Corporal</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Físico Motor</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Esporte Indicado</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Recomendações</th>
-                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Última atualização</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{ta('colunaAluno')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaIndiceCorporal')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaFisicoMotor')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('tituloEsporte')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaRecomendacoes')}</th>
+                      <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('colunaUltimaAtualizacao')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4578,7 +5146,7 @@ export default function AvaliacoesView({
                     {sportRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 6 : 7} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhuma indicação de esporte recomendada neste painel.
+                          {t('vazioEsporteTabela')}
                         </td>
                       </tr>
                     ) : (
@@ -4587,20 +5155,20 @@ export default function AvaliacoesView({
                           <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
                           <td className="px-6 py-4">
                             <span className="px-2 py-0.5 rounded bg-[#1e293b] border border-[#3e484f]/30 text-xs text-[#dae2fd]">
-                              {rec.biotype}
+                              {displayValue(rec.biotype)}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-[#bdc8d1]">{rec.mainSkill}</td>
+                          <td className="px-6 py-4 text-[#bdc8d1]">{displayValue(rec.mainSkill)}</td>
                           <td className="px-6 py-4 font-bold text-[#38bdf8]">{rec.suggestedSport}</td>
-                          <td className="px-6 py-4 text-[#dae2fd]">{rec.recommendedPractice}</td>
+                          <td className="px-6 py-4 text-[#dae2fd]">{displayValue(rec.recommendedPractice)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
                           {user?.role !== 'Aluno' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <button onClick={() => handleEditSport(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Esporte">
+                                <button onClick={() => handleEditSport(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarEsporte')}>
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => handleDeleteSport(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Registro">
+                                <button onClick={() => handleDeleteSport(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirRegistro')}>
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -4619,14 +5187,14 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[820px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Aluno</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Perfil Dominante</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">Área de Interesse</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Carreira Indicada</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[36%]">Parecer do Orientador</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Aferido em</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{ta('colunaAluno')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{t('colunaPerfilDominante')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">{t('colunaAreaInteresse')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{t('colunaCarreiraIndicada')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[36%]">{t('colunaParecerOrientador')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{t('colunaAferidoEm')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4634,25 +5202,25 @@ export default function AvaliacoesView({
                     {vocationalRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 6 : 7} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhum laudo vocacional disponível no catálogo.
+                          {t('vazioVocCatalogo')}
                         </td>
                       </tr>
                     ) : (
                       vocationalRecords.filter(r => matchesFilters(r.studentName, r.studentId)).map((rec) => (
                         <tr key={rec.id} className="hover:bg-[#131b2e]/60 transition-all font-sans text-xs">
                           <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
-                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{rec.profile}</td>
-                          <td className="px-6 py-4 text-[#dae2fd]">{rec.interestArea}</td>
+                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{displayValue(rec.profile)}</td>
+                          <td className="px-6 py-4 text-[#dae2fd]">{displayValue(rec.interestArea)}</td>
                           <td className="px-6 py-4 font-bold text-[#8ed5ff]">{rec.suggestedCareer}</td>
-                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={rec.technicalOpinion}>{rec.technicalOpinion}</td>
+                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={displayValue(rec.technicalOpinion)}>{displayValue(rec.technicalOpinion)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]/80">{formatDateBR(rec.date)}</td>
                           {user?.role !== 'Aluno' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <button onClick={() => handleEditVocational(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Parecer">
+                                <button onClick={() => handleEditVocational(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarParecer')}>
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => handleDeleteVocational(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Parecer">
+                                <button onClick={() => handleDeleteVocational(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirParecer')}>
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -4670,14 +5238,14 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[820px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[14%]">Aluno</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Escore Bruto</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Escore T</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[16%]">Classificação</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[38%]">Parecer</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Aferido em</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[14%]">{ta('colunaAluno')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{t('colunaEscoreBruto')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{t('colunaEscoreT')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[16%]">{t('colunaClassificacao')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[38%]">{t('colunaParecer')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{t('colunaAferidoEm')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4685,7 +5253,7 @@ export default function AvaliacoesView({
                     {healthRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 6 : 7} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhuma avaliação de Saúde Global disponível no catálogo.
+                          {t('vazioSaudeCatalogo')}
                         </td>
                       </tr>
                     ) : (
@@ -4694,16 +5262,16 @@ export default function AvaliacoesView({
                           <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
                           <td className="px-6 py-4 text-[#dae2fd]">{rec.rawScore}</td>
                           <td className="px-6 py-4 text-[#dae2fd]">{Number(rec.tScore).toFixed(2)}</td>
-                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={rec.technicalOpinion}>{rec.technicalOpinion}</td>
+                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={displayValue(rec.technicalOpinion)}>{displayValue(rec.technicalOpinion)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]/80">{formatDateBR(rec.date)}</td>
                           {user?.role !== 'Aluno' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <button onClick={() => handleEditHealth(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Avaliação">
+                                <button onClick={() => handleEditHealth(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarAvaliacao')}>
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => handleDeleteHealth(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Avaliação">
+                                <button onClick={() => handleDeleteHealth(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirAvaliacao')}>
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -4722,14 +5290,14 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[820px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[14%]">Aluno</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">Grupo</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[14%]">Perfil</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">Modalidade Sugerida</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[26%]">Parecer</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Aferido em</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[14%]">{ta('colunaAluno')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">{t('colunaGrupo')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[14%]">{t('colunaPerfil')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">{t('colunaModalidadeSugerida')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[26%]">{t('colunaParecer')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{t('colunaAferidoEm')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4737,7 +5305,7 @@ export default function AvaliacoesView({
                     {pcdRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 6 : 7} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhuma avaliação PCD disponível no catálogo.
+                          {t('vazioPcdCatalogo')}
                         </td>
                       </tr>
                     ) : (
@@ -4749,15 +5317,15 @@ export default function AvaliacoesView({
                             <td className="px-6 py-4 text-[#dae2fd]">{rec.grupoNome || `Grupo ${rec.grupo}`}</td>
                             <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{rec.classificacaoPerfil}</td>
                             <td className="px-6 py-4 text-[#dae2fd]">{top ? (top.modalidade + (top.iar ? ` (IAR ${top.iar.toFixed(2)})` : '')) : '—'}</td>
-                            <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={rec.technicalOpinion}>{rec.technicalOpinion}</td>
+                            <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={displayValue(rec.technicalOpinion)}>{displayValue(rec.technicalOpinion)}</td>
                             <td className="px-6 py-4 text-[#bdc8d1]/80">{formatDateBR(rec.date)}</td>
                             {user?.role !== 'Aluno' && (
                               <td className="px-6 py-4 text-right">
                                 <div className="flex items-center justify-end gap-2">
-                                  <button onClick={() => handleEditPcd(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Avaliação">
+                                  <button onClick={() => handleEditPcd(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarAvaliacao')}>
                                     <Edit3 className="w-3.5 h-3.5" />
                                   </button>
-                                  <button onClick={() => handleDeletePcd(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Avaliação">
+                                  <button onClick={() => handleDeletePcd(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirAvaliacao')}>
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
                                 </div>
@@ -4777,13 +5345,13 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[820px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[16%]">Aluno</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">Pontuação (0-12)</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[18%]">Classificação</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[36%]">Parecer</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Aferido em</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[16%]">{ta('colunaAluno')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">{t('colunaPontuacao12')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[18%]">{t('colunaClassificacao')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[36%]">{t('colunaParecer')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{t('colunaAferidoEm')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4791,7 +5359,7 @@ export default function AvaliacoesView({
                     {oralRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 5 : 6} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhuma avaliação de Higiene Bucal disponível no catálogo.
+                          {t('vazioOralCatalogo')}
                         </td>
                       </tr>
                     ) : (
@@ -4799,16 +5367,16 @@ export default function AvaliacoesView({
                         <tr key={rec.id} className="hover:bg-[#131b2e]/60 transition-all font-sans text-xs">
                           <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
                           <td className="px-6 py-4 text-[#dae2fd]">{rec.score}</td>
-                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={rec.technicalOpinion}>{rec.technicalOpinion}</td>
+                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={displayValue(rec.technicalOpinion)}>{displayValue(rec.technicalOpinion)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]/80">{formatDateBR(rec.date)}</td>
                           {user?.role !== 'Aluno' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <button onClick={() => handleEditOral(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Avaliação">
+                                <button onClick={() => handleEditOral(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarAvaliacao')}>
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => handleDeleteOral(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Avaliação">
+                                <button onClick={() => handleDeleteOral(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirAvaliacao')}>
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -4827,13 +5395,13 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[820px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[16%]">Aluno</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">Pontuação (0-30)</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[18%]">Classificação</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[36%]">Parecer</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Aferido em</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[16%]">{ta('colunaAluno')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">{t('colunaPontuacao30')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[18%]">{t('colunaClassificacao')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[36%]">{t('colunaParecer')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{t('colunaAferidoEm')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4841,7 +5409,7 @@ export default function AvaliacoesView({
                     {autoconceptRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 5 : 6} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhuma avaliação de Autoconceito disponível no catálogo.
+                          {t('vazioAutoCatalogo')}
                         </td>
                       </tr>
                     ) : (
@@ -4849,16 +5417,16 @@ export default function AvaliacoesView({
                         <tr key={rec.id} className="hover:bg-[#131b2e]/60 transition-all font-sans text-xs">
                           <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
                           <td className="px-6 py-4 text-[#dae2fd]">{rec.score}</td>
-                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={rec.technicalOpinion}>{rec.technicalOpinion}</td>
+                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={displayValue(rec.technicalOpinion)}>{displayValue(rec.technicalOpinion)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]/80">{formatDateBR(rec.date)}</td>
                           {user?.role !== 'Aluno' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <button onClick={() => handleEditAuto(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Avaliação">
+                                <button onClick={() => handleEditAuto(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarAvaliacao')}>
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => handleDeleteAuto(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Avaliação">
+                                <button onClick={() => handleDeleteAuto(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirAvaliacao')}>
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -4877,13 +5445,13 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[820px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[16%]">Aluno</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">Pontuação (0-100)</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[18%]">Classificação</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[36%]">Parecer</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">Aferido em</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[16%]">{ta('colunaAluno')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">{t('colunaPontuacao100')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[18%]">{t('colunaClassificacao')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[36%]">{t('colunaParecer')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[10%]">{t('colunaAferidoEm')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4891,7 +5459,7 @@ export default function AvaliacoesView({
                     {iasRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 5 : 6} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhuma avaliação de Índice Alimentar disponível no catálogo.
+                          {t('vazioIasCatalogo')}
                         </td>
                       </tr>
                     ) : (
@@ -4899,16 +5467,16 @@ export default function AvaliacoesView({
                         <tr key={rec.id} className="hover:bg-[#131b2e]/60 transition-all font-sans text-xs">
                           <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
                           <td className="px-6 py-4 text-[#dae2fd]">{rec.totalScore}</td>
-                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={rec.technicalOpinion}>{rec.technicalOpinion}</td>
+                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={displayValue(rec.technicalOpinion)}>{displayValue(rec.technicalOpinion)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]/80">{formatDateBR(rec.date)}</td>
                           {user?.role !== 'Aluno' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <button onClick={() => handleEditIas(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Avaliação">
+                                <button onClick={() => handleEditIas(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarAvaliacao')}>
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => handleDeleteIas(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Avaliação">
+                                <button onClick={() => handleDeleteIas(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirAvaliacao')}>
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -4926,15 +5494,15 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[820px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[14%]">Aluno</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[9%]">Desatenção (0-9)</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[9%]">Hiper/Impuls. (0-9)</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">Relato de</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[15%]">Classificação</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[23%]">Parecer</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[8%]">Aferido em</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[14%]">{ta('colunaAluno')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[9%]">{t('colunaDesatencao')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[9%]">{t('colunaHiperImpulsCurta')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">{t('colunaRelatoDe')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[15%]">{t('colunaClassificacao')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[23%]">{t('colunaParecer')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[8%]">{t('colunaAferidoEm')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4942,7 +5510,7 @@ export default function AvaliacoesView({
                     {snapRecords.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 6 : 7} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhuma avaliação de Rastreamento do TDAH disponível no catálogo.
+                          {t('vazioSnapCatalogo')}
                         </td>
                       </tr>
                     ) : (
@@ -4952,16 +5520,16 @@ export default function AvaliacoesView({
                           <td className="px-6 py-4 text-center text-[#dae2fd]">{rec.inattentionScore}</td>
                           <td className="px-6 py-4 text-center text-[#dae2fd]">{rec.hyperactivityScore}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]">{rec.respondent || '—'}</td>
-                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={rec.technicalOpinion}>{rec.technicalOpinion}</td>
+                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={displayValue(rec.technicalOpinion)}>{displayValue(rec.technicalOpinion)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]/80">{formatDateBR(rec.date)}</td>
                           {user?.role !== 'Aluno' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <button onClick={() => handleEditSnap(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Avaliação">
+                                <button onClick={() => handleEditSnap(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarAvaliacao')}>
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => handleDeleteSnap(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Avaliação">
+                                <button onClick={() => handleDeleteSnap(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirAvaliacao')}>
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -4979,15 +5547,15 @@ export default function AvaliacoesView({
                 <table className="w-full border-collapse min-w-[820px]">
                   <thead>
                     <tr className="bg-[#0b1326] border-b border-[#3e484f]/40 text-left">
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[14%]">Aluno</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">Versão</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[8%]">Pontuação (0-10)</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">Relato de</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[15%]">Classificação</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[23%]">Parecer</th>
-                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[8%]">Aferido em</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[14%]">{ta('colunaAluno')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">{t('colunaVersao')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[8%]">{t('colunaPontuacao10')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[12%]">{t('colunaRelatoDe')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[15%]">{t('colunaClassificacao')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[23%]">{t('colunaParecer')}</th>
+                      <th className="px-4 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider w-[8%]">{t('colunaAferidoEm')}</th>
                       {user?.role !== 'Aluno' && (
-                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">AÇÕES</th>
+                        <th className="px-6 py-3.5 text-xs font-bold text-[#bdc8d1] uppercase tracking-wider text-right">{ta('acoes')}</th>
                       )}
                     </tr>
                   </thead>
@@ -4995,7 +5563,7 @@ export default function AvaliacoesView({
                     {aq10Records.filter(r => matchesFilters(r.studentName, r.studentId)).length === 0 ? (
                       <tr>
                         <td colSpan={user?.role === 'Aluno' ? 7 : 8} className="px-6 py-12 text-center text-[#bdc8d1]/60 text-xs">
-                          Nenhuma avaliação de Rastreamento Precoce do TEA disponível no catálogo.
+                          {t('vazioAq10Catalogo')}
                         </td>
                       </tr>
                     ) : (
@@ -5005,16 +5573,16 @@ export default function AvaliacoesView({
                           <td className="px-6 py-4 text-[#dae2fd]">{AQ10_VERSION_LABELS[rec.version]}</td>
                           <td className="px-6 py-4 text-center text-[#dae2fd]">{rec.totalScore}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]">{rec.respondent || '—'}</td>
-                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{rec.classification}</td>
-                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={rec.technicalOpinion}>{rec.technicalOpinion}</td>
+                          <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classification)}</td>
+                          <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={displayValue(rec.technicalOpinion)}>{displayValue(rec.technicalOpinion)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]/80">{formatDateBR(rec.date)}</td>
                           {user?.role !== 'Aluno' && (
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <button onClick={() => handleEditAq10(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title="Editar Avaliação">
+                                <button onClick={() => handleEditAq10(rec)} className="p-2 hover:bg-[#0b1326] text-[#bdc8d1] hover:text-[#38bdf8] rounded" title={t('titleEditarAvaliacao')}>
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => handleDeleteAq10(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title="Excluir Avaliação">
+                                <button onClick={() => handleDeleteAq10(rec.id, rec.studentName)} className="p-2 hover:bg-[#93000a]/25 text-[#bdc8d1] hover:text-[#ffb4ab] rounded" title={t('titleExcluirAvaliacao')}>
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -5038,22 +5606,29 @@ export default function AvaliacoesView({
         <div className="fixed inset-0 bg-[#060e20]/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
           <div className="bg-[#171f33] border border-[#3e484f] w-full max-w-sm rounded-xl shadow-2xl p-4 sm:p-6 relative animate-in fade-in zoom-in duration-150">
             <h4 className="text-sm font-bold text-[#dae2fd] mb-3 flex items-center gap-2">
-              <span className="text-[#ffb4ab]">⚠️</span> Confirmar Exclusão
+              <span className="text-[#ffb4ab]">⚠️</span> {ta('confirmarExclusao')}
             </h4>
             <p className="text-xs text-[#bdc8d1] mb-5 leading-relaxed">
-              Tem certeza de que deseja remover permanentemente{' '}
-              {itemToDelete.type === 'imc' && 'a medição de IMC'}
-              {itemToDelete.type === 'motor' && 'a avaliação de qualidade motora'}
-              {itemToDelete.type === 'sport' && 'o registro de esporte indicado'}
-              {itemToDelete.type === 'vocational' && 'o parecer de vocacionamento'}
-              {itemToDelete.type === 'health' && 'a avaliação de saúde global'}
-              {itemToDelete.type === 'oral' && 'a avaliação de higiene bucal'}
-              {itemToDelete.type === 'autoconcept' && 'a avaliação de autoconceito'}
-              {itemToDelete.type === 'ias' && 'a avaliação de índice alimentar'}
-              {itemToDelete.type === 'snap' && 'a avaliação de rastreamento do TDAH'}
-              {itemToDelete.type === 'aq10' && 'a avaliação de rastreamento precoce do TEA'}
-              {itemToDelete.type === 'pcd' && 'a avaliação de qualidade motora PCD'}{' '}
-              de <span className="text-[#dae2fd] font-bold">{itemToDelete.studentName}</span>? Esta ação não pode ser desfeita.
+              {t.rich('confirmarRemoverFrase', {
+                tipo: (() => {
+                  const tipos: Record<NonNullable<typeof itemToDelete>['type'], string> = {
+                    imc: t('tipoExclusaoImc'),
+                    motor: t('tipoExclusaoMotor'),
+                    sport: t('tipoExclusaoEsporte'),
+                    vocational: t('tipoExclusaoVoc'),
+                    health: t('tipoExclusaoSaude'),
+                    oral: t('tipoExclusaoOral'),
+                    autoconcept: t('tipoExclusaoAuto'),
+                    ias: t('tipoExclusaoIas'),
+                    snap: t('tipoExclusaoSnap'),
+                    aq10: t('tipoExclusaoAq10'),
+                    pcd: t('tipoExclusaoPcd'),
+                  };
+                  return itemToDelete ? tipos[itemToDelete.type] : '';
+                })(),
+                nome: itemToDelete.studentName,
+                strong: (chunks) => <span className="text-[#dae2fd] font-bold">{chunks}</span>,
+              })}
             </p>
             <div className="flex gap-2 justify-end">
               <button 
@@ -5061,14 +5636,14 @@ export default function AvaliacoesView({
                 onClick={() => setItemToDelete(null)}
                 className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1] transition-colors"
               >
-                Cancelar
+                {ta('cancelar')}
               </button>
               <button 
                 type="button"
                 onClick={handleConfirmDelete}
                 className="px-5 py-2 bg-[#93000a] hover:bg-[#b01614] text-[#ffb4ab] font-bold rounded-lg text-xs shadow-md transition-colors"
               >
-                Confirmar Excluir
+                {ta('confirmarExcluir')}
               </button>
             </div>
           </div>
@@ -5087,17 +5662,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingImc ? 'Ajustar Medição de IMC' : 'Novo Lançamento Fisiológico (IMC)'}
+              {editingImc ? t('tituloAjustarImc') : t('tituloNovoImc')}
             </h4>
 
             <form onSubmit={handleSaveImc} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -5109,8 +5684,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -5118,7 +5693,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -5129,8 +5704,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -5140,7 +5715,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -5150,8 +5725,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -5159,15 +5734,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -5177,14 +5752,14 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Selecione o Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('selecioneAlunoColuna')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
                   disabled={!!editingImc}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {getFilteredModalStudents().map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
@@ -5193,7 +5768,7 @@ export default function AvaliacoesView({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Peso (kg):</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoPeso')}</label>
                   <input 
                     type="number"
                     step="0.1"
@@ -5205,7 +5780,7 @@ export default function AvaliacoesView({
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Altura (metros):</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoAltura')}</label>
                   <input 
                     type="number"
                     step="0.01"
@@ -5219,12 +5794,12 @@ export default function AvaliacoesView({
 
               {/* Dynamic Live Calculations Review Block */}
               <div className="p-3 bg-[#0b1326] rounded-lg border border-[#3e484f]/30 text-center">
-                <span className="text-[10px] text-[#bdc8d1]/75 block font-semibold uppercase tracking-wider">Visualização do IMC Estimado</span>
+                <span className="text-[10px] text-[#bdc8d1]/75 block font-semibold uppercase tracking-wider">{t('tituloImcEstimado')}</span>
                 <span className="text-xl font-bold text-[#38bdf8] block font-mono">
                   {(parseFloat(weightInput) / ((parseFloat(heightInput) || 1) * (parseFloat(heightInput) || 1))).toFixed(1)}
                 </span>
                 <span className="text-[11px] font-semibold block text-[#dae2fd]">
-                  {getImcClass(parseFloat(weightInput), parseFloat(heightInput)).label}
+                  {displayValue(getImcClass(parseFloat(weightInput), parseFloat(heightInput)).label)}
                 </span>
               </div>
 
@@ -5234,13 +5809,13 @@ export default function AvaliacoesView({
                   onClick={() => setShowImcModal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs"
                 >
-                  {editingImc ? 'Salvar Ajustes' : 'Salvar Registro'}
+                  {editingImc ? t('botaoSalvarAjustes') : t('botaoSalvarRegistro')}
                 </button>
               </div>
             </form>
@@ -5260,17 +5835,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingMotor ? 'Editar Avaliação Motora' : 'Nova Avaliação de Qualidade Motora'}
+              {editingMotor ? t('tituloEditarMotor') : t('tituloNovoMotor')}
             </h4>
 
             <form onSubmit={handleSaveMotor} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -5282,8 +5857,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -5291,7 +5866,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -5302,8 +5877,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -5313,7 +5888,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -5323,8 +5898,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -5332,15 +5907,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -5350,14 +5925,14 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Selecione o Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('selecioneAlunoColuna')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
                   disabled={!!editingMotor}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {getFilteredModalStudents().map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
@@ -5366,7 +5941,7 @@ export default function AvaliacoesView({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Impulsão:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoImpulsao')}</label>
                   <select 
                     value={impulsao}
                     onChange={(e) => setImpulsao(e.target.value as 'Excelente' | 'Bom' | 'Regular' | 'Insuficiente')}
@@ -5380,7 +5955,7 @@ export default function AvaliacoesView({
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Abdômen:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoAbdomen')}</label>
                   <select 
                     value={abdomen}
                     onChange={(e) => setAbdomen(e.target.value as 'Excelente' | 'Bom' | 'Regular' | 'Insuficiente')}
@@ -5392,7 +5967,7 @@ export default function AvaliacoesView({
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Agilidade:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoAgilidade')}</label>
                   <select 
                     value={agility}
                     onChange={(e) => setAgility(e.target.value as 'Excelente' | 'Bom' | 'Regular' | 'Insuficiente')}
@@ -5406,7 +5981,7 @@ export default function AvaliacoesView({
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Força Muscular:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoForcaMuscular')}</label>
                   <select 
                     value={strength}
                     onChange={(e) => setStrength(e.target.value as 'Excelente' | 'Bom' | 'Regular' | 'Insuficiente')}
@@ -5420,7 +5995,7 @@ export default function AvaliacoesView({
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Velocidade:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoVelocidade')}</label>
                   <select 
                     value={speed}
                     onChange={(e) => setSpeed(e.target.value as 'Excelente' | 'Bom' | 'Regular' | 'Insuficiente')}
@@ -5443,7 +6018,7 @@ export default function AvaliacoesView({
                     : 'bg-rose-500/10 text-rose-400 border-rose-500/20';
                   return (
                     <>
-                      <span className="text-xs font-semibold text-[#bdc8d1]">Classificação Geral (automática):</span>
+                      <span className="text-xs font-semibold text-[#bdc8d1]">{t('campoClassificacaoGeral')}</span>
                       <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${cls}`}>{g}</span>
                     </>
                   );
@@ -5456,13 +6031,13 @@ export default function AvaliacoesView({
                   onClick={() => setShowMotorModal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs"
                 >
-                  {editingMotor ? 'Salvar Edições' : 'Cadastrar Parecer'}
+                  {editingMotor ? t('botaoSalvarEdicoes') : t('botaoCadastrarParecer')}
                 </button>
               </div>
             </form>
@@ -5482,17 +6057,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingSport ? 'Atualizar Esporte Recomendado' : 'Indicar Novo Esporte'}
+              {editingSport ? t('botaoAtualizarEsporte') : t('botaoIndicarNovoEsporte')}
             </h4>
 
             <form onSubmit={handleSaveSport} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -5504,8 +6079,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -5513,7 +6088,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -5524,8 +6099,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -5535,7 +6110,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -5545,8 +6120,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -5554,15 +6129,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -5572,7 +6147,7 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Mapear para Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('mapearAluno')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => {
@@ -5583,7 +6158,7 @@ export default function AvaliacoesView({
                   disabled={!!editingSport}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {getFilteredModalStudents().map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
@@ -5592,46 +6167,46 @@ export default function AvaliacoesView({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Índice Corporal:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoIndiceCorporal')}</label>
                   <input 
                     type="text"
                     disabled
                     value={editingSport ? biotype : computedBiotype}
                     className="w-full bg-[#0b1326]/60 border border-[#3e484f] rounded-lg p-2 text-xs text-[#dae2fd] font-semibold opacity-75 select-none focus:outline-none"
-                    placeholder="Sem dados de IMC"
+                    placeholder={t('placeholderSemImc')}
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Físico Motor:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoFisicoMotor')}</label>
                   <input 
                     type="text"
                     disabled
                     value={editingSport ? mainSkill : computedMainSkill}
                     className="w-full bg-[#0b1326]/60 border border-[#3e484f] rounded-lg p-2 text-xs text-[#dae2fd] font-semibold opacity-75 select-none focus:outline-none"
-                    placeholder="Sem dados motores"
+                    placeholder={t('placeholderSemMotor')}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Esporte Indicado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoEsporteIndicado')}</label>
                 <input 
                   type="text"
                   readOnly
-                  placeholder="Selecione um aluno com perfil motor e biometria avaliados"
-                  value={suggestedSport}
+                  placeholder={t('placeholderSemPerfilMotor')}
+                  value={displayValue(suggestedSport)}
                   className="w-full bg-[#0b1326]/60 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#38bdf8] font-bold cursor-not-allowed select-none focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Recomendações:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoRecomendacoes')}</label>
                 <input 
                   type="text"
                   required
-                  placeholder="Ex: 3h por semana em dias alternados"
-                  value={recommendedPractice}
+                  placeholder={t('placeholderRecomendacoes')}
+                  value={displayValue(recommendedPractice)}
                   onChange={(e) => setRecommendedPractice(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                 />
@@ -5639,13 +6214,13 @@ export default function AvaliacoesView({
 
               {((editingSport ? mainSkill : computedMainSkill) === 'Não cadastrado') && (
                 <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-400 font-semibold leading-relaxed animate-pulse">
-                  Preencher a Avaliação de Qualidade motora.
+                  {t('erroPreencherMotor')}
                 </div>
               )}
 
               {(!(editingSport ? biotype : computedBiotype) || (editingSport ? biotype : computedBiotype).toLowerCase() === 'não cadastrado') && (
                 <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-400 font-semibold leading-relaxed animate-pulse">
-                  Por favor, cadastre o Índice de Massa Corporal (IMC) deste aluno antes de indicar um esporte.
+                  {t('erroImcAntesEsporte')}
                 </div>
               )}
 
@@ -5655,7 +6230,7 @@ export default function AvaliacoesView({
                   onClick={() => setShowSportModal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
@@ -5665,7 +6240,7 @@ export default function AvaliacoesView({
                   }
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {editingSport ? 'Salvar Recomendações' : 'Indicar Esporte'}
+                  {editingSport ? t('botaoSalvarRecomendacoes') : t('botaoIndicarEsporte')}
                 </button>
               </div>
             </form>
@@ -5685,17 +6260,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingVocational ? 'Diligenciar Vocação' : 'Mapear Novo Perfil Vocacional'}
+              {editingVocational ? t('botaoDiligenciar') : t('botaoMapearNovoPerfil')}
             </h4>
 
             <form onSubmit={handleSaveVocational} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -5707,8 +6282,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -5716,7 +6291,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -5727,8 +6302,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -5738,7 +6313,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -5748,8 +6323,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -5757,15 +6332,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -5775,14 +6350,14 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Mapear para Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('mapearAluno')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
                   disabled={!!editingVocational}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {renderStudentOptions('vocational')}
                 </select>
                 {renderStudentAgeNote('vocational')}
@@ -5793,7 +6368,7 @@ export default function AvaliacoesView({
                 <div className="flex items-center justify-between border-b border-[#3e484f]/20 pb-2 mb-2">
                   <span className="text-[11px] font-bold text-[#38bdf8] uppercase tracking-wider flex items-center gap-1.5">
                     <ClipboardList className="w-4 h-4" />
-                    Questionário de Mapeamento (12 Perguntas)
+                    {t('tituloQuestionario')}
                   </span>
                 </div>
 
@@ -5801,7 +6376,7 @@ export default function AvaliacoesView({
                   {vocQuestions.map((q, i) => (
                     <div key={q.id} className="space-y-1.5">
                       <label className="text-[11px] font-semibold text-[#bdc8d1] block leading-relaxed">
-                        {i + 1}. {q.statement}
+                        {i + 1}. {displayValue(q.statement)}
                       </label>
                       <select
                         value={vocAnswers[i] ?? ''}
@@ -5812,11 +6387,11 @@ export default function AvaliacoesView({
                         }}
                         className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       >
-                        <option value="">Selecione...</option>
-                        <option value="A">A) {q.optionA}</option>
-                        <option value="B">B) {q.optionB}</option>
-                        <option value="C">C) {q.optionC}</option>
-                        <option value="D">D) {q.optionD}</option>
+                        <option value="">{ta('selecione')}</option>
+                        <option value="A">{t('opcaoA')} {displayValue(q.optionA)}</option>
+                        <option value="B">{t('opcaoB')} {displayValue(q.optionB)}</option>
+                        <option value="C">{t('opcaoC')} {displayValue(q.optionC)}</option>
+                        <option value="D">{t('opcaoD')} {displayValue(q.optionD)}</option>
                       </select>
                     </div>
                   ))}
@@ -5825,43 +6400,43 @@ export default function AvaliacoesView({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Perfil Psicológico:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoPerfilPsicologico')}</label>
                   <input 
                     type="text"
                     readOnly
                     value={vocationalProfile}
                     className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none"
-                    placeholder="Auto-calculado..."
+                    placeholder={t('calculadoAutomatico')}
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Gostos / Interesses:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoGostos')}</label>
                   <input 
                     type="text"
                     readOnly
                     value={interestArea}
                     className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none"
-                    placeholder="Auto-calculado..."
+                    placeholder={t('calculadoAutomatico')}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Carreira Sugerida:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoSugerida')}</label>
                 <textarea 
                   rows={2}
                   readOnly
-                  value={suggestedCareer}
+                  value={displayValue(suggestedCareer)}
                   className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none resize-none"
-                  placeholder="Auto-calculado..."
+                  placeholder={t('calculadoAutomatico')}
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Parecer Técnico Detalhado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoParecerTecnico')}</label>
                 <div className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 whitespace-pre-wrap leading-relaxed min-h-[3rem]">
-                  {technicalOpinion || 'Auto-calculado...'}
+                  {technicalOpinion || t('calculadoAutomatico')}
                 </div>
               </div>
 
@@ -5871,13 +6446,13 @@ export default function AvaliacoesView({
                   onClick={() => setShowVocationalModal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs"
                 >
-                  {editingVocational ? 'Salvar Diligência' : 'Entregar Parecer'}
+                  {editingVocational ? t('botaoSalvarDiligencia') : t('botaoEntregarParecer')}
                 </button>
               </div>
             </form>
@@ -5897,17 +6472,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingHealth ? 'Revisar Avaliação de Saúde Global' : 'Nova Avaliação de Saúde Global'}
+              {editingHealth ? t('tituloRevisarSaude') : t('tituloNovoSaude')}
             </h4>
 
             <form onSubmit={handleSaveHealth} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -5919,8 +6494,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -5928,7 +6503,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -5939,8 +6514,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -5950,7 +6525,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -5960,8 +6535,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -5969,15 +6544,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -5987,14 +6562,14 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Avaliar Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('botaoAvaliarAluno')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
                   disabled={!!editingHealth}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {renderStudentOptions('health')}
                 </select>
                 {renderStudentAgeNote('health')}
@@ -6004,7 +6579,7 @@ export default function AvaliacoesView({
                 <div className="flex items-center justify-between border-b border-[#3e484f]/20 pb-2 mb-2">
                   <span className="text-[11px] font-bold text-[#38bdf8] uppercase tracking-wider flex items-center gap-1.5">
                     <ClipboardList className="w-4 h-4" />
-                    KIDSCREEN-10 ({healthQuestions.length} perguntas)
+                    {t('saudeHeader')}{healthQuestions.length} {t('unidadePerguntas')})
                   </span>
                 </div>
 
@@ -6012,8 +6587,8 @@ export default function AvaliacoesView({
                   {healthQuestions.map((q, i) => (
                     <div key={q.id} className="space-y-1.5">
                       <label className="text-[11px] font-semibold text-[#bdc8d1] block leading-relaxed">
-                        {i + 1}. {q.statement}
-                        {q.reversed && <span className="ml-1 text-[9px] text-amber-400 font-bold">(invertido)</span>}
+                        {i + 1}. {displayValue(q.statement)}
+                        {q.reversed && <span className="ml-1 text-[9px] text-amber-400 font-bold">{t('marcadorInvertido')}</span>}
                       </label>
                       <select
                         value={healthAnswers[i] ? String(healthAnswers[i]) : ''}
@@ -6024,9 +6599,9 @@ export default function AvaliacoesView({
                         }}
                         className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       >
-                        <option value="">Selecione...</option>
+                        <option value="">{ta('selecione')}</option>
                         {HEALTH_LIKERT_LABELS.map((label, idx) => (
-                          <option key={idx} value={String(idx + 1)}>{idx + 1} — {label}</option>
+                          <option key={idx} value={String(idx + 1)}>{idx + 1} — {displayValue(label)}</option>
                         ))}
                       </select>
                     </div>
@@ -6036,23 +6611,23 @@ export default function AvaliacoesView({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Escore Bruto:</label>
-                  <input type="text" readOnly value={healthResult ? healthResult.raw : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoEscoreBruto')}</label>
+                  <input type="text" readOnly value={healthResult ? healthResult.raw : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Escore T:</label>
-                  <input type="text" readOnly value={healthResult ? healthResult.t.toFixed(2) : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoEscoreT')}</label>
+                  <input type="text" readOnly value={healthResult ? healthResult.t.toFixed(2) : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Classificação:</label>
-                  <input type="text" readOnly value={healthResult ? healthResult.classification : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoClassificacao')}</label>
+                  <input type="text" readOnly value={healthResult ? displayValue(healthResult.classification) : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Parecer Técnico Detalhado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoParecerTecnico')}</label>
                 <div className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 whitespace-pre-wrap leading-relaxed min-h-[3rem]">
-                  {healthOpinion || 'Auto-calculado...'}
+                  {healthOpinion || t('calculadoAutomatico')}
                 </div>
               </div>
 
@@ -6062,13 +6637,13 @@ export default function AvaliacoesView({
                   onClick={() => setShowHealthModal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs"
                 >
-                  {editingHealth ? 'Salvar Revisão' : 'Entregar Avaliação'}
+                  {editingHealth ? t('botaoSalvarRevisao') : t('botaoEntregarAvaliacao')}
                 </button>
               </div>
             </form>
@@ -6088,17 +6663,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingPcd ? 'Revisar Avaliação PCD' : 'Nova Avaliação PCD'}
+              {editingPcd ? t('tituloRevisarPcd') : t('tituloNovoPcd')}
             </h4>
 
             <form onSubmit={handleSavePcd} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -6110,8 +6685,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -6119,7 +6694,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -6130,8 +6705,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -6141,7 +6716,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -6151,8 +6726,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -6160,15 +6735,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -6178,14 +6753,14 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Avaliar Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('botaoAvaliarAluno')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
                   disabled={!!editingPcd}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {getFilteredModalStudents().map(s => (
                     <option key={s.id} value={s.id}>{s.name}{s.age != null ? ` - ${s.age} anos` : ''}</option>
                   ))}
@@ -6194,23 +6769,23 @@ export default function AvaliacoesView({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Grupo de Triagem:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('grupoTriagem')}</label>
                   <select 
                     value={pcdGrupo}
                     onChange={(e) => { setPcdGrupo(Number(e.target.value)); setPcdDetalhe(''); }}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                   >
-                    {pcdConfigs.grupos.map(g => <option key={g.id} value={g.grupo}>Grupo {g.grupo} — {g.nome}</option>)}
+                    {pcdConfigs.grupos.map(g => <option key={g.id} value={g.grupo}>{t('colunaGrupo')} {g.grupo} — {displayValue(g.nome)}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Classificação / Detalhe:</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('classificacaoDetalhe')}</label>
                   <select 
                     value={pcdDetalhe}
                     onChange={(e) => setPcdDetalhe(e.target.value)}
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                   >
-                    <option value="">(geral)</option>
+                    <option value="">{t('geralParenteses')}</option>
                     {(PCD_DETALHES_POR_GRUPO[pcdGrupo] ?? []).map(d => <option key={d} value={d}>{d}</option>)}
                   </select>
                 </div>
@@ -6220,89 +6795,89 @@ export default function AvaliacoesView({
                 <div className="flex items-center justify-between border-b border-[#3e484f]/20 pb-2 mb-1">
                   <span className="text-[11px] font-bold text-[#38bdf8] uppercase tracking-wider flex items-center gap-1.5">
                     <ClipboardList className="w-4 h-4" />
-                    Bateria de Testes Motores
+                    {t('tituloBateria')}
                   </span>
                 </div>
-                {PCD_TESTES.map(t => {
-                  const { value, setter } = t.key === 'abdominal' ? { value: pcdAbdominal, setter: setPcdAbdominal }
-                    : t.key === 'velocidade' ? { value: pcdVelocidade, setter: setPcdVelocidade }
-                    : t.key === 'agilidade' ? { value: pcdAgilidade, setter: setPcdAgilidade }
-                    : t.key === 'salto' ? { value: pcdSalto, setter: setPcdSalto }
+                {PCD_TESTES.map(testeCfg => {
+                  const { value, setter } = testeCfg.key === 'abdominal' ? { value: pcdAbdominal, setter: setPcdAbdominal }
+                    : testeCfg.key === 'velocidade' ? { value: pcdVelocidade, setter: setPcdVelocidade }
+                    : testeCfg.key === 'agilidade' ? { value: pcdAgilidade, setter: setPcdAgilidade }
+                    : testeCfg.key === 'salto' ? { value: pcdSalto, setter: setPcdSalto }
                     : { value: pcdFlexao, setter: setPcdFlexao };
-                  const nota = pcdResult?.notasPorTeste[t.key];
-                  const invalido = t.invertido && value.trim() !== '' && Number(value) <= 0;
+                  const nota = pcdResult?.notasPorTeste[testeCfg.key];
+                  const invalido = testeCfg.invertido && value.trim() !== '' && Number(value) <= 0;
                   return (
-                    <div key={t.key} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                      <label className="text-[11px] font-semibold text-[#bdc8d1] sm:w-48 sm:shrink-0">{t.label}</label>
+                    <div key={testeCfg.key} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                      <label className="text-[11px] font-semibold text-[#bdc8d1] sm:w-48 sm:shrink-0">{displayValue(testeCfg.label)}</label>
                       <input
                         type="number"
                         step="any"
                         min={0}
-                        placeholder={`Ex.: ${t.unidade === 'cm' ? '150' : '12.5'}`}
+                        placeholder={`Ex.: ${testeCfg.unidade === 'cm' ? '150' : '12.5'}`}
                         value={value}
                         onChange={(e) => setter(e.target.value)}
                         className="w-full sm:w-28 bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       />
-                      <span className="text-[10px] text-[#bdc8d1]/60 sm:w-16 sm:shrink-0">{t.unidade}</span>
+                      <span className="text-[10px] text-[#bdc8d1]/60 sm:w-16 sm:shrink-0">{displayValue(testeCfg.unidade)}</span>
                       <span className={`text-[11px] font-black rounded px-2 py-0.5 self-start sm:self-auto ${nota && nota > 0 ? 'bg-[#38bdf8]/10 text-[#38bdf8]' : 'bg-[#3e484f]/20 text-[#bdc8d1]/50'}`}>{nota ? PCD_NOTAS_LABELS[nota] : '—'}</span>
-                      {invalido && <span className="text-[10px] font-bold text-rose-400 sm:self-auto">Valor inválido: em teste de tempo, 0 não é aceito. Deixe vazio se não realizou.</span>}
+                      {invalido && <span className="text-[10px] font-bold text-rose-400 sm:self-auto">{t('avisoValorInvalido')}</span>}
                     </div>
                   );
                 })}
-                <p className="text-[10px] text-[#bdc8d1]/50 pt-1">Testes marcados como &quot;Não aplicável&quot; no Módulo 15 são ignorados no cálculo. Notas variam de 1 (inicial) a 3 (avançado).</p>
+                <p className="text-[10px] text-[#bdc8d1]/50 pt-1">{t('avisoTestesNaoAplicaveis')}</p>
                 {pcdResult && pcdResult.adaptacoesAplicadas.some(a => a.status === 'Adaptado' || a.status === 'Substituído') && (
                   <div className="mt-2 space-y-1">
-                    <p className="text-[10px] font-bold text-[#38bdf8] uppercase tracking-wider">Testes adaptados/substituídos neste grupo:</p>
+                    <p className="text-[10px] font-bold text-[#38bdf8] uppercase tracking-wider">{t('tituloTestesAdaptados')}</p>
                     {pcdResult.adaptacoesAplicadas.filter(a => a.status === 'Adaptado' || a.status === 'Substituído').map(a => (
-                      <p key={a.teste} className="text-[10px] text-[#bdc8d1]/70"><span className="font-bold text-[#dae2fd]">{PCD_TESTES.find(t => t.key === a.teste)?.label ?? a.teste} ({a.status}):</span> {a.instrucao}</p>
+                      <p key={displayValue(a.teste)} className="text-[10px] text-[#bdc8d1]/70"><span className="font-bold text-[#dae2fd]">{PCD_TESTES.find(t => t.key === a.teste)?.label ?? a.teste} ({displayValue(a.status)}):</span> {displayValue(a.instrucao)}</p>
                     ))}
-                    <p className="text-[10px] text-[#bdc8d1]/50">Na ausência de referência específica validada para o teste alternativo, o resultado deve ser interpretado de forma descritiva e funcional (Etapa B), sem criação de normas artificiais.</p>
+                    <p className="text-[10px] text-[#bdc8d1]/50">{t('notaTesteAlternativo')}</p>
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Perfil e Valências (auto):</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('tituloPerfilValencias')}</label>
                 {pcdResult ? (
                   <div className="space-y-2">
                     <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-4 gap-2">
                       <div className="bg-[#0b1326] border border-[#3e484f] rounded-lg p-2 text-center">
-                        <p className="text-[9px] text-[#bdc8d1]/60 uppercase tracking-wider">Vel/Agil</p>
+                        <p className="text-[9px] text-[#bdc8d1]/60 uppercase tracking-wider">{t('colunaVelAgil')}</p>
                         <p className="text-sm font-black text-[#38bdf8]">{pcdResult.notasValencias.velAgil}</p>
                       </div>
                       <div className="bg-[#0b1326] border border-[#3e484f] rounded-lg p-2 text-center">
-                        <p className="text-[9px] text-[#bdc8d1]/60 uppercase tracking-wider">Força Expl.</p>
+                        <p className="text-[9px] text-[#bdc8d1]/60 uppercase tracking-wider">{t('colunaForcaExpl')}</p>
                         <p className="text-sm font-black text-[#38bdf8]">{pcdResult.notasValencias.forcaExplosiva}</p>
                       </div>
                       <div className="bg-[#0b1326] border border-[#3e484f] rounded-lg p-2 text-center">
-                        <p className="text-[9px] text-[#bdc8d1]/60 uppercase tracking-wider">Membros Sup.</p>
+                        <p className="text-[9px] text-[#bdc8d1]/60 uppercase tracking-wider">{t('colunaMembrosSup')}</p>
                         <p className="text-sm font-black text-[#38bdf8]">{pcdResult.notasValencias.membrosSup}</p>
                       </div>
                       <div className="bg-[#0b1326] border border-[#3e484f] rounded-lg p-2 text-center">
-                        <p className="text-[9px] text-[#bdc8d1]/60 uppercase tracking-wider">Core</p>
+                        <p className="text-[9px] text-[#bdc8d1]/60 uppercase tracking-wider">{t('colunaCore')}</p>
                         <p className="text-sm font-black text-[#38bdf8]">{pcdResult.notasValencias.core}</p>
                       </div>
                     </div>
                     <div className="bg-[#0b1326] border border-[#3e484f] rounded-lg p-3">
-                      <p className="text-[10px] text-[#bdc8d1]/70"><span className="font-bold text-[#dae2fd]">Perfil:</span> {pcdResult.classificacaoPerfil}</p>
-                      <p className="text-[10px] text-[#bdc8d1]/70 mt-1"><span className="font-bold text-[#dae2fd]">Direcionamento:</span> {pcdResult.direcionamento}</p>
+                      <p className="text-[10px] text-[#bdc8d1]/70"><span className="font-bold text-[#dae2fd]">{t('campoPerfil')}</span> {pcdResult.classificacaoPerfil}</p>
+                      <p className="text-[10px] text-[#bdc8d1]/70 mt-1"><span className="font-bold text-[#dae2fd]">{t('campoDirecionamento')}</span> {pcdResult.direcionamento}</p>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-[11px] text-[#bdc8d1]/50">Preencha ao menos um teste para calcular.</p>
+                  <p className="text-[11px] text-[#bdc8d1]/50">{t('dicaPreenchaTeste')}</p>
                 )}
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Radar de Valências:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('tituloRadar')}</label>
                 {pcdResult && ((
                   <div className="h-64 w-full bg-[#0b1326] border border-[#3e484f] rounded-lg p-2">
                     <ResponsiveContainer width="100%" height="100%">
                       <RadarChart data={[
-                        { valencia: 'Vel/Agil', nota: pcdResult.notasValencias.velAgil },
-                        { valencia: 'Força Expl.', nota: pcdResult.notasValencias.forcaExplosiva },
-                        { valencia: 'Membros Sup.', nota: pcdResult.notasValencias.membrosSup },
-                        { valencia: 'Core', nota: pcdResult.notasValencias.core },
+                        { valencia: t('colunaVelAgil'), nota: pcdResult.notasValencias.velAgil },
+                        { valencia: t('colunaForcaExpl'), nota: pcdResult.notasValencias.forcaExplosiva },
+                        { valencia: t('colunaMembrosSup'), nota: pcdResult.notasValencias.membrosSup },
+                        { valencia: t('colunaCore'), nota: pcdResult.notasValencias.core },
                       ]}>
                         <PolarGrid stroke="#3e484f" />
                         <PolarAngleAxis dataKey="valencia" tick={{ fill: '#bdc8d1', fontSize: 10 }} />
@@ -6314,7 +6889,7 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Matriz de Compatibilidade Esportiva (Ranking por IAR bruto):</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('tituloMatriz')}</label>
                 {pcdResult && pcdResult.compatibilidade.length > 0 ? (
                   <div className="space-y-2">
                     <div className="h-64 w-full bg-[#0b1326] border border-[#3e484f] rounded-lg p-2">
@@ -6329,11 +6904,11 @@ export default function AvaliacoesView({
                           <Tooltip
                             contentStyle={{ backgroundColor: '#131b2e', border: '1px solid #3e484f', borderRadius: 8, fontSize: 11 }}
                             labelStyle={{ color: '#dae2fd' }}
-                            formatter={(v) => [`IAR ${Number(v).toFixed(2)} (bruto)`, 'Compatibilidade']}
+                            formatter={(v) => [`IAR ${Number(v).toFixed(2)} (bruto)`, t('colunaCompatibilidade')]}
                           />
                           <Bar dataKey="iar" radius={[0, 6, 6, 0]} label={{ position: 'right', fill: '#38bdf8', fontSize: 10, formatter: (v) => Number(v).toFixed(2) }}>
                             {[...pcdResult.compatibilidade].sort((a, b) => b.iar - a.iar).map((c, i) => (
-                              <Cell key={c.modalidade} fill={i === 0 ? '#38bdf8' : i === 1 ? '#60a5fa' : i === 2 ? '#34d399' : '#475569'} />
+                              <Cell key={displayValue(c.modalidade)} fill={i === 0 ? '#38bdf8' : i === 1 ? '#60a5fa' : i === 2 ? '#34d399' : '#475569'} />
                             ))}
                           </Bar>
                         </BarChart>
@@ -6341,22 +6916,22 @@ export default function AvaliacoesView({
                     </div>
                     <ol className="space-y-1">
                       {[...pcdResult.compatibilidade].sort((a, b) => b.iar - a.iar).map((c, i) => (
-                        <li key={c.modalidade} className="flex items-center justify-between bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-1.5">
-                          <span className="text-[11px] font-semibold text-[#dae2fd]">{i + 1}. {c.modalidade}</span>
-                          <span className="text-[10px] text-[#38bdf8] font-black">IAR {c.iar.toFixed(2)} / {c.maxIar ?? 36} · norm. {c.iarNormalizado != null ? c.iarNormalizado.toFixed(2) : '0.00'}/3</span>
+                        <li key={displayValue(c.modalidade)} className="flex items-center justify-between bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-1.5">
+                          <span className="text-[11px] font-semibold text-[#dae2fd]">{i + 1}. {displayValue(c.modalidade)}</span>
+                          <span className="text-[10px] text-[#38bdf8] font-black">{t('colunaIar')} {c.iar.toFixed(2)} / {c.maxIar ?? 36} {t('iarNormalizado')} {c.iarNormalizado != null ? c.iarNormalizado.toFixed(2) : '0.00'}/3</span>
                         </li>
                       ))}
                     </ol>
-                    <p className="text-[10px] text-[#bdc8d1]/50">IAR bruto = Σ(Nota × Peso) do protocolo (Etapa D). O valor normalizado (1–3) permite comparar modalidades quando há testes não aplicáveis no grupo; o ranking usa o IAR bruto.</p>
+                    <p className="text-[10px] text-[#bdc8d1]/50">{t('notaIar')}</p>
                   </div>
                 ) : (
-                  <p className="text-[11px] text-[#bdc8d1]/50">Sem dados para calcular a matriz de compatibilidade.</p>
+                  <p className="text-[11px] text-[#bdc8d1]/50">{t('vazioMatriz')}</p>
                 )}
               </div>
 
               {pcdResult && pcdResult.funil.length > 0 && (
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Funil Qualitativo de Decisão (Etapa E):</label>
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('tituloFunil')}</label>
                   <ol className="space-y-1">
                     {pcdResult.funil.map((f) => (
                       <li key={f.momento} className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-1.5">
@@ -6365,17 +6940,17 @@ export default function AvaliacoesView({
                       </li>
                     ))}
                   </ol>
-                  <p className="text-[10px] text-[#bdc8d1]/50 mt-1">Somente após a análise conjunta dos três filtros deve ser realizado o direcionamento esportivo inicial.</p>
+                  <p className="text-[10px] text-[#bdc8d1]/50 mt-1">{t('notaFunil')}</p>
                 </div>
               )}
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Parecer Técnico Detalhado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoParecerTecnico')}</label>
                 <textarea
-                  value={pcdOpinion}
+                  value={displayValue(pcdOpinion)}
                   onChange={(e) => setPcdOpinion(e.target.value)}
                   rows={3}
-                  placeholder="Auto-calculado se vazio..."
+                  placeholder={t('calculadoSeVazio')}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                 />
               </div>
@@ -6386,13 +6961,13 @@ export default function AvaliacoesView({
                   onClick={() => setShowPcdModal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs"
                 >
-                  {editingPcd ? 'Salvar Revisão' : 'Entregar Avaliação'}
+                  {editingPcd ? t('botaoSalvarRevisao') : t('botaoEntregarAvaliacao')}
                 </button>
               </div>
             </form>
@@ -6412,17 +6987,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingOral ? 'Revisar Avaliação de Higiene Bucal' : 'Nova Avaliação de Higiene Bucal'}
+              {editingOral ? t('tituloRevisarOral') : t('tituloNovoOral')}
             </h4>
 
             <form onSubmit={handleSaveOral} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -6434,8 +7009,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -6443,7 +7018,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -6454,8 +7029,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -6465,7 +7040,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -6475,8 +7050,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -6484,15 +7059,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -6502,14 +7077,14 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Avaliar Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('botaoAvaliarAluno')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
                   disabled={!!editingOral}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {renderStudentOptions('oral')}
                 </select>
                 {renderStudentAgeNote('oral')}
@@ -6519,7 +7094,7 @@ export default function AvaliacoesView({
                 <div className="flex items-center justify-between border-b border-[#3e484f]/20 pb-2 mb-2">
                   <span className="text-[11px] font-bold text-[#38bdf8] uppercase tracking-wider flex items-center gap-1.5">
                     <ClipboardList className="w-4 h-4" />
-                    HU-DBI ({oralQuestions.length} afirmações)
+                    {t('oralHeader')}{oralQuestions.length} {t('unidadeAfirmacoes')})
                   </span>
                 </div>
 
@@ -6527,7 +7102,7 @@ export default function AvaliacoesView({
                   {oralQuestions.map((q, i) => (
                     <div key={q.id} className="space-y-1.5">
                       <label className="text-[11px] font-semibold text-[#bdc8d1] block leading-relaxed">
-                        {i + 1}. {q.statement}
+                        {i + 1}. {displayValue(q.statement)}
                       </label>
                       <select
                         value={oralAnswers[i] === true ? '1' : oralAnswers[i] === false ? '0' : ''}
@@ -6538,7 +7113,7 @@ export default function AvaliacoesView({
                         }}
                         className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       >
-                        <option value="">Selecione...</option>
+                        <option value="">{ta('selecione')}</option>
                         <option value="1">{ORAL_ANSWER_LABELS[0]}</option>
                         <option value="0">{ORAL_ANSWER_LABELS[1]}</option>
                       </select>
@@ -6549,19 +7124,19 @@ export default function AvaliacoesView({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Pontuação (0-12):</label>
-                  <input type="text" readOnly value={oralResult ? oralResult.score : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoPontuacao12')}</label>
+                  <input type="text" readOnly value={oralResult ? oralResult.score : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Classificação:</label>
-                  <input type="text" readOnly value={oralResult ? oralResult.classification : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoClassificacao')}</label>
+                  <input type="text" readOnly value={oralResult ? displayValue(oralResult.classification) : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Parecer Técnico Detalhado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoParecerTecnico')}</label>
                 <div className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 whitespace-pre-wrap leading-relaxed min-h-[3rem]">
-                  {oralOpinion || 'Auto-calculado...'}
+                  {oralOpinion || t('calculadoAutomatico')}
                 </div>
               </div>
 
@@ -6571,13 +7146,13 @@ export default function AvaliacoesView({
                   onClick={() => setShowOralModal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs"
                 >
-                  {editingOral ? 'Salvar Revisão' : 'Entregar Avaliação'}
+                  {editingOral ? t('botaoSalvarRevisao') : t('botaoEntregarAvaliacao')}
                 </button>
               </div>
             </form>
@@ -6597,17 +7172,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingAuto ? 'Revisar Avaliação de Autoconceito' : 'Nova Avaliação de Autoconceito'}
+              {editingAuto ? t('tituloRevisarAuto') : t('tituloNovoAuto')}
             </h4>
 
             <form onSubmit={handleSaveAuto} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -6619,8 +7194,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -6628,7 +7203,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -6639,8 +7214,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -6650,7 +7225,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -6660,8 +7235,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -6669,15 +7244,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -6687,14 +7262,14 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Avaliar Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('botaoAvaliarAluno')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
                   disabled={!!editingAuto}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {getFilteredModalStudents().map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
@@ -6705,7 +7280,7 @@ export default function AvaliacoesView({
                 <div className="flex items-center justify-between border-b border-[#3e484f]/20 pb-2 mb-2">
                   <span className="text-[11px] font-bold text-[#38bdf8] uppercase tracking-wider flex items-center gap-1.5">
                     <ClipboardList className="w-4 h-4" />
-                    Rosenberg ({autoQuestions.length} afirmações)
+                    {t('autoHeader')}{autoQuestions.length} {t('unidadeAfirmacoes')})
                   </span>
                 </div>
 
@@ -6713,8 +7288,8 @@ export default function AvaliacoesView({
                   {autoQuestions.map((q, i) => (
                     <div key={q.id} className="space-y-1.5">
                       <label className="text-[11px] font-semibold text-[#bdc8d1] block leading-relaxed">
-                        {i + 1}. {q.statement}
-                        {q.itemType === 'negative' && <span className="ml-1 text-[9px] text-rose-400 font-bold">(negativo)</span>}
+                        {i + 1}. {displayValue(q.statement)}
+                        {q.itemType === 'negative' && <span className="ml-1 text-[9px] text-rose-400 font-bold">{t('marcadorNegativo')}</span>}
                       </label>
                       <select
                         value={autoAnswers[i] ?? ''}
@@ -6725,7 +7300,7 @@ export default function AvaliacoesView({
                         }}
                         className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       >
-                        <option value="">Selecione...</option>
+                        <option value="">{ta('selecione')}</option>
                         {AUTOCONCEPT_ANSWER_CODES.map(code => (
                           <option key={code} value={code}>{code} — {AUTOCONCEPT_ANSWER_LABELS[code]}</option>
                         ))}
@@ -6737,19 +7312,19 @@ export default function AvaliacoesView({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Pontuação (0-30):</label>
-                  <input type="text" readOnly value={autoResult ? autoResult.score : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoPontuacao30')}</label>
+                  <input type="text" readOnly value={autoResult ? autoResult.score : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Classificação:</label>
-                  <input type="text" readOnly value={autoResult ? autoResult.classification : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoClassificacao')}</label>
+                  <input type="text" readOnly value={autoResult ? displayValue(autoResult.classification) : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Parecer Técnico Detalhado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoParecerTecnico')}</label>
                 <div className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 whitespace-pre-wrap leading-relaxed min-h-[3rem]">
-                  {autoOpinion || 'Auto-calculado...'}
+                  {autoOpinion || t('calculadoAutomatico')}
                 </div>
               </div>
 
@@ -6759,13 +7334,13 @@ export default function AvaliacoesView({
                   onClick={() => setShowAutoModal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs"
                 >
-                  {editingAuto ? 'Salvar Revisão' : 'Entregar Avaliação'}
+                  {editingAuto ? t('botaoSalvarRevisao') : t('botaoEntregarAvaliacao')}
                 </button>
               </div>
             </form>
@@ -6785,17 +7360,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingIas ? 'Revisar Índice Alimentar' : 'Novo Índice Alimentar'}
+              {editingIas ? t('tituloRevisarIas') : t('tituloNovoIas')}
             </h4>
 
             <form onSubmit={handleSaveIas} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -6807,8 +7382,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -6816,7 +7391,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -6827,8 +7402,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -6838,7 +7413,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -6848,8 +7423,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -6857,15 +7432,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -6875,14 +7450,14 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Avaliar Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('botaoAvaliarAluno')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
                   disabled={!!editingIas}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {getFilteredModalStudents().map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
@@ -6893,7 +7468,7 @@ export default function AvaliacoesView({
                 <div className="flex items-center justify-between border-b border-[#3e484f]/20 pb-2 mb-2">
                   <span className="text-[11px] font-bold text-[#38bdf8] uppercase tracking-wider flex items-center gap-1.5">
                     <ClipboardList className="w-4 h-4" />
-                    IAS ({iasQuestions.length} componentes)
+                    {t('iasHeader')}{iasQuestions.length} {t('unidadeComponentes')})
                   </span>
                 </div>
 
@@ -6901,7 +7476,7 @@ export default function AvaliacoesView({
                   {iasQuestions.map((q, i) => (
                     <div key={q.id} className="space-y-1.5">
                       <label className="text-[11px] font-semibold text-[#bdc8d1] block leading-relaxed">
-                        {i + 1}. {q.statement}
+                        {i + 1}. {displayValue(q.statement)}
                       </label>
                       <select
                         value={iasAnswers[i] >= 0 ? String(iasAnswers[i]) : ''}
@@ -6912,10 +7487,10 @@ export default function AvaliacoesView({
                         }}
                         className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       >
-                        <option value="">Selecione...</option>
-                        <option value="0">{q.option1Text} ({q.option1Points} pts)</option>
-                        <option value="1">{q.option2Text} ({q.option2Points} pts)</option>
-                        <option value="2">{q.option3Text} ({q.option3Points} pts)</option>
+                        <option value="">{ta('selecione')}</option>
+                        <option value="0">{displayValue(q.option1Text)} ({q.option1Points} {t('unidadePontos')})</option>
+                        <option value="1">{displayValue(q.option2Text)} ({q.option2Points} {t('unidadePontos')})</option>
+                        <option value="2">{displayValue(q.option3Text)} ({q.option3Points} {t('unidadePontos')})</option>
                       </select>
                     </div>
                   ))}
@@ -6924,19 +7499,19 @@ export default function AvaliacoesView({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Pontuação (0-100):</label>
-                  <input type="text" readOnly value={iasResult ? `${iasResult.score}` : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoPontuacao100')}</label>
+                  <input type="text" readOnly value={iasResult ? `${iasResult.score}` : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Classificação:</label>
-                  <input type="text" readOnly value={iasResult ? iasResult.classification : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoClassificacao')}</label>
+                  <input type="text" readOnly value={iasResult ? displayValue(iasResult.classification) : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Parecer Técnico Detalhado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoParecerTecnico')}</label>
                 <div className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 whitespace-pre-wrap leading-relaxed min-h-[3rem]">
-                  {iasOpinion || 'Auto-calculado...'}
+                  {iasOpinion || t('calculadoAutomatico')}
                 </div>
               </div>
 
@@ -6946,13 +7521,13 @@ export default function AvaliacoesView({
                   onClick={() => setShowIasModal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs"
                 >
-                  {editingIas ? 'Salvar Revisão' : 'Entregar Avaliação'}
+                  {editingIas ? t('botaoSalvarRevisao') : t('botaoEntregarAvaliacao')}
                 </button>
               </div>
             </form>
@@ -6972,17 +7547,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingSnap ? 'Revisar Rastreamento do TDAH' : 'Novo Rastreamento do TDAH'}
+              {editingSnap ? t('botaoRevisarSnap') : t('botaoNovoSnap')}
             </h4>
 
             <form onSubmit={handleSaveSnap} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -6994,8 +7569,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -7003,7 +7578,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -7014,8 +7589,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -7025,7 +7600,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -7035,8 +7610,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -7044,15 +7619,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -7062,29 +7637,29 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Avaliar Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('botaoAvaliarAluno')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
                   disabled={!!editingSnap}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {renderStudentOptions('snap')}
                 </select>
                 {renderStudentAgeNote('snap')}
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Quem preencheu este relato?</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('quemPreenheu')}</label>
                 <select 
                   value={snapRespondent}
                   onChange={(e) => setSnapRespondent(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                 >
-                  <option value="">Selecione...</option>
+                  <option value="">{ta('selecione')}</option>
                   {SNAP_RESPONDENT_LABELS.map((label) => (
-                    <option key={label} value={label}>{label}</option>
+                    <option key={displayValue(label)} value={displayValue(label)}>{displayValue(label)}</option>
                   ))}
                 </select>
               </div>
@@ -7093,18 +7668,18 @@ export default function AvaliacoesView({
                 <div className="flex items-center justify-between border-b border-[#3e484f]/20 pb-2 mb-2">
                   <span className="text-[11px] font-bold text-[#38bdf8] uppercase tracking-wider flex items-center gap-1.5">
                     <ClipboardList className="w-4 h-4" />
-                    SNAP-IV ({snapQuestions.length} itens)
+                    {t('snapHeader')}{snapQuestions.length} {t('unidadeItens')})
                   </span>
-                  <span className="text-[10px] text-[#bdc8d1]/60">Escala: Nem um pouco (0) • Só um pouco (1) • Bastante (2) • Demais (3)</span>
+                  <span className="text-[10px] text-[#bdc8d1]/60">{t('escalaFrequencia')}</span>
                 </div>
 
                 <div className="space-y-4 max-h-[330px] overflow-y-auto pr-1 scrollbar-thin">
                   {snapQuestions.map((q, i) => (
                     <div key={q.id} className="space-y-1.5">
                       <label className="text-[11px] font-semibold text-[#bdc8d1] block leading-relaxed">
-                        {i + 1}. {q.statement}
+                        {i + 1}. {displayValue(q.statement)}
                         <span className={`ml-2 text-[10px] font-bold ${i < 9 ? 'text-[#8ed5ff]' : 'text-violet-400'}`}>
-                          [{i < 9 ? 'Desatenção' : 'Hiperatividade/Impulsividade'}]
+                          [{i < 9 ? t('subescalaDesatencao') : t('subescalaHiperatividade')}]
                         </span>
                       </label>
                       <select
@@ -7116,9 +7691,9 @@ export default function AvaliacoesView({
                         }}
                         className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       >
-                        <option value="">Selecione...</option>
+                        <option value="">{ta('selecione')}</option>
                         {SNAP_LIKERT_LABELS.map((label, idx) => (
-                          <option key={label} value={idx}>{label} ({idx})</option>
+                          <option key={displayValue(label)} value={idx}>{displayValue(label)} ({idx})</option>
                         ))}
                       </select>
                     </div>
@@ -7128,40 +7703,36 @@ export default function AvaliacoesView({
 
               <div className="p-3 bg-[#3b1d0a]/40 border border-[#f59e0b]/30 rounded-lg space-y-1.5">
                 <p className="text-[10px] font-bold text-[#fbbf24] uppercase tracking-wider flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5" /> Alerta – Uso exclusivo para rastreamento inicial
+                  <AlertTriangle className="w-3.5 h-3.5" /> {t('alertaRastreamento')}
                 </p>
                 <p className="text-[11px] text-[#bdc8d1]/90 leading-relaxed">
-                  O SNAP-IV é uma ferramenta de rastreamento de sintomas e não confirma o diagnóstico de TDAH.
-                  A classificação considera apenas os sintomas (critério A do DSM-5-TR) relatados para os últimos seis meses.
-                  Para o diagnóstico formal, é obrigatório avaliar também os critérios B-E do DSM-5-TR:
-                  início dos sintomas antes dos 12 anos (B), presença em pelo menos dois contextos (C),
-                  prejuízo clinicamente significativo (D) e exclusão de outras causas (E). O DSM-5-TR permite o diagnóstico conjunto com TEA.
+                  {t('notaSnapLonga')}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Itens clínicos – Desatenção (0-9):</label>
-                  <input type="text" readOnly value={snapResult ? `${snapResult.inattention}` : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('itensDesatencao')}</label>
+                  <input type="text" readOnly value={snapResult ? `${snapResult.inattention}` : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Itens clínicos – Hiper/Impulsividade (0-9):</label>
-                  <input type="text" readOnly value={snapResult ? `${snapResult.hyperactivity}` : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                  <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('itensHiperImpulsividade')}</label>
+                  <input type="text" readOnly value={snapResult ? `${snapResult.hyperactivity}` : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Classificação:</label>
-                <input type="text" readOnly value={snapResult ? snapResult.classification : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoClassificacao')}</label>
+                <input type="text" readOnly value={snapResult ? displayValue(snapResult.classification) : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Parecer Técnico Detalhado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoParecerTecnico')}</label>
                 <textarea 
-                  value={snapOpinion}
+                  value={displayValue(snapOpinion)}
                   onChange={(e) => setSnapOpinion(e.target.value)}
                   rows={4}
-                  placeholder="Auto-calculado a partir da classificação..."
+                  placeholder={t('calculadoDaClassificacao')}
                   className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] outline-none min-h-[5rem] leading-relaxed reset-field"
                 />
               </div>
@@ -7172,13 +7743,13 @@ export default function AvaliacoesView({
                   onClick={() => setShowSnapModal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs"
                 >
-                  {editingSnap ? 'Salvar Revisão' : 'Entregar Avaliação'}
+                  {editingSnap ? t('botaoSalvarRevisao') : t('botaoEntregarAvaliacao')}
                 </button>
               </div>
             </form>
@@ -7198,17 +7769,17 @@ export default function AvaliacoesView({
             </button>
 
             <h4 className="text-sm font-bold text-[#38bdf8] uppercase tracking-wider mb-4 border-b border-[#3e484f]/30 pb-2">
-              {editingAq10 ? 'Revisar Rastreamento Precoce do TEA' : 'Novo Rastreamento Precoce do TEA'}
+              {editingAq10 ? t('botaoRevisarAq10') : t('botaoNovoAq10')}
             </h4>
 
             <form onSubmit={handleSaveAq10} className="space-y-4">
               {/* Modal unified filters for selective student searching */}
               <div className="p-3 bg-[#131b2e] border border-[#3e484f]/40 rounded-lg space-y-2">
-                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">Filtrar Alunos por Contrato / Região</p>
+                <p className="text-[10px] font-bold text-[#8ed5ff] uppercase tracking-wider">{t('filtrarAlunosTitulo')}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Contrato:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('contrato')}</label>
                     <select 
                       value={modalContract}
                       onChange={(e) => {
@@ -7220,8 +7791,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Contrato...</option>
-                      <option value="Todos">Todos os Contratos</option>
+                      <option value="">{t('selecioneContrato')}</option>
+                      <option value="Todos">{ta('todosContratos')}</option>
                       {availableContracts.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -7229,7 +7800,7 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Estado:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('estado')}</label>
                     <select 
                       value={modalState}
                       onChange={(e) => {
@@ -7240,8 +7811,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione o Estado...</option>
-                      {modalContract === 'Todos' && <option value="Todos">Todos os Estados</option>}
+                      <option value="">{t('selecioneEstado')}</option>
+                      {modalContract === 'Todos' && <option value="Todos">{ta('todosEstados')}</option>}
                       {modalAvailableStates.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -7251,7 +7822,7 @@ export default function AvaliacoesView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Região:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('regiao')}</label>
                     <select 
                       value={modalRegion}
                       onChange={(e) => {
@@ -7261,8 +7832,8 @@ export default function AvaliacoesView({
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Região...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">Todas as Regiões</option>}
+                      <option value="">{t('selecioneRegiao')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos') && <option value="Todos">{ta('todasRegioes')}</option>}
                       {modalAvailableRegions.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
@@ -7270,15 +7841,15 @@ export default function AvaliacoesView({
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">Localidade:</label>
+                    <label className="text-[10px] font-semibold text-[#bdc8d1] block mb-0.5">{ta('localidade')}</label>
                     <select 
                       value={modalLocality}
                       onChange={(e) => setModalLocality(e.target.value)}
                       disabled={!isUserAdmin}
                       className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-2 py-1 text-[11px] text-[#dae2fd] outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecione a Localidade...</option>
-                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">Todas as Localidades</option>}
+                      <option value="">{t('selecioneLocalidade')}</option>
+                      {(modalContract === 'Todos' || modalState === 'Todos' || modalRegion === 'Todos' || modalRegion === 'Todas') && <option value="Todos">{ta('todasLocalidades')}</option>}
                       {modalAvailableLocalities.map(loc => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -7288,7 +7859,7 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Avaliar Aluno:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('botaoAvaliarAluno')}</label>
                 <select 
                   value={selectedStudentId}
                   onChange={(e) => {
@@ -7304,14 +7875,14 @@ export default function AvaliacoesView({
                   disabled={!!editingAq10}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                 >
-                  <option value="">Selecione o Aluno...</option>
+                  <option value="">{t('selecioneAluno')}</option>
                   {renderStudentOptions('aq10')}
                 </select>
                 {renderStudentAgeNote('aq10')}
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Versão do Instrumento:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('versaoInstrumento')}</label>
                 <select 
                   value={aq10Version}
                   onChange={(e) => {
@@ -7344,15 +7915,15 @@ export default function AvaliacoesView({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Quem preencheu este relato?</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('quemPreenheu')}</label>
                 <select 
                   value={aq10Respondent}
                   onChange={(e) => setAq10Respondent(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                 >
-                  <option value="">Selecione...</option>
+                  <option value="">{ta('selecione')}</option>
                   {AQ10_RESPONDENT_LABELS.map((label) => (
-                    <option key={label} value={label}>{label}</option>
+                    <option key={displayValue(label)} value={displayValue(label)}>{displayValue(label)}</option>
                   ))}
                 </select>
               </div>
@@ -7361,16 +7932,16 @@ export default function AvaliacoesView({
                 <div className="flex items-center justify-between border-b border-[#3e484f]/20 pb-2 mb-2">
                   <span className="text-[11px] font-bold text-[#38bdf8] uppercase tracking-wider flex items-center gap-1.5">
                     <ClipboardList className="w-4 h-4" />
-                    AQ-10 - {AQ10_VERSION_LABELS[aq10Version]} ({aq10Questions.filter(q => q.version === aq10Version).length} itens)
+                    {t('aq10Header')} {displayValue(AQ10_VERSION_LABELS[aq10Version])} ({aq10Questions.filter(q => q.version === aq10Version).length} {t('unidadeItens')})
                   </span>
-                  <span className="text-[10px] text-[#bdc8d1]/60">Escala: Concordo Totalmente (0) • Concordo em Parte (1) • Discordo em Parte (2) • Discordo Totalmente (3)</span>
+                  <span className="text-[10px] text-[#bdc8d1]/60">{t('escalaConcordo')}</span>
                 </div>
 
                 <div className="space-y-4 max-h-[330px] overflow-y-auto pr-1 scrollbar-thin">
                   {aq10Questions.filter(q => q.version === aq10Version).map((q, i) => (
                     <div key={q.id} className="space-y-1.5">
                       <label className="text-[11px] font-semibold text-[#bdc8d1] block leading-relaxed">
-                        {i + 1}. {q.statement}
+                        {i + 1}. {displayValue(q.statement)}
                       </label>
                       <select
                         value={aq10Answers[i] >= 0 ? String(aq10Answers[i]) : ''}
@@ -7381,9 +7952,9 @@ export default function AvaliacoesView({
                         }}
                         className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       >
-                        <option value="">Selecione...</option>
+                        <option value="">{ta('selecione')}</option>
                         {AQ10_LIKERT_LABELS.map((label, idx) => (
-                          <option key={label} value={idx}>{label} ({idx})</option>
+                          <option key={displayValue(label)} value={idx}>{displayValue(label)} ({idx})</option>
                         ))}
                       </select>
                     </div>
@@ -7393,33 +7964,30 @@ export default function AvaliacoesView({
 
               <div className="p-3 bg-[#3b1d0a]/40 border border-[#f59e0b]/30 rounded-lg space-y-1.5">
                 <p className="text-[10px] font-bold text-[#fbbf24] uppercase tracking-wider flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5" /> Alerta – Uso exclusivo para rastreamento inicial
+                  <AlertTriangle className="w-3.5 h-3.5" /> {t('alertaRastreamento')}
                 </p>
                 <p className="text-[11px] text-[#bdc8d1]/90 leading-relaxed">
-                  O AQ-10 é um instrumento de rastreamento (triagem) e não confirma o diagnóstico de TEA.
-                  A pontuação avalia apenas sinais de alerta relatados pelos pais/responsáveis para os itens
-                  de comunicação social e flexibilidade comportamental. Para o diagnóstico formal, é obrigatória
-                  a avaliação multidisciplinar especializada (neuropediatra ou psiquiatra infantil e neuropsicólogo).
+                  {t('notaAq10Longa')}
                 </p>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Pontuação (0-10):</label>
-                <input type="text" readOnly value={aq10Result ? `${aq10Result.totalScore}` : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoPontuacao10')}</label>
+                <input type="text" readOnly value={aq10Result ? `${aq10Result.totalScore}` : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Classificação:</label>
-                <input type="text" readOnly value={aq10Result ? aq10Result.classification : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder="Auto..." />
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoClassificacao')}</label>
+                <input type="text" readOnly value={aq10Result ? displayValue(aq10Result.classification) : ''} className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]/85 cursor-not-allowed outline-none" placeholder={t('placeholderAuto')} />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">Parecer Técnico Detalhado:</label>
+                <label className="text-xs font-semibold text-[#bdc8d1] block mb-1">{t('campoParecerTecnico')}</label>
                 <textarea 
-                  value={aq10Opinion}
+                  value={displayValue(aq10Opinion)}
                   onChange={(e) => setAq10Opinion(e.target.value)}
                   rows={4}
-                  placeholder="Auto-calculado a partir da classificação..."
+                  placeholder={t('calculadoDaClassificacao')}
                   className="w-full bg-[#0b1326]/50 border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] outline-none min-h-[5rem] leading-relaxed reset-field"
                 />
               </div>
@@ -7430,13 +7998,13 @@ export default function AvaliacoesView({
                   onClick={() => setShowAq10Modal(false)}
                   className="px-4 py-2 bg-[#0b1326] hover:bg-[#131b2e] border border-[#3e484f]/60 rounded-lg text-xs text-[#bdc8d1]"
                 >
-                  Cancelar
+                  {ta('cancelar')}
                 </button>
                 <button 
                   type="submit"
                   className="px-5 py-2 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold rounded-lg text-xs"
                 >
-                  {editingAq10 ? 'Salvar Revisão' : 'Entregar Avaliação'}
+                  {editingAq10 ? t('botaoSalvarRevisao') : t('botaoEntregarAvaliacao')}
                 </button>
               </div>
             </form>

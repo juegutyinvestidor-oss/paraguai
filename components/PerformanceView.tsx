@@ -10,11 +10,117 @@ import JSZip from 'jszip';
 import { addReportBackground } from '../lib/pdfUtils';
 import { type Student, type ContratoItem, type PerformanceReport, type ImcRecord, type MotorRecord, type SportRecord, type VocationalRecord, type HealthRecord, type OralRecord, type AutoconceptRecord, type IasRecord, type SnapRecord, type Aq10Record, type PcdRecord, type EstHierarchical, type RegHierarchical, type LocHierarchical } from '../types/edukyne';
 import { buildAssessmentReport, type ReportBuildCtx } from '../lib/reportBuilder';
+import { localizeAssessmentReport, type ReportTranslator } from '../lib/reportI18n';
 import { backfillReportsForStudentIds } from '../lib/autoReport';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { getDb } from '../lib/dbFacade';
 import type { Permission } from '../lib/rbac';
 import { logExport, logDataAccess } from '../lib/auditLog';
+import { useLocale, useTranslations } from 'next-intl';
+
+const DISPLAY_KEYS: Record<string, string> = {
+  "GINÁSTICA (Artística / Rítmica)": "valorGinasticaArtisticaRitmica",
+  "FUTEBOL / FUTSAL": "valorFutebolFutsal",
+  "VÔLEI": "valorVolei",
+  "LUTAS / ARTES MARCIAIS": "valorLutasArtesMarciais",
+  "NATAÇÃO": "valorNatacao",
+  "APRIMORAR HABILIDADES MOTORAS": "valorAprimorarHabilidadesMotoras",
+  "Desempenho Escolar": "valorDesempenhoEscolar",
+  "Desempenho Corporal": "valorDesempenhoCorporal",
+  "Desempenho de Capacidades Físicas": "valorDesempenhoDeCapacidadesFisicas",
+  "Desempenho em Atividades Esportivas": "valorDesempenhoEmAtividadesEsportivas",
+  "Desempenho Vocacional": "valorDesempenhoVocacional",
+  "Desempenho Saúde Global": "valorDesempenhoSaudeGlobal",
+  "Desempenho Higiene Bucal": "valorDesempenhoHigieneBucal",
+  "Desempenho Autoconceito": "valorDesempenhoAutoconceito",
+  "Desempenho Índice Alimentar": "valorDesempenhoIndiceAlimentar",
+  "Desempenho Rastreamento TDAH": "valorDesempenhoRastreamentoTdah",
+  "Desempenho Rastreamento Precoce do TEA": "valorDesempenhoRastreamentoPrecoceDoTea",
+  "Desempenho Qualidade Motora PCD": "valorDesempenhoQualidadeMotoraPcd",
+  "Desempenho Completo": "valorDesempenhoCompleto",
+  "Avaliação de IMC": "valorAvaliacaoDeImc",
+  "Desempenho de capacidades físicas": "valorDesempenhoDeCapacidadesFisicas2",
+  "Qualidade Motora": "valorQualidadeMotora",
+  "Avaliação Esportiva": "valorAvaliacaoEsportiva",
+  "Desempenho vocacional": "valorDesempenhoVocacional2",
+  "Perfil Vocacional": "valorPerfilVocacional",
+  "Não informado": "valorNaoInformado",
+  "CENÁRIO A – MAIS PRESENÇAS DO QUE FALTAS": "valorCenarioAMaisPresencasDoQueFaltas",
+  "O estudante demonstrou excelente regularidade e compromisso com a rotina escolar ao longo deste período. A baixa taxa de absenteísmo reflete uma postura participativa e engajada com o ambiente de aprendizagem.": "valorOEstudanteDemonstrouExcelenteRegularidadeECompromisso",
+  "Parabéns pelo incentivo e parceria. A presença constante tem sido o pilar para os bons resultados mantidos até aqui.": "valorParabensPeloIncentivoEParceriaAPresenca",
+  "### Matriz de Impactos Pedagógicos\n- **Continuidade Pedagógica**: Quando presente, o aluno acompanha as explicações passo a passo, facilitando a execução de tarefas complexas.\n- **Socialização Ativa**: A convivência diária fortalece os vínculos com professores e colegas, desenvolvendo inteligência emocional e trabalho em equipe.\n- **Ritmo de Avaliação**: Menor necessidade de aplicação de provas substitutivas ou trabalhos de recuperação de nota por perda de prazos.": "valorMatrizDeImpactosPedagogicosContinuidadePedagogicaQuando",
+  "CENÁRIO B – MAIS FALTAS DO QUE PRESENÇAS": "valorCenarioBMaisFaltasDoQuePresencas",
+  "Identificamos um número crítico de ausências neste período, superando os dias de comparecimento em sala de aula. Esse padrão de faltas excessivas acende um alerta pedagógico, pois interrompe a sequência didática e prejudica a absorção dos conteúdos ministrados.": "valorIdentificamosUmNumeroCriticoDeAusenciasNeste",
+  "Solicitamos uma atenção especial e um diálogo familiar para identificarmos o motivo das ausências. É fundamental restabelecer a rotina de idas à escola para evitar prejuízos severos na avaliação final deste ciclo.": "valorSolicitamosUmaAtencaoEspecialEUmDialogo",
+  "### Matriz de Impactos Pedagógicos\n- **Lacunas de Conteúdo**: Cada ausência gera a perda de conceitos-chave, acumulando dúvidas para as unidades seguintes.\n- **Desengajamento Escolar**: O excesso de faltas quebra a rotina do estudante, gerando desmotivação e sensação de isolamento em relação à turma.\n- **Sobrecarga de Tarefas**: Acúmulo de atividades pendentes que precisam ser realizadas em casa para cumprir as exigências do ano letivo.": "valorMatrizDeImpactosPedagogicosLacunasDeConteudo",
+  "CENÁRIO C – SEM REGISTROS SUFICIENTES": "valorCenarioCSemRegistrosSuficientes",
+  "Até o momento, não foram identificados registros de presença ou ausência suficientes para o estudante no sistema neste período. A ausência de dados impede uma avaliação precisa do acompanhamento escolar.": "valorAteOMomentoNaoForamIdentificadosRegistros",
+  "Solicitamos que entrem em contato com a secretaria escolar para a regularização dos registros de frequência.": "valorSolicitamosQueEntremEmContatoComA",
+  "### Matriz de Impactos Pedagógicos\n- **Inconsistência de Dados**: A falta de registros impede a análise de evolução pedagógica.\n- **Alerta de Monitoramento**: Recomenda-se a verificação imediata da rotina de frequência.": "valorMatrizDeImpactosPedagogicosInconsistenciaDeDados",
+  "Nenhuma observação adicional registrada.": "valorNenhumaObservacaoAdicionalRegistrada",
+  "### RELATÓRIO DE DESEMPENHO CORPORAL\n\nNenhum registro de IMC selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoCorporalNenhumRegistroDe",
+  "Não classificado": "valorNaoClassificado",
+  "Aguardando Análise": "valorAguardandoAnalise",
+  "Não há um parecer específico cadastrado para esta classificação.": "valorNaoHaUmParecerEspecificoCadastradoPara",
+  "### RELATÓRIO DE DESEMPENHO DE CAPACIDADES FÍSICAS\n\nNenhum registro de Qualidade Motora selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoDeCapacidadesFisicasNenhum",
+  "Nenhuma observação específica registrada pelo educador para este período.": "valorNenhumaObservacaoEspecificaRegistradaPeloEducadorPara",
+  "### RELATÓRIO DE DESEMPENHO EM ATIVIDADES ESPORTIVAS\n\nNenhum registro de Esporte Indicado selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoEmAtividadesEsportivasNenhum",
+  "Não avaliado": "valorNaoAvaliado",
+  "Nenhuma observação complementar registrada.": "valorNenhumaObservacaoComplementarRegistrada",
+  "### RELATÓRIO DE DESEMPENHO VOCACIONAL\n\nNenhum registro de Vocacionamento selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoVocacionalNenhumRegistroDe",
+  "Não especificado": "valorNaoEspecificado",
+  "Nenhum parecer técnico inserido no registro de vocacionamento original.": "valorNenhumParecerTecnicoInseridoNoRegistroDe",
+  "Nenhuma observação complementar registrada para este período.": "valorNenhumaObservacaoComplementarRegistradaParaEstePeriodo",
+  "### RELATÓRIO DE DESEMPENHO - SAÚDE GLOBAL\n\nNenhum registro de Saúde Global selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoSaudeGlobalNenhumRegistro",
+  "Nenhum parecer técnico inserido no registro de Saúde Global original.": "valorNenhumParecerTecnicoInseridoNoRegistroDe2",
+  "### RELATÓRIO DE DESEMPENHO - HIGIENE BUCAL\n\nNenhum registro de Higiene Bucal selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoHigieneBucalNenhumRegistro",
+  "Nenhum parecer técnico inserido no registro de Higiene Bucal original.": "valorNenhumParecerTecnicoInseridoNoRegistroDe3",
+  "### RELATÓRIO DE DESEMPENHO - AUTOCONCEITO\n\nNenhum registro de Autoconceito selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoAutoconceitoNenhumRegistroDe",
+  "Nenhum parecer técnico inserido no registro de Autoconceito original.": "valorNenhumParecerTecnicoInseridoNoRegistroDe4",
+  "### RELATÓRIO DE DESEMPENHO - ÍNDICE ALIMENTAR\n\nNenhum registro de Índice Alimentar selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoIndiceAlimentarNenhumRegistro",
+  "Nenhum parecer técnico inserido no registro de Índice Alimentar original.": "valorNenhumParecerTecnicoInseridoNoRegistroDe5",
+  "### RELATÓRIO DE DESEMPENHO - RASTREAMENTO DO TDAH\n\nNenhum registro de Rastreamento do TDAH selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoRastreamentoDoTdahNenhum",
+  "Nenhum parecer técnico inserido no registro de Rastreamento do TDAH original.": "valorNenhumParecerTecnicoInseridoNoRegistroDe6",
+  "### RELATÓRIO DE DESEMPENHO - RASTREAMENTO PRECOCE DO TEA\n\nNenhum registro de Rastreamento Precoce do TEA selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoRastreamentoPrecoceDoTea",
+  "Não classificada": "valorNaoClassificada",
+  "Nenhum parecer técnico inserido no registro de Rastreamento Precoce do TEA original.": "valorNenhumParecerTecnicoInseridoNoRegistroDe7",
+  "### RELATÓRIO DE DESEMPENHO - QUALIDADE MOTORA PCD\n\nNenhuma avaliação de Qualidade Motora PCD selecionada ou encontrada para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.": "valorRelatorioDeDesempenhoQualidadeMotoraPcdNenhuma",
+  "Substituído": "valorSubstituido",
+  "- Nenhum teste adaptado ou substituído neste grupo.": "valorNenhumTesteAdaptadoOuSubstituidoNesteGrupo",
+  "Nenhum parecer técnico inserido no registro de Avaliação PCD original.": "valorNenhumParecerTecnicoInseridoNoRegistroDe8",
+  "Não informada": "valorNaoInformada",
+  "Nenhum parecer integrador ou observação complementar geral registrada pelo educador para esta consolidação.": "valorNenhumParecerIntegradorOuObservacaoComplementarGeral",
+  "Força Muscular": "valorForcaMuscular",
+  "Impulsão": "valorImpulsao",
+  "Velocidade": "valorVelocidade",
+  "Abdomen": "valorAbdomen",
+  "Agilidade": "valorAgilidade",
+  "Excelente": "valorExcelente",
+  "Geral": "valorGeral",
+  "Adolescente (12 a 15 anos)": "valorAdolescente12A15Anos",
+  "Criança (4 a 11 anos)": "valorCrianca4A11Anos",
+  "Pontuação de 0 a 6: traços comportamentais dentro da média da população geral; acompanhamento rotineiro do desenvolvimento.": "valorPontuacao0a6",
+  "Pontuação de 7 a 10: alerta de traços elevados de TEA; recomendação de encaminhamento prioritário para avaliação multidisciplinar especializada (neuropediatra ou psiquiatra infantil e neuropsicólogo).": "valorPontuacao7a10",
+  "*Nenhum relatório de Desempenho Escolar foi encontrado no histórico.*": "valorSemRelatorioEscolar",
+  "*Nenhum relatório de Desempenho Corporal foi encontrado no histórico.*": "valorSemRelatorioCorporal",
+  "*Nenhum relatório de Capacidades Físicas foi encontrado no histórico.*": "valorSemRelatorioCapacidades",
+  "*Nenhum relatório de Desempenho Esportivo foi encontrado no histórico.*": "valorSemRelatorioEsportivo",
+  "*Nenhum relatório de Desempenho Vocacional foi encontrado no histórico.*": "valorSemRelatorioVocacional",
+  "*Nenhum relatório de Saúde Global foi encontrado no histórico.*": "valorSemRelatorioSaude",
+  "*Nenhum relatório de Higiene Bucal foi encontrado no histórico.*": "valorSemRelatorioHigiene",
+  "*Nenhum relatório de Autoconceito foi encontrado no histórico.*": "valorSemRelatorioAutoconceito",
+  "*Nenhum relatório de Índice Alimentar foi encontrado no histórico.*": "valorSemRelatorioIas",
+  "Centro": "valorCentro",
+  "Regular": "valorRegular",
+  "BASQUETE": "valorBasquete",
+  "HANDEBOL": "valorHandebol",
+  "ATLETISMO": "valorAtletismo",
+};
+
+function displayValue(value: unknown, t: (key: string) => string): string {
+  const text = String(value ?? '');
+  return DISPLAY_KEYS[text] ? t(DISPLAY_KEYS[text]) : text;
+}
 
 interface PerformanceViewUser {
   id?: string;
@@ -259,16 +365,20 @@ const FOCUS_AREAS: string[] = [
 ];
 
 function FocusAreaSelect({ value, onChange, className }: { value: string; onChange: (value: string) => void; className?: string }) {
+  const tArea = useTranslations('desempenho');
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)} className={className}>
       {FOCUS_AREAS.map((area) => (
-        <option key={area} value={area}>{area}</option>
+        <option key={area} value={area}>{displayValue(area, tArea)}</option>
       ))}
     </select>
   );
 }
 
 export default function PerformanceView({ students, contratos, user, isAnaliseGeral, isPainelEstatistico, imcRecords: imcRecordsProp, motorRecords: motorRecordsProp, sportRecords: sportRecordsProp, vocationalRecords: vocationalRecordsProp, healthRecords: healthRecordsProp, oralRecords: oralRecordsProp, autoconceptRecords: autoconceptRecordsProp, iasRecords: iasRecordsProp, snapRecords: snapRecordsProp, aq10Records: aq10RecordsProp, pcdRecords: pcdRecordsProp, runWithPermission }: PerformanceViewProps) {
+  const t = useTranslations('desempenho');
+  const locale = useLocale();
+
   // Match logged in Student object for Aluno role
   const loggedInStudentObj = useMemo(() => {
     if (user?.role !== 'Aluno') return null;
@@ -633,37 +743,37 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
     }
     return {
       velocidade: [
-        { id: "v1", level: "INSUFICIENTE", alertColor: "rose", healthStatus: "A capacidade de deslocamento rápido e o tempo de reação estão abaixo do esperado para a idade. Na saúde, isso indica um sistema neuromuscular com respostas lentas aos estímulos externos e baixa eficiência cardiovascular em esforços explosivos, gerando cansaço precoce e falta de fôlego em corridas curtas.", toImprove: "O aluno precisa desenvolver a eficiência da passada e o ganho de ritmo. O foco inicial deve ser em educativos de corrida (como elevar os joelhos e calcanhares), coordenando a respiração e o movimento dos braços para destravar a agilidade dos pés e melhorar o condicionamento aeróbico de base.", recommendation: "Incentivamos o estímulo em casa através de jogos que exijam arrancadas rápidas, como pique-bandeira, corrida de obstáculos no quintal ou circuitos de tempo." },
-        { id: "v2", level: "REGULAR", alertColor: "yellow", healthStatus: "O aluno consegue correr em um ritmo estável, mas apresenta dificuldades para acelerar rapidamente na largada ou mudar o ritmo de forma brusca. A saúde cardiovascular suporta o esforço, mas a musculatura das pernas gasta energia em excesso por falta de coordenação fina e potência na passada.", toImprove: "O foco deve ser o ganho de acréscimo e a técnica de explosão. Recomenda-se treinar tiros curtos de corrida com descanso completo entre eles, além de brincadeiras de reação rápida, ensinando o corpo a recrutar fibras musculares velozes de forma mais eficiente.", recommendation: "Incentivamos o estímulo em casa através de jogos que exijam arrancadas rápidas, como pique-bandeira, corrida de obstáculos no quintal ou circuitos de tempo." },
-        { id: "v3", level: "BOM", alertColor: "emerald", healthStatus: "Nível saudável e totalmente adequado para a faixa etária. O aluno reage rápido aos estímulos e mantém uma excelente velocidade de deslocamento. Esse padrão reflete um coração forte, ótima capacidade respiratória e músculos condicionados, promovendo excelente queima energética e vitalidade no dia a dia.", toImprove: "Embora esteja em uma faixa segura e saudável, o aluno pode trabalhar a manutenção dessa velocidade por distâncias um pouco maiores. O foco deve ser treinar a resistência de velocidade para evitar quedas abruptas de rendimento no final das atividades.", recommendation: "Parabenizamos pelo excelente vigor físico. Seguiremos oferecendo desafios de alta intensidade em aula para manter o aluno motivado e saudável." },
-        { id: "v4", level: "EXCELENTE", alertColor: "blue", healthStatus: "Desempenho físico excepcional. O aluno possui um tempo de reação curtíssimo e uma aceleração impressionante, atingindo a velocidade máxima com facilidade. O sistema cardiorrespiratório e a musculatura esquelética demonstram altíssima eficiência metabólica e perfeita coordenação neuromuscular.", toImprove: "O objetivo agora é preservar essa alta performance e evitar lesões. Por gerar muita força e velocidade, o aluno deve focar no aquecimento rigoroso antes dos treinos e em exercícios de flexibilidade para manter os músculos longos, elásticos e protegidos contra estiramentos.", recommendation: "Parabenizamos pelo excelente vigor físico. Seguiremos oferecendo desafios de alta intensidade em aula para manter o aluno motivado e saudável." }
+        { id: "v1", level: "INSUFICIENTE", alertColor: "rose", healthStatus: t('textoACapacidadeDeDeslocamentoRapidoEO'), toImprove: t('textoOAlunoPrecisaDesenvolverAEficienciaDa'), recommendation: t('textoIncentivamosOEstimuloEmCasaAtravesDe') },
+        { id: "v2", level: "REGULAR", alertColor: "yellow", healthStatus: t('textoOAlunoConsegueCorrerEmUmRitmo'), toImprove: t('textoOFocoDeveSerOGanhoDe'), recommendation: t('textoIncentivamosOEstimuloEmCasaAtravesDe') },
+        { id: "v3", level: "BOM", alertColor: "emerald", healthStatus: t('textoNivelSaudavelETotalmenteAdequadoParaA'), toImprove: t('textoEmboraEstejaEmUmaFaixaSeguraE'), recommendation: t('textoParabenizamosPeloExcelenteVigorFisicoSeguiremosOferecendo') },
+        { id: "v4", level: "EXCELENTE", alertColor: "blue", healthStatus: t('textoDesempenhoFisicoExcepcionalOAlunoPossuiUm'), toImprove: t('textoOObjetivoAgoraEPreservarEssaAlta'), recommendation: t('textoParabenizamosPeloExcelenteVigorFisicoSeguiremosOferecendo') }
       ],
       forca_muscular: [
-        { id: "f1", level: "INSUFICIENTE", alertColor: "rose", healthStatus: "A capacidade de vencer resistências e sustentar o próprio corpo está abaixo do esperado. Na saúde, a falta de tônus muscular gera sobrecarga direta sobre os ossos e ligamentos, além de causar cansaço extremo em tarefas simples, como carregar a mochila ou manter a postura na carteira escolar.", toImprove: "O aluno precisa desenvolver urgentemente a força de base. O foco inicial deve ser em exercícios calistênicos simples (que usam o peso do próprio corpo), como apoios de joelhos no chão e agachamentos livres adaptados, focando estritamente na execução correta para ganho de massa magra protetora.", recommendation: "Incentivamos atividades lúdicas de força em casa, como brincadeiras de cabo de guerra, escalar brinquedos de parquinho (gaiolas) ou jogos de carregar objetos leves." },
-        { id: "f2", level: "REGULAR", alertColor: "yellow", healthStatus: "O aluno possui uma força muscular estável para as demandas diárias, mas que cansa com facilidade. Falta maior tônus na musculatura profunda, limitando a execução de esforços mais intensos e contínuos.", toImprove: "O foco deve ser o aumento de força por meio de exercícios de fortalecimento, controle corporal e sustentação.", recommendation: "Incentivamos atividades de força lúdicas e desafiadoras em ambiente domiciliar." },
-        { id: "f3", level: "BOM", alertColor: "emerald", healthStatus: "Nível saudável e totalmente adequado para a idade. O aluno apresenta ótima densidade e tônus muscular, sustentando movimentos de impacto com segurança. Essa força atua como um escudo protetor para as articulações, acelerando o metabolismo e garantindo excelente postura corporal.", toImprove: "Embora o nível seja seguro, o aluno pode melhorar a simetria da força (equilíbrio entre o lado direito e esquerdo do corpo). Exercícios unilaterais ajudarão a refinar o movimento e preparar o corpo para a transição rumo ao nível excelente.", recommendation: "Parabenizamos pelo excelente suporte físico. Seguiremos com estímulos desafiadores em aula para manter a integridade da saúde muscular do estudante." },
-        { id: "f4", level: "EXCELENTE", alertColor: "blue", healthStatus: "Desempenho físico excepcional. O aluno demonstra altíssima capacidade de gerar tensão muscular e potência. Seu sistema esquelético está totalmente protegido contra lesões por impacto, e a musculatura apresenta excelente eficiência metabólica e capacidade de recuperação.", toImprove: "O objetivo agora é zelar pela longevidade dessa performance. Recomenda-se associar o treino de força máxima a sessões rigorosas de alongamento e flexibilidade, evitando o encurtamento muscular e a perda de amplitude de movimento nas articulações.", recommendation: "Parabenizamos pelo excelente suporte físico. Seguiremos com estímulos desafiadores em aula para manter a integridade da saúde muscular do estudante." }
+        { id: "f1", level: "INSUFICIENTE", alertColor: "rose", healthStatus: t('textoACapacidadeDeVencerResistenciasESustentar'), toImprove: t('textoOAlunoPrecisaDesenvolverUrgentementeAForca'), recommendation: t('textoIncentivamosAtividadesLudicasDeForcaEmCasa') },
+        { id: "f2", level: "REGULAR", alertColor: "yellow", healthStatus: t('textoOAlunoPossuiUmaForcaMuscularEstavel'), toImprove: t('textoOFocoDeveSerOAumentoDe'), recommendation: t('uiIncentivamosAtividadesDeForcaLudicasEDesafiadoras') },
+        { id: "f3", level: "BOM", alertColor: "emerald", healthStatus: t('textoNivelSaudavelETotalmenteAdequadoParaA2'), toImprove: t('textoEmboraONivelSejaSeguroOAluno'), recommendation: t('textoParabenizamosPeloExcelenteSuporteFisicoSeguiremosCom') },
+        { id: "f4", level: "EXCELENTE", alertColor: "blue", healthStatus: t('textoDesempenhoFisicoExcepcionalOAlunoDemonstraAltissima'), toImprove: t('textoOObjetivoAgoraEZelarPelaLongevidade'), recommendation: t('textoParabenizamosPeloExcelenteSuporteFisicoSeguiremosCom') }
       ],
       agilidade: [
-        { id: "a1", level: "INSUFICIENTE", alertColor: "rose", healthStatus: "A capacidade de mudar de direção rapidamente está abaixo do esperado. O aluno apresenta dificuldades para frear e reajustar o corpo com controle. Na saúde, a falta de agilidade e coordenação aumenta significativamente o risco de quedas, entorses de tornozelo e lesões nos ligamentos do joelho em movimentos bruscos.", toImprove: "O aluno precisa desenvolver urgentemente o tempo de reação e a consciência corporal. O foco inicial deve ser em exercícios de desaceleração controlada e educativos de passadas laterais, aprendendo a abaixar o centro de gravidade para ganhar estabilidade.", recommendation: "Incentivamos a prática de brincadeiras de rua tradicionais em casa, como pega-pega, queimada ou circuitos de zigue-zague desenhados no chão." },
-        { id: "a2", level: "REGULAR", alertColor: "yellow", healthStatus: "O aluno consegue mudar de direção, mas perde o equilíbrio ou a velocidade durante o movimento. Há uma base motora funcional, mas falta eficiência nas articulações para transferir o peso corporal de um lado para o outro de forma fluida, gastando mais energia do que o necessário.", toImprove: "O foco deve ser o refinamento técnico. Recomenda-se treinar com circuitos de cones e escadas de agilidade para melhorar o trabalho de pés (footwork) e a transição rápida de movimentos, aumentando a segurança articular.", recommendation: "Incentivamos a prática de brincadeiras de rua tradicionais em casa, como pega-pega, queimada ou circuitos de zigue-zague desenhados no chão." },
-        { id: "a3", level: "BOM", alertColor: "emerald", healthStatus: "Nível saudável e totalmente adequado para a faixa etária. O aluno demonstra ótimo controle corporal, consegue frear e mudar de rumo com segurança e estabilidade. Essa agilidade protege as articulações contra sobrecargas e reflete um sistema neuromuscular bem desenvolvido.", toImprove: "Embora o nível seja seguro e protetor, o aluno pode aprimorar a eficiência do movimento diminuindo o tempo de hesitação antes de mudar de direção. Introduzir estímulos visuais ou sonoros surpresa ajudará a refinar ainda mais o tempo de reação.", recommendation: "Parabenizamos pela excelente agilidade e prontidão motora. Continuaremos desafiando o estudante com dinâmicas complexas nas aulas." },
-        { id: "a4", level: "EXCELENTE", alertColor: "blue", healthStatus: "Desempenho físico excepcional. O aluno apresenta uma velocidade de reação impressionante e um controle de centro de gravidade perfeito ao mudar de direção. Seu sistema proprioceptivo (capacidade do corpo de reconhecer a própria posição) é altamente eficaz, garantindo proteção máxima contra lesões.", toImprove: "O objetivo atual é manter essa alta performance. Recomenda-se integrar movimentos de agilidade com tomadas de decisão complexas e uso de implementos (como bolas), preparando o aluno para alto rendimento em cenários de jogo reais.", recommendation: "Parabenizamos pela excelente agilidade e prontidão motora. Continuaremos desafiando o estudante com dinâmicas complexas nas aulas." }
+        { id: "a1", level: "INSUFICIENTE", alertColor: "rose", healthStatus: t('textoACapacidadeDeMudarDeDirecaoRapidamente'), toImprove: t('textoOAlunoPrecisaDesenvolverUrgentementeOTempo'), recommendation: t('textoIncentivamosAPraticaDeBrincadeirasDeRua') },
+        { id: "a2", level: "REGULAR", alertColor: "yellow", healthStatus: t('textoOAlunoConsegueMudarDeDirecaoMas'), toImprove: t('textoOFocoDeveSerORefinamentoTecnico'), recommendation: t('textoIncentivamosAPraticaDeBrincadeirasDeRua') },
+        { id: "a3", level: "BOM", alertColor: "emerald", healthStatus: t('textoNivelSaudavelETotalmenteAdequadoParaA3'), toImprove: t('textoEmboraONivelSejaSeguroEProtetor'), recommendation: t('textoParabenizamosPelaExcelenteAgilidadeEProntidaoMotora') },
+        { id: "a4", level: "EXCELENTE", alertColor: "blue", healthStatus: t('textoDesempenhoFisicoExcepcionalOAlunoApresentaUma'), toImprove: t('textoOObjetivoAtualEManterEssaAlta'), recommendation: t('textoParabenizamosPelaExcelenteAgilidadeEProntidaoMotora') }
       ],
       abdomen: [
-        { id: "ab1", level: "INSUFICIENTE", alertColor: "rose", healthStatus: "A resistência da região abdominal está abaixo do esperado. O core (centro de gravidade do corpo) fraco prejudica diretamente a postura, sobrecarrega a coluna lombar e aumenta o risco de dores nas costas e desvios posturais a médio prazo.", toImprove: "O aluno precisa iniciar urgentemente o fortalecimento da musculatura central. É necessário focar na ativação do abdômen através de exercícios estáticos simples, corrigindo a respiração e evitando puxar o pescoço durante a execução.", recommendation: "Incentivamos o estímulo diário através de desafios rápidos em casa, como brincadeiras que envolvam a posição de prancha ou elevação de pernas." },
-        { id: "ab2", level: "REGULAR", alertColor: "yellow", healthStatus: "O aluno possui uma força abdominal básica, mas cansa muito rápido ao tentar manter o esforço. Essa fadiga precoce faz com que ele comece a compensar o movimento com outras partes do corpo, desestabilizando o tronco durante corridas e jogos.", toImprove: "O foco deve ser o aumento gradual do tempo de execução dos exercícios. Treinar a constância e o ritmo das repetições vai ajudar a estabilizar o tronco e proteger a coluna por períodos mais longos.", recommendation: "Incentivamos o preço ou estímulo diário através de desafios rápidos em casa, como brincadeiras que envolvam a posição de prancha ou elevação de pernas." },
-        { id: "ab3", level: "BOM", alertColor: "emerald", healthStatus: "Nível saudável e dentro do padrão recomendado. O aluno apresenta boa sustentação do tronco, o que garante estabilidade corporal, melhora o equilíbrio e protege a região lombar contra os impactos gerados por saltos e corridas.", toImprove: "Embora o nível seja seguro, o aluno pode melhorar a simetria da força (equilíbrio entre o lado direito e esquerdo do corpo). Exercícios unilaterais ajudarão a refinar o movimento e preparar o corpo para a transição rumo ao nível excelente.", recommendation: "Parabenizamos pela excelente condição de saúde física. Manteremos os estímulos nas aulas para preservar esse ótimo suporte postural." },
-        { id: "ab4", level: "EXCELENTE", alertColor: "blue", healthStatus: "Desempenho físico excepcional. O aluno possui excelente resistência muscular na região central do corpo. Isso resulta em uma postura impecável, altíssima eficiência de movimentos e proteção máxima da coluna vertebral sob qualquer tipo de carga ou esforço.", toImprove: "O objetivo agora é manter o padrão. Recomenda-se integrar la força desse abdômen com exercícios de flexibilidade e alongamento da cadeia posterior para evitar qualquer tipo de rigidez muscular.", recommendation: "Parabenizamos pela excelente condição de saúde física. Manteremos os estímulos nas aulas para preservar esse ótimo suporte postural." }
+        { id: "ab1", level: "INSUFICIENTE", alertColor: "rose", healthStatus: t('textoAResistenciaDaRegiaoAbdominalEstaAbaixo'), toImprove: t('textoOAlunoPrecisaIniciarUrgentementeOFortalecimento'), recommendation: t('textoIncentivamosOEstimuloDiarioAtravesDeDesafios') },
+        { id: "ab2", level: "REGULAR", alertColor: "yellow", healthStatus: t('textoOAlunoPossuiUmaForcaAbdominalBasica'), toImprove: t('textoOFocoDeveSerOAumentoGradual'), recommendation: t('textoIncentivamosOPrecoOuEstimuloDiarioAtraves') },
+        { id: "ab3", level: "BOM", alertColor: "emerald", healthStatus: t('textoNivelSaudavelEDentroDoPadraoRecomendado'), toImprove: t('textoEmboraONivelSejaSeguroOAluno'), recommendation: t('textoParabenizamosPelaExcelenteCondicaoDeSaudeFisica') },
+        { id: "ab4", level: "EXCELENTE", alertColor: "blue", healthStatus: t('textoDesempenhoFisicoExcepcionalOAlunoPossuiExcelente'), toImprove: t('textoOObjetivoAgoraEManterOPadrao'), recommendation: t('textoParabenizamosPelaExcelenteCondicaoDeSaudeFisica') }
       ],
       impulsao: [
-        { id: "i1", level: "INSUFICIENTE", alertColor: "rose", healthStatus: "O índice de impulsão está abaixo do esperado para a faixa etária. Isso indica baixa potência e falta de ativação dos músculos das pernas. Na saúde, isso compromete o amortecimento de impactos e enfraquece a estrutura das articulações do joelho e tornozelo.", toImprove: "O aluno precisa desenvolver urgentemente a força de arranque. É necessário corrigir a postura do agachamento e a mecânica do salto para evitar lesões em atividades simples do dia a dia.", recommendation: "Incentivamos o apoio em atividades dinâmicas em casa, como pular corda e brincadeiras de salto." },
-        { id: "i2", level: "REGULAR", alertColor: "yellow", healthStatus: "O aluno possui uma base de força, mas falta explosão muscular. O rendimento físico oscila e gasta mais energia do que o necessário para executar saltos. A estrutura de saúde é estável, mas apresenta fadiga rápida em circuitos.", toImprove: "O foco deve ser a coordenação entre o movimento dos braços e pernas durante o salto. Exercícios repetitivos de saltos baixos vão ajudar a transformar a força atual em potência real.", recommendation: "Incentivamos o apoio em atividades dinâmicas em casa, como pular corda e brincadeiras de salto." },
-        { id: "i3", level: "BOM", alertColor: "emerald", healthStatus: "O nível é saudável e adequado. O aluno apresenta boa resposta neuromuscular e consegue vencer a gravidade com facilidade. Essa condição protege a coluna e absorve impactos de forma segura durante jogos e corridas.", toImprove: "Embora esteja em um nível seguro, o aluno pode melhorar a estabilidade no momento da aterrissagem. O treinamento deve focar no equilíbrio para evoluir do nível bom para o excelente.", recommendation: "Parabenizamos pelo ótimo histórico físico. Continuaremos desafiando o estudante nas aulas para manter este padrão de excelência." },
-        { id: "i4", level: "EXCELENTE", alertColor: "blue", healthStatus: "Desempenho físico excepcional. O aluno possui excelente potência de membros inferiores e coordenação motora impecável. O sistema musculoesquelético está altamente protegido e preparado para desafios físicos de alta intensidade.", toImprove: "O foco agora é a manutenção dessa valência. Recomenda-se o ganho de flexibilidade para que a alta potência não gere rigidez muscular.", recommendation: "Parabenizamos pelo ótimo histórico físico. Continuaremos desafiando o estudante nas aulas para manter este padrão de excelência." }
+        { id: "i1", level: "INSUFICIENTE", alertColor: "rose", healthStatus: t('textoOIndiceDeImpulsaoEstaAbaixoDo'), toImprove: t('textoOAlunoPrecisaDesenvolverUrgentementeAForca2'), recommendation: t('textoIncentivamosOApoioEmAtividadesDinamicasEm') },
+        { id: "i2", level: "REGULAR", alertColor: "yellow", healthStatus: t('textoOAlunoPossuiUmaBaseDeForca'), toImprove: t('textoOFocoDeveSerACoordenacaoEntre'), recommendation: t('textoIncentivamosOApoioEmAtividadesDinamicasEm') },
+        { id: "i3", level: "BOM", alertColor: "emerald", healthStatus: t('textoONivelESaudavelEAdequadoO'), toImprove: t('textoEmboraEstejaEmUmNivelSeguroO'), recommendation: t('textoParabenizamosPeloOtimoHistoricoFisicoContinuaremosDesafiando') },
+        { id: "i4", level: "EXCELENTE", alertColor: "blue", healthStatus: t('textoDesempenhoFisicoExcepcionalOAlunoPossuiExcelente2'), toImprove: t('textoOFocoAgoraEAManutencaoDessa'), recommendation: t('textoParabenizamosPeloOtimoHistoricoFisicoContinuaremosDesafiando') }
       ]
     };
-  }, [m5FromDb]);
+  }, [m5FromDb, t]);
   const [refreshToggle, setRefreshToggle] = useState(false);
 
   const [backfilling, setBackfilling] = useState(false);
@@ -1135,10 +1245,10 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           } else {
           // Defaults if not found
           setM4ImcData([
-            { id: '1', classification: 'Peso normal', status: 'IMC Ideal', alertColor: 'emerald', description: 'O aluno apresenta uma composição corporal excelente e adequada para a sua faixa etária. Esta condição favorece diretamente o rendimento cardiovascular, permitindo treinos de maior intensidade com excelente recuperação física e menor risco de lesões.' },
-            { id: '2', classification: 'Abaixo do Peso', status: 'Atenção Nutricional', alertColor: 'yellow', description: 'O índice sinaliza a necessidade de atenção nutricional. A falta de massa magra ou reserva energética pode limitar a força muscular e a resistência do aluno em atividades de longa duração, gerando fadiga precoce.' },
-            { id: '3', classification: 'Sobrepeso', status: 'Excesso Leve', alertColor: 'orange', description: 'O indicador aponta um leve excesso de peso para a estrutura corporal. Esse quadro exige maior esforço das articulações em treinos de impacto, mas pode ser equalizado rapidamente com o aumento da frequência e intensidade dos treinos esportivos.' },
-            { id: '4', classification: 'Obesidade', status: 'Fator de Risco', alertColor: 'rose', description: 'O índice indica um fator de risco para a saúde cardiovascular e articular. Recomenda-se um plano de atividades físicas de baixo impacto (como natação ou caminhadas aceleradas) associado a um acompanhamento nutricional para garantir a segurança e o bem-estar do aluno.' },
+            { id: '1', classification: t('uiPesoNormal'), status: t('uiImcIdeal'), alertColor: 'emerald', description: t('textoOAlunoApresentaUmaComposicaoCorporalExcelente') },
+            { id: '2', classification: t('uiAbaixoDoPeso'), status: t('uiAtencaoNutricional'), alertColor: 'yellow', description: t('textoOIndiceSinalizaANecessidadeDeAtencao') },
+            { id: '3', classification: 'Sobrepeso', status: t('uiExcessoLeve'), alertColor: 'orange', description: t('textoOIndicadorApontaUmLeveExcessoDe') },
+            { id: '4', classification: 'Obesidade', status: t('uiFatorDeRisco'), alertColor: 'rose', description: t('textoOIndiceIndicaUmFatorDeRisco') },
           ]);
         }
       } catch (e) {
@@ -1189,30 +1299,30 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           setM6Modalidades(JSON.parse(storedM6M));
         } else {
           setM6Modalidades([
-            { id: "m6_b1", name: "BASQUETE", valencias: "Impulsão, Agilidade e Velocidade.", condition: "Níveis Bom / Excelente em Impulsão e Velocidade", report: "Identifico uma alta aptidão biomecânica para a modalidade. O(A) estudante demonstra facilidade natural para ações de transição rápida, verticalidade em rebotes e infiltrações explosivas." },
-            { id: "m6_b2", name: "BASQUETE", valencias: "Impulsão, Agilidade e Velocidade.", condition: "Níveis Insuficiente / Regular em Agilidade ou Impulsão", report: "Observo restrições funcionais em quadra. A falta de agilidade compromete a marcação defensiva e a baixa impulsão limita o raio de ação em jogadas aéreas." },
-            { id: "m6_b3", name: "BASQUETE", valencias: "Impulsão, Agilidade e Velocidade.", condition: "Qualquer Nível (Alerta de Core)", report: "O basquete exige desacelerações bruscas e saltos contínuos. Caso a musculatura do abdômen esteja fraca, as forças de impacto serão transferidas para a coluna lombar, aumentando o risco de microlesões discais." },
-            { id: "m6_g1", name: "GINÁSTICA (Artística / Rítmica)", valencias: "Abdômen, Força Muscular e Agilidade.", condition: "Níveis Bom / Excelente em Abdômen e Força Muscular", report: "O(A) estudante possui o tônus muscular necessário para sustentar o próprio peso corporal e executar giros, equilíbrios e acrobacias com o alinhamento postural exigido." },
-            { id: "m6_g2", name: "GINÁSTICA (Artística / Rítmica)", valencias: "Abdômen, Força Muscular e Agilidade.", condition: "Níveis Insuficiente / Regular em Abdômen ou Força Muscular", report: "Constato déficit de sustentação básica. A fraqueza do core impede o controle corporal no espaço, gerando movimentos compensatórios e desalinhados." },
-            { id: "m6_g3", name: "GINÁSTICA (Artística / Rítmica)", valencias: "Abdômen, Força Muscular e Agilidade.", condition: "Qualquer Nível (Alerta de Core)", report: "Na ginástica, o abdômen funciona como o centro de estabilização. Níveis baixos nesta área expõem as articulações dos ombros e joelhos a sobrecargas severas no momento das aterrissagens." },
-            { id: "m6_h1", name: "HANDEBOL", valencias: "Velocidade, Agilidade e Força Muscular.", condition: "Níveis Bom / Excelente em Velocidade e Força Muscular", report: "Registro um perfil altamente competitivo para o handebol. Há potência mecânica para arremessos de longa distância e velocidade de arranque para quebrar as linhas de defesa." },
-            { id: "m6_h2", name: "HANDEBOL", valencias: "Velocidade, Agilidade e Força Muscular.", condition: "Níveis Insuficiente / Regular em Agilidade ou Velocidade", report: "Noto prejuízo nas transições táticas. O(A) jovem apresenta lentidão para recompor a defesa ou realizar fintas rápidas em pequenos espaços." },
-            { id: "m6_h3", name: "HANDEBOL", valencias: "Velocidade, Agilidade e Força Muscular.", condition: "Qualquer Nível (Alerta Cardiovascular)", report: "Esta modalidade impõe um regime anaeróbico estrito. Índices baixos de velocidade e força muscular indicam fadiga cardiovascular precoce e lentidão na recuperação pós-esforço." },
-            { id: "m6_f1", name: "FUTEBOL / FUTSAL", valencias: "Velocidade, Agilidade e Impulsão.", condition: "Níveis Bom / Excelente em Velocidade e Agilidade", report: "Evidencio excelente capacidade de drible e condução. O(A) estudante consegue alterar o centro de gravidade bruscamente sem perder a estabilidade dinâmica." },
-            { id: "m6_f2", name: "FUTEBOL / FUTSAL", valencias: "Velocidade, Agilidade e Impulsão.", condition: "Níveis Insuficiente / Regular em Agilidade ou Velocidade", report: "Há limitação na proteção de bola e no acompanhamento de atacantes adversários, resultando em reações motoras atrasadas." },
-            { id: "m6_f3", name: "FUTEBOL / FUTSAL", valencias: "Velocidade, Agilidade e Impulsão.", condition: "Qualquer Nível (Alerta Ligamentar)", report: "O futebol apresenta alto índice de lesões ligamentares. Níveis baixos de agilidade associados a articulações desprotegidas elevam o risco de entorses de joelho e tornozelo durante mudanças de direção." },
-            { id: "m6_v1", name: "VÔLEI", valencias: "Impulsão, Agilidade e Abdômen.", condition: "Níveis Bom / Excelente em Impulsão e Agilidade", report: "Avalio ótima aptidão para ações na rede (ataque/bloqueio) e excelente tempo de reação para coberturas defensivas no solo." },
-            { id: "m6_v2", name: "VÔLEI", valencias: "Impulsão, Agilidade e Abdômen.", condition: "Níveis Insuficiente / Regular em Impulsão", report: "O alcance vertical do(a) estudante fica comprometido, limitando sua eficiência tática e participação ativa nas fases aéreas do jogo." },
-            { id: "m6_v3", name: "VÔLEI", valencias: "Impulsão, Agilidade e Abdômen.", condition: "Qualquer Nível (Alerta Articular)", report: "A mecânica do vôlei gera alto estresse nas estruturas inferiores. Se a força de aterrissagem for ruim devido a índices baixos de impulsão e força, há predisposição ao desenvolvimento de tendinite patelar." },
-            { id: "m6_l1", name: "LUTAS / ARTES MARCIAIS", valencias: "Força Muscular, Abdômen e Agilidade.", condition: "Níveis Bom / Excelente em Força Muscular e Abdômen", report: "O(A) jovem demonstra excelente base de sustentação corporal, capacidade de gerar tração mecânica e manter o equilíbrio sob pressão de forças externas." },
-            { id: "m6_l2", name: "LUTAS / ARTES MARCIAIS", valencias: "Força Muscular, Abdômen e Agilidade.", condition: "Níveis Insuficiente / Regular em Força Muscular", report: "Percebo fadiga muscular precoce dos membros superiores e tronco, reduzindo a eficiência em golpes que exigem potência ou manutenção de pegada." },
-            { id: "m6_l3", name: "LUTAS / ARTES MARCIAIS", valencias: "Força Muscular, Abdômen e Agilidade.", condition: "Qualquer Nível (Alerta de Core)", report: "O complexo abdominal e lombar fraco expõe a coluna a vetores de rotação perigosos. O fortalecimento desta zona é crucial para blindar as vértebras contra os impactos e quedas inerentes à modalidade." },
-            { id: "m6_a1", name: "ATLETISMO (Corridas e Saltos)", valencias: "Velocidade, Impulsão e Força Muscular.", condition: "Níveis Bom / Excelente em Velocidade e Impulsão", report: "Diagnostico um padrão de corrida eficiente com excelente aproveitamento elétrico dos músculos (ciclo alongamento-encurtamento), ideal para provas explosivas e saltos." },
-            { id: "m6_a2", name: "ATLETISMO (Corridas e Saltos)", valencias: "Velocidade, Impulsão e Força Muscular.", condition: "Níveis Insuficiente / Regular em Velocidade ou Impulsão", report: "O(A) estudante apresenta uma mecânica de passada pesada, baixo tempo de voo e lentidão no bloco de partida." },
-            { id: "m6_a3", name: "ATLETISMO (Corridas e Saltos)", valencias: "Velocidade, Impulsão e Força Muscular.", condition: "Qualquer Nível (Alerta Tibial)", report: "O gesto repetitivo do atletismo exige dissipação de impacto eficiente. Níveis insuficientes de força muscular transferem o estresse mecânico para a tíbia, podendo desencadear quadros de periostite (canelite)." },
-            { id: "m6_n1", name: "NATAÇÃO", valencias: "Força Muscular, Abdômen e Velocidade.", condition: "Níveis Bom / Excelente em Força Muscular e Abdômen", report: "O(A) estudante mantém uma posição hidrodinâmica impecável na água, gerando braçadas potentes e reduzindo o arrasto frontal do corpo." },
-            { id: "m6_n2", name: "NATAÇÃO", valencias: "Força Muscular, Abdômen e Velocidade.", condition: "Níveis Insuficiente / Regular em Abdômen", report: "Observo uma quebra na linha de flutuação; o quadril afunda durante o nado, o que aumenta a resistência da água e sobrecarrega a articulação dos ombros." },
-            { id: "m6_n3", name: "NATAÇÃO", valencias: "Força Muscular, Abdômen e Velocidade.", condition: "Qualquer Nível (Alerta de Recondicionamento)", report: "Sendo um esporte de baixo impacto articular, é o ambiente ideal para recondicionamento. Níveis fracos nesta área encontram na natação uma via segura para expandir a capacidade pulmonar e corrigir assimetrias posturais." }
+            { id: "m6_b1", name: "BASQUETE", valencias: t('uiImpulsaoAgilidadeEVelocidade'), condition: t('uiNiveisBomExcelenteEmImpulsaoEVelocidade'), report: t('textoIdentificoUmaAltaAptidaoBiomecanicaParaA') },
+            { id: "m6_b2", name: "BASQUETE", valencias: t('uiImpulsaoAgilidadeEVelocidade'), condition: t('uiNiveisInsuficienteRegularEmAgilidadeOuImpulsao'), report: t('textoObservoRestricoesFuncionaisEmQuadraAFalta') },
+            { id: "m6_b3", name: "BASQUETE", valencias: t('uiImpulsaoAgilidadeEVelocidade'), condition: t('uiQualquerNivelAlertaDeCore'), report: t('textoOBasqueteExigeDesaceleracoesBruscasESaltos') },
+            { id: "m6_g1", name: "GINÁSTICA (Artística / Rítmica)", valencias: t('uiAbdomenForcaMuscularEAgilidade'), condition: t('uiNiveisBomExcelenteEmAbdomenEForca'), report: t('textoOAEstudantePossuiOTonusMuscular') },
+            { id: "m6_g2", name: "GINÁSTICA (Artística / Rítmica)", valencias: t('uiAbdomenForcaMuscularEAgilidade'), condition: t('uiNiveisInsuficienteRegularEmAbdomenOuForca'), report: t('textoConstatoDeficitDeSustentacaoBasicaAFraqueza') },
+            { id: "m6_g3", name: "GINÁSTICA (Artística / Rítmica)", valencias: t('uiAbdomenForcaMuscularEAgilidade'), condition: t('uiQualquerNivelAlertaDeCore'), report: t('textoNaGinasticaOAbdomenFuncionaComoO') },
+            { id: "m6_h1", name: "HANDEBOL", valencias: t('uiVelocidadeAgilidadeEForcaMuscular'), condition: t('uiNiveisBomExcelenteEmVelocidadeEForca'), report: t('textoRegistroUmPerfilAltamenteCompetitivoParaO') },
+            { id: "m6_h2", name: "HANDEBOL", valencias: t('uiVelocidadeAgilidadeEForcaMuscular'), condition: t('uiNiveisInsuficienteRegularEmAgilidadeOuVelocidade'), report: t('textoNotoPrejuizoNasTransicoesTaticasOA') },
+            { id: "m6_h3", name: "HANDEBOL", valencias: t('uiVelocidadeAgilidadeEForcaMuscular'), condition: t('uiQualquerNivelAlertaCardiovascular'), report: t('textoEstaModalidadeImpoeUmRegimeAnaerobicoEstrito') },
+            { id: "m6_f1", name: "FUTEBOL / FUTSAL", valencias: t('uiVelocidadeAgilidadeEImpulsao'), condition: t('uiNiveisBomExcelenteEmVelocidadeEAgilidade'), report: t('textoEvidencioExcelenteCapacidadeDeDribleEConducao') },
+            { id: "m6_f2", name: "FUTEBOL / FUTSAL", valencias: t('uiVelocidadeAgilidadeEImpulsao'), condition: t('uiNiveisInsuficienteRegularEmAgilidadeOuVelocidade'), report: t('textoHaLimitacaoNaProtecaoDeBolaE') },
+            { id: "m6_f3", name: "FUTEBOL / FUTSAL", valencias: t('uiVelocidadeAgilidadeEImpulsao'), condition: t('uiQualquerNivelAlertaLigamentar'), report: t('textoOFutebolApresentaAltoIndiceDeLesoes') },
+            { id: "m6_v1", name: "VÔLEI", valencias: t('uiImpulsaoAgilidadeEAbdomen'), condition: t('uiNiveisBomExcelenteEmImpulsaoEAgilidade'), report: t('textoAvalioOtimaAptidaoParaAcoesNaRede') },
+            { id: "m6_v2", name: "VÔLEI", valencias: t('uiImpulsaoAgilidadeEAbdomen'), condition: t('uiNiveisInsuficienteRegularEmImpulsao'), report: t('textoOAlcanceVerticalDoAEstudanteFica') },
+            { id: "m6_v3", name: "VÔLEI", valencias: t('uiImpulsaoAgilidadeEAbdomen'), condition: t('uiQualquerNivelAlertaArticular'), report: t('textoAMecanicaDoVoleiGeraAltoEstresse') },
+            { id: "m6_l1", name: "LUTAS / ARTES MARCIAIS", valencias: t('uiForcaMuscularAbdomenEAgilidade'), condition: t('uiNiveisBomExcelenteEmForcaMuscularE'), report: t('textoOAJovemDemonstraExcelenteBaseDe') },
+            { id: "m6_l2", name: "LUTAS / ARTES MARCIAIS", valencias: t('uiForcaMuscularAbdomenEAgilidade'), condition: t('uiNiveisInsuficienteRegularEmForcaMuscular'), report: t('textoPerceboFadigaMuscularPrecoceDosMembrosSuperiores') },
+            { id: "m6_l3", name: "LUTAS / ARTES MARCIAIS", valencias: t('uiForcaMuscularAbdomenEAgilidade'), condition: t('uiQualquerNivelAlertaDeCore'), report: t('textoOComplexoAbdominalELombarFracoExpoe') },
+            { id: "m6_a1", name: t('uiAtletismoCorridasESaltos'), valencias: t('uiVelocidadeImpulsaoEForcaMuscular'), condition: t('uiNiveisBomExcelenteEmVelocidadeEImpulsao'), report: t('textoDiagnosticoUmPadraoDeCorridaEficienteCom') },
+            { id: "m6_a2", name: t('uiAtletismoCorridasESaltos'), valencias: t('uiVelocidadeImpulsaoEForcaMuscular'), condition: t('uiNiveisInsuficienteRegularEmVelocidadeOuImpulsao'), report: t('textoOAEstudanteApresentaUmaMecanicaDe') },
+            { id: "m6_a3", name: t('uiAtletismoCorridasESaltos'), valencias: t('uiVelocidadeImpulsaoEForcaMuscular'), condition: t('uiQualquerNivelAlertaTibial'), report: t('textoOGestoRepetitivoDoAtletismoExigeDissipacao') },
+            { id: "m6_n1", name: "NATAÇÃO", valencias: t('uiForcaMuscularAbdomenEVelocidade'), condition: t('uiNiveisBomExcelenteEmForcaMuscularE'), report: t('textoOAEstudanteMantemUmaPosicaoHidrodinamica') },
+            { id: "m6_n2", name: "NATAÇÃO", valencias: t('uiForcaMuscularAbdomenEVelocidade'), condition: t('uiNiveisInsuficienteRegularEmAbdomen'), report: t('textoObservoUmaQuebraNaLinhaDeFlutuacao') },
+            { id: "m6_n3", name: "NATAÇÃO", valencias: t('uiForcaMuscularAbdomenEVelocidade'), condition: t('uiQualquerNivelAlertaDeRecondicionamento'), report: t('textoSendoUmEsporteDeBaixoImpactoArticular') }
           ]);
         }
       } catch (e) {
@@ -1245,7 +1355,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           setM6Diretrizes(JSON.parse(storedM6D));
         } else {
           setM6Diretrizes([
-            { id: "m6_d1", diretriz: "APRIMORAR HABILIDADES MOTORAS", criterio: "Esta via deve ser adotada se três ou mais valências físicas estiverem em níveis Insuficiente ou Regular.", conduta: "Desaconselho totalmente a especialização precoce em esportes com regras rígidas ou alta demanda competitiva neste momento. O foco pedagógico deve migrar para circuitos funcionais multiesportivos, jogos cooperativos e estimulação motora de base.", objetivo: "O foco exclusivo deste direcionamento é restaurar a integridade física do(a) jovem. Buscaremos o ganho de massa magra, ativação do tônus postural e melhora da coordenação global para que seu corpo esteja preparado e protegido antes de ser exposto a cargas esportivas avançadas." }
+            { id: "m6_d1", diretriz: "APRIMORAR HABILIDADES MOTORAS", criterio: t('textoEstaViaDeveSerAdotadaSeTres'), conduta: t('textoDesaconselhoTotalmenteAEspecializacaoPrecoceEmEsportes'), objetivo: t('textoOFocoExclusivoDesteDirecionamentoERestaurar') }
           ]);
         }
       } catch (e) {
@@ -1591,73 +1701,73 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           setM7Rows([
             {
               id: "m7_1",
-              profile: "Criativo e Tecnológico (Perfil Híbrido)",
-              component: "Mapa de Perfis e Carreiras",
-              basicData: "Vocação para ambientes inovadores. Potencial para atuar com design de jogos ou desenvolvimento web.",
-              reflection: "Identifico no(a) estudante uma mente que opera na intersecção entre a lógica estruturada e a sensibilidade estética. Sua grande vantagem competitiva é a capacidade de humanizar a tecnologia. Áreas como o design de jogos e o desenvolvimento web exigem exatamente essa flexibilidade, pois demandam alguém capaz de compreender códigos complexos sem perder de vista a experiência, a beleza e a interatividade necessárias para o usuário final."
+              profile: t('uiCriativoETecnologicoPerfilHibrido'),
+              component: t('uiMapaDePerfisECarreiras'),
+              basicData: t('textoVocacaoParaAmbientesInovadoresPotencialParaAtuar'),
+              reflection: t('textoIdentificoNoAEstudanteUmaMenteQue')
             },
             {
               id: "m7_2",
-              profile: "Criativo e Tecnológico (Perfil Híbrido)",
-              component: "Recomendações Pedagógicas",
-              basicData: "Projetos Integradores: Incentivar a participação em feiras de ciências, grêmios ou mostras culturais onde ele(a) precise aplicar planejamento, criatividade e comunicação simultaneamente.",
-              reflection: "Imersão de Mercado: Promover visitas técnicas a universidades ou conversas com profissionais atuantes nas áreas de maior destaque para alinhar as expectativas da carreira à realidade do mercado."
+              profile: t('uiCriativoETecnologicoPerfilHibrido'),
+              component: t('uiRecomendacoesPedagogicas'),
+              basicData: t('textoProjetosIntegradoresIncentivarAParticipacaoEmFeiras'),
+              reflection: t('textoImersaoDeMercadoPromoverVisitasTecnicasA')
             },
             {
               id: "m7_3",
-              profile: "Negócios e Gestão",
-              component: "Mapa de Perfis e Carreiras",
-              basicData: "Dados Básicos: Espírito de liderança ativo, interesse em organizar processos, gerenciar recursos e traçar estratégias.\n\nCarreiras Associadas: Administração, Economia, Ciências Contábeis, Marketing, Logística e Gestão de Recursos Humanos.",
-              reflection: "Observo no(a) estudante uma estrutura cognitiva essencialmente voltada para a eficiência, o pragmatismo e o pensamento sistêmico. Sua mente demonstra facilidade para enxergar o panorama geral de cenários complexos, ordenando prioridades e distribuindo recursos com precisão. A liderança, neste perfil, não é apenas uma posição de comando, mas uma habilidade natural de articular pessoas em prol de um objetivo comum. Sua inclinação para traçar estratégias e gerenciar processos indica um potencial robusto para assumir tomadas de decisão assertivas e mitigar riscos em ambientes corporativos e econômicos dinâmicos."
+              profile: t('uiNegociosEGestao'),
+              component: t('uiMapaDePerfisECarreiras'),
+              basicData: t('textoM7NegociosGestaoBasicData'),
+              reflection: t('textoObservoNoAEstudanteUmaEstruturaCognitiva')
             },
             {
               id: "m7_4",
-              profile: "Negócios e Gestão",
-              component: "Recomendações Pedagógicas",
-              basicData: "Projetos Integradores: Incentivar a coordenação de equipes em feiras de ciências, gincanas escolares ou no grêmio estudantil, onde ele(a) precise aplicar conceitos de planejamento, delegação de tarefas e cumprimento de metas.",
-              reflection: "Imersão de Mercado: Promover visitas técnicas a empresas locais ou conversas com profissionais das áreas de finanças, marketing e gestão para alinhar as expectativas da carreira à realidade prática do mercado."
+              profile: t('uiNegociosEGestao'),
+              component: t('uiRecomendacoesPedagogicas'),
+              basicData: t('textoProjetosIntegradoresIncentivarACoordenacaoDeEquipes'),
+              reflection: t('textoImersaoDeMercadoPromoverVisitasTecnicasA2')
             },
             {
               id: "m7_5",
-              profile: "Biológicas e Criativas",
-              component: "Mapa de Perfis e Carreiras",
-              basicData: "Dados Básicos: Perfil movido pela criatividade. Demonstra forte desejo de inventar, inovar ou possui um profundo interesse pelo estudo da vida, bem-estar e saúde.\n\nCarreiras Associadas: Medicina, Biologia, Design, Publicidade, Artes Visuais, Educação Física e Veterinária.",
-              reflection: "Observo no(a) estudante uma combinação singular entre a sensibilidade inventiva e a empatia orgânica. Este perfil se afasta do cientificismo estrito e tradicional; em vez disso, ele encontra motivação na aplicação de soluções criativas para os desafios que envolvem os seres vivos e a expressão humana. Sua mente é guiada pela necessidade de descobrir novas alternativas, curar, projetar ou transformar o meio ambiente. A presença marcante da criatividade nesta macroárea indica que o(a) jovem possui facilidade para pensar \"fora da caixa\" diante de problemas complexos de saúde ou comunicação visual, sendo ideal para carreiras que exigem inovação no cuidado à vida ou no desenvolvimento de novos conceitos estéticos."
+              profile: t('uiBiologicasECriativas'),
+              component: t('uiMapaDePerfisECarreiras'),
+              basicData: t('textoM7BiologicasCriativasBasicData'),
+              reflection: t('textoM7BiologicasCriativasReflection'),
             },
             {
               id: "m7_6",
-              profile: "Biológicas e Criativas",
-              component: "Recomendações Pedagógicas",
-              basicData: "Projetos Integradores: Incentivar o envolvimento em feiras de ciências com foco ecológico/sustentável ou mostras culturais e artísticas, permitindo que ele(a) une a pesquisa biológica com a expressão criativa.",
-              reflection: "Imersão de Mercado: Promover visitas guiadas a laboratórios de pesquisa, clínicas ou agências de comunicação e estúdios de design para que o(a) jovem compreenda a atuação prática e diária dessas áreas no mercado atual."
+              profile: t('uiBiologicasECriativas'),
+              component: t('uiRecomendacoesPedagogicas'),
+              basicData: t('textoProjetosIntegradoresIncentivarOEnvolvimentoEmFeiras'),
+              reflection: t('textoImersaoDeMercadoPromoverVisitasGuiadasA')
             },
             {
               id: "m7_7",
-              profile: "Exatas e Tecnológicas",
-              component: "Mapa de Perfis e Carreiras",
-              basicData: "Dados Básicos: Perfil estimulado pela resolução de problemas lógicos, facilidade em lidar com dados numéricos e profundo interesse em decifrar o funcionamento das novas tecnologias.\n\nCarreiras Associadas: Engenharias, Ciência da Computação, Matemática, Física, Arquitetura e Tecnologia da Informação.",
-              reflection: "Diagnosticamos no(a) estudante uma estrutura cognitiva predominantemente abstrata, analítica and dedutiva. Sua mente opera de forma sistêmica e encontra motivação na descoberta de padrões, equações e arquitetura de dados. O(A) jovem não se contenta em ser apenas um usuário passivo das ferramentas digitais e das construções do mundo moderno; há uma curiosidade intelectual intrínseca para compreender o \"como\" e o \"porquê\" por trás das engrenagens tecnológicas e estruturais. Essa inclinação para a precisão metodológica fornece uma base sólida para carreiras em desenvolvimento de softwares ou engenharia, ambientes onde o rigor lógico serve como matéria-prima para projetar e construir as soluções do amanhã."
+              profile: t('uiExatasETecnologicas'),
+              component: t('uiMapaDePerfisECarreiras'),
+              basicData: t('textoM7ExatasTecnologicasBasicData'),
+              reflection: t('textoM7ExatasTecnologicasReflection'),
             },
             {
               id: "m7_8",
-              profile: "Exatas e Tecnológicas",
-              component: "Recomendações Pedagógicas",
-              basicData: "Projetos Integradores: Incentivar a liderança em olimpíadas de matemática, competições de robótica, desenvolvimento de pequenos aplicativos ou oficinas de maquetes e modelagem 3D, estimulando o pensamento algorítmico e espacial.",
-              reflection: "Imersão de Mercado: Promover visitas monitoradas a polos tecnológicos, laboratórios acadêmicos e escritórios de engenharia ou arquitetura, aproximando o(a) jovem dos desafios reais de infraestrutura, código e inovação."
+              profile: t('uiExatasETecnologicas'),
+              component: t('uiRecomendacoesPedagogicas'),
+              basicData: t('textoProjetosIntegradoresIncentivarALiderancaEmOlimpiadas'),
+              reflection: t('textoImersaoDeMercadoPromoverVisitasMonitoradasA')
             },
             {
               id: "m7_9",
-              profile: "Humanas e Sociais",
-              component: "Mapa de Perfis e Carreiras",
-              basicData: "Dados Básicos: Perfil pautado na habilidade de se comunicar com clareza, forte empatia para o acolhimento e ajuda ao próximo, além de interesse crítico em compreender as estruturas da sociedade.\n\nCarreiras Associadas: Direito, Letras, Pedagogia, Psicologia, História, Jornalismo e Relações Internacionais.",
-              reflection: "O eixo central de desenvolvimento deste perfil está inteiramente alinhado ao fator humano e às suas complexas interações coletivas. O(A) estudante demonstra uma aptidão notável para a escuta ativa, o exercício da empatia e a articulação verbal de ideias abstratas. Sua mente encontra estímulo ao analisar os fenômenos sociais, os direitos humanos e as narrativas que moldam a nossa cultura. Longe de ser apenas uma inclinação teórica, esse perfil reflete uma inteligência voltada para a transformação prática e para a mediação de conflitos. O(A) jovem apresenta um potencial latente para exercer liderança em ambientes que exijam responsabilidade ética, seja defendendo causas jurídicas, educando, promovendo a saúde mental ou comunicando informações essenciais para a coletividade."
+              profile: t('uiHumanasESociais'),
+              component: t('uiMapaDePerfisECarreiras'),
+              basicData: t('textoM7HumanasSociaisBasicData'),
+              reflection: t('textoOEixoCentralDeDesenvolvimentoDestePerfil')
             },
             {
               id: "m7_10",
-              profile: "Humanas e Sociais",
-              component: "Recomendações Pedagógicas",
-              basicData: "Projetos Integradores: Incentivar o protagonismo em debates escolares, simulações de comitês internacionais (como os modelos da ONU), redação de jornais internos da escola ou coordenação de campanhas e projetos sociais de cunho comunitário.",
-              reflection: "Imersão de Mercado: Fomentar o contato com a realidade profissional por meio de visitas monitoradas a tribunais, institutos de psicologia, agências de comunicação ou espaços de inovação pedagógica, auxiliando o(a) jovem a compreender o impacto real dessas carreiras."
+              profile: t('uiHumanasESociais'),
+              component: t('uiRecomendacoesPedagogicas'),
+              basicData: t('textoProjetosIntegradoresIncentivarOProtagonismoEmDebates'),
+              reflection: t('textoImersaoDeMercadoFomentarOContatoCom')
             }
           ]);
         }
@@ -1668,7 +1778,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
     };
 
     calculateFrequencies();
-  }, [selectedStudentId, students, refreshToggle, imcRecordsProp, motorRecordsProp, sportRecordsProp, vocationalRecordsProp, healthRecordsProp, oralRecordsProp, autoconceptRecordsProp, iasRecordsProp, snapRecordsProp, aq10RecordsProp, pcdRecordsProp]);
+  }, [selectedStudentId, students, refreshToggle, imcRecordsProp, motorRecordsProp, sportRecordsProp, vocationalRecordsProp, healthRecordsProp, oralRecordsProp, autoconceptRecordsProp, iasRecordsProp, snapRecordsProp, aq10RecordsProp, pcdRecordsProp, t]);
 
   const handleDeleteReport = async (reportId: string) => {
     if (!reportId) return;
@@ -1697,10 +1807,10 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           setReportToDelete(null);
         }
 
-        alert('Relatório excluído com sucesso!');
+        alert(t('msgRelatorioExcluidoComSucesso'));
       } catch (e) {
         console.error('Erro ao excluir:', e);
-        alert('Não foi possível excluir o relatório.');
+        alert(t('msgNaoFoiPossivelExcluirORelatorio'));
       }
 
       // 4. Cloud delete
@@ -1731,7 +1841,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
     // Header
     doc.setFontSize(18);
     doc.setTextColor(33, 150, 243);
-    doc.text('Relatório de Desempenho - EDUKYNE', margin, y);
+    doc.text(t('pdfRelatorioDeDesempenhoEdukyne'), margin, y);
     y += 10;
 
     // Foto do aluno (antes do nome)
@@ -1746,17 +1856,17 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
     let iy = y + 5;
-    doc.text(`Aluno: ${studentObj.name}`, infoX, iy);
+    doc.text(t('msgPdfAluno', { p0: displayValue(studentObj.name, t) }), infoX, iy);
     iy += 7;
-    doc.text(`Turma: ${studentObj.grade}`, infoX, iy);
+    doc.text(t('msgPdfTurma', { p0: displayValue(studentObj.grade, t) }), infoX, iy);
     iy += 7;
-    doc.text(`Localidade: ${studentObj.locality || 'N/A'}`, infoX, iy);
+    doc.text(t('msgPdfLocalidade', { p0: displayValue(studentObj.locality || 'N/A', t) }), infoX, iy);
     iy += 7;
-    doc.text(`Estado: ${studentObj.estado || 'N/A'} | Região: ${studentObj.regiao || 'N/A'}`, infoX, iy);
+    doc.text(t('tplEstadoStudentobjEstadoNARegiaoStudentobj', { p0: displayValue(studentObj.estado || 'N/A', t), p1: displayValue(studentObj.regiao || 'N/A', t) }), infoX, iy);
     iy += 7;
-    doc.text(`Dimensão de Foco: ${area}`, infoX, iy);
+    doc.text(t('tplDimensaoDeFocoArea', { p0: displayValue(area, t) }), infoX, iy);
     iy += 7;
-    doc.text(`Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`, infoX, iy);
+    doc.text(t('tplDataDeEmissaoNewDateTolocaledatestringPt', { p0: displayValue(new Date().toLocaleDateString(locale), t) }), infoX, iy);
     y = Math.max(iy + 8, photoBottom);
 
     // Content
@@ -1846,7 +1956,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
 
   const handleBatchDownloadZip = async () => {
     if (selectedStudentIdsForBatch.length === 0) {
-      alert('Selecione pelo menos um aluno para baixar.');
+      alert(t('msgSelecionePeloMenosUmAlunoParaBaixar'));
       return;
     }
 
@@ -1896,7 +2006,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
       }
 
       if (addedCount === 0) {
-        alert('Nenhum relatorio encontrado para os alunos selecionados nesta Dimensao de Foco.');
+        alert(t('msgNenhumRelatorioEncontradoParaOsAlunosSelecionados'));
         setLoading(false);
         return;
       }
@@ -1910,11 +2020,11 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
       link.click();
       URL.revokeObjectURL(link.href);
 
-      alert(`Download concluído! ${addedCount} relatórios foram exportados.`);
+      alert(t('tplDownloadConcluidoAddedcountRelatoriosForamExportados', { p0: displayValue(addedCount, t) }));
       logExport(user?.id || 'unknown', user?.role || 'unknown', 'performance_reports', 'pdf', addedCount);
     } catch (err) {
       console.error('Erro ao gerar ZIP:', err);
-      alert('Ocorreu um erro ao gerar o arquivo ZIP. Tente novamente.');
+      alert(t('msgOcorreuUmErroAoGerarOArquivo'));
     } finally {
       setLoading(false);
     }
@@ -2173,13 +2283,13 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
 
   // Rotulo do escopo atual do painel (do nivel mais especifico pro mais amplo).
   const statsScopeLabel = useMemo(() => {
-    if (gradeFilter) return `Turma ${gradeFilter}`;
-    if (localityFilter && localityFilter !== 'Todos') return `Localidade ${localityFilter}`;
-    if (cityFilter && cityFilter !== 'Todos' && cityFilter !== 'Todas') return `Região ${cityFilter}`;
-    if (stateFilter && stateFilter !== 'Todos') return `Estado ${stateFilter}`;
-    if (contract && contract !== 'Todos') { const c = availableContracts.find(x => x.id === contract); return `Contrato ${c ? c.name : ''}`.trim(); }
-    return 'Todos os alunos';
-  }, [gradeFilter, localityFilter, cityFilter, stateFilter, contract, availableContracts]);
+    if (gradeFilter) return t('tplTurmaGradeFilter', { p0: displayValue(gradeFilter, t) });
+    if (localityFilter && localityFilter !== 'Todos') return t('tplLocalidadeLocalityFilter', { p0: displayValue(localityFilter, t) });
+    if (cityFilter && cityFilter !== 'Todos' && cityFilter !== 'Todas') return t('tplRegiaoCityfilter', { p0: displayValue(cityFilter, t) });
+    if (stateFilter && stateFilter !== 'Todos') return t('tplEstadoStateFilter', { p0: displayValue(stateFilter, t) });
+    if (contract && contract !== 'Todos') { const c = availableContracts.find(x => x.id === contract); return t('tplContratoContractName', { p0: displayValue(c ? c.name : '', t) }); }
+    return t('uiTodosOsAlunos');
+  }, [gradeFilter, localityFilter, cityFilter, stateFilter, contract, availableContracts, t]);
 
   // Carrega a presenca dos alunos da turma (para a estatistica de frequencia).
   useEffect(() => {
@@ -2222,17 +2332,17 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
       };
     };
     const dims = [
-      { label: 'IMC / Desempenho Corporal', d: tally(imcRecordsProp, r => r.classification || '') },
-      { label: 'Capacidades Físicas', d: tally(motorRecordsProp, r => r.generalClass || '') },
-      { label: 'Atividades Esportivas', d: tally(sportRecordsProp, r => r.mainSkill || '') },
-      { label: 'Perfil Vocacional', d: tally(vocationalRecordsProp, r => r.profile || '') },
-      { label: 'Saúde Global', d: tally(healthRecordsProp, r => r.classification || '') },
-      { label: 'Higiene Bucal', d: tally(oralRecordsProp, r => r.classification || '') },
-      { label: 'Autoconceito', d: tally(autoconceptRecordsProp, r => r.classification || '') },
-      { label: 'Índice Alimentar', d: tally(iasRecordsProp, r => r.classification || '') },
-      { label: 'Rastreamento TDAH', d: tally(snapRecordsProp, r => r.classification || '') },
-      { label: 'Rastreamento TEA', d: tally(aq10RecordsProp, r => r.classification || '') },
-      { label: 'Qualidade Motora PCD', d: tally(pcdRecordsProp, r => r.classificacaoPerfil || '') },
+      { label: t('uiImcDesempenhoCorporal'), d: tally(imcRecordsProp, r => r.classification || '') },
+      { label: t('uiCapacidadesFisicas'), d: tally(motorRecordsProp, r => r.generalClass || '') },
+      { label: t('uiAtividadesEsportivas'), d: tally(sportRecordsProp, r => r.mainSkill || '') },
+      { label: t('valorPerfilVocacional'), d: tally(vocationalRecordsProp, r => r.profile || '') },
+      { label: t('uiSaudeGlobal'), d: tally(healthRecordsProp, r => r.classification || '') },
+      { label: t('uiHigieneBucal'), d: tally(oralRecordsProp, r => r.classification || '') },
+      { label: t('valorAutoconceito'), d: tally(autoconceptRecordsProp, r => r.classification || '') },
+      { label: t('uiIndiceAlimentar'), d: tally(iasRecordsProp, r => r.classification || '') },
+      { label: t('uiRastreamentoTdah'), d: tally(snapRecordsProp, r => r.classification || '') },
+      { label: t('uiRastreamentoTea'), d: tally(aq10RecordsProp, r => r.classification || '') },
+      { label: t('uiQualidadeMotoraPcd'), d: tally(pcdRecordsProp, r => r.classificacaoPerfil || '') },
     ];
     let fSum = 0, fN = 0, exc = 0, reg = 0, cri = 0, nod = 0;
     ids.forEach(sid => {
@@ -2243,26 +2353,26 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
     });
     const frequency = { avg: fN ? +(fSum / fN).toFixed(1) : 0, excellent: exc, regular: reg, critical: cri, noData: nod };
     return { total, dims, frequency };
-  }, [statsStudentsList, imcRecordsProp, motorRecordsProp, sportRecordsProp, vocationalRecordsProp, healthRecordsProp, oralRecordsProp, autoconceptRecordsProp, iasRecordsProp, snapRecordsProp, aq10RecordsProp, pcdRecordsProp, attendanceByStudent]);
+  }, [statsStudentsList, imcRecordsProp, motorRecordsProp, sportRecordsProp, vocationalRecordsProp, healthRecordsProp, oralRecordsProp, autoconceptRecordsProp, iasRecordsProp, snapRecordsProp, aq10RecordsProp, pcdRecordsProp, attendanceByStudent, t]);
 
   const handleDownloadStats = () => {
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
     doc.setFontSize(15); doc.setTextColor(11, 19, 38);
-    doc.text(`Painel Estatístico — ${statsScopeLabel}`, 40, 46);
+    doc.text(t('tplPainelEstatisticoStatsscopelabel', { p0: displayValue(statsScopeLabel, t) }), 40, 46);
     doc.setFontSize(9); doc.setTextColor(90);
-    doc.text(`${turmaStats.total} alunos · Emitido em ${new Date().toLocaleDateString('pt-BR')}`, 40, 62);
+    doc.text(t('tplTotalAlunosEmitidoEm', { p0: displayValue(turmaStats.total, t), p1: displayValue(new Date().toLocaleDateString(locale), t) }), 40, 62);
     const f = turmaStats.frequency;
     doc.setFontSize(10); doc.setTextColor(11, 19, 38);
-    doc.text(`Frequência — média ${f.avg}% · Excelente ${f.excellent} · Regular ${f.regular} · Crítico ${f.critical} · Sem dados ${f.noData}`, 40, 84);
+    doc.text(t('tplFrequenciaMediaFAvgExcelenteFExcellent', { p0: displayValue(f.avg, t), p1: displayValue(f.excellent, t), p2: displayValue(f.regular, t), p3: displayValue(f.critical, t), p4: displayValue(f.noData, t) }), 40, 84);
     let y = 100;
     turmaStats.dims.forEach(dim => {
       if (y > 760) { doc.addPage(); y = 50; }
       doc.setFontSize(11); doc.setTextColor(11, 19, 38);
-      doc.text(`${dim.label} — cobertura ${dim.d.coverage}/${turmaStats.total} (${dim.d.coveragePct}%)`, 40, y);
+      doc.text(t('tplDimensaoCobertura', { p0: displayValue(dim.label, t), p1: displayValue(dim.d.coverage, t), p2: displayValue(turmaStats.total, t), p3: displayValue(dim.d.coveragePct, t) }), 40, y);
       autoTable(doc, {
         startY: y + 6,
-        head: [['Categoria', 'Alunos', '%']],
-        body: dim.d.distribution.map(x => [x.label, String(x.count), turmaStats.total ? `${Math.round((x.count / turmaStats.total) * 100)}%` : '0%']),
+        head: [[t('tableCategoria'), t('tableAlunos'), t('tablePercentual')]],
+        body: dim.d.distribution.map(x => [displayValue(x.label, t), String(x.count), turmaStats.total ? `${Math.round((x.count / turmaStats.total) * 100)}%` : '0%']),
         theme: 'striped',
         styles: { fontSize: 8.5, cellPadding: 3 },
         headStyles: { fillColor: [56, 189, 248] },
@@ -2275,10 +2385,10 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
 
   // Sequential loading text generator
   const loadingMessages = [
-    'Consultando frequência do estudante no sistema eletrônico de presenças...',
-    'Avaliando anotações e registros dos profissionais orientadores...',
-    'Estruturando dados comportamentais e matrizes pedagógicas...',
-    'Formatando o Parecer Executivo Final para entrega institucional...'
+    t('uiConsultandoFrequenciaDoEstudanteNoSistemaEletronico'),
+    t('uiAvaliandoAnotacoesERegistrosDosProfissionaisOrientadores'),
+    t('uiEstruturandoDadosComportamentaisEMatrizesPedagogicas'),
+    t('uiFormatandoOParecerExecutivoFinalParaEntrega')
   ];
 
   // Memoized list of reports for the logged in student in the selected focus area
@@ -2306,11 +2416,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
       );
 
       if (matched.length === 0) {
-        setAiReport(`### NENHUM REGISTRO ENCONTRADO
-
-Nenhum relatório de desempenho foi registrado no histórico para você na área de foco ${focusArea} até o momento.
-
-Por favor, entre em contato com seus professores ou orientadores pedagógicos para que eles publiquem as avaliações no sistema.`);
+        setAiReport(t('tplNenhumRegistroEncontradoNenhumRelatorioDeDesempenho', { p0: displayValue(focusArea, t) }));
         setSelectedReportId('');
       } else {
         // Automatically load and visualize the first (most recent) one
@@ -2377,7 +2483,7 @@ Por favor, entre em contato com seus professores ou orientadores pedagógicos pa
 
   const handleGenerateReport = async () => {
     if (!selectedStudentId) {
-      alert('Selecione um aluno da lista antes de gerar o relatório.');
+      alert(t('msgSelecioneUmAlunoDaListaAntesDe'));
       return;
     }
 
@@ -2444,13 +2550,16 @@ Por favor, entre em contato com seus professores ou orientadores pedagógicos pa
     try {
       // Rule-based generation (Replacing AI)
       let generatedReport = '';
-      const dateStr = new Date().toLocaleDateString('pt-BR');
+      const dateStr = new Date().toLocaleDateString(locale);
       const rate = attendanceRate !== null ? attendanceRate.toFixed(1) : 'N/A';
       const absenceRate = attendanceRate !== null ? (100 - attendanceRate).toFixed(1) : 'N/A';
-      const status = attendanceRate !== null ? (attendanceRate >= 75 ? 'Excelente' : attendanceRate >= 50 ? 'Regular' : 'Crítico') : 'N/A';
+      const status = attendanceRate !== null ? (attendanceRate >= 75 ? t('valorExcelente') : attendanceRate >= 50 ? t('valorRegular') : t('uiCritico')) : 'N/A';
 
       // Fonte unica: usa o construtor compartilhado para todas as dimensoes.
-      const builtReport = buildAssessmentReport(makeReportCtx(focusArea, studentObj.name, studentObj.grade, observations, dateStr, savedReports.filter(r => r.studentId === studentObj.id).map(r => ({ focusArea: r.focusArea, report: r.report }))));
+      const reportCtx = makeReportCtx(focusArea, studentObj.name, studentObj.grade, observations, dateStr, savedReports.filter(r => r.studentId === studentObj.id).map(r => ({ focusArea: r.focusArea, report: r.report })));
+      const builtReport = locale === 'pt-BR'
+        ? buildAssessmentReport(reportCtx)
+        : localizeAssessmentReport(reportCtx, t as ReportTranslator);
       if (builtReport) {
         generatedReport = builtReport.report;
       } else
@@ -2481,35 +2590,12 @@ Por favor, entre em contato com seus professores ou orientadores pedagógicos pa
 
         const absenceCount = totalCount - presenceCount;
 
-        generatedReport = `### FREQUÊNCIA ESCOLAR ACUMULADA: ${rate}% (${status})
-
-#### RESUMO DO CÁLCULO
-| Categoria | Quantidade | Porcentagem |
-| **Total** | ${totalCount} | 100% |
-| **Presenças** | ${presenceCount} | ${rate}% (Frequência) |
-| **Faltas** | ${absenceCount} | ${absenceRate}% |
-
-#### 1. Análise de Cenário
-**${scenarioText}**
-
-#### 2. Parecer de Frequência
-${m3Analysis?.parecerFrequencia || frequencyText}
-
-#### 3. Orientações aos Pais e Responsáveis
-${m3Analysis?.parecerPais || parentsText}
-
-${impactosText}
-
-#### 4. Observações Complementares
-${observations || 'Nenhuma observação adicional registrada.'}
-
----
-*Relatório de desempenho escolar acumulado - ${dateStr}*`;
+        generatedReport = t('tplFrequenciaEscolarAcumuladaRateStatusResumoDo', { p0: displayValue(rate, t), p1: displayValue(status, t), p2: displayValue(totalCount, t), p3: displayValue(presenceCount, t), p4: displayValue(rate, t), p5: displayValue(absenceCount, t), p6: displayValue(absenceRate, t), p7: displayValue(scenarioText, t), p8: displayValue(m3Analysis?.parecerFrequencia || frequencyText, t), p9: displayValue(m3Analysis?.parecerPais || parentsText, t), p10: displayValue(impactosText, t), p11: displayValue(observations || 'Nenhuma observação adicional registrada.', t), p12: displayValue(dateStr, t) });
       } else if (focusArea === 'Desempenho Corporal') {
         const selectedImc = imcRecords.find(r => r.id === selectedImcId);
         
         if (!selectedImc) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO CORPORAL\n\nNenhum registro de IMC selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoCorporalNenhumRegistroDe');
         } else {
           // Find matching M4 classification
           // Normalizing strings for better matching
@@ -2523,34 +2609,13 @@ ${observations || 'Nenhuma observação adicional registrada.'}
           const statusM4 = match?.status || 'Aguardando Análise';
           const descriptionM4 = match?.description || 'Não há um parecer específico cadastrado para esta classificação.';
 
-          generatedReport = `### RELATÓRIO DE DESEMPENHO CORPORAL
-
-#### DADOS DA AVALIAÇÃO (${selectedImc.date})
-- **Peso:** ${weight} kg
-- **Altura:** ${height} m
-- **IMC:** ${imcValue}
-- **Classificação:** ${classification}
-
-#### 1. Tabela de Classificação e Parecer
-**Status:** ${statusM4}
-
-**Parecer Técnico:**
-${descriptionM4}
-
-#### 2. Orientações Gerais
-O Índice de Massa Corporal (IMC) é um indicador internacional usado para diagnosticar o peso ideal. A manutenção de uma composição corporal adequada é fundamental para a saúde musculoesquelética e o rendimento em atividades físicas.
-
-#### 3. Observações do Educador
-${observations || 'Nenhuma observação adicional registrada.'}
-
----
-*Relatório de desempenho corporal - ${dateStr}*`;
+          generatedReport = t('tplRelatorioDeDesempenhoCorporalDadosDaAvaliacao', { p0: displayValue(selectedImc.date, t), p1: displayValue(weight, t), p2: displayValue(height, t), p3: displayValue(imcValue, t), p4: displayValue(classification, t), p5: displayValue(statusM4, t), p6: displayValue(descriptionM4, t), p7: displayValue(observations || 'Nenhuma observação adicional registrada.', t), p8: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho de Capacidades Físicas') {
         const selectedMotor = motorRecords.find(r => r.id === selectedMotorId);
         
         if (!selectedMotor) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO DE CAPACIDADES FÍSICAS\n\nNenhum registro de Qualidade Motora selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoDeCapacidadesFisicasNenhum');
         } else {
           // Normalize string helper for matching level in m5Data
           const norm = (s: string) => (s || '').toLowerCase().trim();
@@ -2560,10 +2625,11 @@ ${observations || 'Nenhuma observação adicional registrada.'}
             const rows = m5Data[capKey] || [];
             // Match row where level matches levelName
             const match = rows.find(r => norm(r.level) === norm(levelName));
+            const capName = capKey === 'forca_muscular' ? 'Força Muscular' : capKey === 'impulsao' ? 'Impulsão' : capKey.charAt(0).toUpperCase() + capKey.slice(1);
             return match || {
-              healthStatus: `A capacidade de ${capKey === 'forca_muscular' ? 'Força Muscular' : capKey === 'impulsao' ? 'Impulsão' : capKey.charAt(0).toUpperCase() + capKey.slice(1)} foi classificada como ${levelName}.`,
-              toImprove: `Focar em atividades progressivas e adaptadas para o desenvolvimento de ${capKey === 'forca_muscular' ? 'Força Muscular' : capKey === 'impulsao' ? 'Impulsão' : capKey.charAt(0).toUpperCase() + capKey.slice(1)}.`,
-              recommendation: `Estimular atividades motoras e brincadeiras lúdicas direcionadas em casa.`
+              healthStatus: t('tplACapacidadeDeCapkeyForcaMuscularForca', { p0: displayValue(capName, t), p1: displayValue(levelName, t) }),
+              toImprove: t('tplFocarEmAtividadesProgressivasEAdaptadasPara', { p0: displayValue(capName, t) }),
+              recommendation: t('textoEstimularAtividadesMotoras')
             };
           };
 
@@ -2573,59 +2639,13 @@ ${observations || 'Nenhuma observação adicional registrada.'}
           const abdDetail = getCapDetail('abdomen', selectedMotor.abdomen || selectedMotor.coordination || 'Excelente');
           const impDetail = getCapDetail('impulsao', selectedMotor.impulsao || selectedMotor.flexibility || 'Excelente');
 
-          generatedReport = `### RELATÓRIO DE DESEMPENHO DE CAPACIDADES FÍSICAS
-
-#### DADOS DA AVALIAÇÃO MOTORA (${selectedMotor.date ? selectedMotor.date.split('-').reverse().join('/') : 'N/A'})
-- **Velocidade:** ${selectedMotor.speed || 'Excelente'}
-- **Força Muscular:** ${selectedMotor.strength || 'Excelente'}
-- **Agilidade:** ${selectedMotor.agility || 'Excelente'}
-- **Abdômen:** ${selectedMotor.abdomen || selectedMotor.coordination || 'Excelente'}
-- **Impulsão:** ${selectedMotor.impulsao || selectedMotor.flexibility || 'Excelente'}
-- **Classificação Geral:** ${selectedMotor.generalClass || 'Excelente'}
-
-#### 1. Diagnóstico e Recomendações Pedagógicas
-
-##### **Velocidade**
-- **Classificação:** ${selectedMotor.speed || 'Excelente'}
-- **Parecer de Saúde:** ${velDetail.healthStatus}
-- **Diretrizes de Intervenção / Melhoria:** ${velDetail.toImprove}
-- **Recomendação para a Família (Casa):** ${velDetail.recommendation}
-
-##### **Força Muscular**
-- **Classificação:** ${selectedMotor.strength || 'Excelente'}
-- **Parecer de Saúde:** ${forcaDetail.healthStatus}
-- **Diretrizes de Intervenção / Melhoria:** ${forcaDetail.toImprove}
-- **Recomendação para a Família (Casa):** ${forcaDetail.recommendation}
-
-##### **Agilidade**
-- **Classificação:** ${selectedMotor.agility || 'Excelente'}
-- **Parecer de Saúde:** ${agilDetail.healthStatus}
-- **Diretrizes de Intervenção / Melhoria:** ${agilDetail.toImprove}
-- **Recomendação para a Família (Casa):** ${agilDetail.recommendation}
-
-##### **Abdômen**
-- **Classificação:** ${selectedMotor.abdomen || selectedMotor.coordination || 'Excelente'}
-- **Parecer de Saúde:** ${abdDetail.healthStatus}
-- **Diretrizes de Intervenção / Melhoria:** ${abdDetail.toImprove}
-- **Recomendação para a Família (Casa):** ${abdDetail.recommendation}
-
-##### **Impulsão**
-- **Classificação:** ${selectedMotor.impulsao || selectedMotor.flexibility || 'Excelente'}
-- **Parecer de Saúde:** ${impDetail.healthStatus}
-- **Diretrizes de Intervenção / Melhoria:** ${impDetail.toImprove}
-- **Recomendação para a Família (Casa):** ${impDetail.recommendation}
-
-#### 2. Observações do Educador
-${observations || 'Nenhuma observação específica registrada pelo educador para este período.'}
-
----
-*Relatório de Capacidades Físicas - ${dateStr}*`;
+          generatedReport = t('tplRelatorioDeDesempenhoDeCapacidadesFisicasDados', { p0: displayValue(selectedMotor.date ? selectedMotor.date.split('-').reverse().join('/') : 'N/A', t), p1: displayValue(selectedMotor.speed || 'Excelente', t), p2: displayValue(selectedMotor.strength || 'Excelente', t), p3: displayValue(selectedMotor.agility || 'Excelente', t), p4: displayValue(selectedMotor.abdomen || selectedMotor.coordination || 'Excelente', t), p5: displayValue(selectedMotor.impulsao || selectedMotor.flexibility || 'Excelente', t), p6: displayValue(selectedMotor.generalClass || 'Excelente', t), p7: displayValue(selectedMotor.speed || 'Excelente', t), p8: displayValue(velDetail.healthStatus, t), p9: displayValue(velDetail.toImprove, t), p10: displayValue(velDetail.recommendation, t), p11: displayValue(selectedMotor.strength || 'Excelente', t), p12: displayValue(forcaDetail.healthStatus, t), p13: displayValue(forcaDetail.toImprove, t), p14: displayValue(forcaDetail.recommendation, t), p15: displayValue(selectedMotor.agility || 'Excelente', t), p16: displayValue(agilDetail.healthStatus, t), p17: displayValue(agilDetail.toImprove, t), p18: displayValue(agilDetail.recommendation, t), p19: displayValue(selectedMotor.abdomen || selectedMotor.coordination || 'Excelente', t), p20: displayValue(abdDetail.healthStatus, t), p21: displayValue(abdDetail.toImprove, t), p22: displayValue(abdDetail.recommendation, t), p23: displayValue(selectedMotor.impulsao || selectedMotor.flexibility || 'Excelente', t), p24: displayValue(impDetail.healthStatus, t), p25: displayValue(impDetail.toImprove, t), p26: displayValue(impDetail.recommendation, t), p27: displayValue(observations || 'Nenhuma observação específica registrada pelo educador para este período.', t), p28: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho em Atividades Esportivas') {
         const selectedSport = sportRecords.find(r => r.id === selectedSportId);
 
         if (!selectedSport) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO EM ATIVIDADES ESPORTIVAS\n\nNenhum registro de Esporte Indicado selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoEmAtividadesEsportivasNenhum');
         } else {
           const rawActiveSportName = selectedSportName || selectedSport.suggestedSport || '';
           const activeSportName = rawActiveSportName.replace(/[🥋🏐🏃🏊⚽🤾🤸🏀♂♀\u200d\ufe0f]/g, '').trim();
@@ -2645,30 +2665,12 @@ ${observations || 'Nenhuma observação específica registrada pelo educador par
               return dirNorm.includes('aprimorar habilidades motoras') || dirNorm.includes('habilidades motoras');
             }) || {
               diretriz: "APRIMORAR HABILIDADES MOTORAS",
-              criterio: "Esta via deve ser adotada se três ou mais valências físicas estiverem em níveis Insuficiente ou Regular.",
-              conduta: "Desaconselho totalmente a especialização precoce em esportes com regras rígidas ou alta demanda competitiva neste momento. O foco pedagógico deve migrar para circuitos funcionais multiesportivos, jogos cooperativos e estimulação motora de base.",
-              objetivo: "O foco exclusivo deste direcionamento é restaurar a integridade física do(a) jovem. Buscaremos o ganho de massa magra, ativação do tônus postural e melhora da coordenação global para que seu corpo esteja preparado e protegido antes de ser exposto a cargas esportivas avançadas."
+              criterio: t('textoEstaViaDeveSerAdotadaSeTres'),
+              conduta: t('textoDesaconselhoTotalmenteAEspecializacaoPrecoceEmEsportes'),
+              objetivo: t('textoOFocoExclusivoDesteDirecionamentoERestaurar')
             };
 
-            generatedReport = `### RELATÓRIO DE DIRETRIZES DE INTERVENÇÃO MOTORAS
-
-#### DADOS DO ALUNO E AVALIAÇÃO (${selectedSport.date ? selectedSport.date.split('-').reverse().join('/') : 'N/A'})
-- **Biotipo Corporal:** ${selectedSport.biotype || 'Não avaliado'}
-- **Aptidão Predominante:** ${selectedSport.mainSkill || 'Não avaliado'}
-- **Foco de Direcionamento:** ${activeSportName}
-- **Prática Recomendada:** ${selectedSport.recommendedPractice || 'Não avaliado'}
-
-#### 1. Diretriz de Intervenção Aplicada
-- **Diretriz:** ${matchedDiretriz.diretriz}
-- **Critério de Enquadramento:** ${matchedDiretriz.criterio}
-- **Conduta Pedagógica:** ${matchedDiretriz.conduta}
-- **Objetivo da Intervenção:** ${matchedDiretriz.objetivo}
-
-#### 2. Observações Complementares do Educador
-${observations || 'Nenhuma observação complementar registrada.'}
-
----
-*Relatório de Intervenção de Habilidades Motoras - ${dateStr}*`;
+            generatedReport = t('tplRelatorioDeDiretrizesDeIntervencaoMotorasDados', { p0: displayValue(selectedSport.date ? selectedSport.date.split('-').reverse().join('/') : 'N/A', t), p1: displayValue(selectedSport.biotype || 'Não avaliado', t), p2: displayValue(selectedSport.mainSkill || 'Não avaliado', t), p3: displayValue(activeSportName, t), p4: displayValue(selectedSport.recommendedPractice || 'Não avaliado', t), p5: displayValue(matchedDiretriz.diretriz, t), p6: displayValue(matchedDiretriz.criterio, t), p7: displayValue(matchedDiretriz.conduta, t), p8: displayValue(matchedDiretriz.objetivo, t), p9: displayValue(observations || 'Nenhuma observação complementar registrada.', t), p10: displayValue(dateStr, t) });
           } else {
             // Find matching modalities in m6Modalidades
             const matchedMods = m6Modalidades.filter(modalidade => {
@@ -2687,43 +2689,20 @@ ${observations || 'Nenhuma observação complementar registrada.'}
 
             let matchedModalitiesText = '';
             if (activeMods.length > 0) {
-              matchedModalitiesText = activeMods.map(mod => `##### **${(mod.name || '').replace(/[🥋🏐🏃🏊⚽🤾🤸🏀♂♀\u200d\ufe0f]/g, '').trim()}**
-- **Valências Importantes:** ${mod.valencias}
-- **Condição de Enquadramento:** ${mod.condition}
-- **Parecer / Diretriz:** ${mod.report}`).join('\n\n');
+              matchedModalitiesText = activeMods.map(mod => t('tplModNameReplaceU200dUfe0fGTrim', { p0: displayValue((mod.name || '').replace(/[🥋🏐🏃🏊⚽🤾🤸🏀♂♀\u200d\ufe0f]/g, '').trim(), t), p1: displayValue(mod.valencias, t), p2: displayValue(mod.condition, t), p3: displayValue(mod.report, t) })).join('\n\n');
             } else if (matchedMods.length > 0) {
-              matchedModalitiesText = matchedMods.map(mod => `##### **${(mod.name || '').replace(/[🥋🏐🏃🏊⚽🤾🤸🏀♂♀\u200d\ufe0f]/g, '').trim()}**
-- **Valências Importantes:** ${mod.valencias}
-- **Condição de Enquadramento:** ${mod.condition}
-- **Parecer / Diretriz:** ${mod.report}`).join('\n\n');
+              matchedModalitiesText = matchedMods.map(mod => t('tplModNameReplaceU200dUfe0fGTrim', { p0: displayValue((mod.name || '').replace(/[🥋🏐🏃🏊⚽🤾🤸🏀♂♀\u200d\ufe0f]/g, '').trim(), t), p1: displayValue(mod.valencias, t), p2: displayValue(mod.condition, t), p3: displayValue(mod.report, t) })).join('\n\n');
             } else {
-              matchedModalitiesText = `Não foi encontrado um enquadramento exato para a modalidade "${activeSportName}" nas tabelas de referência. 
-
-No entanto, recomenda-se focar nas valências de força muscular, velocidade e agilidade exigidas por esportes de dinâmica similar.`;
+              matchedModalitiesText = t('tplNaoFoiEncontradoUmEnquadramentoExatoPara', { p0: displayValue(activeSportName, t) });
             }
 
-            generatedReport = `### RELATÓRIO DE DESEMPENHO EM ATIVIDADES ESPORTIVAS
-
-#### DADOS DO DIRECIONAMENTO ESPORTIVO (${selectedSport.date ? selectedSport.date.split('-').reverse().join('/') : 'N/A'})
-- **Biotipo Corporal:** ${selectedSport.biotype || 'Não avaliado'}
-- **Aptidão Predominante:** ${selectedSport.mainSkill || 'Não avaliado'}
-- **Modalidade Selecionada:** ${activeSportName}
-- **Prática Recomendada:** ${selectedSport.recommendedPractice || 'Não avaliado'}
-
-#### 1. Parecer de Direcionamento por Modalidade
-${matchedModalitiesText}
-
-#### 2. Observações Complementares do Educador
-${observations || 'Nenhuma observação complementar registrada.'}
-
----
-*Relatório de Direcionamento Esportivo - ${dateStr}*`;
+            generatedReport = t('tplRelatorioDeDesempenhoEmAtividadesEsportivasDados', { p0: displayValue(selectedSport.date ? selectedSport.date.split('-').reverse().join('/') : 'N/A', t), p1: displayValue(selectedSport.biotype || 'Não avaliado', t), p2: displayValue(selectedSport.mainSkill || 'Não avaliado', t), p3: displayValue(activeSportName, t), p4: displayValue(selectedSport.recommendedPractice || 'Não avaliado', t), p5: displayValue(matchedModalitiesText, t), p6: displayValue(observations || 'Nenhuma observação complementar registrada.', t), p7: displayValue(dateStr, t) });
           }
         }
       } else if (focusArea === 'Desempenho Vocacional') {
         const selectedVocation = vocationRecords.find(r => r.id === selectedVocationId);
         if (!selectedVocation) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO VOCACIONAL\n\nNenhum registro de Vocacionamento selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoVocacionalNenhumRegistroDe');
         } else {
           const profile = selectedVocation.profile || 'Não especificado';
           
@@ -2744,339 +2723,129 @@ ${observations || 'Nenhuma observação complementar registrada.'}
           // Match in m7Rows for Mapa de Perfis e Carreiras
           const mapaRow = m7Rows.find(row => 
             normalizeProfileName(row.profile) === targetNorm && 
-            row.component === 'Mapa de Perfis e Carreiras'
+            row.component === t('uiMapaDePerfisECarreiras')
           );
           
           // Match in m7Rows for Recomendações Pedagógicas
           const recRow = m7Rows.find(row => 
             normalizeProfileName(row.profile) === targetNorm && 
-            row.component === 'Recomendações Pedagógicas'
+            row.component === t('uiRecomendacoesPedagogicas')
           );
 
-          const basicDataMapa = mapaRow?.basicData || `Dados Básicos: Não cadastrados para o perfil ${profile} no Módulo 7.`;
-          const reflectionMapa = mapaRow?.reflection || `Reflexão: Não cadastrada para o perfil ${profile} no Módulo 7.`;
+          const basicDataMapa = mapaRow?.basicData || t('tplDadosBasicosNaoCadastradosParaOPerfil', { p0: displayValue(profile, t) });
+          const reflectionMapa = mapaRow?.reflection || t('tplReflexaoNaoCadastradaParaOPerfilProfile', { p0: displayValue(profile, t) });
           
-          const basicDataRec = recRow?.basicData || `Diretrizes Pedagógicas: Não cadastradas para o perfil ${profile} no Módulo 7.`;
-          const reflectionRec = recRow?.reflection || `Imersão de Mercado: Não cadastrada para o perfil ${profile} no Módulo 7.`;
+          const basicDataRec = recRow?.basicData || t('tplDiretrizesPedagogicasNaoCadastradasParaOPerfil', { p0: displayValue(profile, t) });
+          const reflectionRec = recRow?.reflection || t('tplImersaoDeMercadoNaoCadastradaParaO', { p0: displayValue(profile, t) });
 
-          generatedReport = `### RELATÓRIO DE DESEMPENHO VOCACIONAL
-
-**ESTUDANTE:** ${studentObj.name}
-**DATA DA AVALIAÇÃO VOCACIONAL:** ${selectedVocation.date ? selectedVocation.date.split('-').reverse().join('/') : 'N/A'}
-**PERFIL DOMINANTE (AFERIDO):** ${profile}
-
----
-
-#### 1. MAPA DE PERFIS E CARREIRAS
-- **Diretrizes e Áreas:** ${basicDataMapa}
-${reflectionMapa !== (selectedVocation.technicalOpinion || '') ? `- **Análise Cognitiva e Psicológica:** ${reflectionMapa}` : ''}
-
----
-
-#### 2. RECOMENDAÇÕES PEDAGÓGICAS E IMERSÃO NO MERCADO
-- **Projetos Integradores e Ações Pedagógicas:** ${basicDataRec}
-- **Estratégias de Imersão e Prática:** ${reflectionRec}
-
----
-
-#### 3. PARECER DO ORIENTADOR VOCACIONAL
-${selectedVocation.technicalOpinion || 'Nenhum parecer técnico inserido no registro de vocacionamento original.'}
-
-#### 4. OBSERVAÇÕES COMPLEMENTARES DO EDUCADOR
-${observations || 'Nenhuma observação complementar registrada para este período.'}
-
----
-*Relatório de Desempenho e Direcionamento Vocacional - ${dateStr}*`;
+          generatedReport = t('tplRelatorioDeDesempenhoVocacionalEstudanteStudentobjName', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedVocation.date ? selectedVocation.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(profile, t), p3: displayValue(basicDataMapa, t), p4: displayValue(reflectionMapa !== (selectedVocation.technicalOpinion || '') ? t('tplAnaliseCognitivaPsicologica', { p0: displayValue(reflectionMapa, t) }) : '', t), p5: displayValue(basicDataRec, t), p6: displayValue(reflectionRec, t), p7: displayValue(selectedVocation.technicalOpinion || 'Nenhum parecer técnico inserido no registro de vocacionamento original.', t), p8: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p9: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Saúde Global') {
         const selectedHealth = healthRecords.find(r => r.id === selectedHealthId);
         if (!selectedHealth) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - SAÚDE GLOBAL\n\nNenhum registro de Saúde Global selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoSaudeGlobalNenhumRegistro');
         } else {
           const classification = selectedHealth.classification || 'Não classificado';
           const normCls = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
           const m9match = m9Rows.find(row => normCls(row.classification) === normCls(classification));
-          const basicData = m9match?.basicData || `Dados da classificação "${classification}" não cadastrados no Módulo 9.`;
+          const basicData = m9match?.basicData || t('tplDadosDaClassificacaoClassificationNaoCadastradosNo', { p0: displayValue(classification, t) });
           const reflection = m9match?.reflection || '';
 
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - SAÚDE GLOBAL (KIDSCREEN-10)
-
-**ESTUDANTE:** ${studentObj.name}
-**DATA DA AVALIAÇÃO:** ${selectedHealth.date ? selectedHealth.date.split('-').reverse().join('/') : 'N/A'}
-**ESCORE BRUTO:** ${selectedHealth.rawScore} (faixa 10-50)
-**ESCORE T (PADRONIZADO):** ${Number(selectedHealth.tScore).toFixed(2)}
-**CLASSIFICAÇÃO:** ${classification}
-
----
-
-#### 1. INTERPRETAÇÃO DO RESULTADO
-- **Leitura:** ${basicData}
-
----
-
-#### 2. PARECER DO EDUCADOR
-${selectedHealth.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Saúde Global original.'}
-
-#### 3. OBSERVAÇÕES COMPLEMENTARES DO EDUCADOR
-${observations || 'Nenhuma observação complementar registrada para este período.'}
-
----
-*Relatório de Saúde Global (KIDSCREEN-10) - ${dateStr}*`;
+          generatedReport = t('tplRelatorioDeDesempenhoSaudeGlobalKidscreen10', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedHealth.date ? selectedHealth.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedHealth.rawScore, t), p3: displayValue(Number(selectedHealth.tScore).toFixed(2), t), p4: displayValue(classification, t), p5: displayValue(basicData, t), p6: displayValue(selectedHealth.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Saúde Global original.', t), p7: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p8: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Higiene Bucal') {
         const selectedOral = oralRecords.find(r => r.id === selectedOralId);
         if (!selectedOral) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - HIGIENE BUCAL\n\nNenhum registro de Higiene Bucal selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoHigieneBucalNenhumRegistro');
         } else {
           const classification = selectedOral.classification || 'Não classificado';
           const normCls = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
           const m10match = m10Rows.find(row => normCls(row.classification) === normCls(classification));
-          const basicData = m10match?.basicData || `Faixa da classificação "${classification}" não cadastrada no Módulo 10.`;
+          const basicData = m10match?.basicData || t('tplFaixaDaClassificacaoClassificationNaoCadastradaNo', { p0: displayValue(classification, t) });
           const reflection = m10match?.reflection || '';
 
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - HIGIENE BUCAL (HU-DBI)
-
-**ESTUDANTE:** ${studentObj.name}
-**DATA DA AVALIAÇÃO:** ${selectedOral.date ? selectedOral.date.split('-').reverse().join('/') : 'N/A'}
-**PONTUAÇÃO:** ${selectedOral.score} (faixa 0-12)
-**CLASSIFICAÇÃO:** ${classification}
-
----
-
-#### 1. INTERPRETAÇÃO DO RESULTADO
-- **Leitura:** ${basicData}
-
----
-
-#### 2. PARECER DO EDUCADOR
-${selectedOral.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Higiene Bucal original.'}
-
-#### 3. OBSERVAÇÕES COMPLEMENTARES DO EDUCADOR
-${observations || 'Nenhuma observação complementar registrada para este período.'}
-
----
-*Relatório de Higiene Bucal (HU-DBI) - ${dateStr}*`;
+          generatedReport = t('tplRelatorioDeDesempenhoHigieneBucalHuDbi', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedOral.date ? selectedOral.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedOral.score, t), p3: displayValue(classification, t), p4: displayValue(basicData, t), p5: displayValue(selectedOral.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Higiene Bucal original.', t), p6: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p7: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Autoconceito') {
         const selectedAuto = autoconceptRecords.find(r => r.id === selectedAutoId);
         if (!selectedAuto) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - AUTOCONCEITO\n\nNenhum registro de Autoconceito selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoAutoconceitoNenhumRegistroDe');
         } else {
           const classification = selectedAuto.classification || 'Não classificado';
           const normCls = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
           const m11match = m11Rows.find(row => normCls(row.classification) === normCls(classification));
-          const basicData = m11match?.basicData || `Faixa da classificação "${classification}" não cadastrada no Módulo 11.`;
+          const basicData = m11match?.basicData || t('tplFaixaDaClassificacaoClassificationNaoCadastradaNo2', { p0: displayValue(classification, t) });
           const reflection = m11match?.reflection || '';
 
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - AUTOCONCEITO (Escala de Rosenberg)
-
-**ESTUDANTE:** ${studentObj.name}
-**DATA DA AVALIAÇÃO:** ${selectedAuto.date ? selectedAuto.date.split('-').reverse().join('/') : 'N/A'}
-**PONTUAÇÃO:** ${selectedAuto.score} (faixa 0-30)
-**CLASSIFICAÇÃO:** ${classification}
-
----
-
-#### 1. INTERPRETAÇÃO DO RESULTADO
-- **Leitura:** ${basicData}
-
----
-
-#### 2. PARECER DO EDUCADOR
-${selectedAuto.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Autoconceito original.'}
-
-#### 3. OBSERVAÇÕES COMPLEMENTARES DO EDUCADOR
-${observations || 'Nenhuma observação complementar registrada para este período.'}
-
----
-*Relatório de Autoconceito (Rosenberg) - ${dateStr}*`;
+          generatedReport = t('tplRelatorioDeDesempenhoAutoconceitoEscalaDeRosenberg', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedAuto.date ? selectedAuto.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedAuto.score, t), p3: displayValue(classification, t), p4: displayValue(basicData, t), p5: displayValue(selectedAuto.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Autoconceito original.', t), p6: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p7: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Índice Alimentar') {
         const selectedIas = iasRecords.find(r => r.id === selectedIasId);
         if (!selectedIas) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - ÍNDICE ALIMENTAR\n\nNenhum registro de Índice Alimentar selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoIndiceAlimentarNenhumRegistro');
         } else {
           const classification = selectedIas.classification || 'Não classificado';
           const normCls = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
           const m12match = m12Rows.find(row => normCls(row.classification) === normCls(classification));
-          const basicData = m12match?.basicData || `Faixa da classificação "${classification}" não cadastrada no Módulo 12.`;
+          const basicData = m12match?.basicData || t('tplFaixaDaClassificacaoClassificationNaoCadastradaNo3', { p0: displayValue(classification, t) });
           const reflection = m12match?.reflection || '';
 
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - ÍNDICE ALIMENTAR (IAS)
-
-**ESTUDANTE:** ${studentObj.name}
-**DATA DA AVALIAÇÃO:** ${selectedIas.date ? selectedIas.date.split('-').reverse().join('/') : 'N/A'}
-**PONTUAÇÃO:** ${selectedIas.totalScore} (faixa 0-100)
-**CLASSIFICAÇÃO:** ${classification}
-
----
-
-#### 1. INTERPRETAÇÃO DO RESULTADO
-- **Leitura:** ${basicData}
-
----
-
-#### 2. PARECER DO EDUCADOR
-${selectedIas.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Índice Alimentar original.'}
-
-#### 3. OBSERVAÇÕES COMPLEMENTARES DO EDUCADOR
-${observations || 'Nenhuma observação complementar registrada para este período.'}
-
----
-*Relatório de Índice Alimentar (IAS) - ${dateStr}*`;
+          generatedReport = t('tplRelatorioDeDesempenhoIndiceAlimentarIasEstudante', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedIas.date ? selectedIas.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedIas.totalScore, t), p3: displayValue(classification, t), p4: displayValue(basicData, t), p5: displayValue(selectedIas.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Índice Alimentar original.', t), p6: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p7: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Rastreamento TDAH') {
         const selectedSnap = snapRecords.find(r => r.id === selectedSnapId);
         if (!selectedSnap) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - RASTREAMENTO DO TDAH\n\nNenhum registro de Rastreamento do TDAH selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoRastreamentoDoTdahNenhum');
         } else {
           const classification = selectedSnap.classification || 'Não classificado';
           const normCls = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
           const m13match = m13Rows.find(row => normCls(row.classification) === normCls(classification));
-          const basicData = m13match?.basicData || `Classificação "${classification}" não cadastrada no Módulo 13.`;
+          const basicData = m13match?.basicData || t('tplClassificacaoClassificationNaoCadastradaNoModulo13', { p0: displayValue(classification, t) });
           const reflection = m13match?.reflection || '';
 
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - RASTREAMENTO DO TDAH (SNAP-IV)
-
-**ESTUDANTE:** ${studentObj.name}
-**DATA DA AVALIAÇÃO:** ${selectedSnap.date ? selectedSnap.date.split('-').reverse().join('/') : 'N/A'}
-**RESPONDENTE:** ${selectedSnap.respondent || 'Não informado'}
-**ITENS CLÍNICOS - DESATENÇÃO (0-9):** ${selectedSnap.inattentionScore}
-**ITENS CLÍNICOS - HIPERATIVIDADE/IMPULSIVIDADE (0-9):** ${selectedSnap.hyperactivityScore}
-**CLASSIFICAÇÃO:** ${classification}
-
----
-
-#### 1. INTERPRETAÇÃO DO RESULTADO
-- **Leitura:** ${basicData}
-
----
-
-#### 2. PARECER DO EDUCADOR
-${selectedSnap.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Rastreamento do TDAH original.'}
-
-#### 3. OBSERVAÇÕES COMPLEMENTARES DO EDUCADOR
-${observations || 'Nenhuma observação complementar registrada para este período.'}
-
-> **Alerta Fundamental:** O SNAP-IV é um instrumento de rastreamento inicial e NÃO substitui o diagnóstico médico de TDAH. A classificação considera apenas o critério A do DSM-5-TR (sintomas). Para o diagnóstico formal, é obrigatória a avaliação dos critérios B–E (início antes dos 12 anos, sintomas em mais de um contexto, prejuízo clinicamente significativo e exclusão de outras causas) por profissional de saúde habilitado. O DSM-5-TR permite o diagnóstico conjunto com TEA.
-
----
-*Relatório de Rastreamento do TDAH (SNAP-IV) - ${dateStr}*`;
+          generatedReport = t('tplRelatorioDeDesempenhoRastreamentoDoTdahSnap', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedSnap.date ? selectedSnap.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedSnap.respondent || 'Não informado', t), p3: displayValue(selectedSnap.inattentionScore, t), p4: displayValue(selectedSnap.hyperactivityScore, t), p5: displayValue(classification, t), p6: displayValue(basicData, t), p7: displayValue(selectedSnap.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Rastreamento do TDAH original.', t), p8: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p9: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Rastreamento Precoce do TEA') {
         const selectedAq10 = aq10Records.find(r => r.id === selectedAq10Id);
         if (!selectedAq10) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - RASTREAMENTO PRECOCE DO TEA\n\nNenhum registro de Rastreamento Precoce do TEA selecionado ou encontrado para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoRastreamentoPrecoceDoTea');
         } else {
           const classification = selectedAq10.classification || 'Não classificada';
           const normClsLocal = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
           const m14match = m14Rows.find(row => normClsLocal(row.classification) === normClsLocal(classification));
-          const basicData = m14match?.basicData || `Classificação "${classification}" não cadastrada no Módulo 14.`;
+          const basicData = m14match?.basicData || t('tplClassificacaoClassificationNaoCadastradaNoModulo14', { p0: displayValue(classification, t) });
           const reflection = m14match?.reflection || '';
 
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - RASTREAMENTO PRECOCE DO TEA (AQ-10)
-
-**ESTUDANTE:** ${studentObj.name}
-**DATA DA AVALIAÇÃO:** ${selectedAq10.date ? selectedAq10.date.split('-').reverse().join('/') : 'N/A'}
-**RESPONDENTE:** ${selectedAq10.respondent || 'Não informado'}
-**VERSÃO DO INSTRUMENTO:** ${selectedAq10.version === 'adolescente' ? 'Adolescente (12 a 15 anos)' : 'Criança (4 a 11 anos)'}
-**PONTUAÇÃO TOTAL:** ${selectedAq10.totalScore} (0-10)
-**CLASSIFICAÇÃO:** ${classification}
-
----
-
-#### 1. INTERPRETAÇÃO DO RESULTADO
-- **Leitura:** ${basicData}
-
----
-
-#### 2. PARECER DO EDUCADOR
-${selectedAq10.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Rastreamento Precoce do TEA original.'}
-
-#### 3. OBSERVAÇÕES COMPLEMENTARES DO EDUCADOR
-${observations || 'Nenhuma observação complementar registrada para este período.'}
-
-#### 4. ENCAMINHAMENTO SUGERIDO
-- ${(selectedAq10.totalScore ?? 0) <= 6
+          generatedReport = t('tplRelatorioDeDesempenhoRastreamentoPrecoceDoTea', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedAq10.date ? selectedAq10.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedAq10.respondent || 'Não informado', t), p3: displayValue(selectedAq10.version === 'adolescente' ? 'Adolescente (12 a 15 anos)' : 'Criança (4 a 11 anos)', t), p4: displayValue(selectedAq10.totalScore, t), p5: displayValue(classification, t), p6: displayValue(basicData, t), p7: displayValue(selectedAq10.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Rastreamento Precoce do TEA original.', t), p8: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p9: displayValue((selectedAq10.totalScore ?? 0) <= 6
     ? 'Pontuação de 0 a 6: traços comportamentais dentro da média da população geral; acompanhamento rotineiro do desenvolvimento.'
-    : 'Pontuação de 7 a 10: alerta de traços elevados de TEA; recomendação de encaminhamento prioritário para avaliação multidisciplinar especializada (neuropediatra ou psiquiatra infantil e neuropsicólogo).'}
-
-> **Alerta Fundamental:** O AQ-10 é um instrumento de rastreamento (triagem) e NÃO substitui o diagnóstico formal de TEA. Em caso de pontuação indicativa (7-10), recomenda-se o encaminhamento prioritário para avaliação multidisciplinar especializada (neuropediatra ou psiquiatra infantil e neuropsicólogo) para investigação diagnóstica.
-
----
-*Relatório de Rastreamento Precoce do TEA (AQ-10) - ${dateStr}*`;
+    : 'Pontuação de 7 a 10: alerta de traços elevados de TEA; recomendação de encaminhamento prioritário para avaliação multidisciplinar especializada (neuropediatra ou psiquiatra infantil e neuropsicólogo).', t), p10: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Qualidade Motora PCD') {
         const selectedPcd = pcdRecords.find(r => r.id === selectedPcdId);
         if (!selectedPcd) {
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - QUALIDADE MOTORA PCD\n\nNenhuma avaliação de Qualidade Motora PCD selecionada ou encontrada para este aluno. Por favor, realize uma avaliação na área de Avaliações primeiro.`;
+          generatedReport = t('valorRelatorioDeDesempenhoQualidadeMotoraPcdNenhuma');
         } else {
-          const grupoNome = selectedPcd.grupoNome || `Grupo ${selectedPcd.grupo}`;
+          const grupoNome = selectedPcd.grupoNome || t('tplGrupoP0', { p0: displayValue(selectedPcd.grupo, t) });
           const valenciaLabels: { label: string; nota: number }[] = [
-            { label: 'Velocidade e Agilidade', nota: selectedPcd.notaVelAgil },
-            { label: 'Força Explosiva (Membros Inf.)', nota: selectedPcd.notaForcaExplosiva },
-            { label: 'Força Membros Superiores', nota: selectedPcd.notaMembrosSup },
-            { label: 'Estabilidade de Tronco / Core', nota: selectedPcd.notaCore },
+            { label: t('uiVelocidadeEAgilidade'), nota: selectedPcd.notaVelAgil },
+            { label: t('uiForcaExplosivaMembrosInf'), nota: selectedPcd.notaForcaExplosiva },
+            { label: t('uiForcaMembrosSuperiores'), nota: selectedPcd.notaMembrosSup },
+            { label: t('uiEstabilidadeDeTroncoCore'), nota: selectedPcd.notaCore },
           ];
-          const valenciaStr = valenciaLabels.map(v => `- **${v.label}:** nota ${v.nota} (de 1 a 3)`).join('\n');
+          const valenciaStr = valenciaLabels.map(v => t('tplValenciaNota', { p0: displayValue(v.label, t), p1: displayValue(v.nota, t) })).join('\n');
           const compat = selectedPcd.compatibilidade.length
-            ? selectedPcd.compatibilidade.map((c, i) => `${i + 1}. ${c.modalidade} — IAR ${c.iar.toFixed(2)} (bruto)${c.iarNormalizado != null ? ` · normalizado ${c.iarNormalizado.toFixed(2)}/3` : ''}`).join('\n')
-            : '- Sem dados de compatibilidade registrados.';
+            ? selectedPcd.compatibilidade.map((c, i) => t('tplCompatibilidadeItem', { p0: displayValue(i + 1, t), p1: displayValue(c.modalidade, t), p2: displayValue(c.iar.toFixed(2), t), p3: c.iarNormalizado != null ? t('tplCompatibilidadeNormalizado', { p0: displayValue(c.iarNormalizado.toFixed(2), t) }) : '' })).join('\n')
+            : t('uiSemDadosDeCompatibilidadeRegistrados');
           const funilPcd = selectedPcd.funil ?? [];
           const funilStr = funilPcd.length
             ? funilPcd.map(f => `${f.momento}. **${f.titulo}:** ${f.regra}`).join('\n')
-            : '- Funil qualitativo não registrado nesta avaliação.';
+            : t('uiFunilQualitativoNaoRegistradoNestaAvaliacao');
           const adaptStr = (selectedPcd.adaptacoesAplicadas ?? [])
             .filter(a => a.status === 'Adaptado' || a.status === 'Substituído')
             .map(a => `- **${a.teste}** (${a.status}): ${a.instrucao}`).join('\n');
-          const topPcd = selectedPcd.compatibilidade.length > 0 ? selectedPcd.compatibilidade[0].modalidade : 'A complementar';
+          const topPcd = selectedPcd.compatibilidade.length > 0 ? selectedPcd.compatibilidade[0].modalidade : t('uiAComplementar');
 
-          generatedReport = `### RELATÓRIO DE DESEMPENHO - QUALIDADE MOTORA PCD
-
-**ESTUDANTE:** ${studentObj.name}
-**DATA DA AVALIAÇÃO:** ${selectedPcd.date ? selectedPcd.date.split('-').reverse().join('/') : 'N/A'}
-**GRUPO DE TRIAGEM:** ${grupoNome}
-**CLASSIFICAÇÃO / DETALHE:** ${selectedPcd.detalheClassificacao || 'Geral'}
-**PERFIL MOTOR:** ${selectedPcd.classificacaoPerfil}
-
----
-
-#### 1. VALÊNCIAS DOMINANTES (NOTAS 1 A 3)
-${valenciaStr}
-
----
-
-#### 2. MATRIZ DE COMPATIBILIDADE ESPORTIVA
-${compat}
-
-> **Nota metodológica:** o IAR é uma soma ponderada e, portanto, sensível a quanto cada modalidade valoriza cada capacidade e a quais capacidades foram efetivamente avaliadas. Avaliações incompletas produzem rankings parciais. O índice é orientativo e não substitui o funil qualitativo.
-
----
-
-#### 3. MODALIDADE SUGERIDA (INDICAÇÃO PRELIMINAR)
-- **${topPcd}**
-- O IAR tem caráter operacional e orientativo; a definição final depende do funil qualitativo e da preferência do participante.
-
----
-
-#### 4. ADAPTAÇÕES/SUBSTITUIÇÕES APLICADAS
-${adaptStr || '- Nenhum teste adaptado ou substituído neste grupo.'}
-
----
-
-#### 5. FUNIL QUALITATIVO DE DECISÃO
-${funilStr}
-
----
-
-#### 6. PARECER
-${selectedPcd.technicalOpinion || 'Nenhum parecer técnico inserido no registro de Avaliação PCD original.'}
-
-#### 7. OBSERVAÇÕES COMPLEMENTARES DO EDUCADOR
-${observations || 'Nenhuma observação complementar registrada para este período.'}
-
----
-*Relatório de Avaliação PCD (Qualidade Motora) - ${dateStr}*`;
+          generatedReport = t('tplRelatorioDeDesempenhoQualidadeMotoraPcdEstudante', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedPcd.date ? selectedPcd.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(grupoNome, t), p3: displayValue(selectedPcd.detalheClassificacao || 'Geral', t), p4: displayValue(selectedPcd.classificacaoPerfil, t), p5: displayValue(valenciaStr, t), p6: displayValue(compat, t), p7: displayValue(topPcd, t), p8: displayValue(adaptStr || '- Nenhum teste adaptado ou substituído neste grupo.', t), p9: displayValue(funilStr, t), p10: displayValue(selectedPcd.technicalOpinion || 'Nenhum parecer técnico inserido no registro de Avaliação PCD original.', t), p11: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p12: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Completo') {
         const reportEscolar = savedReports.find(r => r.focusArea === 'Desempenho Escolar');
@@ -3092,105 +2861,15 @@ ${observations || 'Nenhuma observação complementar registrada para este perío
         const hasAnyReport = reportEscolar || reportCorporal || reportMotor || reportEsportivo || reportVocacional || reportSaudeGlobal || reportHigieneBucal || reportAutoconcept || reportIas;
 
         if (!hasAnyReport) {
-          generatedReport = `### PARECER INTEGRADO DE DESEMPENHO COMPLETO
-
-**ESTUDANTE:** ${studentObj.name}
-**TURMA:** ${studentObj.grade || 'Não informada'}
-**DATA DE CONSOLIDAÇÃO:** ${dateStr}
-
----
-
-**AVISO:** Nenhum relatório de foco individual (Escolar, Corporal, Capacidades Físicas, Esportivo ou Vocacional) foi encontrado no histórico deste estudante.
-
-Para que a consolidação de desempenho completo seja realizada com sucesso, é necessário que pelo menos um relatório de dimensão individual tenha sido gerado e salvo anteriormente no "Histórico de Relatórios". Por favor, selecione outras Dimensões de Foco na lista acima, gere e salve os relatórios individuais correspondentes e, em seguida, retorne a esta opção para consolidá-los de forma automatizada.`;
+          generatedReport = t('tplParecerIntegradoDeDesempenhoCompletoEstudanteStudentobj', { p0: displayValue(studentObj.name, t), p1: displayValue(studentObj.grade || 'Não informada', t), p2: displayValue(dateStr, t) });
         } else {
-          generatedReport = `### PARECER INTEGRADO DE DESEMPENHO COMPLETO
-
-**ESTUDANTE:** ${studentObj.name}
-**TURMA:** ${studentObj.grade || 'Não informada'}
-**DATA DE CONSOLIDAÇÃO:** ${dateStr}
-
----
-
-#### APRESENTAÇÃO
-Este documento consolida e integra de forma sistêmica as dimensões multidisciplinares de acompanhamento do estudante **${studentObj.name}**. A análise unifica os registros históricos de frequência, avaliação física corporal, mapeamento motor, direcionamento esportivo e perfil de vocacionamento pedagógico/profissional para compor um parecer de desenvolvimento global de excelência.
-
----
-
-### 1. DIMENSÃO ESCOLAR (FREQUÊNCIA E ENGAJAMENTO)
-${reportEscolar ? reportEscolar.report : '*Nenhum relatório de Desempenho Escolar foi encontrado no histórico.*'}
-
----
-
-### 2. DIMENSÃO CORPORAL (COMPOSIÇÃO E IMC)
-${reportCorporal ? reportCorporal.report : '*Nenhum relatório de Desempenho Corporal foi encontrado no histórico.*'}
-
----
-
-### 3. DIMENSÃO DE CAPACIDADES FÍSICAS (QUALIDADE MOTORA)
-${reportMotor ? reportMotor.report : '*Nenhum relatório de Capacidades Físicas foi encontrado no histórico.*'}
-
----
-
-### 4. DIMENSÃO ESPORTIVA (DIRECIONAMENTO POR MODALIDADE)
-${reportEsportivo ? reportEsportivo.report : '*Nenhum relatório de Desempenho Esportivo foi encontrado no histórico.*'}
-
----
-
-### 5. DIMENSÃO VOCACIONAL (PERFIS E CARREIRAS DE MODALIDADE)
-${reportVocacional ? reportVocacional.report : '*Nenhum relatório de Desempenho Vocacional foi encontrado no histórico.*'}
-
----
-
-### 6. DIMENSÃO SAÚDE GLOBAL (KIDSCREEN-10)
-${reportSaudeGlobal ? reportSaudeGlobal.report : '*Nenhum relatório de Saúde Global foi encontrado no histórico.*'}
-
----
-
-### 7. DIMENSÃO HIGIENE BUCAL (HU-DBI)
-${reportHigieneBucal ? reportHigieneBucal.report : '*Nenhum relatório de Higiene Bucal foi encontrado no histórico.*'}
-
----
-
-### 8. DIMENSÃO AUTOCONCEITO (ESCALA DE ROSENBERG)
-${reportAutoconcept ? reportAutoconcept.report : '*Nenhum relatório de Autoconceito foi encontrado no histórico.*'}
-
----
-
-### 9. DIMENSÃO ÍNDICE ALIMENTAR (IAS)
-${reportIas ? reportIas.report : '*Nenhum relatório de Índice Alimentar foi encontrado no histórico.*'}
-
----
-
-#### 10. PARECER GERAL INTEGRADO E DIRETRIZES DO EDUCADOR
-${observations || 'Nenhum parecer integrador ou observação complementar geral registrada pelo educador para esta consolidação.'}
-
----
-*Relatório Consolidado de Desempenho Completo Integrado - ${dateStr}*`;
+          generatedReport = t('tplParecerIntegradoDeDesempenhoCompletoEstudanteStudentobj2', { p0: displayValue(studentObj.name, t), p1: displayValue(studentObj.grade || 'Não informada', t), p2: displayValue(dateStr, t), p3: displayValue(studentObj.name, t), p4: displayValue(reportEscolar ? reportEscolar.report : '*Nenhum relatório de Desempenho Escolar foi encontrado no histórico.*', t), p5: displayValue(reportCorporal ? reportCorporal.report : '*Nenhum relatório de Desempenho Corporal foi encontrado no histórico.*', t), p6: displayValue(reportMotor ? reportMotor.report : '*Nenhum relatório de Capacidades Físicas foi encontrado no histórico.*', t), p7: displayValue(reportEsportivo ? reportEsportivo.report : '*Nenhum relatório de Desempenho Esportivo foi encontrado no histórico.*', t), p8: displayValue(reportVocacional ? reportVocacional.report : '*Nenhum relatório de Desempenho Vocacional foi encontrado no histórico.*', t), p9: displayValue(reportSaudeGlobal ? reportSaudeGlobal.report : '*Nenhum relatório de Saúde Global foi encontrado no histórico.*', t), p10: displayValue(reportHigieneBucal ? reportHigieneBucal.report : '*Nenhum relatório de Higiene Bucal foi encontrado no histórico.*', t), p11: displayValue(reportAutoconcept ? reportAutoconcept.report : '*Nenhum relatório de Autoconceito foi encontrado no histórico.*', t), p12: displayValue(reportIas ? reportIas.report : '*Nenhum relatório de Índice Alimentar foi encontrado no histórico.*', t), p13: displayValue(observations || 'Nenhum parecer integrador ou observação complementar geral registrada pelo educador para esta consolidação.', t), p14: displayValue(dateStr, t) });
         }
       } else {
         // Simple template for other areas if AI is removed
         const absenceCount = totalCount - presenceCount;
 
-        generatedReport = `### FREQUÊNCIA ESCOLAR ACUMULADA: ${rate}% (${status})
-
-#### RESUMO DO CÁLCULO
-| Categoria | Quantidade | Porcentagem |
-| **Total** | ${totalCount} | 100% |
-| **Presenças** | ${presenceCount} | ${rate}% (Frequência) |
-| **Faltas** | ${absenceCount} | ${absenceRate}% |
-
-#### 1. Contextualização
-Este relatório apresenta uma análise do desempenho do estudante na dimensão de **${focusArea}**.
-
-#### 2. Observações do Educador
-${observations || 'Nenhuma observação específica registrada pelo educador para este período.'}
-
-#### 3. Conclusão e Próximos Passos
-O acompanhamento contínuo nas atividades propostas é fundamental para a evolução do estudante. Recomenda-se a manutenção do engajamento e a participação ativa em todas as sessões.
-
----
-*Parecer de acompanhamento institucional - ${dateStr}*`;
+        generatedReport = t('tplFrequenciaEscolarAcumuladaRateStatusResumoDo2', { p0: displayValue(rate, t), p1: displayValue(status, t), p2: displayValue(totalCount, t), p3: displayValue(presenceCount, t), p4: displayValue(rate, t), p5: displayValue(absenceCount, t), p6: displayValue(absenceRate, t), p7: displayValue(focusArea, t), p8: displayValue(observations || 'Nenhuma observação específica registrada pelo educador para este período.', t), p9: displayValue(dateStr, t) });
       }
 
       // Simulate a bit of delay for "processing" feel
@@ -3208,7 +2887,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
       const newReportId = evaluationId
         ? `REP-${evaluationId}`
         : (generatedReportId || ('REP_' + uuid().slice(0, 8)));
-      const currentDateString = new Date().toLocaleDateString('pt-BR');
+      const currentDateString = new Date().toLocaleDateString(locale);
       
       const newReport: PerformanceReport = {
         id: newReportId,
@@ -3263,7 +2942,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
       }
     } catch (err) {
       console.error(err);
-      setErrorMessage(err instanceof Error ? err.message : 'Verifique se sua chave de API do Gemini foi inserida na seção Secrets do painel superior.');
+      setErrorMessage(err instanceof Error ? err.message : t('uiVerifiqueSeSuaChaveDeApiDo'));
     } finally {
       clearInterval(stepInterval);
       setLoading(false);
@@ -3274,7 +2953,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
   // existente daquela avaliacao. Se ainda nao existir, cria gerando normalmente.
   const handleAddInfo = async () => {
     if (!selectedStudentId) {
-      alert('Selecione um aluno da lista antes de adicionar informações.');
+      alert(t('msgSelecioneUmAlunoDaListaAntesDe2'));
       return;
     }
     const studentObj = students.find(s => s.id === selectedStudentId);
@@ -3384,7 +3063,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
     const run = async () => {
       const supabase = getDb();
       if (!supabase) return;
-      const dateStr = new Date().toLocaleDateString('pt-BR');
+      const dateStr = new Date().toLocaleDateString(locale);
       const today = new Date().toISOString().split('T')[0];
       const cleanText = (s: string) => s.replace(/#+/g, '').replace(/\*\*/g, '');
       const existing = studentReports.map(r => ({ focusArea: r.focusArea, report: r.report }));
@@ -3468,10 +3147,10 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
         onProgress: (done, total) => setBackfillProgress({ done, total }),
       });
       setRefreshToggle(prev => !prev);
-      setBackfillMsg(`Pronto: ${wrote} relatório(s) gerado(s)/atualizado(s).`);
+      setBackfillMsg(t('tplProntoWroteRelatorioSGeradoSAtualizado', { p0: displayValue(wrote, t) }));
     } catch (e) {
       console.error('Backfill da turma falhou:', e);
-      setBackfillMsg('Falha ao gerar relatórios da turma.');
+      setBackfillMsg(t('msgFalhaAoGerarRelatoriosDaTurma'));
     } finally {
       setBackfilling(false);
     }
@@ -3553,21 +3232,21 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
   const statsPanelInner = (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h5 className="text-[16px] font-black text-[#8ed5ff] uppercase tracking-wider">📊 {statsScopeLabel} · {turmaStats.total} aluno(s)</h5>
+        <h5 className="text-[16px] font-black text-[#8ed5ff] uppercase tracking-wider">📊 {statsScopeLabel} · {turmaStats.total}  {t('uiAlunoS')}</h5>
         <button
           type="button"
           onClick={handleDownloadStats}
           className="flex items-center gap-1.5 px-4 py-2 bg-[#38bdf8]/15 hover:bg-[#38bdf8]/25 border border-[#38bdf8]/40 rounded-lg text-[#38bdf8] text-[13px] font-bold transition-all cursor-pointer"
         >
-          <Download className="w-4 h-4" /> Baixar PDF
+          <Download className="w-4 h-4" />  {t('uiBaixarPdf')}
         </button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-[13px] font-mono text-[#bdc8d1]/85">
-        <span>Freq. média: <strong className="text-[15px] text-white">{turmaStats.frequency.avg}%</strong></span>
-        <span className="text-emerald-400">Excelente: <strong className="text-white">{turmaStats.frequency.excellent}</strong></span>
-        <span className="text-amber-400">Regular: <strong className="text-white">{turmaStats.frequency.regular}</strong></span>
-        <span className="text-rose-400">Crítico: <strong className="text-white">{turmaStats.frequency.critical}</strong></span>
-        <span className="text-[#bdc8d1]/50">Sem dados: <strong className="text-white">{turmaStats.frequency.noData}</strong></span>
+        <span>{t('uiFreqMedia')} <strong className="text-[15px] text-white">{turmaStats.frequency.avg}%</strong></span>
+        <span className="text-emerald-400">{t('uiExcelente')} <strong className="text-white">{turmaStats.frequency.excellent}</strong></span>
+        <span className="text-amber-400">{t('uiRegular')} <strong className="text-white">{turmaStats.frequency.regular}</strong></span>
+        <span className="text-rose-400">{t('uiCritico2')} <strong className="text-white">{turmaStats.frequency.critical}</strong></span>
+        <span className="text-[#bdc8d1]/50">{t('uiSemDados')} <strong className="text-white">{turmaStats.frequency.noData}</strong></span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {turmaStats.dims.map(dim => (
@@ -3578,7 +3257,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             </div>
             <div className="flex flex-wrap gap-1.5">
               {dim.d.distribution.length === 0 ? (
-                <span className="text-[13px] text-[#bdc8d1]/50 italic">Nenhuma avaliação registrada</span>
+                <span className="text-[13px] text-[#bdc8d1]/50 italic">{t('uiNenhumaAvaliacaoRegistrada')}</span>
               ) : dim.d.distribution.map(x => (
                 <span key={x.label} className="px-2 py-1 rounded bg-[#131b2e] border border-[#3e484f]/40 text-[13px] text-[#bdc8d1]">{x.label}: <strong className="text-[15px] text-white">{x.count}</strong></span>
               ))}
@@ -3595,12 +3274,12 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
         <div className="flex items-center justify-between border-b border-[#3e484f]/25 pb-2">
           <div className="flex items-center gap-2">
             <ClipboardCopy className="w-4 h-4 text-[#38bdf8]" />
-            <h4 className="text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{isPainelEstatistico ? 'Painel de Controle' : 'Painel de Controle de Desempenho'}</h4>
+            <h4 className="text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{isPainelEstatistico ? t('uiPainelDeControle') : t('uiPainelDeControleDeDesempenho')}</h4>
           </div>
           {isSupabaseConfigured && (
-            <span className="text-[10px] text-emerald-400 flex items-center gap-1 font-mono font-bold" title="Sincronização em tempo real ativada com Supabase">
+            <span className="text-[10px] text-emerald-400 flex items-center gap-1 font-mono font-bold" title={t('uiSincronizacaoEmTempoRealAtivadaComSupabase')}>
               <Database className="w-3 h-3 animate-pulse" />
-              <span>Sincronizado</span>
+              <span>{t('uiSincronizado')}</span>
             </span>
           )}
         </div>
@@ -3611,21 +3290,21 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="flex items-center gap-2">
                 <StudentAvatar student={loggedInStudentObj} size="h-7 w-7" text="text-[9px]" />
                 <div>
-                  <span className="text-[#bdc8d1]/60">Estudante:</span>{' '}
+                  <span className="text-[#bdc8d1]/60">{t('uiEstudante')}</span>{' '}
                   <strong className="text-white">{loggedInStudentObj.name}</strong>
                 </div>
               </div>
               <div>
-                <span className="text-[#bdc8d1]/60">Matrícula:</span>{' '}
+                <span className="text-[#bdc8d1]/60">{t('uiMatricula')}</span>{' '}
                 <strong className="text-[#8ed5ff]">{loggedInStudentObj.enrollmentId || loggedInStudentObj.id}</strong>
               </div>
               <div>
-                <span className="text-[#bdc8d1]/60">Série/Turma:</span>{' '}
+                <span className="text-[#bdc8d1]/60">{t('uiSerieTurma')}</span>{' '}
                 <strong className="text-[#8ed5ff]">{loggedInStudentObj.grade}</strong>
               </div>
               <div>
-                <span className="text-[#bdc8d1]/60">Unidade:</span>{' '}
-                <strong className="text-[#8ed5ff]">{loggedInStudentObj.locality || 'Centro'}</strong>
+                <span className="text-[#bdc8d1]/60">{t('uiUnidade')}</span>{' '}
+                <strong className="text-[#8ed5ff]">{displayValue(loggedInStudentObj.locality || 'Centro', t)}</strong>
               </div>
             </div>
 
@@ -3634,7 +3313,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 <div className="space-y-1 min-w-[200px] w-full md:w-auto">
                   <label className="text-[10px] font-semibold text-[#bdc8d1]/90 flex items-center gap-1">
                     <Flag className="w-3 h-3 text-[#38bdf8]" />
-                    Dimensão de Foco
+                    
+                    {t('uiDimensaoDeFoco')}
                   </label>
                   <FocusAreaSelect
                     value={focusArea}
@@ -3646,7 +3326,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 <div className="space-y-1 min-w-[200px] w-full md:w-auto">
                   <label className="text-[10px] font-semibold text-[#bdc8d1]/90 flex items-center gap-1">
                     <History className="w-3 h-3 text-[#38bdf8]" />
-                    Histórico de Relatórios
+                    
+                    {t('uiHistoricoDeRelatorios')}
                   </label>
                   <select
                     value={selectedReportId}
@@ -3655,7 +3336,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                   >
                     {orderedHistoryReports.map(r => (
                       <option key={r.id} value={r.id}>
-                        [{toBrDate(r.date)}] {r.focusArea}
+                        [{toBrDate(r.date)}] {displayValue(r.focusArea, t)}
                       </option>
                   ))}
                 </select>
@@ -3668,10 +3349,10 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                   onClick={handleGeneratePDF}
                   disabled={!aiReport || !selectedStudentId}
                   className="flex items-center justify-center gap-1.5 py-2 px-4 bg-[#38bdf8]/15 hover:bg-[#38bdf8]/25 disabled:opacity-40 border border-[#38bdf8]/35 rounded-lg text-[#38bdf8] text-xs font-bold transition-all h-[34px] self-end cursor-pointer"
-                  title="Baixar Relatório como PDF"
+                  title={t('uiBaixarRelatorioComoPdf')}
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Baixar PDF</span>
+                  <span>{t('uiBaixarPdf')}</span>
                 </button>
               )}
             </div>
@@ -3681,7 +3362,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {/* 1. Contrato */}
             <div className="space-y-1">
               <div className="flex items-center gap-1">
-                <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight">Contrato</label>
+                <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight">{t('uiContrato')}</label>
                 {!isUserAdmin && assignedContracts.length === 1 && (
                   <Lock className="w-3 h-3 text-amber-400" />
                 )}
@@ -3700,8 +3381,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 disabled={isHydrating || (!isUserAdmin && assignedContracts.length === 1)}
                 className="w-full bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="">{isHydrating ? 'Carregando...' : 'Selecione...'}</option>
-                {!isHydrating && isUserAdmin && <option value="Todos">Todos</option>}
+                <option value="">{isHydrating ? t('uiCarregando') : t('uiSelecione')}</option>
+                {!isHydrating && isUserAdmin && <option value={t('uiTodos')}>{t('uiTodos')}</option>}
                 {!isHydrating && availableContracts.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
@@ -3711,7 +3392,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {/* 2. Estado */}
             <div className="space-y-1">
               <div className="flex items-center gap-1">
-                <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight">Estado</label>
+                <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight">{t('uiEstado')}</label>
                 {!isUserAdmin && assignedStates.length === 1 && (
                   <Lock className="w-3 h-3 text-amber-400" />
                 )}
@@ -3729,8 +3410,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 disabled={isHydrating || !contract || (!isUserAdmin && assignedStates.length === 1)}
                 className="w-full bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] disabled:opacity-60 disabled:cursor-not-allowed focus:border-[#38bdf8] outline-none transition-all"
               >
-                <option value="">{isHydrating ? 'Carregando...' : 'Selecione...'}</option>
-                {!isHydrating && isUserAdmin && contract === 'Todos' && <option value="Todos">Todos</option>}
+                <option value="">{isHydrating ? t('uiCarregando') : t('uiSelecione')}</option>
+                {!isHydrating && isUserAdmin && contract === t('uiTodos') && <option value={t('uiTodos')}>{t('uiTodos')}</option>}
                 {!isHydrating && availableStates.map(st => (
                   <option key={st} value={st}>{st}</option>
                 ))}
@@ -3740,7 +3421,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {/* 3. Região */}
             <div className="space-y-1">
               <div className="flex items-center gap-1">
-                <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight">Região</label>
+                <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight">{t('uiRegiao')}</label>
                 {!isUserAdmin && assignedRegions.length === 1 && (
                   <Lock className="w-3 h-3 text-amber-400" />
                 )}
@@ -3757,8 +3438,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 disabled={isHydrating || !stateFilter || (!isUserAdmin && assignedRegions.length === 1)}
                 className="w-full bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] disabled:opacity-60 disabled:cursor-not-allowed focus:border-[#38bdf8] outline-none transition-all"
               >
-                <option value="">{isHydrating ? 'Carregando...' : 'Selecione...'}</option>
-                {!isHydrating && isUserAdmin && (contract === 'Todos' || stateFilter === 'Todos') && <option value="Todos">Todas</option>}
+                <option value="">{isHydrating ? t('uiCarregando') : t('uiSelecione')}</option>
+                {!isHydrating && isUserAdmin && (contract === 'Todos' || stateFilter === 'Todos') && <option value="Todos">{t('uiTodas')}</option>}
                 {!isHydrating && availableRegions.map(reg => (
                   <option key={reg} value={reg}>{reg}</option>
                 ))}
@@ -3768,7 +3449,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {/* 4. Localidade */}
             <div className="space-y-1">
               <div className="flex items-center gap-1">
-                <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight">Localidade</label>
+                <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight">{t('uiLocalidade')}</label>
                 {!isUserAdmin && assignedLocalities.length === 1 && (
                   <Lock className="w-3 h-3 text-amber-400" />
                 )}
@@ -3784,8 +3465,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 disabled={isHydrating || !cityFilter || (!isUserAdmin && assignedLocalities.length === 1)}
                 className="w-full bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] disabled:opacity-60 disabled:cursor-not-allowed focus:border-[#38bdf8] outline-none transition-all"
               >
-                <option value="">{isHydrating ? 'Carregando...' : 'Selecione...'}</option>
-                {!isHydrating && isUserAdmin && (contract === 'Todos' || stateFilter === 'Todos' || cityFilter === 'Todos' || cityFilter === 'Todas') && <option value="Todos">Todas</option>}
+                <option value="">{isHydrating ? t('uiCarregando') : t('uiSelecione')}</option>
+                {!isHydrating && isUserAdmin && (contract === 'Todos' || stateFilter === 'Todos' || cityFilter === 'Todos' || cityFilter === t('uiTodas')) && <option value="Todos">{t('uiTodas')}</option>}
                 {!isHydrating && availableLocalities.map(loc => (
                   <option key={loc} value={loc}>{loc}</option>
                 ))}
@@ -3794,7 +3475,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
 
             {/* 5. Série ou Turma */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight">Série/Turma</label>
+              <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight">{t('uiSerieTurma2')}</label>
               <select 
                 value={gradeFilter}
                 onChange={(e) => {
@@ -3805,7 +3486,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 disabled={isHydrating || !localityFilter}
                 className="w-full bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] disabled:opacity-50 focus:border-[#38bdf8] outline-none transition-all"
               >
-                <option value="">Selecione...</option>
+                <option value="">{t('uiSelecione')}</option>
                 {availableGrades.map(g => (
                   <option key={g} value={g}>{g}</option>
                 ))}
@@ -3818,7 +3499,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight flex items-center gap-1">
                     <Flag className="w-3 h-3 text-[#38bdf8]" />
-                    Dimensão de Foco
+                    
+                    {t('uiDimensaoDeFoco')}
                   </label>
                   <FocusAreaSelect
                     value={focusArea}
@@ -3831,7 +3513,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-[#bdc8d1]/85 block uppercase tracking-tight flex items-center gap-1">
                   <History className="w-3 h-3 text-[#38bdf8]" />
-                  Histórico
+                  
+                  {t('uiHistorico')}
                 </label>
                 <select
                   value={selectedReportId}
@@ -3840,7 +3523,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {orderedHistoryReports.map(r => (
                     <option key={r.id} value={r.id}>
-                      [{toBrDate(r.date)}] {r.studentName} - {r.focusArea}
+                      [{toBrDate(r.date)}] {r.studentName} - {displayValue(r.focusArea, t)}
                     </option>
                   ))}
                 </select>
@@ -3855,10 +3538,10 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                   onClick={handleGeneratePDF}
                   disabled={!aiReport || !selectedStudentId}
                   className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 bg-[#38bdf8]/15 hover:bg-[#38bdf8]/25 disabled:opacity-40 disabled:hover:bg-[#38bdf8]/15 border border-[#38bdf8]/35 rounded-lg text-[#38bdf8] text-xs font-bold transition-all h-[34px] cursor-pointer"
-                  title="Baixar Relatório como PDF"
+                  title={t('uiBaixarRelatorioComoPdf')}
                 >
                   <Download className="w-4 h-4" />
-                  <span>PDF</span>
+                  <span>{t('uiPdf')}</span>
                 </button>
               </div>
             )}
@@ -3873,12 +3556,12 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
               <section className="lg:col-span-2 bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 shadow-lg h-fit space-y-5">
                 <div className="bg-[#0b1326]/50 rounded-xl p-4 border border-[#3e484f]/25 text-center text-xs text-[#bdc8d1]/80">
-                  <h4 className="text-[#38bdf8] font-bold mb-1 uppercase tracking-wider">OLÁ, {loggedInStudentObj?.name}!</h4>
-                  <p>Este é o seu painel de Análise de Desempenho Institucional.</p>
+                  <h4 className="text-[#38bdf8] font-bold mb-1 uppercase tracking-wider">{t('uiOla')} {loggedInStudentObj?.name}!</h4>
+                  <p>{t('uiEsteEOSeuPainelDeAnalise')}</p>
                 </div>
                 
                 <div className="space-y-3">
-                  <label className="text-[10px] font-bold text-[#bdc8d1] uppercase tracking-widest block">DIMENSÃO DE FOCO</label>
+                  <label className="text-[10px] font-bold text-[#bdc8d1] uppercase tracking-widest block">{t('uiDimensaoDeFoco2')}</label>
                   <FocusAreaSelect
                     value={focusArea}
                     onChange={(v) => {
@@ -3895,7 +3578,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                   <div className="space-y-2 mt-3 p-3 bg-[#0b1326]/40 border border-[#3e484f]/20 rounded-lg animate-in fade-in duration-300">
                     <label className="text-[10px] font-bold text-[#38bdf8] uppercase tracking-widest block flex items-center gap-1">
                       <History className="w-3 h-3 text-[#38bdf8]" />
-                      Histórico Disponível ({studentFocusReports.length})
+                      
+                      {t('uiHistoricoDisponivel')}{studentFocusReports.length})
                     </label>
                     <select
                       value={selectedReportId}
@@ -3911,15 +3595,17 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                       }}
                       className="w-full bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-1.5 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all cursor-pointer font-sans"
                     >
-                      <option value="">-- Selecione uma versão --</option>
+                      <option value="">{t('uiSelecioneUmaVersao')}</option>
                       {studentFocusReports.map((r, index) => (
                         <option key={r.id} value={r.id}>
-                          Relatório {index === 0 ? '(Mais Recente) ' : ''}- {r.date}
+                          
+                          {t('uiRelatorio')} {index === 0 ? t('uiMaisRecente') : ''}- {r.date}
                         </option>
                       ))}
                     </select>
                     <p className="text-[10px] text-[#bdc8d1]/60 leading-tight">
-                      Há {studentFocusReports.length} relatórios neste foco. Selecione a versão desejada acima para visualizar.
+                      
+                      {t('uiHa')} {studentFocusReports.length}  {t('uiRelatoriosNesteFocoSelecioneAVersaoDesejada')}
                     </p>
                   </div>
                 )}
@@ -3931,7 +3617,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                   className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#38bdf8] hover:bg-[#38bdf8]/90 text-[#001e2c] font-bold text-xs rounded-lg transition-transform active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-lg shadow-[#38bdf8]/10 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 animate-spin-slow" />
-                  <span>Ver Meu Desempenho</span>
+                  <span>{t('uiVerMeuDesempenho')}</span>
                 </button>
               </section>
 
@@ -3939,7 +3625,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 <div className="flex justify-between items-center border-b border-[#3e484f]/25 pb-3 mb-4">
                   <div className="flex items-center gap-2">
                     <Bot className="w-5 h-5 text-[#38bdf8]" />
-                    <h3 className="text-sm font-bold text-white">Relatório Consolidado</h3>
+                    <h3 className="text-sm font-bold text-white">{t('uiRelatorioConsolidado')}</h3>
                   </div>
                   {aiReport && (
                     <button
@@ -3947,7 +3633,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                       className="flex items-center gap-1 text-[10px] font-bold text-[#38bdf8] bg-[#38bdf8]/10 px-2 py-1 rounded hover:bg-[#38bdf8]/20 transition-all cursor-pointer"
                     >
                       <Download className="w-3 h-3" />
-                      PDF
+                      
+                      {t('uiPdf')}
                     </button>
                   )}
                 </div>
@@ -3955,7 +3642,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 {loading ? (
                   <div className="flex-1 flex flex-col items-center justify-center space-y-4 py-12">
                     <div className="w-10 h-10 rounded-full border-2 border-[#3e484f] border-t-[#38bdf8] animate-spin"></div>
-                    <p className="text-[10px] text-[#bdc8d1] animate-pulse">Carregando sua análise...</p>
+                    <p className="text-[10px] text-[#bdc8d1] animate-pulse">{t('uiCarregandoSuaAnalise')}</p>
                   </div>
                 ) : aiReport ? (
                   <div className="prose prose-invert max-w-none text-[#dae2fd] text-xs leading-relaxed overflow-y-auto max-h-[500px] pr-2 scrollbar-thin scrollbar-thumb-surface-container">
@@ -3964,7 +3651,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 ) : (
                   <div className="flex-1 flex flex-col items-center justify-center py-12 text-center text-[#bdc8d1]/60 space-y-3">
                     <Sparkles className="w-8 h-8 text-[#3e484f]" />
-                    <p className="text-[11px] max-w-xs">Clique no botão para gerar sua análise de desempenho atualizada.</p>
+                    <p className="text-[11px] max-w-xs">{t('uiCliqueNoBotaoParaGerarSuaAnalise')}</p>
                   </div>
                 )}
               </section>
@@ -3978,8 +3665,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                     <Flag className="w-5 h-5 text-[#38bdf8]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white tracking-tight">Painel Estatístico</h3>
-                    <p className="text-xs text-[#bdc8d1]/70">Visão consolidada por Contrato, Estado, Região, Localidade e Turma</p>
+                    <h3 className="text-lg font-bold text-white tracking-tight">{t('uiPainelEstatistico')}</h3>
+                    <p className="text-xs text-[#bdc8d1]/70">{t('uiVisaoConsolidadaPorContratoEstadoRegiaoLocalidade')}</p>
                   </div>
                 </div>
               </div>
@@ -3989,9 +3676,10 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                     <div className="w-16 h-16 bg-[#1a2b4b] rounded-full flex items-center justify-center mx-auto mb-4">
                       <Users className="w-8 h-8 text-[#38bdf8]/40" />
                     </div>
-                    <h4 className="text-sm font-bold text-[#dae2fd]">Selecione um filtro</h4>
+                    <h4 className="text-sm font-bold text-[#dae2fd]">{t('uiSelecioneUmFiltro')}</h4>
                     <p className="text-xs text-[#bdc8d1]/80 leading-relaxed">
-                      Use os filtros acima (Contrato, Estado, Região, Localidade e/ou Turma) para gerar a estatística consolidada do grupo desejado.
+                      
+                      {t('uiUseOsFiltrosAcimaContratoEstadoRegiao')}
                     </p>
                   </div>
                 </div>
@@ -4006,8 +3694,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                     <Flag className="w-5 h-5 text-[#38bdf8]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white tracking-tight">Análise Geral: Exportação em Lote</h3>
-                    <p className="text-xs text-[#bdc8d1]/70">Download em PDF de relatórios por turmas e alunos</p>
+                    <h3 className="text-lg font-bold text-white tracking-tight">{t('uiAnaliseGeralExportacaoEmLote')}</h3>
+                    <p className="text-xs text-[#bdc8d1]/70">{t('uiDownloadEmPdfDeRelatoriosPorTurmas')}</p>
                   </div>
                 </div>
                 
@@ -4017,7 +3705,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                       onClick={handleToggleSelectAll}
                       className="px-3 py-1.5 bg-[#0b1326] border border-[#3e484f]/40 hover:border-[#38bdf8]/50 rounded-lg text-[10px] font-bold text-[#bdc8d1] transition-all cursor-pointer"
                     >
-                      {selectedStudentIdsForBatch.length === activeStudentsList.length ? 'Desmarcar Todos' : 'Marcar Todos'}
+                      {selectedStudentIdsForBatch.length === activeStudentsList.length ? t('uiDesmarcarTodos') : t('uiMarcarTodos')}
                     </button>
                     <button
                       onClick={handleBatchDownloadZip}
@@ -4025,16 +3713,16 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                       disabled={loading}
                     >
                       <Download className="w-4 h-4" />
-                      <span>{loading ? 'PROCESSANDO...' : `BAIXAR SELECIONADOS (${selectedStudentIdsForBatch.length})`}</span>
+                      <span>{loading ? t('msgProcessando') : t('tplBaixarSelecionados', { p0: displayValue(selectedStudentIdsForBatch.length, t) })}</span>
                     </button>
                     <button
                       onClick={handleFillReportsTurma}
                       disabled={backfilling || loading}
                       className="flex items-center gap-2 px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-[#0b1326] rounded-lg text-xs font-black transition-all shadow-lg cursor-pointer"
-                      title="Gera/atualiza os relatórios de todos os alunos desta turma antes de baixar"
+                      title={t('uiGeraAtualizaOsRelatoriosDeTodosOs')}
                     >
                       <Download className={`w-4 h-4 ${backfilling ? 'animate-bounce' : ''}`} />
-                      <span>{backfilling ? 'GERANDO...' : 'PREENCHER RELATÓRIOS'}</span>
+                      <span>{backfilling ? t('msgGerando') : t('uiPreencherRelatorios')}</span>
                     </button>
                   </div>
                 )}
@@ -4046,7 +3734,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                         <div className="h-2 w-full bg-[#0b1326] rounded-full overflow-hidden border border-[#3e484f]/40">
                           <div className="h-full bg-emerald-500 transition-all" style={{ width: `${Math.round((backfillProgress.done / backfillProgress.total) * 100)}%` }} />
                         </div>
-                        <p className="text-[10px] text-[#bdc8d1]/70 font-mono">{backfillProgress.done}/{backfillProgress.total} relatórios processados</p>
+                        <p className="text-[10px] text-[#bdc8d1]/70 font-mono">{backfillProgress.done}/{backfillProgress.total}  {t('uiRelatoriosProcessados')}</p>
                       </>
                     )}
                     {backfillMsg && <p className="text-[11px] font-semibold text-emerald-400">{backfillMsg}</p>}
@@ -4060,22 +3748,24 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                     <div className="w-16 h-16 bg-[#1a2b4b] rounded-full flex items-center justify-center mx-auto mb-4">
                       <Users className="w-8 h-8 text-[#38bdf8]/40" />
                     </div>
-                    <h4 className="text-sm font-bold text-[#dae2fd]">Selecione uma Série/Turma</h4>
+                    <h4 className="text-sm font-bold text-[#dae2fd]">{t('uiSelecioneUmaSerieTurma')}</h4>
                     <p className="text-xs text-[#bdc8d1]/80 leading-relaxed">
-                      Para visualizar a lista de alunos e realizar o download dos relatórios, utilize os filtros de localidade e turma no painel abaixo.
+                      
+                      {t('uiParaVisualizarAListaDeAlunosE')}
                     </p>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold text-[#bdc8d1] uppercase tracking-widest">Alunos da Turma: {gradeFilter}</span>
-                    <span className="text-[10px] text-[#38bdf8] font-mono">{activeStudentsList.length} registros encontrados</span>
+                    <span className="text-[10px] font-bold text-[#bdc8d1] uppercase tracking-widest">{t('uiAlunosDaTurma')} {gradeFilter}</span>
+                    <span className="text-[10px] text-[#38bdf8] font-mono">{activeStudentsList.length}  {t('uiRegistrosEncontrados')}</span>
                   </div>
                   
                   {activeStudentsList.length === 0 ? (
                     <div className="bg-[#0b1326]/50 rounded-xl p-4 sm:p-8 border border-[#3e484f]/25 text-center text-xs text-[#bdc8d1]/50 italic">
-                      Nenhum aluno encontrado para esta seleção.
+                      
+                      {t('uiNenhumAlunoEncontradoParaEstaSelecao')}
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -4099,7 +3789,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                             <StudentAvatar student={s} size="h-8 w-8" text="text-[9px]" />
                             <div className="flex-1 min-w-0">
                               <p className="text-xs font-bold text-white truncate">{s.name}</p>
-                              <p className="text-[9px] text-[#bdc8d1]/60 font-mono">ID: {s.enrollmentId || s.id.substring(0, 8)}</p>
+                              <p className="text-[9px] text-[#bdc8d1]/60 font-mono">{t('uiId')} {s.enrollmentId || s.id.substring(0, 8)}</p>
                             </div>
                           </div>
                         );
@@ -4120,14 +3810,15 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
       <section className="lg:col-span-2 bg-[#171f33] border border-[#3e484f]/40 rounded-xl p-5 shadow-lg h-fit space-y-5">
         {user?.role === 'Aluno' ? (
           <div className="bg-[#0b1326]/50 rounded-xl p-4 border border-[#3e484f]/25 text-center text-xs text-[#bdc8d1]/80">
-            Ambiente exclusivo para consulta individual do aluno.
+            
+            {t('uiAmbienteExclusivoParaConsultaIndividualDoAluno')}
           </div>
         ) : !gradeFilter ? (
           <div className="bg-[#0b1326]/50 rounded-xl p-6 border border-[#3e484f]/25 text-center space-y-3 py-10">
             <Users className="w-10 h-10 text-[#bdc8d1]/30 mx-auto" />
-            <h5 className="text-xs font-bold text-white uppercase tracking-wider">Aguardando Turma</h5>
+            <h5 className="text-xs font-bold text-white uppercase tracking-wider">{t('uiAguardandoTurma')}</h5>
             <p className="text-[11px] text-[#bdc8d1]/65 leading-relaxed">
-              Selecione uma <strong>Série ou Turma</strong> no submenu acima para visualizar a lista de alunos da classe.
+              {t.rich('uiSelecioneUmaSerieOuTurmaNoSubmenuAcimaParaVisualizarAListaDeAlunosDaClasse', { strong: (chunks) => <strong>{chunks}</strong> })}
             </p>
           </div>
         ) : (
@@ -4135,15 +3826,16 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             <div className="flex items-center justify-between border-b border-[#3e484f]/25 pb-2">
               <div className="flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-[#38bdf8]" />
-                <h4 className="text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">Alunos ({activeStudentsList.length})</h4>
+                <h4 className="text-xs font-bold text-[#bdc8d1] uppercase tracking-wider">{t('uiAlunos')}{activeStudentsList.length})</h4>
               </div>
               <span className="text-[10px] bg-[#38bdf8]/10 text-[#38bdf8] px-2 py-0.5 rounded-full font-bold">
-                Turma {gradeFilter}
+                
+                {t('uiTurma')} {gradeFilter}
               </span>
             </div>
 
             {activeStudentsList.length === 0 ? (
-              <p className="text-xs text-[#bdc8d1]/50 italic text-center py-6">Nenhum aluno ativo encontrado nesta turma.</p>
+              <p className="text-xs text-[#bdc8d1]/50 italic text-center py-6">{t('uiNenhumAlunoAtivoEncontradoNestaTurma')}</p>
             ) : (
               <div className="space-y-2 max-h-[240px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-surface-container">
                 {activeStudentsList.map((s) => {
@@ -4164,7 +3856,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                           {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
                         </h5>
                         <p className="text-[9px] text-[#bdc8d1]/65 mt-0.5 font-mono">
-                          Matrícula: {s.enrollmentId || s.id.substring(0, 8)}
+                          
+                          {t('uiMatricula')} {s.enrollmentId || s.id.substring(0, 8)}
                         </p>
                       </div>
                       <button
@@ -4195,16 +3888,17 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-[#38bdf8]" />
-                <h5 className="text-[11px] font-bold text-[#bdc8d1] uppercase tracking-wider">Configuração do Relatório</h5>
+                <h5 className="text-[11px] font-bold text-[#bdc8d1] uppercase tracking-wider">{t('uiConfiguracaoDoRelatorio')}</h5>
               </div>
               {selectedReportId && (
                 <button
                   type="button"
                   onClick={() => handleDeleteReport(selectedReportId)}
                   className="p-2 px-2 bg-red-900/40 hover:bg-red-950 border border-red-500/30 rounded text-red-400 text-[10px] font-bold transition-colors cursor-pointer"
-                  title="Excluir este relatório salvo"
+                  title={t('uiExcluirEsteRelatorioSalvo')}
                 >
-                  Excluir Salvo
+                  
+                  {t('uiExcluirSalvo')}
                 </button>
               )}
             </div>
@@ -4213,18 +3907,18 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {attendanceRate !== null && (
               <div className="p-3 bg-[#0b1326] rounded-xl border border-[#3e484f]/40 flex items-center justify-between">
                 <div>
-                  <p className="text-[9px] text-[#bdc8d1]/60 uppercase font-bold tracking-tight">Frequência Escolar Acumulada</p>
+                  <p className="text-[9px] text-[#bdc8d1]/60 uppercase font-bold tracking-tight">{t('uiFrequenciaEscolarAcumulada')}</p>
                   <p className="text-xs font-black text-white">{attendanceRate.toFixed(1)}%</p>
                 </div>
                 <div className={`px-2 py-0.5 rounded text-[9px] font-bold ${attendanceRate >= 75 ? 'bg-emerald-500/20 text-emerald-400' : attendanceRate >= 50 ? 'bg-amber-500/20 text-amber-400' : 'bg-rose-500/20 text-rose-400'}`}>
-                  {attendanceRate >= 75 ? 'Excelente' : attendanceRate >= 50 ? 'Regular' : 'Crítico'}
+                  {attendanceRate >= 75 ? t('valorExcelente') : attendanceRate >= 50 ? t('valorRegular') : t('uiCritico')}
                 </div>
               </div>
             )}
 
             {/* Focus Area Selection */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90 block">Dimensão de Foco:</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90 block">{t('uiDimensaoDeFoco3')}</label>
               <FocusAreaSelect
                 value={focusArea}
                 onChange={(v) => setFocusArea(v)}
@@ -4238,7 +3932,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
                 <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                   <Database className="w-3 h-3" />
-                  Avaliação de IMC:
+                  
+                  {t('uiAvaliacaoDeImc')}
                 </label>
                 <select
                   value={selectedImcId}
@@ -4247,7 +3942,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {imcRecords.map((rec) => (
                     <option key={rec.id} value={rec.id}>
-                      {rec.date} - IMC: {rec.imc} ({rec.classification})
+                      {rec.date}  {t('uiImc')} {rec.imc} ({displayValue(rec.classification, t)})
                     </option>
                   ))}
                 </select>
@@ -4257,7 +3952,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho Corporal' && imcRecords.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de IMC registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeImc')}</p>
               </div>
             )}
 
@@ -4266,7 +3961,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
                 <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                   <Database className="w-3 h-3" />
-                  Qualidade Motora:
+                  
+                  {t('uiQualidadeMotora')}
                 </label>
                 <select
                   value={selectedMotorId}
@@ -4275,7 +3971,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {motorRecords.map((rec) => (
                     <option key={rec.id} value={rec.id}>
-                      {rec.date ? rec.date.split('-').reverse().join('/') : 'Sem data'} - Geral: {rec.generalClass || 'Não classificado'}
+                      {rec.date ? rec.date.split('-').reverse().join('/') : t('uiSemData')}  {t('uiGeral')} {displayValue(rec.generalClass || 'Não classificado', t)}
                     </option>
                   ))}
                 </select>
@@ -4285,7 +3981,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho de Capacidades Físicas' && motorRecords.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de Qualidade Motora registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeQualidade')}</p>
               </div>
             )}
 
@@ -4295,7 +3991,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                     <Database className="w-3 h-3" />
-                    Avaliação Esportiva:
+                    
+                    {t('uiAvaliacaoEsportiva')}
                   </label>
                   <select
                     value={selectedSportId}
@@ -4304,7 +4001,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                   >
                     {sportRecords.map((rec) => (
                       <option key={rec.id} value={rec.id}>
-                        {rec.date ? rec.date.split('-').reverse().join('/') : 'Sem data'} - Esporte: {rec.suggestedSport || 'Não especificado'}
+                        {rec.date ? rec.date.split('-').reverse().join('/') : t('uiSemData')}  {t('uiEsporte')} {displayValue(rec.suggestedSport || 'Não especificado', t)}
                       </option>
                     ))}
                   </select>
@@ -4314,7 +4011,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                   <div className="space-y-1 animate-in fade-in duration-200">
                     <label className="text-xs font-semibold text-[#a855f7] block flex items-center gap-1">
                       <Sparkles className="w-3 h-3 text-[#a855f7] animate-pulse" />
-                      Esporte do Relatório:
+                      
+                      {t('uiEsporteDoRelatorio')}
                     </label>
                     <select
                       value={selectedSportName}
@@ -4323,7 +4021,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                     >
                       {availableSubSports.map((sport) => (
                         <option key={sport} value={sport}>
-                          {sport}
+                          {displayValue(sport, t)}
                         </option>
                       ))}
                     </select>
@@ -4335,7 +4033,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho em Atividades Esportivas' && sportRecords.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de Esporte Indicado registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeEsporte')}</p>
               </div>
             )}
 
@@ -4344,7 +4042,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1 animate-in fade-in duration-200">
                 <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                   <Database className="w-3 h-3" />
-                  Perfil Vocacional:
+                  
+                  {t('uiPerfilVocacional')}
                 </label>
                 <select
                   value={selectedVocationId}
@@ -4353,7 +4052,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {vocationRecords.map((rec) => (
                     <option key={rec.id} value={rec.id}>
-                      {rec.date ? rec.date.split('-').reverse().join('/') : 'Sem data'} - Perfil: {rec.profile || 'Não especificado'}
+                      {rec.date ? rec.date.split('-').reverse().join('/') : t('uiSemData')}  {t('uiPerfil')} {displayValue(rec.profile || 'Não especificado', t)}
                     </option>
                   ))}
                 </select>
@@ -4363,7 +4062,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho Vocacional' && vocationRecords.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de Vocacionamento registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeVocacionamento')}</p>
               </div>
             )}
 
@@ -4372,7 +4071,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1 animate-in fade-in duration-200">
                 <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                   <Database className="w-3 h-3" />
-                  Avaliação de Saúde Global:
+                  
+                  {t('uiAvaliacaoDeSaudeGlobal')}
                 </label>
                 <select
                   value={selectedHealthId}
@@ -4381,7 +4081,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {healthRecords.map((rec) => (
                     <option key={rec.id} value={rec.id}>
-                      {rec.date ? rec.date.split('-').reverse().join('/') : 'Sem data'} - {rec.classification || 'Não classificado'} (T {Number(rec.tScore).toFixed(1)})
+                      {rec.date ? rec.date.split('-').reverse().join('/') : t('uiSemData')} - {displayValue(rec.classification || 'Não classificado', t)}  {t('uiT')} {Number(rec.tScore).toFixed(1)})
                     </option>
                   ))}
                 </select>
@@ -4391,7 +4091,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho Saúde Global' && healthRecords.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de Saúde Global registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeSaude')}</p>
               </div>
             )}
 
@@ -4400,7 +4100,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1 animate-in fade-in duration-200">
                 <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                   <Database className="w-3 h-3" />
-                  Avaliação de Higiene Bucal:
+                  
+                  {t('uiAvaliacaoDeHigieneBucal')}
                 </label>
                 <select
                   value={selectedOralId}
@@ -4409,7 +4110,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {oralRecords.map((rec) => (
                     <option key={rec.id} value={rec.id}>
-                      {rec.date ? rec.date.split('-').reverse().join('/') : 'Sem data'} - {rec.classification || 'Não classificado'} (Score {rec.score}/12)
+                      {rec.date ? rec.date.split('-').reverse().join('/') : t('uiSemData')} - {displayValue(rec.classification || 'Não classificado', t)}  {t('uiScore')} {rec.score}/12)
                     </option>
                   ))}
                 </select>
@@ -4419,7 +4120,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho Higiene Bucal' && oralRecords.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de Higiene Bucal registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeHigiene')}</p>
               </div>
             )}
 
@@ -4428,7 +4129,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1 animate-in fade-in duration-200">
                 <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                   <Database className="w-3 h-3" />
-                  Avaliação de Autoconceito:
+                  
+                  {t('uiAvaliacaoDeAutoconceito')}
                 </label>
                 <select
                   value={selectedAutoId}
@@ -4437,7 +4139,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {autoconceptRecords.map((rec) => (
                     <option key={rec.id} value={rec.id}>
-                      {rec.date ? rec.date.split('-').reverse().join('/') : 'Sem data'} - {rec.classification || 'Não classificado'} (Score {rec.score}/30)
+                      {rec.date ? rec.date.split('-').reverse().join('/') : t('uiSemData')} - {displayValue(rec.classification || 'Não classificado', t)}  {t('uiScore')} {rec.score}/30)
                     </option>
                   ))}
                 </select>
@@ -4447,7 +4149,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho Autoconceito' && autoconceptRecords.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de Autoconceito registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeAutoconceito')}</p>
               </div>
             )}
 
@@ -4456,7 +4158,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1 animate-in fade-in duration-200">
                 <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                   <Database className="w-3 h-3" />
-                  Avaliação de Índice Alimentar:
+                  
+                  {t('uiAvaliacaoDeIndiceAlimentar')}
                 </label>
                 <select
                   value={selectedIasId}
@@ -4465,7 +4168,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {iasRecords.map((rec) => (
                     <option key={rec.id} value={rec.id}>
-                      {rec.date ? rec.date.split('-').reverse().join('/') : 'Sem data'} - {rec.classification || 'Não classificado'} (Score {rec.totalScore}/100)
+                      {rec.date ? rec.date.split('-').reverse().join('/') : t('uiSemData')} - {displayValue(rec.classification || 'Não classificado', t)}  {t('uiScore')} {rec.totalScore}/100)
                     </option>
                   ))}
                 </select>
@@ -4475,7 +4178,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho Índice Alimentar' && iasRecords.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de Índice Alimentar registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeIndice')}</p>
               </div>
             )}
 
@@ -4484,7 +4187,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1 animate-in fade-in duration-200">
                 <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                   <Database className="w-3 h-3" />
-                  Avaliação de Rastreamento do TDAH:
+                  
+                  {t('uiAvaliacaoDeRastreamentoDoTdah')}
                 </label>
                 <select
                   value={selectedSnapId}
@@ -4493,7 +4197,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {snapRecords.map((rec) => (
                     <option key={rec.id} value={rec.id}>
-                      {rec.date ? rec.date.split('-').reverse().join('/') : 'Sem data'} - {rec.classification || 'Não classificado'} (Desat. {rec.inattentionScore}/9 · Hiper. {rec.hyperactivityScore}/9)
+                      {rec.date ? rec.date.split('-').reverse().join('/') : t('uiSemData')} - {displayValue(rec.classification || 'Não classificado', t)}  {t('uiDesat')} {rec.inattentionScore}{t('ui9Hiper')} {rec.hyperactivityScore}/9)
                     </option>
                   ))}
                 </select>
@@ -4503,7 +4207,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho Rastreamento TDAH' && snapRecords.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de Rastreamento do TDAH registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeRastreamento')}</p>
               </div>
             )}
 
@@ -4512,7 +4216,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1 animate-in fade-in duration-200">
                 <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                   <Database className="w-3 h-3" />
-                  Avaliação de Rastreamento Precoce do TEA:
+                  
+                  {t('uiAvaliacaoDeRastreamentoPrecoceDoTea')}
                 </label>
                 <select
                   value={selectedAq10Id}
@@ -4521,7 +4226,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {aq10Records.map((rec) => (
                     <option key={rec.id} value={rec.id}>
-                      {rec.date ? rec.date.split('-').reverse().join('/') : 'Sem data'} - {rec.classification || 'Não classificada'} (Score {rec.totalScore}/10)
+                      {rec.date ? rec.date.split('-').reverse().join('/') : t('uiSemData')} - {displayValue(rec.classification || 'Não classificada', t)}  {t('uiScore')} {rec.totalScore}/10)
                     </option>
                   ))}
                 </select>
@@ -4531,7 +4236,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho Rastreamento Precoce do TEA' && aq10Records.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de Rastreamento Precoce do TEA registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeRastreamento2')}</p>
               </div>
             )}
 
@@ -4540,7 +4245,8 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="space-y-1 animate-in fade-in duration-200">
                 <label className="text-xs font-semibold text-[#38bdf8] block flex items-center gap-1">
                   <Database className="w-3 h-3" />
-                  Avaliação de Qualidade Motora PCD:
+                  
+                  {t('uiAvaliacaoDeQualidadeMotoraPcd')}
                 </label>
                 <select
                   value={selectedPcdId}
@@ -4549,7 +4255,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 >
                   {pcdRecords.map((rec) => (
                     <option key={rec.id} value={rec.id}>
-                      {rec.date ? rec.date.split('-').reverse().join('/') : 'Sem data'} - {rec.grupoNome || `Grupo ${rec.grupo}`} ({rec.classificacaoPerfil || 'Não classificado'})
+                      {rec.date ? rec.date.split('-').reverse().join('/') : t('uiSemData')} - {rec.grupoNome || t('tplGrupoP0', { p0: displayValue(rec.grupo, t) })} ({displayValue(rec.classificacaoPerfil || 'Não classificado', t)})
                     </option>
                   ))}
                 </select>
@@ -4559,7 +4265,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             {focusArea === 'Desempenho Qualidade Motora PCD' && pcdRecords.length === 0 && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg flex items-center gap-2 text-amber-200/70">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-[10px]">Este aluno não possui avaliações de Qualidade Motora PCD registradas.</p>
+                <p className="text-[10px]">{t('uiEsteAlunoNaoPossuiAvaliacoesDeQualidade2')}</p>
               </div>
             )}
 
@@ -4567,9 +4273,9 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             <>
             {/* Educador Annotations */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#bdc8d1]/90 block">Anotações do Educador (Opcional):</label>
+              <label className="text-xs font-semibold text-[#bdc8d1]/90 block">{t('uiAnotacoesDoEducadorOpcional')}</label>
               <textarea
-                placeholder="Insira anotações breves de comportamento, conquistas recentes ou desafios do aluno..."
+                placeholder={t('uiInsiraAnotacoesBrevesDeComportamentoConquistasRecentes')}
                 value={observations}
                 onChange={(e) => setObservations(e.target.value)}
                 rows={3}
@@ -4589,14 +4295,14 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               }`}
             >
               <Sparkles className={`w-4 h-4 ${!observationsSaved && annotatable ? 'animate-spin-slow' : ''}`} />
-              <span>{observationsSaved ? 'Informações salvas!' : 'Adicionar Informações'}</span>
+              <span>{observationsSaved ? t('uiInformacoesSalvas') : t('uiAdicionarInformacoes')}</span>
             </button>
             {annotatable
               ? currentReportExists && (
-                  <p className="text-emerald-400/80 text-[10px] font-bold text-center mt-2">Relatório gerado automaticamente. Use o botão Adicionar Informações para anotar.</p>
+                  <p className="text-emerald-400/80 text-[10px] font-bold text-center mt-2">{t('uiRelatorioGeradoAutomaticamenteUseOBotaoAdicionar')}</p>
                 )
               : (
-                  <p className="text-amber-400/80 text-[10px] font-bold text-center mt-2">Selecione uma avaliação feita para adicionar informações.</p>
+                  <p className="text-amber-400/80 text-[10px] font-bold text-center mt-2">{t('uiSelecioneUmaAvaliacaoFeitaParaAdicionarInformacoes')}</p>
                 )}
             </>
             )}
@@ -4621,7 +4327,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <Sparkles className="w-5 h-5 text-[#38bdf8] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
             </div>
             <div className="text-center space-y-2 max-w-sm px-4">
-              <p className="text-xs font-bold text-[#8ed5ff] uppercase tracking-wider">Processando dados do sistema...</p>
+              <p className="text-xs font-bold text-[#8ed5ff] uppercase tracking-wider">{t('uiProcessandoDadosDoSistema')}</p>
               <p className="text-xs text-[#bdc8d1]/90 leading-relaxed font-mono transition-all animate-pulse">
                 {loadingMessages[loadingStep]}
               </p>
@@ -4637,7 +4343,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
               <div className="flex-1 flex items-center gap-2.5">
                 <StudentAvatar student={selectedStudentObj} size="h-11 w-11" text="text-xs" />
                 <div className="min-w-0">
-                  <p className="text-[10px] text-[#87929a] font-semibold tracking-wider uppercase">Documento Gerado Para</p>
+                  <p className="text-[10px] text-[#87929a] font-semibold tracking-wider uppercase">{t('uiDocumentoGeradoPara')}</p>
                   <h5 className="text-sm font-bold text-[#dae2fd] truncate max-w-[200px]">{selectedStudentObj.name}</h5>
                   <p className="text-[9px] text-[#87929a] mt-0.5 truncate uppercase font-bold tracking-tight">
                     {selectedStudentObj.estado || 'N/A'} • {selectedStudentObj.regiao || 'N/A'} • {selectedStudentObj.locality || 'N/A'}
@@ -4645,7 +4351,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-[10px] text-[#87929a] font-semibold tracking-wider uppercase">Unidade de Classe</p>
+                <p className="text-[10px] text-[#87929a] font-semibold tracking-wider uppercase">{t('uiUnidadeDeClasse')}</p>
                 <span className="text-xs text-[#38bdf8] font-bold">{selectedStudentObj.grade}</span>
               </div>
             </div>
@@ -4661,7 +4367,7 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
         {!loading && errorMessage && (
           <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-2">
             <AlertCircle className="w-10 h-10 text-[#ffb4ab] animate-bounce" />
-            <p className="text-xs font-bold text-[#ffb4ab]">Falha na Chamada de Geração</p>
+            <p className="text-xs font-bold text-[#ffb4ab]">{t('uiFalhaNaChamadaDeGeracao')}</p>
             <p className="text-xs text-[#bdc8d1]/80 max-w-md">{errorMessage}</p>
           </div>
         )}
@@ -4672,11 +4378,13 @@ O acompanhamento contínuo nas atividades propostas é fundamental para a evolu�
             <FileText className="w-10 h-10 text-[#3e484f]" />
             {selectedStudentId && focusAreaRecordCount === 0 ? (
               <p className="text-xs font-semibold text-[#dae2fd]/80 max-w-sm">
-                Este aluno ainda não possui avaliação de {focusArea.replace(/^Desempenho\s+/, '')}. Realize a avaliação na área de Avaliações para gerar o relatório.
+                
+                {t('uiEsteAlunoAindaNaoPossuiAvaliacaoDe')} {displayValue(focusArea, t)}{t('uiRealizeAAvaliacaoNaAreaDeAvaliacoes')}
               </p>
             ) : (
               <p className="text-[10px] max-w-sm">
-                O sistema irá extrair estatísticas de presenças, referências de matrizes pedagógicas e consolidar um parecer institucional formal em instantes.
+                
+                {t('uiOSistemaIraExtrairEstatisticasDePresencas')}
               </p>
             )}
           </div>

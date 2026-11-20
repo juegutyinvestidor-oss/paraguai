@@ -96,6 +96,43 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   'delete:plano_acao': 'Excluir Pastas e PDFs do Plano de Ação'
 };
 
+export const PERMISSION_LABEL_KEYS: Record<Permission, string> = {
+  'view:dashboard': 'permissoes.viewDashboard',
+  'view:contrato': 'permissoes.viewContrato',
+  'view:alunos': 'permissoes.viewAlunos',
+  'view:presenca': 'permissoes.viewPresenca',
+  'view:profissionais': 'permissoes.viewProfissionais',
+  'view:modalidades': 'permissoes.viewModalidades',
+  'view:avaliacoes': 'permissoes.viewAvaliacoes',
+  'view:performance': 'permissoes.viewPerformance',
+  'view:analise-geral': 'permissoes.viewAnaliseGeral',
+  'view:painel-estatistico': 'permissoes.viewPainelEstatistico',
+  'view:estudo-comparativo': 'permissoes.viewEstudoComparativo',
+  'view:questionario': 'permissoes.viewQuestionario',
+  'view:perfil': 'permissoes.viewPerfil',
+  'view:settings': 'permissoes.viewSettings',
+  'view:plano_acao': 'permissoes.viewPlanoAcao',
+  'create:contrato': 'permissoes.createContrato',
+  'edit:contrato': 'permissoes.editContrato',
+  'delete:contrato': 'permissoes.deleteContrato',
+  'create:alunos': 'permissoes.createAlunos',
+  'edit:alunos': 'permissoes.editAlunos',
+  'delete:alunos': 'permissoes.deleteAlunos',
+  'edit:presenca': 'permissoes.editPresenca',
+  'create:profissionais': 'permissoes.createProfissionais',
+  'edit:profissionais': 'permissoes.editProfissionais',
+  'delete:profissionais': 'permissoes.deleteProfissionais',
+  'create:modalidades': 'permissoes.createModalidades',
+  'edit:modalidades': 'permissoes.editModalidades',
+  'delete:modalidades': 'permissoes.deleteModalidades',
+  'create:avaliacoes': 'permissoes.createAvaliacoes',
+  'edit:avaliacoes': 'permissoes.editAvaliacoes',
+  'delete:avaliacoes': 'permissoes.deleteAvaliacoes',
+  'create:plano_acao': 'permissoes.createPlanoAcao',
+  'edit:plano_acao': 'permissoes.editPlanoAcao',
+  'delete:plano_acao': 'permissoes.deletePlanoAcao'
+};
+
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   Administrador: [
     'view:dashboard',

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { 
   Check, 
   X, 
@@ -47,6 +48,9 @@ interface PresencaViewProps {
 }
 
 export default function PresencaView({ students, runWithPermission, contratos, user }: PresencaViewProps) {
+  const t = useTranslations('presenca');
+  const ta = useTranslations('alunos');
+
   // Security Context checks: Lock filters if they have single value, restrict if multiple values
   const isHydrating = user?.id === 'loading';
   const isUserAdmin = user?.role === 'Administrador' || !user;
@@ -317,19 +321,19 @@ export default function PresencaView({ students, runWithPermission, contratos, u
   }, [user, students]);
 
   const MONTH_NAMES = [
-    { value: 'Todos', label: 'Todos os Meses' },
-    { value: '01', label: 'Janeiro' },
-    { value: '02', label: 'Fevereiro' },
-    { value: '03', label: 'Março' },
-    { value: '04', label: 'Abril' },
-    { value: '05', label: 'Maio' },
-    { value: '06', label: 'Junho' },
-    { value: '07', label: 'Julho' },
-    { value: '08', label: 'Agosto' },
-    { value: '09', label: 'Setembro' },
-    { value: '10', label: 'Outubro' },
-    { value: '11', label: 'Novembro' },
-    { value: '12', label: 'Dezembro' }
+    { value: 'Todos', label: t('mesesTodos') },
+    { value: '01', label: t('mes01') },
+    { value: '02', label: t('mes02') },
+    { value: '03', label: t('mes03') },
+    { value: '04', label: t('mes04') },
+    { value: '05', label: t('mes05') },
+    { value: '06', label: t('mes06') },
+    { value: '07', label: t('mes07') },
+    { value: '08', label: t('mes08') },
+    { value: '09', label: t('mes09') },
+    { value: '10', label: t('mes10') },
+    { value: '11', label: t('mes11') },
+    { value: '12', label: t('mes12') }
   ];
 
   const handleContractChange = (val: string) => {
@@ -951,21 +955,21 @@ export default function PresencaView({ students, runWithPermission, contratos, u
         <section className="bg-[#171f33] border border-[#3e484f]/40 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="px-2.5 py-1 text-[10px] uppercase tracking-wider font-bold bg-[#38bdf8]/10 text-[#38bdf8] border border-[#38bdf8]/20 rounded-full">
-              Seu Diário de Presença
+              {t('tituloAluno')}
             </span>
             <h3 className="text-sm md:text-base font-black text-white tracking-tight flex items-center gap-2 mt-1">
               <ClipboardCheck className="w-4 h-4 text-[#38bdf8]" />
-              Suas Presenças e Faltas
+              {t('tituloAlunoSub')}
             </h3>
             <p className="text-xs text-[#bdc8d1]/70 mt-1">
-              Turma: <span className="font-bold text-[#8ed5ff]">{selectedGrade}</span> • Unidade: <span className="font-bold text-[#8ed5ff]">{localityFilter}</span>
+              {t('turmaCurta')} <span className="font-bold text-[#8ed5ff]">{selectedGrade}</span> {t('unidadeCurta')} <span className="font-bold text-[#8ed5ff]">{localityFilter}</span>
             </p>
           </div>
           
           <div className="flex flex-col gap-1.5 min-w-[150px]">
             <label className="text-[10px] uppercase font-bold text-[#38bdf8] tracking-wider flex items-center gap-1">
               <CalendarDays className="w-3.5 h-3.5" />
-              <span>Mês de Referência:</span>
+              <span>{t('mesReferencia')}</span>
             </label>
             <select 
               value={selectedMonth}
@@ -992,7 +996,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
             <div>
               <h3 className="text-sm md:text-base font-black text-white tracking-tight flex items-center gap-2">
                 <ClipboardCheck className="w-4 h-4 text-[#38bdf8]" />
-                Filtro Unificado - Presença por Localidade
+                {t('filtroTitulo')}
               </h3>
             </div>
           </div>
@@ -1003,7 +1007,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
             {/* 1. Contrato */}
             <div className="flex flex-col gap-1.5" id="filtro-contrato">
               <label className="text-[10px] uppercase font-bold text-[#bdc8d1]/90 tracking-wider flex items-center gap-1">
-                <span>1. Contrato:</span>
+                <span>{t('filtroContrato')}</span>
                 {!isUserAdmin && assignedContracts.length === 1 && (
                   <Lock className="w-2.5 h-2.5 text-amber-400" />
                 )}
@@ -1014,7 +1018,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                 onChange={(e) => handleContractChange(e.target.value)}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="Todos">Todos os Contratos</option>
+                <option value="Todos">{ta('todosContratos')}</option>
                 {availableContracts.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
@@ -1024,7 +1028,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
             {/* 2. Estado */}
             <div className="flex flex-col gap-1.5" id="filtro-estado">
               <label className="text-[10px] uppercase font-bold text-[#bdc8d1]/90 tracking-wider flex items-center gap-1">
-                <span>2. Estado:</span>
+                <span>{t('filtroEstado')}</span>
                 {!isUserAdmin && assignedStates.length === 1 && (
                   <Lock className="w-2.5 h-2.5 text-amber-400" />
                 )}
@@ -1035,7 +1039,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                 onChange={(e) => handleStateChange(e.target.value)}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="Todos">Todos os Estados</option>
+                <option value="Todos">{ta('todosEstados')}</option>
                 {availableStates.map(st => (
                   <option key={st} value={st}>{st}</option>
                 ))}
@@ -1046,7 +1050,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
             <div className="flex flex-col gap-1.5" id="filtro-regiao">
               <label className="text-[10px] uppercase font-bold text-[#bdc8d1]/90 tracking-wider flex items-center gap-1">
                 <MapPin className="w-3 h-3 text-[#38bdf8]" />
-                <span>3. Região:</span>
+                <span>{t('filtroRegiao')}</span>
                 {!isUserAdmin && assignedRegions.length === 1 && (
                   <Lock className="w-2.5 h-2.5 text-amber-400" />
                 )}
@@ -1057,7 +1061,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                 onChange={(e) => handleRegionChange(e.target.value)}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="Todos">Todas as Regiões</option>
+                <option value="Todos">{ta('todasRegioes')}</option>
                 {availableRegions.map(reg => (
                   <option key={reg} value={reg}>{reg}</option>
                 ))}
@@ -1068,7 +1072,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
             <div className="flex flex-col gap-1.5" id="filtro-localidade">
               <label className="text-[10px] uppercase font-bold text-[#bdc8d1]/90 tracking-wider flex items-center gap-1">
                 <Building className="w-3 h-3 text-[#38bdf8]" />
-                <span>4. Localidade:</span>
+                <span>{t('filtroLocalidade')}</span>
                 {!isUserAdmin && assignedLocalities.length === 1 && (
                   <Lock className="w-2.5 h-2.5 text-amber-400" />
                 )}
@@ -1079,7 +1083,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                 onChange={(e) => handleLocalityChange(e.target.value)}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="Todos">Todas as Localidades</option>
+                <option value="Todos">{ta('todasLocalidades')}</option>
                 {availableLocalities.map(loc => (
                   <option key={loc} value={loc}>{loc}</option>
                 ))}
@@ -1090,7 +1094,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
             <div className="flex flex-col gap-1.5" id="filtro-mes">
               <label className="text-[10px] uppercase font-bold text-[#38bdf8] tracking-wider flex items-center gap-1">
                 <CalendarDays className="w-3.5 h-3.5 text-[#38bdf8] animate-pulse" />
-                <span>5. Mês de Ref:</span>
+                <span>{t('filtroMes')}</span>
               </label>
               <select 
                 value={selectedMonth}
@@ -1107,7 +1111,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
             <div className="flex flex-col gap-1.5" id="filtro-turma">
               <label className="text-[10px] uppercase font-bold text-[#bdc8d1]/95 tracking-wider flex items-center gap-1">
                 <Users className="w-3 h-3 text-[#38bdf8]" />
-                <span>6. Turma:</span>
+                <span>{t('filtroTurma')}</span>
                 {!isUserAdmin && assignedGrades.length === 1 && (
                   <Lock className="w-2.5 h-2.5 text-amber-400" />
                 )}
@@ -1121,7 +1125,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                 }}
                 className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-2.5 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="Todos">Todas as Turmas</option>
+                <option value="Todos">{ta('todasTurmas')}</option>
                 {availableGradesFiltered.map(g => (
                   <option key={g} value={g}>{g}</option>
                 ))}
@@ -1132,7 +1136,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
             <div className="flex flex-col gap-1.5" id="filtro-data">
               <label className="text-[10px] uppercase font-bold text-[#bdc8d1]/90 tracking-wider flex items-center gap-1">
                 <Calendar className="w-3 h-3 text-[#38bdf8]" />
-                <span>7. Data Aula:</span>
+                <span>{t('filtroDataAula')}</span>
               </label>
               <input 
                 type="date"
@@ -1147,20 +1151,20 @@ export default function PresencaView({ students, runWithPermission, contratos, u
           <div className="flex flex-col lg:flex-row items-center justify-between pt-4 border-t border-[#3e484f]/25 gap-4">
             <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#bdc8d1]/80 italic">
               <Sparkles className="w-3.5 h-3.5 text-[#38bdf8] shrink-0" />
-              <span>Filtros encadeados em sequência. Selecione cada campo para refinar os alunos.</span>
+              <span>{t('filtroDica')}</span>
             </div>
             
             <div className="flex items-center gap-4 bg-[#0b1326] border border-[#3e484f]/35 p-3 rounded-xl w-full lg:w-auto justify-between lg:justify-start">
               <div className="text-left">
                 <p className="text-[9px] text-[#bdc8d1]/70 font-black tracking-widest uppercase">
-                  {date ? "Estatística desta Aula" : `Freq. Média Mensal - ${MONTH_NAMES.find(m => m.value === selectedMonth)?.label}`}
+                  {date ? t('estatisticaAula') : t('freqMediaMensal', { mes: MONTH_NAMES.find(m => m.value === selectedMonth)?.label ?? '' })}
                 </p>
                 <div className="flex items-baseline gap-2 mt-0.5">
                   <span className="text-lg font-black text-white">{date ? presenceRate : avgMonthlyRate}%</span>
                   <span className="text-[10px] text-[#38bdf8] font-semibold">
                     {date 
-                      ? `(${presentCount} de ${totalInClass} presentes)` 
-                      : `(${totalInClass} aluno${totalInClass !== 1 ? 's' : ''} monitorado${totalInClass !== 1 ? 's' : ''})`
+                      ? t('presentesContador', { presentes: presentCount, total: totalInClass }) 
+                      : t('monitoradosContador', { total: totalInClass })
                     }
                   </span>
                 </div>
@@ -1172,17 +1176,17 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                   onClick={selectAllPresent}
                   disabled={!date || totalInClass === 0}
                   className="px-2.5 py-1.5 hover:bg-[#38bdf8]/10 border border-[#38bdf8]/35 hover:border-[#38bdf8] disabled:opacity-30 disabled:pointer-events-none text-[#38bdf8] text-[10px] font-bold rounded-lg transition-all"
-                  title={!date ? "Selecione uma data para realizar chamada" : "Marcar todos como Presente"}
+                  title={!date ? t('selecioneDataChamada') : t('marcarTodosPresente')}
                 >
-                  Sim (Todos)
+                  {t('simTodos')}
                 </button>
                 <button 
                   onClick={selectAllAbsent}
                   disabled={!date || totalInClass === 0}
                   className="px-2.5 py-1.5 hover:bg-[#ffb4ab]/10 border border-[#ffb4ab]/35 hover:border-[#ffb4ab] disabled:opacity-30 disabled:pointer-events-none text-[#ffb4ab] text-[10px] font-bold rounded-lg transition-all"
-                  title={!date ? "Selecione uma data para realizar chamada" : "Marcar todos como Ausente"}
+                  title={!date ? t('selecioneDataChamada') : t('marcarTodosAusente')}
                 >
-                  Não (Todos)
+                  {t('naoTodos')}
                 </button>
               </div>
             </div>
@@ -1198,8 +1202,8 @@ export default function PresencaView({ students, runWithPermission, contratos, u
         {/* Table/List Subheader with search and filter logs info */}
         <div className="p-5 bg-[#0b1326] border-b border-[#3e484f]/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <span className="text-xs font-extrabold text-white">Alunos Ativos Disponíveis ({totalInClass})</span>
-            <p className="text-[10px] text-[#bdc8d1]/70 mt-0.5">Indicador mensal avalia faltas e presenças de {MONTH_NAMES.find(m => m.value === selectedMonth)?.label}</p>
+            <span className="text-xs font-extrabold text-white">{t('alunosDisponiveis', { total: totalInClass })}</span>
+            <p className="text-[10px] text-[#bdc8d1]/70 mt-0.5">{t('indicadorMensal', { mes: MONTH_NAMES.find(m => m.value === selectedMonth)?.label ?? '' })}</p>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-center">
@@ -1207,27 +1211,27 @@ export default function PresencaView({ students, runWithPermission, contratos, u
               onClick={exportToExcel}
               disabled={totalInClass === 0}
               className="w-full sm:w-auto px-3 py-1.5 bg-[#10b981] hover:bg-[#059669] disabled:opacity-50 disabled:cursor-not-allowed text-xs text-white font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 border border-[#10b981]/20 cursor-pointer text-center"
-              title="Exportar para Excel"
+              title={ta('exportarExcel')}
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>Excel</span>
+              <span>{ta('excel')}</span>
             </button>
 
             <button 
               onClick={exportToPDF}
               disabled={totalInClass === 0}
               className="w-full sm:w-auto px-3 py-1.5 bg-[#f43f5e] hover:bg-[#e11d48] disabled:opacity-50 disabled:cursor-not-allowed text-xs text-white font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 border border-[#f43f5e]/20 cursor-pointer text-center"
-              title="Exportar para PDF"
+              title={ta('exportarPdf')}
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>PDF</span>
+              <span>{ta('pdf')}</span>
             </button>
 
             {(!user || normalizeRole(user.role ?? '') !== 'Aluno') && (
               <div className="relative w-full sm:w-64">
                 <input 
                   type="text"
-                  placeholder="Pesquisar por aluno ou CPF..."
+                  placeholder={t('pesquisar')}
                   value={studentSearch}
                   onChange={(e) => setStudentSearch(e.target.value)}
                   className="w-full bg-[#171f33] border border-[#3e484f]/50 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white outline-none focus:border-[#38bdf8] transition-all"
@@ -1242,7 +1246,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
           <div className="mx-5 mt-4 p-3.5 bg-[#d9af3f]/10 border border-[#d9af3f]/25 rounded-xl flex items-center gap-3 text-xs text-[#ebd074]">
             <Calendar className="w-4 h-4 shrink-0 animate-pulse" />
             <span>
-              <strong>Visão Geral do Mês de Referência:</strong> Exibindo a frequência mensal consolidada. Caso queira realizar a chamada de um dia específico, selecione a data no campo <strong>7. Data Aula</strong> acima.
+              <strong>{t('visaoGeralTitulo')}</strong> {t('visaoGeralTexto1')} <strong>{t('filtroDataAula')}</strong> {t('visaoGeralTexto2')}
             </span>
           </div>
         )}
@@ -1253,9 +1257,9 @@ export default function PresencaView({ students, runWithPermission, contratos, u
               <AlertCircle className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <span className="font-extrabold text-[#dae2fd] text-sm block">Nenhum Aluno Encontrado</span>
+              <span className="font-extrabold text-[#dae2fd] text-sm block">{t('nenhumAluno')}</span>
               <p className="text-xs max-w-sm mx-auto text-[#bdc8d1]/75">
-                Nenhum aluno ativo encontrado para os filtros selecionados. Altere os filtros acima para refinar sua busca.
+                {t('nenhumAlunoDesc')}
               </p>
             </div>
           </div>
@@ -1302,7 +1306,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                         {student.cpf && (
                           <>
                             <span className="text-[#3e484f]/50">•</span>
-                            <span>CPF: {student.cpf}</span>
+                            <span>{ta('cpf')} {student.cpf}</span>
                           </>
                         )}
                       </p>
@@ -1314,7 +1318,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                     <div className="flex justify-between items-center text-[10px] font-bold text-[#bdc8d1]">
                       <span className="flex items-center gap-1">
                         <TrendingUp className="w-3.5 h-3.5 text-[#38bdf8]" />
-                        <span>Frequência no Mês ({MONTH_NAMES.find(m => m.value === selectedMonth)?.label})</span>
+                        <span>{t('frequenciaMes', { mes: MONTH_NAMES.find(m => m.value === selectedMonth)?.label ?? '' })}</span>
                       </span>
                       <span className={`px-1.5 py-0.5 text-[10px] font-mono border rounded ${badgeColorClass}`}>
                         {stats.rate}%
@@ -1330,8 +1334,8 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                     </div>
 
                     <div className="flex justify-between text-[9px] text-[#bdc8d1]/70 font-mono">
-                      <span className="text-emerald-400 font-bold">{stats.present} presenças</span>
-                      <span className="text-[#ffb4ab] font-bold">{stats.absent} faltas</span>
+                      <span className="text-emerald-400 font-bold">{t('presencasContador', { total: stats.present })}</span>
+                      <span className="text-[#ffb4ab] font-bold">{t('faltasContador', { total: stats.absent })}</span>
                     </div>
 
                     {/* Granular Monthly Grid of specific dates with presences and absences */}
@@ -1349,7 +1353,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                                   ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
                                   : 'bg-red-500/10 text-red-400 border-red-500/20'
                               }`}
-                              title={`${shortDStr}: ${isPr ? 'Presente' : 'Falta'}`}
+                              title={`${shortDStr}: ${isPr ? t('presente') : t('faltaCurta')}`}
                             >
                               <span>{parts[2]}</span>
                               <span>{isPr ? '✓' : '✗'}</span>
@@ -1359,7 +1363,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                       </div>
                     ) : (
                       <div className="text-[8px] text-[#bdc8d1]/40 italic mt-1 bg-[#0b1326]/50 px-1.5 py-0.5 rounded border border-[#3e484f]/10">
-                        Nenhuma chamada realizada no mês
+                        {t('nenhumaChamada')}
                       </div>
                     )}
                   </div>
@@ -1369,7 +1373,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                     !date ? (
                       <div className="flex items-center gap-2 bg-[#d9af3f]/10 border border-[#d9af3f]/25 px-3 py-2 rounded-xl text-xs text-[#ebd074] font-bold">
                         <Calendar className="w-3.5 h-3.5" />
-                        <span>Sem data definida para chamada</span>
+                        <span>{t('semDataChamada')}</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-3">
@@ -1382,12 +1386,12 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                               ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/45 shadow-[0_0_12px_rgba(52,211,153,0.15)]' 
                               : 'bg-transparent text-[#bdc8d1]/65 hover:text-white hover:bg-[#11192d] border border-transparent'
                           }`}
-                          title="Registrar Presença do Aluno"
+                          title={t('registrarPresenca')}
                         >
                           <div className={`p-1 rounded-full ${isPresentStatus ? 'bg-emerald-400 text-[#001e2c]' : 'bg-[#1e293b]'}`}>
                             <Check className="w-3 h-3 stroke-[3]" />
                           </div>
-                          <span>Presente</span>
+                          <span>{t('presente')}</span>
                         </button>
 
                         {/* Register Absent Button with state feedback */}
@@ -1398,12 +1402,12 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                               ? 'bg-[#ffb4ab]/15 text-[#ffb4ab] border border-[#ffb4ab]/40 shadow-[0_0_12px_rgba(255,180,171,0.15)]' 
                               : 'bg-transparent text-[#bdc8d1]/65 hover:text-[#ffb4ab] hover:bg-[#11192d] border border-transparent'
                           }`}
-                          title="Registrar Falta do Aluno"
+                          title={t('registrarFalta')}
                         >
                           <div className={`p-1 rounded-full ${!isPresentStatus ? 'bg-[#ffb4ab] text-[#001e2c]' : 'bg-[#1e293b]'}`}>
                             <X className="w-3 h-3 stroke-[3]" />
                           </div>
-                          <span>Ausente</span>
+                          <span>{t('ausente')}</span>
                         </button>
 
                       </div>
@@ -1411,7 +1415,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                   ) : (
                     <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs text-emerald-400 font-bold font-mono">
                       <Sparkles className="w-4 h-4 text-emerald-400" />
-                      <span>Frequência Individual</span>
+                      <span>{t('frequenciaIndividual')}</span>
                     </div>
                   )}
 
@@ -1429,17 +1433,17 @@ export default function PresencaView({ students, runWithPermission, contratos, u
                 <div className="bg-emerald-500/10 border border-emerald-500/30 px-4 py-2 rounded-xl flex items-center gap-2 animate-fade-in">
                   <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
                   <span className="text-xs text-emerald-400 font-bold">
-                    Chamada gravada e sincronizada no banco SQL e localStorage!
+                    {t('gravadaSucesso')}
                   </span>
                 </div>
               ) : isSaving ? (
                 <div className="flex items-center gap-2 text-xs text-[#bdc8d1]/80 bg-[#171f33] px-3 py-1.5 rounded-lg border border-[#3e484f]/20">
                   <RefreshCw className="w-3.5 h-3.5 text-[#38bdf8] animate-spin" />
-                  <span className="font-bold">Sincronizando com Banco de Dados...</span>
+                  <span className="font-bold">{t('sincronizando')}</span>
                 </div>
               ) : (
                 <div className="text-[10px] text-[#bdc8d1]/80 font-mono">
-                  Padrão de envio: Postgres Table public.attendance_records
+                  {t('padraoEnvio')}
                 </div>
               )}
             </div>
@@ -1454,7 +1458,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
               ) : (
                 <Save className="w-4 h-4" />
               )}
-              <span>Gravar & Sincronizar Frequência</span>
+              <span>{t('gravarSincronizar')}</span>
             </button>
           </div>
         )}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import DashboardView from '../../components/DashboardView';
@@ -24,7 +25,7 @@ import { getDb } from '../../lib/dbFacade';
 import { apiWrite, profilePayloadFromUser, setSessionToken, getSessionToken } from '../../lib/sessionClient';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Check, Database, WifiOff, ShieldAlert } from 'lucide-react';
-import { normalizeRole, TAB_PERMISSION_MAP, PERMISSION_LABELS, type Permission, ROLE_PERMISSIONS, type UserRole, hasPermissionDynamic, canAccessTabDynamic } from '../../lib/rbac';
+import { normalizeRole, TAB_PERMISSION_MAP, PERMISSION_LABEL_KEYS, type Permission, ROLE_PERMISSIONS, type UserRole, hasPermissionDynamic, canAccessTabDynamic } from '../../lib/rbac';
 
 const INITIAL_STUDENTS: Student[] = [];
 
@@ -64,6 +65,8 @@ type UserState = UserProfile & {
   locality?: string;
   grade?: string;
 };
+
+type StatusError = { key: string; values?: Record<string, string | number> };
 
 function isInvalidApiKeyError(err: unknown): boolean {
   return String(err).includes('Invalid API key');
@@ -286,6 +289,10 @@ interface PcdRow {
 }
 
 export default function Page() {
+  const t = useTranslations('appShell');
+  const trbac = useTranslations('rbac');
+  const strongRose = { strong: (chunks: React.ReactNode) => <strong className="text-rose-400">{chunks}</strong> };
+
   // Dynamic Role Permissions Configurable State
   const [rolePermissions, setRolePermissions] = useState<Record<UserRole, Permission[]>>(() => {
     if (typeof window !== 'undefined') {
@@ -330,7 +337,7 @@ export default function Page() {
     }
     return {
       id: 'loading',
-      name: 'Carregando...',
+      name: t('carregando'),
       role: 'Professor', // More restricted default
       email: '',
       avatarUrl: ''
@@ -405,7 +412,7 @@ export default function Page() {
       setActionDenied({
         permission,
         role: normRole,
-        msg: PERMISSION_LABELS[permission] || permission
+        msg: trbac(PERMISSION_LABEL_KEYS[permission])
       });
     }
   };
@@ -414,7 +421,7 @@ export default function Page() {
   const [dbStatus, setDbStatus] = useState({
     configured: isSupabaseConfigured,
     loading: isSupabaseConfigured,
-    error: null as string | null
+    error: null as StatusError | null
   });
 
   // Load initial data from Supabase or LocalStorage fallback
@@ -647,7 +654,10 @@ export default function Page() {
       // 2. Online live Supabase Load
       try {
         const supabase = getDb();
-        if (!supabase) throw new Error('Não foi possível iniciar o cliente Supabase.');
+        if (!supabase) {
+          setDbStatus({ configured: false, loading: false, error: { key: 'erroClienteSupabase' } });
+          return;
+        }
 
         // Load Custom User Profile safely if table is created
         try {
@@ -1438,7 +1448,7 @@ export default function Page() {
         setDbStatus({ 
           configured: false, 
           loading: false, 
-          error: `Contingência ativa: ${errMsg}` 
+          error: { key: 'contingenciaAtiva', values: { erro: errMsg } } 
         });
       }
     }
@@ -1504,7 +1514,7 @@ export default function Page() {
           if (!error) {
             setDbStatus(prev => ({
               ...prev,
-              error: "⚠️ Tabelas do Supabase desatualizadas (coluna 'structure' ausente). Use as Configurações para atualizar o banco."
+              error: { key: 'tabelasDesatualizadasStructure' }
             }));
           }
         }
@@ -1516,7 +1526,7 @@ export default function Page() {
       console.error('Failed to sync contratos with Supabase:', errMsg);
       setDbStatus(prev => ({
         ...prev,
-        error: `Erro ao sincronizar contratos no Supabase: ${errMsg}`
+        error: { key: 'erroSyncContratos', values: { erro: errMsg } }
       }));
     }
   };
@@ -1629,7 +1639,7 @@ export default function Page() {
       const errMsg = getErrorMessage(e);
       setDbStatus(prev => ({
         ...prev,
-        error: `Erro ao sincronizar alunos no Supabase: ${errMsg}`
+        error: { key: 'erroSyncAlunos', values: { erro: errMsg } }
       }));
     }
   };
@@ -1739,7 +1749,7 @@ export default function Page() {
       const errMsg = getErrorMessage(e);
       setDbStatus(prev => ({
         ...prev,
-        error: `Erro ao sincronizar modalidades no Supabase: ${errMsg}`
+        error: { key: 'erroSyncModalidades', values: { erro: errMsg } }
       }));
     }
   };
@@ -1885,7 +1895,7 @@ export default function Page() {
           if (!error) {
             setDbStatus(prev => ({
               ...prev,
-              error: "⚠️ Tabelas do Supabase desatualizadas (coluna 'grade' ausente em profissionais). Use as Configurações para atualizar o banco."
+              error: { key: 'tabelasDesatualizadasGrade' }
             }));
           }
         }
@@ -1906,7 +1916,7 @@ export default function Page() {
       const errMsg = getErrorMessage(e);
       setDbStatus(prev => ({
         ...prev,
-        error: `Erro ao sincronizar profissionais no Supabase: ${errMsg}`
+        error: { key: 'erroSyncProfissionais', values: { erro: errMsg } }
       }));
     }
   };
@@ -2778,21 +2788,21 @@ export default function Page() {
           </div>
           
           <div className="space-y-2">
-            <h3 className="text-lg font-bold text-rose-400">Acesso Negado por Middleware RBAC</h3>
+            <h3 className="text-lg font-bold text-rose-400">{t('acessoNegadoTitulo')}</h3>
             <p className="text-xs text-[#bdc8d1]/90">
-              O seu perfil atual no sistema (<strong className="text-rose-400">{normRole}</strong>) não possui as permissões de acesso necessárias para visualizar esta seção.
+              {t.rich('acessoNegadoDescricao', { perfil: normRole, ...strongRose })}
             </p>
           </div>
 
           <div className="bg-[#0b1326] border border-[#3e484f]/20 rounded-lg p-4 space-y-2 text-left text-xs font-mono">
             <div>
-              <span className="text-rose-400 font-semibold">Identificação:</span> {user.id || '1'}
+              <span className="text-rose-400 font-semibold">{t('identificacao')}</span> {user.id || '1'}
             </div>
             <div>
-              <span className="text-rose-400 font-semibold">Permissão Requerida:</span> {requiredPermission}
+              <span className="text-rose-400 font-semibold">{t('permissaoRequerida')}</span> {requiredPermission}
             </div>
             <div>
-              <span className="text-rose-400 font-semibold">Ação Interceptada:</span> Transição de rota de {activeTab}
+              <span className="text-rose-400 font-semibold">{t('acaoInterceptada')}</span> {t('transicaoRota')} {activeTab}
             </div>
           </div>
 
@@ -2801,7 +2811,7 @@ export default function Page() {
               onClick={() => setActiveTab('dashboard')}
               className="px-4 py-2 bg-[#1a2b4b] hover:bg-[#1a2b4b]/80 border border-[#3e484f]/40 text-xs font-bold text-[#8ed5ff] rounded-lg transition-transform active:scale-95"
             >
-              Voltar ao Dashboard
+              {t('voltarDashboard')}
             </button>
           </div>
         </div>
@@ -3004,7 +3014,7 @@ export default function Page() {
       default:
         return (
           <div className="py-12 text-center text-xs">
-            Seção indisponível temporariamente.
+            {t('secaoIndisponivel')}
           </div>
         );
     }
@@ -3016,7 +3026,7 @@ export default function Page() {
       <div className="w-full min-h-screen bg-[#070b19] flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-[#38bdf8] border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xs text-[#bdc8d1]/60 font-mono tracking-widest uppercase">Carregando EDUKYNE...</p>
+          <p className="text-xs text-[#bdc8d1]/60 font-mono tracking-widest uppercase">{t('carregandoApp')}</p>
         </div>
       </div>
     );
@@ -3062,24 +3072,26 @@ export default function Page() {
             {dbStatus.configured ? (
               <span className="flex items-center gap-1 text-[#38bdf8] font-semibold shrink-0">
                 <Database className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Supabase Conectado</span>
-                <span className="sm:hidden">Supabase</span>
+                <span className="hidden sm:inline">{t('supabaseConectado')}</span>
+                <span className="sm:hidden">{t('supabase')}</span>
               </span>
             ) : (
               <span className="flex items-center gap-1 text-[#87929a] shrink-0">
                 <WifiOff className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Modo Local Offline Ativo</span>
-                <span className="sm:hidden">Offline</span>
+                <span className="hidden sm:inline">{t('modoOffline')}</span>
+                <span className="sm:hidden">{t('offline')}</span>
               </span>
             )}
             <span className="text-[#87929a]/60 shrink-0">|</span>
             <span className="min-w-0 truncate">
-              {dbStatus.error ? dbStatus.error : (dbStatus.configured ? 'Persistência em tempo real e nuvem ativa na base de dados PostgreSQL.' : 'Dados salvos localmente. Integre com o Supabase no painel de Secrets.')}
+              {dbStatus.error
+                ? t(dbStatus.error.key, dbStatus.error.values as never)
+                : (dbStatus.configured ? t('persistenciaNuvem') : t('dadosLocais'))}
             </span>
           </div>
           {dbStatus.configured && !dbStatus.error && (
             <span className="hidden sm:inline-flex items-center gap-1 text-emerald-400 font-bold uppercase tracking-wider text-[9px] bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              <Check className="w-3 h-3" /> Live Sync
+              <Check className="w-3 h-3" /> {t('liveSync')}
             </span>
           )}
         </div>
@@ -3098,19 +3110,19 @@ export default function Page() {
             </div>
 
             <div className="space-y-1">
-              <h4 className="text-sm font-bold text-rose-400 uppercase tracking-wider">Ação Negada por Middleware</h4>
+              <h4 className="text-sm font-bold text-rose-400 uppercase tracking-wider">{t('acaoNegadaTitulo')}</h4>
               <p className="text-xs text-[#bdc8d1]">
-                O seu perfil de acesso (<strong className="text-rose-400">{actionDenied.role}</strong>) não possui a permissão necessária para executar esta ação administrativa.
+                {t.rich('acaoNegadaDescricao', { perfil: actionDenied.role, ...strongRose })}
               </p>
             </div>
 
             <div className="bg-[#0b1326] rounded-xl border border-[#3e484f]/25 p-3.5 text-left text-[11px] font-mono space-y-1">
-              <p><span className="text-[#8ed5ff]">Ação Requerida:</span> {actionDenied.msg}</p>
-              <p><span className="text-[#8ed5ff]">Código do Recurso:</span> {actionDenied.permission}</p>
+              <p><span className="text-[#8ed5ff]">{t('acaoRequerida')}</span> {actionDenied.msg}</p>
+              <p><span className="text-[#8ed5ff]">{t('codigoRecurso')}</span> {actionDenied.permission}</p>
             </div>
 
             <p className="text-[10px] text-[#bdc8d1]/50 italic">
-              Seu acesso foi verificado em milissegundos seguindo o modelo RBAC de Segurança.
+              {t('verificacaoRbac')}
             </p>
 
             <div className="pt-2">
@@ -3118,7 +3130,7 @@ export default function Page() {
                 onClick={() => setActionDenied(null)}
                 className="w-full px-4 py-2 bg-[#1a2b4b] text-[#bdc8d1] hover:text-[#dae2fd] text-xs font-semibold rounded-lg transition-transform active:scale-95"
               >
-                Fechar Aviso
+                {t('fecharAviso')}
               </button>
             </div>
           </div>
