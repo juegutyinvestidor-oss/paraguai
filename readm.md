@@ -103,14 +103,22 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
 - Auditoria de `content/generated/*.json`: `es-PY` 62, `gn-PY` 8 e `en` 5 textos idênticos ao pt-BR, todos legítimos (faixas numéricas, siglas GMFCS/HU-DBI/IAS/AQ-10 e palavras válidas como “Peso normal”, “Sobrepeso”, “Híbrido”, “Filtro Clínico/Grupo”). Em `content/pt-PT.json` foram ajustados 3 valores: `espectro`→`espetro`, `transtorno do espetro autista`→`perturbação do espetro autista` e `triagem/responsáveis`→`rastreio/encarregados de educação`.
 - Validações: `i18n:check` 2.503 chaves/idioma; `i18n:scan` 6 ocorrências/4 arquivos (intencionais); `lint`, `tsc --noEmit` e `build` OK.
 
+### Atualização (21/11/2026 — rascunho completo de Guarani)
+- A pedido do usuário, `messages/gn-PY.json` (2.503 chaves) e `content/gn-PY.json` (713 folhas; 551 entradas geradas) foram traduzidos integralmente do espanhol para guarani em seis lotes, com glossário baseado na terminologia informática CONACYT/SPL (ex.: `Guardar=Eñongatu`, `Cancelar=Ehejánte`, `Buscar=Eheka`, `Contraseña=Ñe'ẽñemi`, `Iniciar sesión=Emomba'apoñepyrũ`) e normalização do apóstrofo guaraní.
+- `messages/es-PY.json` e `content/es-PY.json` não foram alterados: o app continua com espanhol e guarani separados.
+- Cobertura conferida: 2.503/2.503 valores em `messages/gn-PY.json` e 713/713 folhas em `content/gn-PY.json`; placeholders `{pN}`/ICU, markdown, números, siglas e nomes canônicos preservados. Após consolidação, 26 resíduos óbvios de espanhol foram corrigidos manualmente (ex.: `Localidad`→`Táva`, `Contrato`→`Ñe'ỹjoaju`, `Vóley`→`Voleibol`).
+- Restam 97 valores idênticos ao espanhol que são legítimos: siglas/unidades/markdown (`CPF`, `PDF`, `IMC`, `kg`, `A)`, `{p0}. **{p1}:** {p2}`) e nomes canônicos de geometria/modalidades.
+- Validações: `i18n:check` 2.503 chaves/idioma; `i18n:scan` 6 ocorrências/4 arquivos (intencionais); `content:build` 551 entradas/idioma; `lint` 0 erros/2 avisos prévios; `tsc --noEmit` e `build` OK.
+- **Atenção**: é um rascunho completo em guarani, mas ainda exige revisão de falante nativo antes de ser considerado definitivo. Este rascunho ainda não foi commitado.
+
 ### MARCADOR PARA CONTINUAR DEPOIS (21/11/2026)
-- **Estado congelado**: 5 idiomas com 2.503 chaves/idioma; resíduo de glossário zerado; conferência de rotas/PDF/Excel/gráficos feita; scan/extract/content/lint/tsc/build passando; alterações ainda não commitadas.
+- **Estado**: o trabalho anterior foi commitado pelo usuário em `05f6f79 att  v5`. O rascunho completo de Guarani descrito acima está pronto para análise, mas ainda não foi commitado.
 - **Decisões de continuação (21/11/2026)**: item 3 cancelado — os relatórios já gerados não precisam ser traduzidos nem regenerados; o item 4 (revisão nativa do Guarani) fica pendente.
 - **Próximo trabalho imediato, nesta ordem**:
   1. ~~Revisar e corrigir traduções antigas geradas por glossário no namespace `desempenho`~~ (concluído em 21/11/2026).
   2. ~~Conferência visual por idioma (telas, PDFs, Excel, gráficos)~~ (concluída em 21/11/2026).
   3. ~~Regenerar os 69 `performance_reports.report` no locale ativo pela tela de Performance (“Preencher relatórios”)~~ (**cancelado pelo usuário em 21/11/2026**: relatórios já gerados não precisam ser traduzidos; permanecem em pt-BR no Supabase). Nenhuma escrita em lote foi feita.
-  4. Revisão humana obrigatória do Guarani antes de declarar a tradução definitiva. **Decisão do usuário (21/11/2026): permanece pendente; a versão atual usa empréstimos do espanhol e não é definitiva.**
+  4. Revisão humana obrigatória do Guarani antes de declarar a tradução definitiva. **A versão atual já é um rascunho completo em guarani; o usuário vai analisar e encaminhar a revisão nativa.**
   5. Não traduzir as 6 ocorrências restantes do scan: marca `EDUKYNE` (Header/Login/Sidebar) e `EDU`/`KYNE`/`lgpd@edukyne.com.br` em `politica-privacidade`.
   6. ~~Opcional: revisão terminológica de `pt-PT`~~ (concluída em 21/11/2026; 138 valores corrigidos em `messages/pt-PT.json`).
   7. Ao finalizar, rodar novamente `npm run i18n:check`, `npm run i18n:scan`, `npm run i18n:extract`, `npm run content:build`, `npm run lint`, `npx tsc --noEmit`, `npm run build`; só commitar se o usuário pedir explicitamente.
@@ -120,7 +128,7 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
 - `next-intl` + App Router com segmento dinâmico `[locale]`.
 - `pt-BR` é o default em `/`; os demais usam prefixo (`/pt-PT`, `/es-PY`, `/gn-PY`, `/en`). `/pt-BR` redireciona 307 para `/` — isso é esperado (`localePrefix: 'as-needed'`).
 - Seletor de idioma disponível na tela de login e no sidebar (após login).
-- Guarani será revisado por falante nativo; a versão atual usa empréstimos do espanhol e já teve alguns erros grosseiros corrigidos, mas não é definitiva.
+- Guarani será revisado por falante nativo; a versão atual é um rascunho completo em guarani, já com terminologia CONACYT/SPL, mas não é definitiva. `es-PY` permanece em espanhol.
 - Valores canônicos de geometria (`ESTADOS_LIST`, séries pré-definidas e o fallback `São Paulo` em `ContratosView`) permanecem em pt-BR de propósito: são gravados no Supabase e usados em filtros; traduzi-los geraria dados incompatíveis entre idiomas. A estratégia de rótulos localizados com valores canônicos preservados usa `displayCanonical` e `delocalizeRows`.
 - Em `AvaliacoesView`, classificações, níveis motores, respostas e itens de questionários permanecem em pt-BR como valores gravados/comparados; o helper `displayValue` + `DISPLAY_KEYS` traduz apenas a exibição, inclusive em PDF/Excel, sem alterar a lógica.
 - Nos dicionários de conteúdo, apenas texto descritivo é traduzido. Identificadores, classificações, níveis e demais valores usados em filtros/gravações permanecem canônicos em pt-BR; `delocalizeRows` garante que edições feitas em outro idioma não persistam valores traduzidos.

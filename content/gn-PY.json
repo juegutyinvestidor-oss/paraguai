@@ -1,110 +1,110 @@
 {
   "voc_questions": {
     "q1": {
-      "statement": "Pe mba’apo ñondivepa mbo’ehaópe, ¿mba’épa porãve ne ñe’ẽme?",
-      "option_a": "Ajapóta jehaipy ha aheka umi tema.",
-      "option_b": "Ajapóta ñemboguejy ha ajapo umi gráfico.",
-      "option_c": "Ajapóta dibujo, amongu’ã ha añangareko jehechápe.",
-      "option_d": "Amohenda’ĩta aty, umi arange ha oyano va’erã."
+      "statement": "Pe tembiapo ñondivepa mbo'ehaópe, ¿mba'épa porãve ne ñe'ẽme?",
+      "option_a": "Ajapóta jehaipy ha aheka mba'ekuaarã.",
+      "option_b": "Ajapóta ñemboguejy ha ajapo umi ta'anga.",
+      "option_c": "Ajapóta ta'anga, amongu'ã ha añangareko jehechápe.",
+      "option_d": "Amohenda'ĩta aty, umi arange ha oyano va'erã."
     },
     "q2": {
-      "statement": "Ne aravo henyhẽvévemi, ¿mba’épa omoñe’ẽveva nde?",
-      "option_a": "Amoñe’ẽ aranduka, amba’apo filmes térã añomongeta amigos ndive.",
-      "option_b": "Amontaña térã ambojo’o mba’é, térã ajapo juegos de lógica.",
-      "option_c": "Ajapo deporte, añangareko ka’avo térã mymba.",
-      "option_d": "Amohenda events, a’e aty ha ajojui acuerdos."
+      "statement": "Ne aravo henyhẽvévemi, ¿mba'épa omokyre'ỹveva nde?",
+      "option_a": "Amoñe'ẽ aranduka, amba'apo ta'angakuera térã añomongeta irũ ndive.",
+      "option_b": "Amontaña térã ambojo'o mba'e, térã ajapo ñembosarái lóhika rehegua.",
+      "option_c": "Ajapo jetepyso, añangareko ka'avo térã mymba.",
+      "option_d": "Amohenda ñembyaty, a'e aty ha ajojui joaju."
     },
     "q3": {
-      "statement": "¿Kóva apytépe mba’e materiapá porãve ne?",
-      "option_a": "Historia, Literatura térã Filosofía.",
-      "option_b": "Matemáticas, Física térã Química.",
-      "option_c": "Biología, Educación Física térã Artes.",
-      "option_d": "Geografía, Redacción térã Sociología."
+      "statement": "¿Kóva apytépe mba'e mba'ekuaapá porãve ne?",
+      "option_a": "Tembiasakue, ñe'ẽporã térã arandu ñeimo'ã.",
+      "option_b": "Papapy, tetepykuaa térã ñemoambue kuaa.",
+      "option_c": "Tekove kuaa, tetepy ñemoarandu térã tembiporu porã.",
+      "option_d": "Yvy kuaa, jehaipy térã tapicha aty kuaa."
     },
     "q4": {
-      "statement": "¿Mba’éichapa ojapo kua’ỹva problema hasýva?",
-      "option_a": "Añomongeta ha aheka entende mba’épa he’i umi tapicha.",
-      "option_b": "Aipuru números, datos ha hechos exactos.",
-      "option_c": "Ajapo solución práctica ha innovadora.",
-      "option_d": "Amopu’ã peteĩ plan de acción paso a paso."
+      "statement": "¿Mba'éichapa omba'apo kua'ỹva apañuãi hasýva?",
+      "option_a": "Añomongeta ha aheka jeikũmby mba'épa he'i umi tapicha.",
+      "option_b": "Aipuru papapy, mba'ekuaarã ha mba'e oikóva hekopete.",
+      "option_c": "Ajapo ñemyatyrõ hekopete ha pyahu.",
+      "option_d": "Amopu'ã peteĩ tembiapo ñemohenda peteĩteĩ rupi."
     },
     "q5": {
-      "statement": "¿Nde re’e ndekuehe máva omba’apo va’erã?:",
-      "option_a": "Gusta ayudar umi tapicha ha añe’ẽ porã.",
-      "option_b": "Aheka mba’éichapa omba’apo umi mba’e.",
-      "option_c": "Hetave mbarete ha gusta ajapo mba’e pyahu.",
-      "option_d": "Ha’e organizada, práctica ha gusta ami órden."
+      "statement": "¿Nde re'e ndéhegui máva omba'apo va'erã?:",
+      "option_a": "Che gusta aipytyvõ umi tapicha ha añe'ẽ porã.",
+      "option_b": "Aheka mba'éichapa omba'apo umi mba'e.",
+      "option_c": "Hetave mbarete ha che gusta ajapo mba'e pyahu.",
+      "option_d": "Ha'e ñemohendáva, hekopete ha che gusta ami ñemohenda."
     },
     "q6": {
-      "statement": "Ipóta reho viaje ko’ã tendápe, ¿mba’épa reiporãta?",
-      "option_a": "Peteĩ táva ymaguaré museum ha cultura ndie.",
-      "option_b": "Peteĩ centro tecnología yvate térã feria de ciencias.",
-      "option_c": "Peteĩ reserva ecológica térã centro de artes.",
-      "option_d": "Peteĩ táva tuicha negocio ha comercio."
+      "statement": "Ipóta reho ñani ko'ã tendápe, ¿mba'épa reiporãta?",
+      "option_a": "Peteĩ táva ymaguaré, mba'e ymaguaré renda ha tetã reko ndive.",
+      "option_b": "Peteĩ teknología yvate renda térã mba'ekuaa ñembyaty.",
+      "option_c": "Peteĩ tekoha ñangareko renda térã tembiporu porã renda.",
+      "option_d": "Peteĩ táva tuicha ñemu ha ñemuha."
     },
     "q7": {
-      "statement": "¿Mba’épa omoñe’ẽveva ne peteĩ proyectope?",
-      "option_a": "Impacto og̃uahẽva tapicha rekovepe.",
-      "option_b": "Mba’éichapa oñemopu’ã ha estructuras lógica.",
-      "option_c": "Estética ha creatividad resultado final.",
-      "option_d": "Resultados financieros ha éxito proyecto."
+      "statement": "¿Mba'épa omokyre'ỹveva ne peteĩ tembiapo ñemohenda-pe?",
+      "option_a": "Jehechakuaa og̃uahẽva tapicha rekovepe.",
+      "option_b": "Mba'éichapa oñemopu'ã ha ñemohenda lóhika.",
+      "option_c": "Porãkue ha ñemoheñói pyahu jehupyty pahápe.",
+      "option_d": "Jehupyty pymare'ã rehegua ha tembiapo ñemohenda jehupyty porã."
     },
     "q8": {
-      "statement": "¿Mba’éichapa tenda de trabajo reiporãva?",
-      "option_a": "Ikatúva añomongeta ideias ha ahai.",
-      "option_b": "Oĩva rutina clara, investigación ha tecnología hetave.",
-      "option_c": "Ikatúva aaponu creatividad ha ajapo libremente.",
-      "option_d": "Oĩva líder, metas claras ha decisión pya’e."
+      "statement": "¿Mba'éichapa tembiapo renda reiporãva?",
+      "option_a": "Ikatúva añomongeta ñemoimo'ã ha ahai.",
+      "option_b": "Oĩva jepokuaa hesakã, jeheka ha teknología hetave.",
+      "option_c": "Ikatúva aaponu ñemoheñói pyahu ha ajapo hekosãsomeme.",
+      "option_d": "Oĩva mburuvicha, hupytyrã hesakã ha ñemoneí pya'e."
     },
     "q9": {
-      "statement": "Oñepyrũvo ñaipytũ umi tapichape, ¿mba’épa reiporãva?",
-      "option_a": "Ajapysaka, ami consejo ha añangareko salud térã derecho.",
-      "option_b": "A’e exactas térã ajapo tecnología pyahu vidape.",
-      "option_c": "Aipuru arte térã deporte ombopy’aguasu’ã hag̃ua.",
-      "option_d": "Amohenda recursos ha donaciones."
+      "statement": "Oñepyrũvo ñaipytũ umi tapichape, ¿mba'épa reiporãva?",
+      "option_a": "Ajapysaka, ami ñe'ẽmbo'e ha añangareko tesãi térã tekog̃uahẽ.",
+      "option_b": "A'e papapy térã ajapo teknología pyahu tekovepe g̃uarã.",
+      "option_c": "Aipuru tembiporu porã térã jetepyso ombopy'aguasu hag̃ua.",
+      "option_d": "Amohenda mbae'ỹrã ha ñeme'ẽ."
     },
     "q10": {
-      "statement": "Ko’ã ñemoñe’ẽ apytépe, ¿mba’épa reiporãva?",
-      "option_a": "Biografías, novelas térã artículos de comportamiento.",
-      "option_b": "Revistas científicas térã aranduka tecnología ha innovación.",
-      "option_c": "Revistas decoración, diseño térã historietas.",
-      "option_d": "Aranduka economía, finanzas térã administración."
+      "statement": "Ko'ã ñemoñe'ẽ apytépe, ¿mba'épa reiporãva?",
+      "option_a": "Tekove marandu, tembiasakue ñe'ẽ térã marandu'i jeiko rehegua.",
+      "option_b": "Kuatiahaipy mba'ekuaa rehegua térã aranduka teknología ha tembiapy pyahu rehegua.",
+      "option_c": "Kuatiahaipy ñemohenda porã, tembiapy ñemohenda térã ta'angakuatia.",
+      "option_d": "Aranduka pymare'ã kuaa, pymare'ã térã ñemohenda rehegua."
     },
     "q11": {
-      "statement": "¿Mba’éichapa reñe’ẽta nde mba’apo kuaa?",
-      "option_a": "Fácil añe’ẽ, ahai ha aargumenta.",
-      "option_b": "Memoria porã datospe ha fácil númerospe.",
-      "option_c": "Imaginación, creatividad ha intuición hetave.",
-      "option_d": "Talento ombotu’u, omo’e ha omohenda."
+      "statement": "¿Mba'éichapa reñe'ẽta nde katupyry?",
+      "option_a": "Ndahasýi añe'ẽ, ahai ha añe'ẽ ñemope reheve.",
+      "option_b": "Mandu'a porã mba'ekuaarãpe ha ndahasýi papapýpe.",
+      "option_c": "Ñemoimo'ã, ñemoheñói pyahu ha ñandu tee hetave.",
+      "option_d": "Katupyry ombotu'u, ombo'é ha omohenda."
     },
     "q12": {
-      "statement": "¿Mba’épa tuichave peteĩ mba’apo tenonderãpe nde?",
-      "option_a": "Ajapo diferencia sociedade ha mundope.",
-      "option_b": "Aikuaa mba’éichapa omba’apo ha ajapo desafíos.",
-      "option_c": "Aipu’ã creatividad ha innovación oipe’a’ỹre.",
-      "option_d": "Aguãta éxito financiero ha cargo de jefe."
+      "statement": "¿Mba'épa tuichave peteĩ tembiapo tenonderãpe nde?",
+      "option_a": "Ajapo mba'e iñambuéva tapicha aty ha yvy ape ári-pe.",
+      "option_b": "Aikuaa mba'éichapa omba'apo ha ajapo ñeha'ã.",
+      "option_c": "Aipu'ã ñemoheñói pyahu ha tembiapy pyahu oipe'a'ỹre.",
+      "option_d": "Aguãta pymare'ã jehupyty porã ha mburuvicha cargo-pe."
     }
   },
   "m4_imc_config": {
     "1": {
-      "classification": "Peso normal",
-      "status": "IMC ideal",
-      "description": "Estudiante oguereko peteĩ cuerpo composición porã ha oĩ porãva i-edadpe. Kóva omo’ỹ porã cardiovascular, ha ikatu omba’apo tuichave intensidad ndive, heko porã recovered ha mba’asy’ỹ."
+      "classification": "Peso hekopete",
+      "status": "IMC hekopete",
+      "description": "Mbo'eharã oguereko peteĩ tete ñemohenda porã ha oĩ porãva i-edadpe. Kóva omo'ỹ porã tymba'óga ha tuguy rape rehegua, ha ikatu omba'apo tuichave mbaretete ndive, heko porã jehupyty jey ha mba'asy'ỹ."
     },
     "2": {
-      "classification": "Peso’ỹ",
-      "status": "Ñangareko nutricional",
-      "description": "Índice ohechauka tekotevẽ ñangareko nutricional. Músculo masa’ỹ térã energía reserva’ỹ ikatu ombog̃ue mbarete ha resistencia estudiante, omo’ẽ kansa’ẽ pya’e."
+      "classification": "Peso'ỹ",
+      "status": "Ñangareko karu rehegua",
+      "description": "Papapy ohechauka tekotevẽ ñangareko nutricional. ñe'ẽndýi masa'ỹ térã mbarete ñongatu'ỹ ikatu ombog̃ue mbarete ha kane'õ'ỹ mbo'eharã, omo'ẽ kane'õ'ẽ pya'e."
     },
     "3": {
       "classification": "Peso hetave",
-      "status": "Hetave’ỹ",
-      "description": "Indicador ohechauka oĩ hetave peso cuerpo structurespe. Kóva omoingove articulacionespe entrenamiento impacto ndive, ha ikatu oñembo’y pya’e omo’ỹve frecuencia ha intensidad deporte."
+      "status": "Hetave'ỹ",
+      "description": "Jehechakuaa ohechauka oĩ hetave peso tete structurespe. Kóva omoingove tete joajupe ñembokatupyry jehechakuaa ndive, ha ikatu oñembo'y pya'e omo'ỹve jepiveguáicha ha mbaretete jetepyso."
     },
     "4": {
-      "classification": "Obesidad",
-      "status": "Mba’asy ñepyrũ",
-      "description": "Índice ohechauka factor de riesgo cardiovascular ha articulación. Oñemoneí peteĩ plan de actividad física de bajo impacto (natación térã ñangutiningo pya’e) ñangareko nutricional ndive, estudiante seguridá ha bienestar omo’ã hag̃ua."
+      "classification": "Pohýi hetave",
+      "status": "Mba'asy ñepyrũ",
+      "description": "Papapy ohechauka apañuãi rekopa tymba'óga ha tuguy rape rehegua ha tete joaju. Oñemoneí peteĩ ñemohenda jetepyso rehegua jeharu michĩva (y rupi ñani térã ñangutiningo pya'e) ñangareko nutricional ndive, mbo'eharã ñangareko ha tekove porã omo'ã hag̃ua."
     }
   },
   "m9_health_questions": {
@@ -112,119 +112,119 @@
       "statement": "¿Nde reñandu porã ha mbarete ndive?"
     },
     "hq2": {
-      "statement": "¿Nde reñandu triste?"
+      "statement": "¿Nde reñandu vy'a'ỹ?"
     },
     "hq3": {
-      "statement": "¿Nde reñandu ijo’o?"
+      "statement": "¿Nde reñandu ijo'o?"
     },
     "hq5": {
-      "statement": "¿Ikatu nde rejapo umi mba’e reiporãva ne aravo henyhẽvévemi?"
+      "statement": "¿Ikatu nde rejapo umi mba'e reiporãva ne aravo henyhẽvévemi?"
     },
     "hq4": {
       "statement": "¿Nde oguereko aravo henyhẽ porãva ndejehe?"
     },
     "hq6": {
-      "statement": "¿Ne sy ha ne ru otrata nde justicia ndive?"
+      "statement": "¿Ne sy ha ne ru otrata nde tekog̃uahẽ ndive?"
     },
     "hq7": {
-      "statement": "¿Nde remoñe’ẽ ne amigos ndive?"
+      "statement": "¿Nde remoñe'ẽ ne irũ ndive?"
     },
     "hq8": {
-      "statement": "¿Nde rejapo porã mbo’ehaópe ha ñemoarandupe?"
+      "statement": "¿Nde rejapo porã mbo'ehaópe ha ñemoarandupe?"
     },
     "hq9": {
-      "statement": "¿Nde ikatu japysaka ha ñeconcentra?"
+      "statement": "¿Nde ikatu japysaka ha ñemope?"
     },
     "hq10": {
-      "statement": "¿Nde reñandu deprimido térã esperanza’ỹ?"
+      "statement": "¿Nde reñandu vy'a'ỹ guasu térã jerovia'ỹ?"
     }
   },
   "m10_oral_questions": {
     "oq1": {
-      "statement": "Ndachepreocupaite dentista pe aháva."
+      "statement": "Ndachepreocupaite tãi ñangarekohára pe aháva."
     },
     "oq2": {
-      "statement": "Che encía osangra che tãi acepilla jave."
+      "statement": "Che tãi joko osangra che tãi opotĩ jave."
     },
     "oq4": {
-      "statement": "Che tãipe ahecha peteĩ gosma térã ky’a (placa)."
+      "statement": "Che tãipe ahecha peteĩ ky'a ñatã térã ky'a (ky'a ñembyaty)."
     },
     "oq3": {
-      "statement": "Chepreocupaite che tãi sa’y rehe."
+      "statement": "Chepreocupaite che tãi sa'y rehe."
     },
     "oq6": {
-      "statement": "Amo’ã imposible ñaevita encía problema solamente che tãi acepilláva."
+      "statement": "Amo'ã imposible ñaevita tãi joko apañuãi solamente che tãi acepilláva."
     },
     "oq5": {
-      "statement": "Aipuru peteĩ cepillo de dientes cerdas mbarete ndive."
+      "statement": "Aipuru peteĩ tãi ñemopotĩha tãi ñemopotĩha chag̃ui mbarete ndive."
     },
     "oq7": {
-      "statement": "Ajepive acepilla che tãi pya’e cada comida opa rire."
+      "statement": "Ajepive opotĩ che tãi pya'e opa karu opa rire."
     },
     "oq9": {
-      "statement": "Aipuru peteĩ técnica de cepillado che dentista omoneíva."
+      "statement": "Aipuru peteĩ tecnika tãi rehegua ñemopotĩ che tãi ñangarekohára omoneíva."
     },
     "oq8": {
-      "statement": "Añandu che tãi ambopotĩ porãma hilo dental’ỹre."
+      "statement": "Añandu che tãi ambopotĩ porãma tãi pajã'ỹre."
     },
     "oq10": {
-      "statement": "Añandu che tãi oempeora, acepilla jepe opa día ndive."
+      "statement": "Añandu che tãi oempeora, opotĩ jepe opa ára ndive."
     },
     "oq11": {
-      "statement": "O’e che ma che aliento porã."
+      "statement": "O'e che ma che pytu porã."
     },
     "oq13": {
       "statement": "Chepreocupa che tãi ñemohenda térã forma rehe."
     },
     "oq12": {
-      "statement": "Aexamina che tãi detalle ndive espejo pe cepillado opa rire."
+      "statement": "Aexamina che tãi detalle'i ndive jehechaha pe tãi ñemopotĩ opa rire."
     },
     "oq15": {
-      "statement": "Añandu che tãi nda’eve opotĩ porãite."
+      "statement": "Añandu che tãi nda'eve opotĩ porãite."
     },
     "oq14": {
-      "statement": "Atsy dentista pe hasy ñandu."
+      "statement": "Atsy tãi ñangarekohára pe hasy ñandu."
     },
     "oq16": {
-      "statement": "Acepilla che ñe’ẽ jepive."
+      "statement": "Opotĩ che ñe'ẽ jepive."
     },
     "oq17": {
-      "statement": "Aipuru enjuague bucal opa día ypývo."
+      "statement": "Aipuru juru ñemopotĩ y opa ára ypývo."
     },
     "oq18": {
-      "statement": "Añandu acepilla che tãi mbarete hetave ndive."
+      "statement": "Añandu opotĩ che tãi mbarete hetave ndive."
     },
     "oq19": {
-      "statement": "Aipuru hilo dental al menos peteĩ jey día pe."
+      "statement": "Aipuru tãi pajã jepe peteĩ jey ára pe."
     },
     "oq20": {
-      "statement": "Aha dentista pe solamente che hasy ñandu jave."
+      "statement": "Aha tãi ñangarekohára pe solamente che hasy ñandu jave."
     }
   },
   "m11_autoconcept_questions": {
     "aq1": {
-      "statement": "Añandu che peteĩ tapicha valor ndiveva, al menos umi tapicha ichaha."
+      "statement": "Añandu che peteĩ tapicha iporã ndiveva, jepe umi tapicha ichaha."
     },
     "aq2": {
       "statement": "Aguereko peteĩ actitud positiva chejehe rehe."
     },
     "aq4": {
-      "statement": "Ikatu ajapo umi mba’e porã hetave umi tapicha ichaha."
+      "statement": "Ikatu ajapo umi mba'e porã hetave umi tapicha ichaha."
     },
     "aq3": {
-      "statement": "Generalmente, che ñemo’ã che fracasado."
+      "statement": "Jepiveguáicha, che ñemo'ã che fracasado."
     },
     "aq5": {
-      "statement": "Añandu ndaipóri hetave mba’e orgullo che ñandu hag̃ua."
+      "statement": "Añandu ndaipóri hetave mba'e orgullo che ñandu hag̃ua."
     },
     "aq7": {
-      "statement": "Generalmente, che conforme chejehe ndive."
+      "statement": "Jepiveguáicha, che conforme chejehe ndive."
     },
     "aq6": {
-      "statement": "Añandu aguereko cualidades positivas."
+      "statement": "Añandu aguereko katupyry porã positivas."
     },
     "aq8": {
-      "statement": "Jepive, amo’ã ndaipóri mba’e che servi hag̃ua."
+      "statement": "Jepive, amo'ã ndaipóri mba'e che servi hag̃ua."
     },
     "aq9": {
       "statement": "Jepive, añandu che inútil."
@@ -235,188 +235,188 @@
   },
   "m13_snap_questions": {
     "sq6": {
-      "statement": "Ohevita, ndaho’a térã oñemoag̃ui ñandu’ỹre mba’apo oiporãva esfuerzo mental pukúva ndive."
+      "statement": "Ohevita, ndaho'a térã oñemoag̃ui ñandu'ỹre mba'apo oiporãva mbarete ñeimo'ã pukúva ndive."
     },
     "sq4": {
-      "statement": "Osigue instrucciones opa peve ha ndoopa deberes de escuela, tareas térã obligaciones."
+      "statement": "Osigue ñe'ẽmbo'e opa peve ha ndoopa tembiapo mbo'ehao rehegua, tembiapo térã tekotevẽ."
     },
     "sq5": {
-      "statement": "Oguereko hasýva omohenda tareas ha actividades."
+      "statement": "Oguereko hasýva omohenda tembiapo ha tembiapo."
     },
     "sq7": {
-      "statement": "Oñehundi umi mba’e tekotevẽva actividadespe (p. ej: juguetes, deberes de escuela, lápiz térã aranduka)."
+      "statement": "Oñehundi umi mba'e tekotevẽva actividadespe (techapyrã:: ñembosarái, tembiapo mbo'ehao rehegua, haiha térã aranduka)."
     },
     "sq8": {
       "statement": "Oñedistrae umi estímulo externo ndive."
     },
     "sq9": {
-      "statement": "Oñeolvida umi actividad día a día pe."
+      "statement": "Oñeolvida umi actividad ára a ára pe."
     },
     "sq12": {
-      "statement": "Oñan peteĩ ykégui ambue yképe térã ojupi hetave mba’e ári situaciones inapropiadaspe."
+      "statement": "Oñan peteĩ ykégui ambue yképe térã ojupi hetave mba'e ári mba'e oikóva inapropiadaspe."
     },
     "sq13": {
-      "statement": "Oguereko hasýva ojuga térã oñemoag̃ui actividades de recreaciónpe calmamente."
+      "statement": "Oguereko hasýva ojuga térã oñemoag̃ui tembiapo jeku'e reheguape calmamente."
     },
     "sq11": {
-      "statement": "Oheja itenda sala de clasepe térã situaciones oñeha’ãva okupa hag̃ua."
+      "statement": "Oheja itenda mbo'epy kotýpe térã mba'e oikóva oñeha'ãva okupa hag̃ua."
     },
     "sq10": {
-      "statement": "Omueve ipo térã ipy, térã oñemomýi silla ári."
+      "statement": "Omueve ipo térã ipy, térã oñemomýi apyka ári."
     },
     "sq14": {
-      "statement": "Ndopyta térã jepive oĩ “mil por hora”."
+      "statement": "Ndopyta térã jepive oĩ \"mil por aravo\"."
     },
     "sq15": {
-      "statement": "Oñe’ẽ hetave."
+      "statement": "Oñe'ẽ hetave."
     },
     "sq17": {
-      "statement": "Oguereko hasýva oha’ã iturno."
+      "statement": "Oguereko hasýva oha'ã iturno."
     },
     "sq18": {
-      "statement": "Ointerrumpe umi tapicha térã oñemoag̃ui (por ejemplo: oñemoag̃ui ñomongetápe, juegope, etc.)."
+      "statement": "Ointerrumpe umi tapicha térã oñemoag̃ui (techapyrã: oñemoag̃ui ñomongetápe, juegope, ha ambue)."
     },
     "sq16": {
-      "statement": "Ombohovai umi pregunta pya’e ndive opa mboyve."
+      "statement": "Ombohovai umi porandu pya'e ndive opa mboyve."
     },
     "sq1": {
-      "statement": "Ndoikatu japysaka hetave detalle rehe térã ojapo erro descuido ndive escuela mba’apo térã tareaspe."
+      "statement": "Ndoikatu japysaka hetave detalle'i rehe térã ojapo ñembotavy jehecha'ỹ ndive mbo'ehao mba'apo térã tembiapope."
     },
     "sq3": {
-      "statement": "Parece ndohendu oñe’ẽ katu chupe."
+      "statement": "Parece ndohendu oñe'ẽ katu chupe."
     },
     "sq2": {
-      "statement": "Oguereko hasýva omantene atención tareaspe térã actividades de recreaciónpe."
+      "statement": "Oguereko hasýva omantene jesareko tembiapope térã tembiapo jeku'e reheguape."
     }
   },
   "m14_aq10_questions": {
     "aq10q11": {
-      "statement": "Ha’e siempre ohecha patrones/categorías umi mba’e apytépe."
+      "statement": "Ha'e mantenonoite ohecha ñemohendakuera/ñemohendakuera umi mba'e apytépe."
     },
     "aq10q1": {
-      "statement": "Ha’e ohecha jepive umi sonido’i umi tapicha ndohenduvéva."
+      "statement": "Ha'e ohecha jepive umi sonido'i umi tapicha ndohenduvéva."
     },
     "aq10q12": {
-      "statement": "Ha’e generalmente ofoca hetave imagen térã situación opávope, detalle’i rehe."
+      "statement": "Ha'e jepiveguáicha omoĩ hetave ta'anga térã mba'e oikóva opávope, detalle'i'i rehe."
     },
     "aq10q2": {
-      "statement": "Habitualmente, ha’e oconcentra hetave imagen térã situación opávope, detalle’i rehe."
+      "statement": "Jepiveguáicha, ha'e omoĩ hetave ta'anga térã mba'e oikóva opávope, detalle'i'i rehe."
     },
     "aq10q3": {
-      "statement": "Grupo socialpe oĩ jave, ha’e ikatu osigue fácilmente ñomongeta hetave tapicha ndive."
+      "statement": "Aty socialpe oĩ jave, ha'e ikatu osigue ndahasýi ñomongeta hetave tapicha ndive."
     },
     "aq10q13": {
-      "statement": "Oĩ jave peteĩ grupo socialpe, ha’e ikatu oacompaña fácilmente ñomongeta hetave tapicha ndive."
+      "statement": "Oĩ jave peteĩ aty socialpe, ha'e ikatu oacompaña ndahasýi ñomongeta hetave tapicha ndive."
     },
     "aq10q4": {
-      "statement": "Ha’e ikatu ojapo fácilmente mba’e hetave peteĩ aravo pe."
+      "statement": "Ha'e ikatu ojapo ndahasýi mba'e hetave peteĩ aravo pe."
     },
     "aq10q14": {
-      "statement": "En caso de interrupción, ha’e ikatu ojevy pya’e ojapóva rehe."
+      "statement": "Oĩ jave ñembojoe, ha'e ikatu ojevy pya'e ojapóva rehe."
     },
     "aq10q5": {
-      "statement": "Ha’e ndikuaa mba’éichapa omantene ñomongeta umi compañero ndive."
+      "statement": "Ha'e ndikuaa mba'éichapa omantene ñomongeta umi irũ ndive."
     },
     "aq10q15": {
-      "statement": "Frecuentemente, ha’e ohecha ndikuaa mba’éichapa omantene ñomongeta."
+      "statement": "Jepiveguáicha, ha'e ohecha ndikuaa mba'éichapa omantene ñomongeta."
     },
     "aq10q16": {
-      "statement": "Socialmente, ha’e peteĩ conversador porã."
+      "statement": "Aty ñe'ẽme, ha'e peteĩ ñe'ẽporãha porã."
     },
     "aq10q6": {
-      "statement": "Socialmente, ha’e conversador porã."
+      "statement": "Aty ñe'ẽme, ha'e ñe'ẽporãha porã."
     },
     "aq10q17": {
-      "statement": "Imitãve jave, ha’e oho’a ojuga ‘faz de conta’ umi mitã ambue ndive."
+      "statement": "Imitãve jave, ha'e oho'a ojuga '«ojapo hag̃ua»' umi mitã ambue ndive."
     },
     "aq10q7": {
-      "statement": "Historia lectura jave, ha’e oguereko hasýva ohecha intenciones ha emociones umi personajes ndive."
+      "statement": "Tembiasakue jehai jehecha jave, ha'e oguereko hasýva ohecha jehechakuaa ha ñe'ẽlandu umi mitã'i kuatia pegua ndive."
     },
     "aq10q8": {
-      "statement": "Preescolarpe, ha’e oho’a ojuga juegos de ‘faz de conta’ umi mitã ambue ndive."
+      "statement": "Preescolarpe, ha'e oho'a ojuga ñe'ẽjovái '«ojapo hag̃ua»' umi mitã ambue ndive."
     },
     "aq10q18": {
-      "statement": "Ha’e oguereko hasýva omo’ã mba’éichapa oĩva ambue tapicha."
+      "statement": "Ha'e oguereko hasýva omo'ã mba'éichapa oĩva ambue tapicha."
     },
     "aq10q9": {
-      "statement": "Ha’e ohecha fácilmente mba’e oimo’ãva térã oñanduva peteĩ tapicha, solamente icara rehe ohecha."
+      "statement": "Ha'e ohecha ndahasýi mba'e oimo'ãva térã oñanduva peteĩ tapicha, solamente icara rehe ohecha."
     },
     "aq10q19": {
-      "statement": "Ha’e omo’ã fácil umi situación social."
+      "statement": "Ha'e omo'ã ndahasýi umi mba'e oikóva aty rehegua."
     },
     "aq10q20": {
-      "statement": "Ha’e oguereko hasýva ojapo amigo pyahu."
+      "statement": "Ha'e oguereko hasýva ojapo irũ pyahu."
     },
     "aq10q10": {
-      "statement": "Ha’e oguereko hasýva ojapo amigo pyahu."
+      "statement": "Ha'e oguereko hasýva ojapo irũ pyahu."
     }
   },
   "ias_questions": {
     "iq1": {
-      "statement": "Frutas opa (incluyendo jugos naturales).",
-      "option_1_text": "Jepive’ỹ térã nda’eve akaru frutas.",
-      "option_2_text": "Akaru 1 porción día pe (ej: 1 rebanada de sandía térã 1 manzana).",
-      "option_3_text": "Akaru 2 térã hetave porción frutas opa día pe."
+      "statement": "Yva opa (incluyendo yva y tee).",
+      "option_1_text": "Jepive'ỹ térã nda'eve akaru yva.",
+      "option_2_text": "Akaru 1 ñembyaty ára pe (ej: 1 yva kirii sandia rehegua térã 1 manzana).",
+      "option_3_text": "Akaru 2 térã hetave ñembyaty yva opa ára pe."
     },
     "iq3": {
-      "statement": "Vegetales opa (verduras ha legumbres crudas térã cocidas).",
-      "option_1_text": "Jepive’ỹ térã nda’eve akaru vegetales.",
-      "option_2_text": "Akaru vegetales solamente 1 comida pe (solamente almuerzo térã solamente cena).",
-      "option_3_text": "Akaru vegetales almuerzo ha cena pe opa día ndive."
+      "statement": "Ka'avo opa (ka'avo ha poroto ha lenteha ndojepe'ãiva térã ojepe'ãva).",
+      "option_1_text": "Jepive'ỹ térã nda'eve akaru ka'avo.",
+      "option_2_text": "Akaru ka'avo solamente 1 karu pe (solamente ñemkaru guasu térã solamente ñemkaru pahápe).",
+      "option_3_text": "Akaru ka'avo ñemkaru guasu ha ñemkaru pahápe pe opa ára ndive."
     },
     "iq2": {
-      "statement": "Frutas enteras (solamente fruta entera/trozos, jugo’ỹre).",
-      "option_1_text": "Solamente ay’u jugo térã ndakaru frutas.",
-      "option_2_text": "Akaru al menos 1 fruta entera hetave día pe.",
-      "option_3_text": "Akaru 2 térã hetave fruta entera opa día (ogaranti fibra)."
+      "statement": "Yva oĩmbáva (solamente yva oĩmbáva/trozos, yva y'ỹre).",
+      "option_1_text": "Solamente ay'u yva y térã ndakaru yva.",
+      "option_2_text": "Akaru jepe 1 yva oĩmbáva hetave ára pe.",
+      "option_3_text": "Akaru 2 térã hetave yva oĩmbáva opa ára (ogaranti fibra)."
     },
     "iq4": {
-      "statement": "Vegetales oscuros ha legumbres (brócoli, col, espinaca, poroto, lenteja...).",
-      "option_1_text": "Jepive’ỹ térã nda’eve akaru ko’ã alimento.",
-      "option_2_text": "Akaru poroto térã vegetales oscuros 3 térã 4 jey semana pe.",
-      "option_3_text": "Akaru poroto ha/térã vegetales verde oscuro prácticamente opa día."
+      "statement": "Ka'avo hũva ha poroto ha lenteha (brókoli, col, espinaka, poroto, lenteha...).",
+      "option_1_text": "Jepive'ỹ térã nda'eve akaru ko'ã alimento.",
+      "option_2_text": "Akaru poroto térã ka'avo hũva 3 térã 4 jey semana pe.",
+      "option_3_text": "Akaru poroto ha/térã ka'avo hũva prácticamente opa ára."
     },
     "iq5": {
-      "statement": "Cereales integrales (arroz integral, avena, pan integral, linaza, chia).",
-      "option_1_text": "Solamente akaru cereales refinados (arroz blanco, pan francés, fideos normales).",
-      "option_2_text": "Akaru al menos 1 porción de cereal integral térã semilla día pe.",
-      "option_3_text": "Che cereales diarios apytépe hetave oĩ integrales (2 térã hetave porción/día)."
+      "statement": "Ta'ỹi oĩmbáva (arroz oĩmbáva, avena, pan oĩmbáva, linaza, chia).",
+      "option_1_text": "Solamente akaru ta'ỹi ñemopotĩva (arroz morotĩ, pan francés, fideos comunes).",
+      "option_2_text": "Akaru jepe 1 ñembyaty ta'ỹi oĩmbáva rehegua térã mba'e ñepyrũ ára pe.",
+      "option_3_text": "Che ta'ỹi diarios apytépe hetave oĩ oĩmbáva (2 térã hetave ñembyaty/ára)."
     },
     "iq6": {
-      "statement": "Lácteos (leche, queso, yogur - preferentemente menos grasa).",
-      "option_1_text": "Ndakaru lácteos (térã equivalente vegetal fortificado calcio ndive).",
-      "option_2_text": "Akaru 1 térã 2 porción día pe.",
-      "option_3_text": "Akaru 3 porción día pe (recomendación estándar de calcio)."
+      "statement": "Leche rehegua (leche, queso, yogur - preferentemente menos ñandy).",
+      "option_1_text": "Ndakaru leche rehegua (térã ka'avo ñemohenda fortificado calcio ndive).",
+      "option_2_text": "Akaru 1 térã 2 ñembyaty ára pe.",
+      "option_3_text": "Akaru 3 ñembyaty ára pe (papapy hekopete ñemoneí kalsio rehegua)."
     },
     "iq7": {
-      "statement": "Carnes, huevos ha legumbres (fuentes de proteína en general).",
-      "option_1_text": "Akaru proteína bajísima opa día ndive.",
-      "option_2_text": "Akaru proteína solamente peteĩ comida tuicháva apytépe.",
-      "option_3_text": "Akaru fuente saludable distribuidas almuerzo, cena ha merienda pe."
+      "statement": "So'o, rupi'a ha poroto ha lenteha (protéina ñemyatyha opaite).",
+      "option_1_text": "Akaru protéina bajísima opa ára ndive.",
+      "option_2_text": "Akaru protéina solamente peteĩ karu tuicháva apytépe.",
+      "option_3_text": "Akaru fuente tesãiable ñemohenda ñemkaru guasu, ñemkaru pahápe ha karu michĩ pe."
     },
     "iq9": {
-      "statement": "Sodio (sal de cocina ha alimento salado).",
-      "option_1_text": "Aipuru sal hetave, aipuru condimento listo (cubo) ha akaru hetave embutido/saladito.",
-      "option_2_text": "Aipuru sal moderadamente, pero todavía akaru umi industrializado salado.",
-      "option_3_text": "Comida baja en sal, aporã condimento natural ha ahevita ultraprocesado."
+      "statement": "Sodio (karu sal ha karu sal ndive).",
+      "option_1_text": "Aipuru sal hetave, aipuru karu karu ñe'ẽ listo (kubo) ha akaru hetave so'o ñembyaty / mba'e sal ndive.",
+      "option_2_text": "Aipuru sal moderadamente, ha katu gueteri akaru umi fábrika-pe jejapo sal ndive.",
+      "option_3_text": "Karu sal sa'ive ndive, aporã karu karu ñe'ẽ tee ha ahevita heta jey ojejapóva."
     },
     "iq8": {
-      "statement": "Pescado ha fuente de grasa porã (sardina/atún, aceite de oliva, castaña, palta).",
-      "option_1_text": "Ndakaru ko’ã alimento térã aipuru solamente aceite vegetal común.",
-      "option_2_text": "Aipuru aceite de oliva regularmente, térã akaru castaña/palta jepive semana pe.",
-      "option_3_text": "Akaru pescado al menos 2 jey semana pe ha aipuru grasa porã opa día."
+      "statement": "Pira ha ñandy porã ñemyatyha (sardina/atun, oliva ñandy, kastaña, palta).",
+      "option_1_text": "Ndakaru ko'ã alimento térã aipuru solamente ka'avo ñandy_common.",
+      "option_2_text": "Aipuru oliva ñandy regularmente, térã akaru kastaña/palta jepive semana pe.",
+      "option_3_text": "Akaru pira jepe 2 jey semana pe ha aipuru ñandy porã opa ára."
     },
     "iq10": {
-      "statement": "Grasa saturada (carne grasa, piel de pollo, manteca, aceite de coco, queso amarillo).",
-      "option_1_text": "Akaru carne hetave grasa, fritura ha queso graso case opa día.",
-      "option_2_text": "Akaru moderado; aalterna carne magra/grasa, acontrola manteca ñipuru.",
-      "option_3_text": "Alimentación bajísima en grasa saturada (aporã carne magra ha asado)."
+      "statement": "Ñandy ñembyatypa (so'o ñandy ndive, pollo rag, ñandy, ñandy kokó rehegua, queso sa'yju).",
+      "option_1_text": "Akaru so'o hetave ñandy, fritura ha queso graso case opa ára.",
+      "option_2_text": "Akaru moderado; aalterna so'o ñandy'ỹva/ñandy, acontrola ñandy ñipuru.",
+      "option_3_text": "Alimentación bajísima en ñandy ñembyatypa (aporã so'o ñandy'ỹva ha asado)."
     },
     "iq11": {
-      "statement": "Caloría de fuente vacía (azúcar agregado, dulce, refresco, alcohol ha grasa sólida).",
-      "option_1_text": "Akaru dulce, refresco térã bebida azucarada/alcohólica opa día.",
-      "option_2_text": "Akaru ko’ã mba’e forma moderada pe (2 térã 3 jey semana pe).",
-      "option_3_text": "Jepive’ỹ akaru (menos de 1 jey semana pe) azúcar refinado, refresco térã alcohol."
+      "statement": "Kaloria ñemyatyha'ỹ (asuka ñemoĩva, he'ẽ, y he'ẽ, alcohol ha ñandy hatã).",
+      "option_1_text": "Akaru he'ẽ, y he'ẽ térã y he'ẽ / y alcohol ndive opa ára.",
+      "option_2_text": "Akaru ko'ã mba'e forma moderada pe (2 térã 3 jey semana pe).",
+      "option_3_text": "Jepive'ỹ akaru (sa'ive 1 jey semana pe) asuka ñemopotĩva, y he'ẽ térã alcohol."
     }
   },
   "m2_modalidades_config": {
@@ -431,186 +431,186 @@
   },
   "m3_cenarios": {
     "c3": {
-      "cenario": "ESCENARIO C",
+      "cenario": "TECHAPYRÃ C",
       "condicao": "Ndaipóri jeike térã ndaijeikéi oñemboheraguapýva",
-      "frequencia": "Ko’ág̃a peve, ndojejuhúi temimbo’e jeike térã ndaijeikéi rehegua registro sistema-pe ko ára pukukue aja. Umi mba’ekuaarã’ỹ ndaikatúi ojehecha porã mbo’eha rapykueho, upévare tekotevẽ oñemoañete pya’e secretaria térã aty mbo’ehára ndive oñemyatyrõ hag̃ua umi jehai.",
-      "mensagem": "Rojerure peẽme peñe’ẽ hag̃ua mbo’ehao secretaria ndive oñemyatyrõ hag̃ua umi registro. Rohecha ndaipóri jeike térã ndaijeikéi jehai ko’ág̃a peve, upéva omboyke temimbo’e jepokuaa rapykueho hekopete."
+      "frequencia": "Ko'ág̃a peve, ndojejuhúi mbo'eharã jeike térã ndaijeikéi rehegua registro ñemohenda-pe ko ára pukukue aja. Umi mba'ekuaarã'ỹ ndaikatúi ojehecha porã mbo'eha rapykueho, upévare tekotevẽ oñemoañete pya'e secretaria térã aty mbo'ehára ndive oñemyatyrõ hag̃ua umi jehai.",
+      "mensagem": "Rojerure peẽme peñe'ẽ hag̃ua mbo'ehao secretaria ndive oñemyatyrõ hag̃ua umi registro. Rohecha ndaipóri jeike térã ndaijeikéi jehai ko'ág̃a peve, upéva omboyke mbo'eharã jepokuaa rapykueho hekopete."
     },
     "c1": {
-      "cenario": "ESCENARIO A",
+      "cenario": "TECHAPYRÃ A",
       "condicao": "Hetave jeike ndaijeikéi-gui",
-      "frequencia": "Temimbo’e ohechauka jepiveguáicha ohoha mbo’ehaópe ha omomba’e guasu jepokuaa mbo’ehao rehegua ko jasy pukukue. Sa’i ndaijeikéi ohechauka oñeparticipa ha oñemoirũ porãha mbo’eha rendápe.",
-      "mensagem": "Aguyje penemokyre’ỹ ha peñepytyvõ rehe. Jeike meme ha’e mba’e tuichavéva ombohape hag̃ua umi resultado porã oĩva ko’ág̃a peve."
+      "frequencia": "Mbo'eharã ohechauka jepiveguáicha ohoha mbo'ehaópe ha omomba'e guasu jepokuaa mbo'ehao rehegua ko jasy pukukue. Sa'i ndaijeikéi ohechauka oñeparticipa ha oñemoirũ porãha mbo'eha rendápe.",
+      "mensagem": "Aguyje penemokyre'ỹ ha peñepytyvõ rehe. Jeike meme ha'e mba'e tuichavéva ombohape hag̃ua umi jehupyty porã oĩva ko'ág̃a peve."
     },
     "c2": {
-      "cenario": "ESCENARIO B",
+      "cenario": "TECHAPYRÃ B",
       "condicao": "Hetave ndaijeikéi jeike-gui",
-      "frequencia": "Rohecha hetaiterei ndaijeikéi ko ára pukukue aja, ohóva ári umi ára ojeikéva koty mbo’ehápe. Ko ndaijeikéi hetaiterei omombáy alerta pedagógico, omondohóvo mbo’esyry ha ombogue temimbo’e oñemoarandu hag̃ua umi mba’e oñembo’éva.",
-      "mensagem": "Rojerure peñangareko porã ha peñomongeta familia ndive roikuaa hag̃ua mba’érepa ndaijeikéi. Iñimportanteete oñembojevy jepive mbo’ehaópe jeho hag̃ua ani hag̃ua oĩ mba’e vai jehechakuépe opa rire ko ciclo."
+      "frequencia": "Rohecha hetaiterei ndaijeikéi ko ára pukukue aja, ohóva ári umi ára ojeikéva koty mbo'ehápe. Ko ndaijeikéi hetaiterei omombáy ñemongu'ẽ pedagogika, omondohóvo mbo'esyry ha ombogue mbo'eharã oñemoarandu hag̃ua umi mba'e oñembo'éva.",
+      "mensagem": "Rojerure peñangareko porã ha peñomongeta ogaykue ndive roikuaa hag̃ua mba'érepa ndaijeikéi. Iñimportanteete oñembojevy jepive mbo'ehaópe jeho hag̃ua ani hag̃ua oĩ mba'e vai jehechakuépe opa rire ko ciclo."
     }
   },
   "m3_impactos": {
     "i1": {
-      "tipo": "Mba’e porã (Kyta mbarete)",
-      "indicador": "Mbo’esyry joapy’ỹre, Ñemoirũ ha Jehechajey ritmo",
-      "descricao": "Oĩ jave, temimbo’e ohapykueho umi ñemyesakã peteĩteĩ, ombohape hag̃ua tembiapo hasy’ỹve jejapo. Oiko jepive tapicha apytépe omombarete joaju mbo’ehára ha irũnguéra ndive, omokakuaa inteligencia emocional ha tembiapo aty rehegua. Sa’ive tekotevẽ aranduchauka térã tembiapo jevy pytyvõrã oñehundi haguére ára."
+      "tipo": "Mba'e porã (kyta mbarete)",
+      "indicador": "Mbo'esyry joapy'ỹre, Ñemoirũ ha Jehechajey ñemboguata",
+      "descricao": "Oĩ jave, mbo'eharã ohapykueho umi ñemyesakã peteĩteĩ, ombohape hag̃ua tembiapo hasy'ỹve jejapo. Oiko jepive tapicha apytépe omombarete joaju mbo'ehára ha irũnguéra ndive, omokakuaa ñe'ẽlandu katupyry ha tembiapo aty rehegua. Sa'ive tekotevẽ aranduchauka térã tembiapo jevy pytyvõrã oñehundi haguére ára."
     },
     "i2": {
-      "tipo": "Mba’e vai (Kyta ñangarekova’erã)",
-      "indicador": "Mba’ekuaarã okañy, Mbo’ehao-gui ñemomombyry ha Tembiapo hetaiterei",
-      "descricao": "Peteĩteĩ ndaijeikéi ombyai concepto tuicháva, omboheta porandu umi unidad oúva hag̃uápe. Hetaiterei ndaijeikéi omondoro temimbo’e jepokuaa, omoheñói ñeñemomombyry ha jeikuaa’ỹ aty guive. Oñembyaty tembiapo ojapova’erãva ógape oñeme’ẽ hag̃ua ary mbo’esyry jerurekuéra."
+      "tipo": "Mba'e vai (kyta ñangarekova'erã)",
+      "indicador": "Mba'ekuaarã okañy, Mbo'ehao-gui ñemomombyry ha Tembiapo hetaiterei",
+      "descricao": "Peteĩteĩ ndaijeikéi ombyai ñemoimo'ã tuicháva, omboheta porandu umi unidad oúva hag̃uápe. Hetaiterei ndaijeikéi omondoro mbo'eharã jepokuaa, omoheñói ñeñemomombyry ha jeikuaa'ỹ aty guive. Oñembyaty tembiapo ojapova'erãva ógape oñeme'ẽ hag̃ua ary mbo'esyry jerurekuéra."
     }
   },
   "m5_capacidades_config": {
     "v1": {
-      "health_status": "Katupyry oñemyi pya’e ha oñembohovái hag̃ua sa’i oĩ oñeha’arõvagui ary rehehápe. Tesãi rehegua, kóva ohechauka sistema neuromuscular oñembohovái mbegue hag̃ua estímulo okapegua rehe ha corazón ha pulmón ndoikói porãiva tembiapo ipya’evépe, omoheñóivo kane’õ pya’e ha pytu vai ñani mbykýpe.",
-      "to_improve": "Temimbo’e tekotevẽ omoporãve ipy apyka ha ohupyty ritmo. Ñepyrũrã oñemotenondeva’erã tembiapo ñani mbo’eháramo (techapyrã, omopu’ã tenyhẽ ha pyta), ombojoaju pytu ha jyva jeku’e omyasãi hag̃ua ipy pya’e ha omoporãve hag̃ua condicionamiento aeróbico ypykue.",
-      "recommendation": "Romokyre’ỹ oñemokyre’ỹ hag̃ua ógape ñembosarái rupive oikotevẽva ñani pya’e, techapyrã pique-bandera, ñani mba’e jokoha ári korapýpe térã circuito aravo rehegua."
+      "health_status": "Katupyry oñemyi pya'e ha oñembohovái hag̃ua sa'i oĩ oñeha'arõvagui ary rehehápe. Tesãi rehegua, kóva ohechauka jetepyso ñemohenda oñembohovái mbegue hag̃ua estímulo okapegua rehe ha tymba'óga ha pytu renda ndoikói porãiva tembiapo ipya'evépe, omoheñóivo kane'õ pya'e ha pytu vai ñani mbykýpe.",
+      "to_improve": "Mbo'eharã tekotevẽ omoporãve ipy apyka ha ohupyty ñemboguata. Ñepyrũrã oñemotenondeva'erã tembiapo ñani mbo'eháramo (techapyrã, omopu'ã tenyhẽ ha pyta), ombojoaju pytu ha jyva jeku'e omyasãi hag̃ua ipy pya'e ha omoporãve hag̃ua pytu porã ñembokatupyry ypykue.",
+      "recommendation": "Romokyre'ỹ oñemokyre'ỹ hag̃ua ógape ñembosarái rupive oikotevẽva ñani pya'e, techapyrã piki-bandera, ñani mba'e jokoha ári korapýpe térã circuito aravo rehegua."
     },
     "v4": {
-      "health_status": "Tembiapo tetepy iporãitereíva. Temimbo’e oñembohovái pya’eterei ha oñemombopya’e tuicha hag̃uáme, ohupytývo pya’ekue tuichavéva ndahasýi. Sistema cardiorrespiratorio ha músculo esquelético ohechauka eficiencia metabólica yvate ha coordinación neuromuscular iporãiterei.",
-      "to_improve": "Ko’ág̃a peve, jahecha va’erã oñeñongatu hag̃ua ko tembiapo porã ha oñemboyke hag̃ua jeharu. Omoheñóivo mbarete ha pya’ekue hetaiterei, temimbo’e oñemotenondeva’erã ñemomba’e porã rehe entrenamiento mboyve ha tembiapo flexibilidad rehegua omombyta hag̃ua músculo, hu’ũ ha oñangarekóva estiramiento-gui.",
-      "recommendation": "Rojeroviahápe romomorã nde vigor físico iporãitereíva rehe. Roñeme’ẽta meme desafío intensidad yvategua mbo’epy kotýpe temimbo’e omokyre’ỹ ha hesãi hag̃ua."
+      "health_status": "Tembiapo tetepy iporãitereíva. mbo'eharã oñembohovái pya'eterei ha oñemombopya'e tuicha hag̃uáme, ohupytývo pya'ekue tuichavéva ndahasýi. ñemohenda tymba'óga ha pytu rehegua ha ñe'ẽndýi esquelético ohechauka eficiencia metabólica yvate ha coordinación neuromuscular iporãiterei.",
+      "to_improve": "Ko'ág̃a peve, jahecha va'erã oñeñongatu hag̃ua ko tembiapo porã ha oñemboyke hag̃ua jeharu. Omoheñóivo mbarete ha pya'ekue hetaiterei, mbo'eharã oñemotenondeva'erã ñemomba'e porã rehe ñembokatupyry mboyve ha tembiapo ñemboguata rehegua omombyta hag̃ua ñe'ẽndýi, hu'ũ ha oñangarekóva ñembopyahu-gui.",
+      "recommendation": "Rojeroviahápe romomorã nde vigor tete rehegua iporãitereíva rehe. Roñeme'ẽta meme ñe'ẽjovái mbaretete yvategua mbo'epy kotýpe mbo'eharã omokyre'ỹ ha hesãi hag̃ua."
     },
     "f3": {
-      "health_status": "Nivel hesãiva ha oĩ porãitereíva ary rehehápe. Temimbo’e ohechauka músculo tuicha ha tônus porã, omopytávo jeku’e impacto rehegua tekorosãme. Ko mbarete oñemba’apo peteĩ escudo ramo oñangareko hag̃ua articulación, omombopya’e metabolismo ha ome’ẽ postura corporal iporãitereíva.",
-      "to_improve": "Nivel tekorosãramo jepe, temimbo’e ikatu omoporãve mbarete joja (ojoja hag̃ua akatúa ha asu tetépe). Tembiapo peteĩ tenda reheguáva oipytyvõta omoporãve hag̃ua jeku’e ha ombosako’i tetepy ohasa hag̃ua nivel excelente-pe.",
-      "recommendation": "Rojeroviahápe romomorã nde pytyvõ físico iporãitereíva rehe. Rohapykuehóta ñemokyre’ỹ desafío reheguáva mbo’epy kotýpe roñongatu hag̃ua temimbo’e salud muscular tekopy."
+      "health_status": "Nivel hesãiva ha oĩ porãitereíva ary rehehápe. mbo'eharã ohechauka ñe'ẽndýi tuicha ha ñe'ẽndýi mbarete porã, omopytávo jeku'e jehechakuaa rehegua tekorosãme. Ko mbarete oñemba'apo peteĩ escudo ramo oñangareko hag̃ua tete joaju, omombopya'e metabolismo ha ome'ẽ jeku'e tete rehegua iporãitereíva.",
+      "to_improve": "Nivel tekorosãramo jepe, mbo'eharã ikatu omoporãve mbarete joja (ojoja hag̃ua akatúa ha asu tetépe). Tembiapo peteĩ tenda reheguáva oipytyvõta omoporãve hag̃ua jeku'e ha ombosako'i tetepy ohasa hag̃ua nivel iporãitereíva-pe.",
+      "recommendation": "Rojeroviahápe romomorã nde pytyvõ tete rehegua iporãitereíva rehe. Rohapykuehóta ñemokyre'ỹ ñe'ẽjovái reheguáva mbo'epy kotýpe roñongatu hag̃ua mbo'eharã tesãi ñe'ẽndýi tekopy."
     },
     "ab2": {
-      "health_status": "Temimbo’e oguereko mbarete abdominal ypykue, ha katu kane’õ pya’eterei oñeha’ãvo omantene esfuerzo. Ko kane’õ pya’e ojapo chupe oñepyrũvo omyengovia jeku’e tetepy ambue hendáre, omomboguývo tronco ñani ha ñembosarái aja.",
-      "to_improve": "Oñemotenondeva’erã oñembohetave mbeguekatúpe aravo tembiapo jejapo rehegua. Oñembokatupyry hag̃ua jepive ha ritmo repetición rehegua oipytyvõta omopyta hag̃ua tronco ha oñangareko hag̃ua espinazo pukukueve.",
-      "recommendation": "Romokyre’ỹ ñemokyre’ỹ ára ha ára ógape desafío pya’e rupive, techapyrã ñembosarái oiporúva posición prancha térã tetyma jehupi."
+      "health_status": "Mbo'eharã oguereko mbarete abdominal ypykue, ha katu kane'õ pya'eterei oñeha'ãvo omantene mbarete. Ko kane'õ pya'e ojapo chupe oñepyrũvo omyengovia jeku'e tetepy ambue hendáre, omomboguývo tronco ñani ha ñembosarái aja.",
+      "to_improve": "Oñemotenondeva'erã oñembohetave mbeguekatúpe aravo tembiapo jejapo rehegua. Oñembokatupyry hag̃ua jepive ha ñemboguata repetición rehegua oipytyvõta omopyta hag̃ua tronco ha oñangareko hag̃ua espínago pukukueve.",
+      "recommendation": "Romokyre'ỹ ñemokyre'ỹ ára ha ára ógape ñe'ẽjovái pya'e rupive, techapyrã ñembosarái oiporúva posición prancha térã tetyma jehupi."
     },
     "i3": {
-      "health_status": "Nivel hesãiva ha oĩ porãva. Temimbo’e ohechauka ñembohovái neuromuscular porã ha ikatu oñemoĩ gravedad ári ndahasýi. Ko tekotee oñangareko espinazo rehe ha omomichĩ impacto tekorosãme ñembosarái ha ñani aja.",
-      "to_improve": "Nivel tekorosãramo oĩ jepe, temimbo’e ikatu omoporãve estabilidad oguejy jave. Ñembokatupyry oñemotenondeva’erã joja rehe omopu’ã hag̃ua nivel porãgui excelente-pe.",
-      "recommendation": "Rojeroviahápe romomorã temimbo’e tembiapo físico porã rehe. Rombohasy meme temimbo’e mbo’epy kotýpe roñongatu hag̃ua ko excelencia estándar."
+      "health_status": "Nivel hesãiva ha oĩ porãva. mbo'eharã ohechauka ñembohovái neuromuscular porã ha ikatu oñemoĩ hasýkue ári ndahasýi. Ko tekotee oñangareko espínago rehe ha omomichĩ jehechakuaa tekorosãme ñembosarái ha ñani aja.",
+      "to_improve": "Nivel tekorosãramo oĩ jepe, mbo'eharã ikatu omoporãve estabilidad oguejy jave. Ñembokatupyry oñemotenondeva'erã joja rehe omopu'ã hag̃ua nivel porãgui iporãitereíva-pe.",
+      "recommendation": "Rojeroviahápe romomorã mbo'eharã tembiapo tete rehegua porã rehe. Rombohasy meme mbo'eharã mbo'epy kotýpe roñongatu hag̃ua ko excelencia hekopete."
     },
     "i1": {
-      "health_status": "Impulso índice sa’i oĩ oñeha’arõvagui ary rehehápe. Kóva ohechauka potencia mbovy ha músculo tetyma ndoikói porãiva. Tesãi rehegua, kóva ombogue impacto ñemomichĩ ha omombegue articulación tenyhẽ ha pyapy rehegua.",
-      "to_improve": "Temimbo’e tekotevẽ pya’e omokakuaa mbarete ñepyrũrã. Tekotevẽ oñemyatyrõ postura ñekuã rehegua ha mecánica popo rehegua oñemboyke hag̃ua jeharu tembiapo hasy’ỹvape ára ha ára-pe.",
-      "recommendation": "Romokyre’ỹ peñepytyvõ tembiapo dinámico rehe ógape, techapyrã popo soga ári ha ñembosarái popo rehegua."
+      "health_status": "Impulso papapy sa'i oĩ oñeha'arõvagui ary rehehápe. Kóva ohechauka mbaretete mbovy ha ñe'ẽndýi tetyma ndoikói porãiva. Tesãi rehegua, kóva ombogue jehechakuaa ñemomichĩ ha omombegue tete joaju tenyhẽ ha pyapy rehegua.",
+      "to_improve": "Mbo'eharã tekotevẽ pya'e omokakuaa mbarete ñepyrũrã. Tekotevẽ oñemyatyrõ jeku'e ñekuã rehegua ha mecánica popo rehegua oñemboyke hag̃ua jeharu tembiapo hasy'ỹvape ára ha ára-pe.",
+      "recommendation": "Romokyre'ỹ peñepytyvõ tembiapo dinámico rehe ógape, techapyrã popo soga ári ha ñembosarái popo rehegua."
     },
     "v3": {
-      "health_status": "Nivel hesãiva ha oĩ porãitereíva ary rehehápe. Temimbo’e oñembohovái pya’e estímulo-pe ha omantene pya’ekue oñemyi hag̃ua iporãitereíva. Ko tekotee ohechauka corazón mbarete, capacidad respiratoria porã ha músculo oñembokatupyrýva, omokyre’ỹ energía poru ha tekove mbarete ára ha ára.",
-      "to_improve": "Rango tekorosã ha hesãivápe oĩ jepe, temimbo’e ikatu omba’apo omantene hag̃ua ko pya’ekue mombyryve michĩmi. Oñemotenondeva’erã oñembokatupyry resistencia velocidad rehegua ani hag̃ua osaite rendimiento tembiapo pahápe.",
-      "recommendation": "Rojeroviahápe romomorã nde vigor físico iporãitereíva rehe. Roñeme’ẽta meme desafío intensidad yvategua mbo’epy kotýpe temimbo’e omokyre’ỹ ha hesãi hag̃ua."
+      "health_status": "Nivel hesãiva ha oĩ porãitereíva ary rehehápe. mbo'eharã oñembohovái pya'e estímulo-pe ha omantene pya'ekue oñemyi hag̃ua iporãitereíva. Ko tekotee ohechauka tymba'óga mbarete, capacidad respiratoria porã ha ñe'ẽndýi oñembokatupyrýva, omokyre'ỹ mbarete poru ha tekove mbarete ára ha ára.",
+      "to_improve": "Rango tekorosã ha hesãivápe oĩ jepe, mbo'eharã ikatu omba'apo omantene hag̃ua ko pya'ekue mombyryve michĩmi. Oñemotenondeva'erã oñembokatupyry kane'õ'ỹ velocidad rehegua ani hag̃ua osaite rendimiento tembiapo pahápe.",
+      "recommendation": "Rojeroviahápe romomorã nde vigor tete rehegua iporãitereíva rehe. Roñeme'ẽta meme ñe'ẽjovái mbaretete yvategua mbo'epy kotýpe mbo'eharã omokyre'ỹ ha hesãi hag̃ua."
     },
     "ab3": {
-      "health_status": "Nivel hesãiva ha oĩva estándar oñeha’arõvape. Temimbo’e omopyta porã tronco, upéva ome’ẽ estabilidad corporal, omoporãve joja ha oñangareko tenda lumbar rehe impacto popo ha ñani omoheñóiva rehe.",
-      "to_improve": "Nivel tekorosãramo jepe, temimbo’e ikatu ombojoja entrenamiento oñemba’apóvo abdominal iñambuéva rehe (techapyrã tenda yke/oblíqua). Kóva omoporãvéta tronco jere deporte-pe ha omombaretevéta tenondegua nivel excelente-pe guarã.",
-      "recommendation": "Rojeroviahápe romomorã ne salud física iporãitereíva rehe. Romantene meme ñemokyre’ỹ mbo’epy kotýpe roñongatu hag̃ua ko pytyvõ postural porãite."
+      "health_status": "Nivel hesãiva ha oĩva hekopete oñeha'arõvape. mbo'eharã omopyta porã tronco, upéva ome'ẽ estabilidad tete rehegua, omoporãve joja ha oñangareko tenda lumbar rehe jehechakuaa popo ha ñani omoheñóiva rehe.",
+      "to_improve": "Nivel tekorosãramo jepe, mbo'eharã ikatu ombojoja ñembokatupyry oñemba'apóvo abdominal iñambuéva rehe (techapyrã tenda yke/oblíqua). Kóva omoporãvéta tronco jere jetepyso-pe ha omombaretevéta tenondegua nivel iporãitereíva-pe guarã.",
+      "recommendation": "Rojeroviahápe romomorã ne tesãi tetepykuaa iporãitereíva rehe. Romantene meme ñemokyre'ỹ mbo'epy kotýpe roñongatu hag̃ua ko pytyvõ postural porãite."
     },
     "v2": {
-      "health_status": "Temimbo’e ikatu oñani ritmo oñemantene porãva rehe, ha katu oguereko apañuãi oñemombopya’e pya’e hag̃ua ñepyrũme térã omoambue hag̃ua ritmo sapy’a. Salud cardiovascular omopyta esfuerzo, ha katu tetyma músculo oiporu energía hetaiterei ndoikói rupi coordinación porã ha mbarete ipy apyka rehegua.",
-      "to_improve": "Oñemotenondeva’erã oñeheta aceleración ha técnica explosión rehegua. Ñe’ẽporã oñembokatupyry ñani mbyky pya’e rehe pytu tuicháva pa’ũme, avei ñembosarái oñembohovái pya’e hag̃ua, ombo’évo tetepy omopu’ã hag̃ua fibra muscular ipya’éva porãve.",
-      "recommendation": "Romokyre’ỹ oñemokyre’ỹ hag̃ua ógape ñembosarái rupive oikotevẽva ñani pya’e, techapyrã pique-bandera, ñani mba’e jokoha ári korapýpe térã circuito aravo rehegua."
+      "health_status": "Mbo'eharã ikatu oñani ñemboguata oñemantene porãva rehe, ha katu oguereko apañuãi oñemombopya'e pya'e hag̃ua ñepyrũme térã omoambue hag̃ua ñemboguata sapy'a. tesãi tymba'óga ha tuguy rape rehegua omopyta mbarete, ha katu tetyma ñe'ẽndýi oiporu mbarete hetaiterei ndoikói rupi coordinación porã ha mbarete ipy apyka rehegua.",
+      "to_improve": "Oñemotenondeva'erã oñeheta aceleración ha técnika mbaretete ñepyrũ rehegua. Ñe'ẽporã oñembokatupyry ñani mbyky pya'e rehe pytu tuicháva pa'ũme, avei ñembosarái oñembohovái pya'e hag̃ua, ombo'évo tetepy omopu'ã hag̃ua fibra ñe'ẽndýi ipya'éva porãve.",
+      "recommendation": "Romokyre'ỹ oñemokyre'ỹ hag̃ua ógape ñembosarái rupive oikotevẽva ñani pya'e, techapyrã piki-bandera, ñani mba'e jokoha ári korapýpe térã circuito aravo rehegua."
     },
     "a2": {
-      "health_status": "Temimbo’e ikatu omoambue hendape, ha katu okañy joja térã pya’ekue jeku’e aja. Oguereko ypykue motriz oikóva, ha katu ndoikói porãiva articulación omoambue hag̃ua tete pohýi peteĩ tendágui ambuépe hesakãme, oiporúvo energía hetave oñeikotevẽvagui.",
-      "to_improve": "Oñemotenondeva’erã oñemoporãve técnica. Ñe’ẽporã oñembokatupyry circuito cono ha escada agilidad rehegua omoporãve hag̃ua py apyka (footwork) ha jeku’e ñemoambue pya’e, ombotuichávo articulación tekorosã.",
-      "recommendation": "Romokyre’ỹ oñembosarái hag̃ua ógape ñembosarái ypykue tape rehegua, techapyrã ñañeha’ã, queimado térã circuito zigue-zague ojehaíva yvýpe."
+      "health_status": "Mbo'eharã ikatu omoambue hendape, ha katu okañy joja térã pya'ekue jeku'e aja. Oguereko ypykue motriz oikóva, ha katu ndoikói porãiva tete joaju omoambue hag̃ua tete pohýi peteĩ tendágui ambuépe hesakãme, oiporúvo mbarete hetave oñeikotevẽvagui.",
+      "to_improve": "Oñemotenondeva'erã oñemoporãve técnika. Ñe'ẽporã oñembokatupyry circuito cono ha escada agilidad rehegua omoporãve hag̃ua py apyka (footwork) ha jeku'e ñemoambue pya'e, ombotuichávo tete joaju tekorosã.",
+      "recommendation": "Romokyre'ỹ oñembosarái hag̃ua ógape ñembosarái ypykue tape rehegua, techapyrã ñañeha'ã, keimado térã circuito sige-sague ojehaíva yvýpe."
     },
     "ab4": {
-      "health_status": "Tembiapo tetepy iporãitereíva. Temimbo’e oguereko resistencia muscular iporãitereíva tete mbyte rehegua. Kóva omoheñói postura iporãva, jeku’e eficiencia tuichaitereíva ha espinazo ñangareko tuichavéva oimeraẽ pohýi térã esfuerzo-pe.",
-      "to_improve": "Ko’ág̃a peve, jahecha va’erã oñemantene hag̃ua estándar. Ñe’ẽporã oñembojoaju abdominal mbarete tembiapo flexibilidad ha alongamiento cadena posterior rehegua ndive ani hag̃ua oĩ rigidez muscular.",
-      "recommendation": "Rojeroviahápe romomorã ne salud física iporãitereíva rehe. Romantene meme ñemokyre’ỹ mbo’epy kotýpe roñongatu hag̃ua ko pytyvõ postural porãite."
+      "health_status": "Tembiapo tetepy iporãitereíva. mbo'eharã oguereko kane'õ'ỹ ñe'ẽndýi iporãitereíva tete mbyte rehegua. Kóva omoheñói jeku'e iporãva, jeku'e eficiencia tuichaitereíva ha espínago ñangareko tuichavéva oimeraẽ pohýi térã mbarete-pe.",
+      "to_improve": "Ko'ág̃a peve, jahecha va'erã oñemantene hag̃ua hekopete. Ñe'ẽporã oñembojoaju abdominal mbarete tembiapo ñemboguata ha ñembohetave tete kupy gotyo rehegua ndive ani hag̃ua oĩ ñe'ẽndýi hatã.",
+      "recommendation": "Rojeroviahápe romomorã ne tesãi tetepykuaa iporãitereíva rehe. Romantene meme ñemokyre'ỹ mbo'epy kotýpe roñongatu hag̃ua ko pytyvõ postural porãite."
     },
     "i2": {
-      "health_status": "Temimbo’e oguereko mbarete ypykue, ha katu ndoipóri explosión muscular. Tembiapo físico iñambue ha oiporu energía hetave oñeikotevẽvagui ojapo hag̃ua popo. Tesãi estructura oĩ porã, ha katu kane’õ pya’e circuito-pe.",
-      "to_improve": "Oñemotenondeva’erã coordinación jyva ha tetyma jeku’e apytépe popo aja. Tembiapo popo mbykýva je’ejey oipytyvõta omoambue hag̃ua mbarete ko’áĝagua potencia añetévape.",
-      "recommendation": "Romokyre’ỹ peñepytyvõ tembiapo dinámico rehe ógape, techapyrã popo soga ári ha ñembosarái popo rehegua."
+      "health_status": "Mbo'eharã oguereko mbarete ypykue, ha katu ndoipóri ñe'ẽndýi mbaretete ñepyrũ. Tembiapo tete rehegua iñambue ha oiporu mbarete hetave oñeikotevẽvagui ojapo hag̃ua popo. Tesãi ñemohenda oĩ porã, ha katu kane'õ pya'e circuito-pe.",
+      "to_improve": "Oñemotenondeva'erã coordinación jyva ha tetyma jeku'e apytépe popo aja. Tembiapo popo mbykýva je'ejey oipytyvõta omoambue hag̃ua mbarete ko'áĝagua mbaretete añetévape.",
+      "recommendation": "Romokyre'ỹ peñepytyvõ tembiapo dinámico rehe ógape, techapyrã popo soga ári ha ñembosarái popo rehegua."
     },
     "a4": {
-      "health_status": "Tembiapo tetepy iporãitereíva. Temimbo’e ohechauka pya’ekue oñembohovái hag̃ua hechapyrã ha centro de gravedad jepoko iporãitereíva omoambuévo hendape. Isistema propioceptivo (tetepy katupyry oikuaa hag̃ua oñeĩha hese) oikói porãiterei, ome’ẽvo ñangareko tuichavéva jeharu-gui.",
-      "to_improve": "Ko’ág̃a peve, jahecha va’erã oñemantene hag̃ua ko tembiapo porã. Ñe’ẽporã oñembojoaju jeku’e agilidad rehegua decisión jejapy hasy ha mba’e jeporu (techapyrã pelota) ndive, ombosako’i hag̃ua temimbo’e rendimiento yvate ñembosarái añetépe g̃uarã.",
-      "recommendation": "Rojeroviahápe romomorã agilidad ha katupyry motriz iporãitereíva rehe. Rombohasy meme temimbo’e dinámica hasy reheguáva ndive mbo’epy kotýpe."
+      "health_status": "Tembiapo tetepy iporãitereíva. mbo'eharã ohechauka pya'ekue oñembohovái hag̃ua hechapyrã ha hasýkue jepoko renda jepoko iporãitereíva omoambuévo hendape. Isistema propioceptivo (tetepy katupyry oikuaa hag̃ua oñeĩha hese) oikói porãiterei, ome'ẽvo ñangareko tuichavéva jeharu-gui.",
+      "to_improve": "Ko'ág̃a peve, jahecha va'erã oñemantene hag̃ua ko tembiapo porã. Ñe'ẽporã oñembojoaju jeku'e agilidad rehegua ñemoneí jejapy hasy ha mba'e jeporu (techapyrã pelota) ndive, ombosako'i hag̃ua mbo'eharã rendimiento yvate ñembosarái añetépe g̃uarã.",
+      "recommendation": "Rojeroviahápe romomorã agilidad ha katupyry motriz iporãitereíva rehe. Rombohasy meme mbo'eharã dinámica hasy reheguáva ndive mbo'epy kotýpe."
     },
     "i4": {
-      "health_status": "Tembiapo tetepy iporãitereíva. Temimbo’e oguereko potencia iporãitereíva tetyma rehegua ha coordinación motriz oĩ porãiterei. Sistema musculoesquelético oñangarekóva ha oĩmbáma desafío físico intensidad yvate hag̃ua.",
-      "to_improve": "Ko’ág̃a peve, oñemotenondeva’erã oñemantene hag̃ua ko katupyry. Ñe’ẽporã oñeheta flexibilidad ani hag̃ua potencia yvate omoheñói rigidez muscular.",
-      "recommendation": "Rojeroviahápe romomorã temimbo’e tembiapo físico porã rehe. Rombohasy meme temimbo’e mbo’epy kotýpe roñongatu hag̃ua ko excelencia estándar."
+      "health_status": "Tembiapo tetepy iporãitereíva. mbo'eharã oguereko mbaretete iporãitereíva tetyma rehegua ha coordinación motriz oĩ porãiterei. ñe'ẽndýi ha kangue ñemohenda oñangarekóva ha oĩmbáma ñe'ẽjovái tete rehegua mbaretete yvate hag̃ua.",
+      "to_improve": "Ko'ág̃a peve, oñemotenondeva'erã oñemantene hag̃ua ko katupyry. Ñe'ẽporã oñeheta ñemboguata ani hag̃ua mbaretete yvate omoheñói ñe'ẽndýi hatã.",
+      "recommendation": "Rojeroviahápe romomorã mbo'eharã tembiapo tete rehegua porã rehe. Rombohasy meme mbo'eharã mbo'epy kotýpe roñongatu hag̃ua ko excelencia hekopete."
     },
     "ab1": {
-      "health_status": "Resistencia tenda abdominal rehegua sa’i oĩ oñeha’arõvagui. Core (tetepy gravedad mbyte) kangy ombyai directamente postura, ombohykue espinazo lumbar ha ombotuicha riesgo hasy atukupe rehegua ha desvío postural medio plazo-pe.",
-      "to_improve": "Temimbo’e tekotevẽ oñepyrũ pya’e omombarete hag̃ua músculo mbyte rehegua. Tekotevẽ oñemotenonde abdominal myendy tembiapo estático simple rupive, oñemyatyrõvo pytu ha oñemboykévo ajúra ñekyty ojapokuévo.",
-      "recommendation": "Romokyre’ỹ ñemokyre’ỹ ára ha ára ógape desafío pya’e rupive, techapyrã ñembosarái oiporúva posición prancha térã tetyma jehupi."
+      "health_status": "Kane'õ'ỹ tenda abdominal rehegua sa'i oĩ oñeha'arõvagui. Mbyte (tetepy hasýkue mbyte) kangy ombyai directamente jeku'e, ombohykue espínago lumbar ha ombotuicha riesgo hasy atukupe rehegua ha jeku'e ñemboheko'ỹ medio plazo-pe.",
+      "to_improve": "Mbo'eharã tekotevẽ oñepyrũ pya'e omombarete hag̃ua ñe'ẽndýi mbyte rehegua. Tekotevẽ oñemotenonde abdominal myendy tembiapo estático simple rupive, oñemyatyrõvo pytu ha oñemboykévo ajúra ñekyty ojapokuévo.",
+      "recommendation": "Romokyre'ỹ ñemokyre'ỹ ára ha ára ógape ñe'ẽjovái pya'e rupive, techapyrã ñembosarái oiporúva posición prancha térã tetyma jehupi."
     },
     "f1": {
-      "health_status": "Katupyry oñemoĩ hag̃ua mba’e pohýi ári ha oñemopyta hag̃ua ijehe sa’i oĩ oñeha’arõvagui. Tesãi rehegua, tônus muscular’ỹ omoĩ pohýi tuicha kangue ha ligamento ári, avei omoheñói kane’õ tuicha tembiapo hasy’ỹvape, techapyrã ogueraha hag̃ua mochila térã oguapy porã mbo’ehao mesa ári.",
-      "to_improve": "Temimbo’e tekotevẽ pya’e omokakuaa mbarete ypykue. Ñepyrũrã oñemotenondeva’erã tembiapo calisténico simple rehe (oiporúva ijehe pohýi), techapyrã jeñopytyvõ tenyhẽme yvýpe ha ñekuã isãsóva oñembohekopyahúva, oñemotenondévo jejapo hekopete rehe ohupyty hag̃ua masa magra ñangarekóva.",
-      "recommendation": "Romokyre’ỹ tembiapo mbarete rehegua vy’ápe ógape, techapyrã ñorairõ sãme, jupi ñembosarái renda parquinho-pe (jaula) térã ñembosarái ogueraha hag̃ua mba’e ivevúi."
+      "health_status": "Katupyry oñemoĩ hag̃ua mba'e pohýi ári ha oñemopyta hag̃ua ijehe sa'i oĩ oñeha'arõvagui. Tesãi rehegua, ñe'ẽndýi mbarete ñe'ẽndýi'ỹ omoĩ pohýi tuicha kangue ha ligamento ári, avei omoheñói kane'õ tuicha tembiapo hasy'ỹvape, techapyrã ogueraha hag̃ua mochila térã oguapy porã mbo'ehao mesa ári.",
+      "to_improve": "Mbo'eharã tekotevẽ pya'e omokakuaa mbarete ypykue. Ñepyrũrã oñemotenondeva'erã tembiapo calisténico simple rehe (oiporúva ijehe pohýi), techapyrã jeñopytyvõ tenyhẽme yvýpe ha ñekuã isãsóva oñembohekopyahúva, oñemotenondévo jejapo hekopete rehe ohupyty hag̃ua ñe'ẽndýi porã ñangarekóva.",
+      "recommendation": "Romokyre'ỹ tembiapo mbarete rehegua vy'ápe ógape, techapyrã ñorairõ sãme, jupi ñembosarái pymare'ã ñembosarái renda-pe (jaula) térã ñembosarái ogueraha hag̃ua mba'e ivevúi."
     },
     "f2": {
-      "health_status": "Temimbo’e oguereko mbarete oikóva tembiapo jepivegua hag̃ua, ha katu ojavy térã okañy hete joaju oñeme’ẽ jave esfuerzo ipukuvéva michĩmi. Tesãi estructura oĩ porã, ha katu músculo omopytáva kane’õ pya’e, omoheñóivo descompensación postural ñembosarái aja.",
-      "to_improve": "Oñemotenondeva’erã oñembohetave mbeguekatúpe resistencia mbarete rehegua. Ñe’ẽporã oñemoinge circuito funcional mba’e michĩva ndive (techapyrã cinta elástica térã pelota medicinal ivevúi) omombarete hag̃ua estructura muscular ha oñangareko hag̃ua sistema esquelético rehe.",
-      "recommendation": "Romokyre’ỹ tembiapo mbarete rehegua vy’ápe ógape, techapyrã ñorairõ sãme, jupi ñembosarái renda parquinho-pe (jaula) térã ñembosarái ogueraha hag̃ua mba’e ivevúi."
+      "health_status": "Mbo'eharã oguereko mbarete oikóva tembiapo jepivegua hag̃ua, ha katu ojavy térã okañy hete joaju oñeme'ẽ jave mbarete ipukuvéva michĩmi. Tesãi ñemohenda oĩ porã, ha katu ñe'ẽndýi omopytáva kane'õ pya'e, omoheñóivo descompensación postural ñembosarái aja.",
+      "to_improve": "Oñemotenondeva'erã oñembohetave mbeguekatúpe kane'õ'ỹ mbarete rehegua. Ñe'ẽporã oñemoinge circuito funcional mba'e michĩva ndive (techapyrã cinta elástika térã pelota medicinal ivevúi) omombarete hag̃ua ñemohenda ñe'ẽndýi ha oñangareko hag̃ua kangue ñemohenda rehe.",
+      "recommendation": "Romokyre'ỹ tembiapo mbarete rehegua vy'ápe ógape, techapyrã ñorairõ sãme, jupi ñembosarái pymare'ã ñembosarái renda-pe (jaula) térã ñembosarái ogueraha hag̃ua mba'e ivevúi."
     },
     "a1": {
-      "health_status": "Katupyry oñemoambue pya’e hag̃ua hendape sa’i oĩ oñeha’arõvagui. Temimbo’e oguereko apañuãi opyta ha oñemboheko jey hag̃ua tetepy oñangarekóvo. Tesãi rehegua, agilidad ha coordinación’ỹ ombotuicha tuicha riesgo je’a, pyapy ñemongu’e ha ligamento tenyhẽ rehegua jeharu jeku’e sapy’aitépe.",
-      "to_improve": "Temimbo’e tekotevẽ pya’e omokakuaa oñembohovái aravo ha oikuaa hag̃ua ijetepy. Ñepyrũrã oñemotenondeva’erã tembiapo oñembopya’egue ñemomichĩ rehegua oñangarekóvo ha tembiapo yke gotyo ipy apyka rehegua, oikuaávo omboguejy hag̃ua gravedad mbyte ohupyty hag̃ua estabilidad.",
-      "recommendation": "Romokyre’ỹ oñembosarái hag̃ua ógape ñembosarái ypykue tape rehegua, techapyrã ñañeha’ã, queimado térã circuito zigue-zague ojehaíva yvýpe."
+      "health_status": "Katupyry oñemoambue pya'e hag̃ua hendape sa'i oĩ oñeha'arõvagui. mbo'eharã oguereko apañuãi opyta ha oñemboheko jey hag̃ua tetepy oñangarekóvo. Tesãi rehegua, agilidad ha coordinación'ỹ ombotuicha tuicha riesgo je'a, pyapy ñemongu'e ha ligamento tenyhẽ rehegua jeharu jeku'e sapy'aitépe.",
+      "to_improve": "Mbo'eharã tekotevẽ pya'e omokakuaa oñembohovái aravo ha oikuaa hag̃ua ijetepy. Ñepyrũrã oñemotenondeva'erã tembiapo oñembopya'egue ñemomichĩ rehegua oñangarekóvo ha tembiapo yke gotyo ipy apyka rehegua, oikuaávo omboguejy hag̃ua hasýkue mbyte ohupyty hag̃ua estabilidad.",
+      "recommendation": "Romokyre'ỹ oñembosarái hag̃ua ógape ñembosarái ypykue tape rehegua, techapyrã ñañeha'ã, keimado térã circuito sige-sague ojehaíva yvýpe."
     },
     "f4": {
-      "health_status": "Tembiapo tetepy iporãitereíva. Temimbo’e ohechauka katupyry tuichaitereíva omoheñói hag̃ua tensión muscular ha potencia. Isistema esquelético oñangareko porãiterei jeharu impacto-gui, ha músculo ohechauka eficiencia metabólica porã ha katupyry oñembojevy hag̃ua.",
-      "to_improve": "Ko’ág̃a peve, jahecha va’erã oñemantene puku hag̃ua ko tembiapo porã. Ñe’ẽporã oñembojoaju entrenamiento mbarete tuichavéva sesión alongamiento ha flexibilidad mbarete reheguáva ndive, oñemboykévo músculo ñemombyky ha articulación jeku’e tuichakue ñehundi.",
-      "recommendation": "Rojeroviahápe romomorã nde pytyvõ físico iporãitereíva rehe. Rohapykuehóta ñemokyre’ỹ desafío reheguáva mbo’epy kotýpe roñongatu hag̃ua temimbo’e salud muscular tekopy."
+      "health_status": "Tembiapo tetepy iporãitereíva. mbo'eharã ohechauka katupyry tuichaitereíva omoheñói hag̃ua ñe'ẽndýi ñemongu'e ha mbaretete. Isistema esquelético oñangareko porãiterei jeharu jehechakuaa-gui, ha ñe'ẽndýi ohechauka eficiencia metabólica porã ha katupyry oñembojevy hag̃ua.",
+      "to_improve": "Ko'ág̃a peve, jahecha va'erã oñemantene puku hag̃ua ko tembiapo porã. Ñe'ẽporã oñembojoaju ñembokatupyry mbarete tuichavéva sesión ñembohetave ha ñemboguata mbarete reheguáva ndive, oñemboykévo ñe'ẽndýi ñemombyky ha tete joaju jeku'e tuichakue ñehundi.",
+      "recommendation": "Rojeroviahápe romomorã nde pytyvõ tete rehegua iporãitereíva rehe. Rohapykuehóta ñemokyre'ỹ ñe'ẽjovái reheguáva mbo'epy kotýpe roñongatu hag̃ua mbo'eharã tesãi ñe'ẽndýi tekopy."
     },
     "a3": {
-      "health_status": "Nivel hesãiva ha oĩ porãitereíva ary rehehápe. Temimbo’e ohechauka tetepy jepoko porã, ikatu opyta ha omoambue hendape tekorosã ha estabilidad reheve. Ko agilidad oñangareko articulación pohýi hetaiterei-gui ha ohechauka sistema neuromuscular oñembokakuaáva porã.",
-      "to_improve": "Nivel tekorosã ha ñangarekóramo jepe, temimbo’e ikatu omoporãve jeku’e eficiencia omomichĩvo aravo oñepy’amongeta mboyve omoambue hag̃ua hendape. Oñemoinge estímulo jehecha térã ñehendu sapy’agua oipytyvõta omoporãve hag̃ua oñembohovái aravo.",
-      "recommendation": "Rojeroviahápe romomorã agilidad ha katupyry motriz iporãitereíva rehe. Rombohasy meme temimbo’e dinámica hasy reheguáva ndive mbo’epy kotýpe."
+      "health_status": "Nivel hesãiva ha oĩ porãitereíva ary rehehápe. mbo'eharã ohechauka tetepy jepoko porã, ikatu opyta ha omoambue hendape tekorosã ha estabilidad reheve. Ko agilidad oñangareko tete joaju pohýi hetaiterei-gui ha ohechauka jetepyso ñemohenda oñembokakuaáva porã.",
+      "to_improve": "Nivel tekorosã ha ñangarekóramo jepe, mbo'eharã ikatu omoporãve jeku'e eficiencia omomichĩvo aravo oñepy'amongeta mboyve omoambue hag̃ua hendape. Oñemoinge estímulo jehecha térã ñehendu sapy'agua oipytyvõta omoporãve hag̃ua oñembohovái aravo.",
+      "recommendation": "Rojeroviahápe romomorã agilidad ha katupyry motriz iporãitereíva rehe. Rombohasy meme mbo'eharã dinámica hasy reheguáva ndive mbo'epy kotýpe."
     }
   },
   "m6_modalidades_direcionamento": {
     "m6_v1": {
-      "valencias": "Po’i, Agilidad ha Abdomen.",
-      "condition": "Nivel Porã / Iporãitereíva Po’i ha Agilidad-pe",
-      "report": "Ojehechakuaa po’i katupyry yvate ha aravo iporãitereíva agilidad ñeha’ãme, oñembohovái porãiterei estímulo oikotevẽva ñembohovái pya’e rehe."
+      "valencias": "Po'i, Agilidad ha py'ã.",
+      "condition": "Nivel Porã / Iporãitereíva Po'i ha Agilidad-pe",
+      "report": "Ojehechakuaa po'i katupyry yvate ha aravo iporãitereíva agilidad ñeha'ãme, oñembohovái porãiterei estímulo oikotevẽva ñembohovái pya'e rehe."
     },
     "m6_a1": {
-      "valencias": "Pya’ekue, Po’i ha Mbarete Muscular.",
-      "condition": "Nivel Porã / Iporãitereíva Pya’ekue ha Po’i-pe",
-      "report": "Ohechauka índice iporãitereíva pya’ekue ha po’i rehegua ñeha’ãme. Ko ñembojoaju ohechauka katupyry porã explosión ha potencia física-pe g̃uarã ko modalidad-pe."
+      "valencias": "Pya'ekue, Po'i ha Mbarete ñe'ẽndýi.",
+      "condition": "Nivel Porã / Iporãitereíva Pya'ekue ha Po'i-pe",
+      "report": "Ohechauka papapy iporãitereíva pya'ekue ha po'i rehegua ñeha'ãme. Ko ñembojoaju ohechauka katupyry porã mbaretete ñepyrũ ha mbaretete tetepykuaa-pe g̃uarã ko modalidad-pe."
     },
     "m6_f1": {
-      "valencias": "Pya’ekue, Agilidad ha Po’i.",
-      "condition": "Nivel Porã / Iporãitereíva Pya’ekue ha Agilidad-pe",
-      "report": "Ohechauka tembiapo iporãitereíva pya’ekue ha agilidad ñeha’ãme. Ohechauka hasy’ỹ oñemombopya’e ha omoambue hendape pya’e hag̃ua."
+      "valencias": "Pya'ekue, Agilidad ha Po'i.",
+      "condition": "Nivel Porã / Iporãitereíva Pya'ekue ha Agilidad-pe",
+      "report": "Ohechauka tembiapo iporãitereíva pya'ekue ha agilidad ñeha'ãme. Ohechauka hasy'ỹ oñemombopya'e ha omoambue hendape pya'e hag̃ua."
     },
     "m6_g1": {
-      "valencias": "Abdomen, Mbarete Muscular ha Agilidad.",
-      "condition": "Nivel Porã / Iporãitereíva Abdomen ha Mbarete Muscular-pe",
-      "report": "Ohechauka resultado iporãiterei ñeha’ã mbarete ha resistencia abdominal rehegua. Ko ypykue ome’ẽ pytyvõ iporãitereíva, mbaretépe ha tetepy jepoko oñemopytáva."
+      "valencias": "Py'ã, Mbarete ñe'ẽndýi ha Agilidad.",
+      "condition": "Nivel Porã / Iporãitereíva py'ã ha Mbarete ñe'ẽndýi-pe",
+      "report": "Ohechauka jehupyty iporãiterei ñeha'ã mbarete ha kane'õ'ỹ abdominal rehegua. Ko ypykue ome'ẽ pytyvõ iporãitereíva, mbaretépe ha tetepy jepoko oñemopytáva."
     },
     "m6_b1": {
-      "valencias": "Po’i, Agilidad ha Pya’ekue.",
-      "condition": "Nivel Porã / Iporãitereíva Po’i ha Pya’ekue-pe",
-      "report": "Ojehechakuaa tembiapo iporãitereíva po’i ha pya’ekue ñeha’ãme. Ohechauka katupyry ojapo hag̃ua ñepyrũ pya’e ha popo yvate oikóva porã."
+      "valencias": "Po'i, Agilidad ha Pya'ekue.",
+      "condition": "Nivel Porã / Iporãitereíva Po'i ha Pya'ekue-pe",
+      "report": "Ojehechakuaa tembiapo iporãitereíva po'i ha pya'ekue ñeha'ãme. Ohechauka katupyry ojapo hag̃ua ñepyrũ pya'e ha popo yvate oikóva porã."
     },
     "m6_n1": {
-      "valencias": "Mbarete Muscular, Abdomen ha Pya’ekue.",
-      "condition": "Nivel Porã / Iporãitereíva Mbarete Muscular ha Abdomen-pe",
-      "report": "Ohechauka nivel iporãiterei mbarete muscular ha resistencia abdominal ñeha’ãme. Ko estructura física ome’ẽ pytyvõ iporãitereíva omantene hag̃ua tetepy mbarete ha potente."
+      "valencias": "Mbarete ñe'ẽndýi, py'ã ha Pya'ekue.",
+      "condition": "Nivel Porã / Iporãitereíva Mbarete ñe'ẽndýi ha py'ã-pe",
+      "report": "Ohechauka nivel iporãiterei mbarete ñe'ẽndýi ha kane'õ'ỹ abdominal ñeha'ãme. Ko ñemohenda tetepykuaa ome'ẽ pytyvõ iporãitereíva omantene hag̃ua tetepy mbarete ha potente."
     },
     "m6_h1": {
-      "valencias": "Pya’ekue, Agilidad ha Mbarete Muscular.",
-      "condition": "Nivel Porã / Iporãitereíva Pya’ekue ha Mbarete Muscular-pe",
-      "report": "Pya’ekue ha mbarete ñeha’ã ohechauka perfil físico potente tuicha. Oguereko katupyry iporãitereíva oñemombopya’e ha oipuru hag̃ua mbarete muscular."
+      "valencias": "Pya'ekue, Agilidad ha Mbarete ñe'ẽndýi.",
+      "condition": "Nivel Porã / Iporãitereíva Pya'ekue ha Mbarete ñe'ẽndýi-pe",
+      "report": "Pya'ekue ha mbarete ñeha'ã ohechauka perfil tete rehegua potente tuicha. Oguereko katupyry iporãitereíva oñemombopya'e ha oipuru hag̃ua mbarete ñe'ẽndýi."
     },
     "m6_l1": {
-      "valencias": "Mbarete Muscular, Abdomen ha Agilidad.",
-      "condition": "Nivel Porã / Iporãitereíva Mbarete Muscular ha Abdomen-pe",
-      "report": "Ohechauka tembiapo yvate mbarete ha abdomen resistencia ñeha’ãme. Oguereko músculo mbyte mbarete, iporãva estabilidad corporal ha resistencia-pe g̃uarã."
+      "valencias": "Mbarete ñe'ẽndýi, py'ã ha Agilidad.",
+      "condition": "Nivel Porã / Iporãitereíva Mbarete ñe'ẽndýi ha py'ã-pe",
+      "report": "Ohechauka tembiapo yvate mbarete ha py'ã kane'õ'ỹ ñeha'ãme. Oguereko ñe'ẽndýi mbyte mbarete, iporãva estabilidad tete rehegua ha kane'õ'ỹ-pe g̃uarã."
     }
   },
   "m6_diretrizes_intervencao": {
     "m6_d1": {
       "diretriz": "ÑEMOPORÃVE KATUPYRY MOTRIZ",
-      "criterio": "Ko tape ojepurúva’erã mbohapy térã hetave katupyry físico oĩramo nivel Ndoikói térã Regular-pe.",
-      "conduta": "Ndoro’ẽporãi mitãrusu oñemotenonde deporte peteĩme añónte térã oike competencia mbaretépe ko’ág̃a. Iporãve ko’ág̃a oñemotenonde circuito funcional, tembiapo ombojehe’áva deporte heta ha ñembosarái oñopytyvõva, omokyre’ỹ hag̃ua desarrollo motriz tuichakue.",
-      "objetivo": "Mba’e tuichavéva ha’e omombarete ha ombosako’i mitãrusu tetepy tekorosãme. Ñañemotenondéta oñeheta hag̃ua masa magra, oñemoporãve hag̃ua postura ha coordinación tuichakue, rogarantisa hag̃ua tetepy oñangarekóva ohasa mboyve entrenamiento pohýivevape."
+      "criterio": "Ko tape ojepurúva'erã mbohapy térã hetave katupyry tete rehegua oĩramo nivel Ndoikói térã regular-pe.",
+      "conduta": "Ndoro'ẽporãi mitãrusu oñemotenonde jetepyso peteĩme añónte térã oike ñeha'ã mbaretépe ko'ág̃a. Iporãve ko'ág̃a oñemotenonde circuito funcional, tembiapo ombojehe'áva jetepyso heta ha ñembosarái oñopytyvõva, omokyre'ỹ hag̃ua desarrollo motriz tuichakue.",
+      "objetivo": "Mba'e tuichavéva ha'e omombarete ha ombosako'i mitãrusu tetepy tekorosãme. Ñañemotenondéta oñeheta hag̃ua ñe'ẽndýi porã, oñemoporãve hag̃ua jeku'e ha coordinación tuichakue, rogarantisa hag̃ua tetepy oñangarekóva ohasa mboyve ñembokatupyry pohýivevape."
     }
   },
   "aptidao_referenciais": {
@@ -738,109 +738,109 @@
       "insuficiente": "17 térã hetave",
       "regular": "15 guive 16 peve",
       "bom": "12 guive 14 peve",
-      "excelente": "11 térã sa’ive"
+      "excelente": "11 térã sa'ive"
     },
     "ag-2": {
       "insuficiente": "17 térã hetave",
       "regular": "15 guive 16 peve",
       "bom": "12 guive 14 peve",
-      "excelente": "11 térã sa’ive"
+      "excelente": "11 térã sa'ive"
     },
     "ag-3": {
       "insuficiente": "16 térã hetave",
       "regular": "14 guive 15 peve",
       "bom": "11 guive 13 peve",
-      "excelente": "10 térã sa’ive"
+      "excelente": "10 térã sa'ive"
     },
     "ag-4": {
       "insuficiente": "16 térã hetave",
       "regular": "14 guive 15 peve",
       "bom": "11 guive 13 peve",
-      "excelente": "10 térã sa’ive"
+      "excelente": "10 térã sa'ive"
     },
     "ag-9": {
       "insuficiente": "14 térã hetave",
       "regular": "11 guive 13 peve",
       "bom": "9 guive 10 peve",
-      "excelente": "8 térã sa’ive"
+      "excelente": "8 térã sa'ive"
     },
     "v-9": {
       "insuficiente": "7,00 térã hetave",
       "regular": "5,81 guive 6,99 peve",
       "bom": "3,81 guive 5,80 peve",
-      "excelente": "3,80 térã sa’ive"
+      "excelente": "3,80 térã sa'ive"
     },
     "ag-5": {
       "insuficiente": "15 térã hetave",
       "regular": "13 guive 14 peve",
       "bom": "12 guive 10 peve",
-      "excelente": "9 térã sa’ive"
+      "excelente": "9 térã sa'ive"
     },
     "ag-6": {
       "insuficiente": "15 térã hetave",
       "regular": "13 guive 14 peve",
       "bom": "12 guive 10 peve",
-      "excelente": "9 térã sa’ive"
+      "excelente": "9 térã sa'ive"
     },
     "ag-7": {
       "insuficiente": "14 térã hetave",
       "regular": "11 guive 13 peve",
       "bom": "9 guive 10 peve",
-      "excelente": "8 térã sa’ive"
+      "excelente": "8 térã sa'ive"
     },
     "ag-8": {
       "insuficiente": "14 térã hetave",
       "regular": "11 guive 13 peve",
       "bom": "9 guive 10 peve",
-      "excelente": "8 térã sa’ive"
+      "excelente": "8 térã sa'ive"
     },
     "v-1": {
       "insuficiente": "7,00 térã hetave",
       "regular": "6,12 guive 6,99 peve",
       "bom": "4,11 guive 6,11 peve",
-      "excelente": "4,10 térã sa’ive"
+      "excelente": "4,10 térã sa'ive"
     },
     "v-2": {
       "insuficiente": "7,00 térã hetave",
       "regular": "6,12 guive 6,99 peve",
       "bom": "4,11 guive 6,11 peve",
-      "excelente": "4,10 térã sa’ive"
+      "excelente": "4,10 térã sa'ive"
     },
     "v-3": {
       "insuficiente": "7,00 térã hetave",
       "regular": "5,61 guive 6,99 peve",
       "bom": "3,61 guive 5,60 peve",
-      "excelente": "3,60 térã sa’ive"
+      "excelente": "3,60 térã sa'ive"
     },
     "v-4": {
       "insuficiente": "7,00 térã hetave",
       "regular": "5,81 guive 6,99 peve",
       "bom": "3,81 guive 5,80 peve",
-      "excelente": "3,80 térã sa’ive"
+      "excelente": "3,80 térã sa'ive"
     },
     "v-5": {
       "insuficiente": "7,00 térã hetave",
       "regular": "5,47 guive 6,99 peve",
       "bom": "3,46 guive 5,46 peve",
-      "excelente": "3,45 térã sa’ive"
+      "excelente": "3,45 térã sa'ive"
     },
     "v-6": {
       "insuficiente": "7,00 térã hetave",
       "regular": "5,69 guive 6,99 peve",
       "bom": "3,68 guive 5,68 peve",
-      "excelente": "3,68 térã sa’ive"
+      "excelente": "3,68 térã sa'ive"
     },
     "v-7": {
       "insuficiente": "7,00 térã hetave",
       "regular": "5,81 guive 6,99 peve",
       "bom": "3,81 guive 5,80 peve",
-      "excelente": "3,80 térã sa’ive"
+      "excelente": "3,80 térã sa'ive"
     },
     "v-8": {
       "insuficiente": "7,00 térã hetave",
       "regular": "5,17 guive 6,99 peve",
       "bom": "3,16 guive 5,16 peve",
-      "excelente": "3,15 térã sa’ive"
+      "excelente": "3,15 térã sa'ive"
     },
     "a-1": {
       "insuficiente": "Ndojepurúi",
@@ -851,285 +851,285 @@
   },
   "m7_perfis_pareceres": {
     "m7_4": {
-      "component": "Ñe’ẽporã Pedagógico",
-      "basic_data": "Proyecto Integrador: Romokyre’ỹ aty ñemohenda feria ciencia-pe, gincana mbo’ehaópe térã gremio temimbo’e rehegua, ha’e tekotevẽhápe oipuru concepto planificación, tembiapo me’ẽ ha hupytyha rehegua.",
-      "reflection": "Mercado-pe Jeike: Romotenonde jeho técnica empresa tendagua-pe térã ñomongeta profesional finanza, marketing ha gestión rehegua ndive, ombojoja hag̃ua carrera jeroviaha mercado realidad práctica rehe."
+      "component": "Ñe'ẽporã pedagogiko",
+      "basic_data": "Tembiapo ñemohenda joajúva: Romokyre'ỹ aty ñemohenda ñembyaty mba'ekuaa-pe, ginkana mbo'ehaópe térã aty mbo'eharã rehegua, ha'e tekotevẽhápe oipuru ñemoimo'ã ñemohenda, tembiapo me'ẽ ha hupytyha rehegua.",
+      "reflection": "Ñemu pymare'ã-pe Jeike: Romotenonde jeho técnika empresa tendagua-pe térã ñomongeta katupyryhára finanza, marketing ha ñemohenda rehegua ndive, ombojoja hag̃ua carrera jeroviaha ñemu pymare'ã realidad hekopete rehe."
     },
     "m7_1": {
-      "component": "Perfil ha Carrera Mapa",
-      "basic_data": "Oguereko katupyry tenda pyahu rehegua. Ikatu omba’apo porã diseño juego rehegua térã desarrollo web-pe.",
-      "reflection": "Ahecha temimboépe peteĩ tembipurupy’o omba’apóva lógica oñemohendáva ha sensibilidad estética joajuha. Iventaja tuichavéva ha’e katupyry omohumano hag̃ua tecnología. Tenda ha’eháicha diseño juego ha desarrollo web oikotevẽ añete ko flexibilidad, ojerurévo oĩ ikatúva oikumby código hasy ha avei ndohesarái experiencia, iporã ha interacción poruhára oikotevẽvagui.",
-      "interest_area": "Iporãitereíva diseño juego térã desarrollo web-pe g̃uarã.",
-      "careers": "Híbrido"
+      "component": "Perfil ha carrera mapa",
+      "basic_data": "Oguereko katupyry tenda pyahu rehegua. Ikatu omba'apo porã tembiapy ñemohenda juego rehegua térã web ñemoheñói-pe.",
+      "reflection": "Ahecha temimboépe peteĩ tembipurupy'o omba'apóva lóhika oñemohendáva ha sensibilidad porãkue joajuha. Iventaja tuichavéva ha'e katupyry omohumano hag̃ua teknología. Tenda ha'eháicha tembiapy ñemohenda juego ha web ñemoheñói oikotevẽ añete ko ñemboguata, ojerurévo oĩ ikatúva oikumby kódigo hasy ha avei ndohesarái jehechakuaa, iporã ha interacción poruhára oikotevẽvagui.",
+      "interest_area": "Iporãitereíva tembiapy ñemohenda juego térã web ñemoheñói-pe g̃uarã.",
+      "careers": "Mbojoajupy"
     },
     "m7_2": {
-      "component": "Ñe’ẽporã Pedagógico",
-      "basic_data": "Proyecto Integrador: Romokyre’ỹ oñeparticipa hag̃ua feria ciencia-pe, gremio térã muestra cultural-pe, ha’e tekotevẽhápe oipuru planificación, creatividad ha comunicación peteĩ aravo.",
-      "reflection": "Mercado-pe Jeike: Romotenonde jeho técnica universidad-pe térã ñomongeta profesional omba’apóva tenda ojehechakuaavévape, ombojoja hag̃ua carrera jeroviaha mercado realidad rehe."
+      "component": "Ñe'ẽporã pedagogiko",
+      "basic_data": "Tembiapo ñemohenda joajúva: Romokyre'ỹ oñeparticipa hag̃ua ñembyaty mba'ekuaa-pe, aty térã tetã reko jehechauka-pe, ha'e tekotevẽhápe oipuru ñemohenda, ñemoheñói pyahu ha ñe'ẽjovái peteĩ aravo.",
+      "reflection": "Ñemu pymare'ã-pe Jeike: Romotenonde jeho técnika mbo'ehao yvate-pe térã ñomongeta katupyryhára omba'apóva tenda ojehechakuaavévape, ombojoja hag̃ua carrera jeroviaha ñemu pymare'ã realidad rehe."
     },
     "m7_8": {
-      "component": "Ñe’ẽporã Pedagógico",
-      "basic_data": "Proyecto Integrador: Romokyre’ỹ tenondete olimpiada matemática-pe, competencia robótica-pe, aplicación michĩ jejapo térã taller maqueta ha modelado 3D rehegua, omokyre’ỹvo pensamiento algorítmico ha espacial.",
-      "reflection": "Mercado-pe Jeike: Romotenonde jeho oñemañaháva polo tecnológico, laboratorio académico ha oficina ingeniería térã arquitectura rehegua, omboja mitãrusúpe desafío añete infraestructura, código ha innovación rehegua."
+      "component": "Ñe'ẽporã pedagogiko",
+      "basic_data": "Tembiapo ñemohenda joajúva: Romokyre'ỹ tenondete olimpiada papapy-pe, ñeha'ã robótika-pe, aplicación michĩ jejapo térã taller maqueta ha modelado 3D rehegua, omokyre'ỹvo pensamiento algorítmiko ha espacial.",
+      "reflection": "Ñemu pymare'ã-pe Jeike: Romotenonde jeho oñemañaháva teknología ñu, laboratorio akadémiko ha ofisina ingeniería térã arquitectura rehegua, omboja mitãrusúpe ñe'ẽjovái añete infraestructura, kódigo ha tembiapy pyahu rehegua."
     },
     "m7_6": {
-      "component": "Ñe’ẽporã Pedagógico",
-      "basic_data": "Proyecto Integrador: Romokyre’ỹ oike hag̃ua feria ciencia-pe foco ecológico/sustentable reheguáva térã muestra cultural ha artístico, ohejáva chupe ombojoaju jeheka biológico expresión creativa ndive.",
-      "reflection": "Mercado-pe Jeike: Romotenonde jeho oñesãmbyhýva laboratorio jeheka rehegua, clínica térã agencia comunicación ha estudio diseño rehegua-pe, mitãrusu oikumby hag̃ua mba’éichapa omba’apo ára ha ára ko’ã tenda mercado ko’áĝaguápe."
+      "component": "Ñe'ẽporã pedagogiko",
+      "basic_data": "Tembiapo ñemohenda joajúva: Romokyre'ỹ oike hag̃ua ñembyaty mba'ekuaa-pe foco ekológico/opyta porãva reheguáva térã tetã reko jehechauka ha tembiporu porã rehegua, ohejáva chupe ombojoaju jeheka tekove rehegua ñemoheñói pyahu ndive.",
+      "reflection": "Ñemu pymare'ã-pe Jeike: Romotenonde jeho oñesãmbyhýva laboratorio jeheka rehegua, klinika térã agencia ñe'ẽjovái ha estudio tembiapy ñemohenda rehegua-pe, mitãrusu oikumby hag̃ua mba'éichapa omba'apo ára ha ára ko'ã tenda ñemu pymare'ã ko'áĝaguápe."
     },
     "m7_10": {
-      "component": "Ñe’ẽporã Pedagógico",
-      "basic_data": "Proyecto Integrador: Romokyre’ỹ tenondete debate mbo’ehaópe, simulación comité internacional (techapyrã ONU modelo), kuatiahaipy mbo’ehao marandu’i ryepýpe térã campaña ha proyecto social comunidad rehegua ñemohenda.",
-      "reflection": "Mercado-pe Jeike: Romokyre’ỹ oñeikumby hag̃ua realidad profesional jeho oñemañaháva tribunal, instituto psicología, agencia comunicación térã tenda innovación pedagógica rehegua rupive, oipytyvõvo mitãrusúpe oikumby hag̃ua ko’ã carrera impacto añete."
+      "component": "Ñe'ẽporã pedagogiko",
+      "basic_data": "Tembiapo ñemohenda joajúva: Romokyre'ỹ tenondete ñomongeta mbo'ehaópe, ñemoangã aty tetãnguéra rehegua (techapyrã ONU modelo), kuatiahaipy mbo'ehao marandu'i ryepýpe térã campaña ha tembiapo ñemohenda aty rehegua comunidad rehegua ñemohenda.",
+      "reflection": "Ñemu pymare'ã-pe Jeike: Romokyre'ỹ oñeikumby hag̃ua realidad katupyryhára jeho oñemañaháva tribunal, instituto ñe'ẽlandu kuaa, agencia ñe'ẽjovái térã tenda tembiapy pyahu pedagogika rehegua rupive, oipytyvõvo mitãrusúpe oikumby hag̃ua ko'ã carrera jehechakuaa añete."
     },
     "m7_7": {
-      "component": "Perfil ha Carrera Mapa",
-      "basic_data": "Mba’ekuaarã ypykue: Perfil omokyre’ỹva apañuãi lógico ñemyatyrõ, ndahasýi oipuru hag̃ua mba’ekuaarã papapy rehegua ha oipotaite oikuaa mba’éichapa omba’apo tecnología pyahu.\n\nCarrera ojoajúva: Ingeniería, Ciencia de la Computación, Matemática, Física, Arquitectura ha Tecnología de la Información.",
-      "reflection": "Rohechakuaa temimboépe estructura cognitiva tuichavéva abstracta, analítica ha deductiva. Iñakã omba’apo forma sistèmica-pe ha ojuhu mburuvicha patrón, ecuación ha mba’ekuaarã arquitectura jehechakuaápe. Mitãrusu ndovy’ái oĩ hag̃ua poruhára sapy’a añónte tembipuru digital ha mba’e oñemopu’ãva ko mundo pyahúpe; oĩ chupe curiosidad intelectual oikuaa hag̃ua \"mba’éichapa\" ha \"mba’érepa\" tecnología ha estructura rapykuéri. Ko ñe’ẽme’ẽ precisión metodológica rehe ome’ẽ ypy porã carrera software ñemoheñói térã ingeniería-pe, tenda rigor lógico ojeporúva mba’e ypykue ramo omoheñói ha omopu’ã hag̃ua solución ko’ẽrõ guarã.",
-      "interest_area": "Nde reipota remyatyrõ apañuãi lógico, reipuru papapy ha reikuaa mba’éichapa omba’apo tecnología.",
-      "careers": "Ingeniería, Ciencia de la Computación, Matemática, Física, Arquitectura ha Tecnología de la Información."
+      "component": "Perfil ha carrera mapa",
+      "basic_data": "Mba'ekuaarã ypykue: Perfil omokyre'ỹva apañuãi lógico ñemyatyrõ, ndahasýi oipuru hag̃ua mba'ekuaarã papapy rehegua ha oipotaite oikuaa mba'éichapa omba'apo teknología pyahu. carrera ojoajúva: ingeniería, papapy'i ñembokatupyry, papapy, tetepykuaa, arquitectura ha teknología marandu rehegua.",
+      "reflection": "Rohechakuaa temimboépe ñemohenda cognitiva tuichavéva abstracta, analítica ha deduktiva. Iñakã omba'apo forma sistèmica-pe ha ojuhu mburuvicha patrón, ecuación ha mba'ekuaarã arquitectura jehechakuaápe. Mitãrusu ndovy'ái oĩ hag̃ua poruhára sapy'a añónte tembipuru digital ha mba'e oñemopu'ãva ko mundo pyahúpe; oĩ chupe arandu jeheka oikuaa hag̃ua \"mba'éichapa\" ha \"mba'érepa\" teknología ha ñemohenda rapykuéri. Ko ñe'ẽme'ẽ hekopete ñemohenda rehe ome'ẽ ypy porã carrera software ñemoheñói térã ingeniería-pe, tenda lóhika hatã ojeporúva mba'e ypykue ramo omoheñói ha omopu'ã hag̃ua ñemyatyrõ ko'ẽrõ guarã.",
+      "interest_area": "Nde reipota remyatyrõ apañuãi lógico, reipuru papapy ha reikuaa mba'éichapa omba'apo teknología.",
+      "careers": "Ingeniería, papapy'i ñembokatupyry, papapy, tetepykuaa, arquitectura ha teknología marandu rehegua."
     },
     "m7_3": {
-      "component": "Perfil ha Carrera Mapa",
-      "basic_data": "Mba’ekuaarã ypykue: Espíritu tenondete activo, oipota omohenda proceso, omboguata recurso ha omoheñói estrategia.\n\nCarrera ojoajúva: Administración, Economía, Ciencias Contables, Marketing, Logística ha Gestión de Recursos Humanos.",
-      "reflection": "Ahecha temimboépe estructura cognitiva oñemotenondéva eficiencia, pragmatismo ha pensamiento sistémico rehe. Iñakã ohechauka ndahasýi ohecha hag̃ua tesarái tuichakue escenario hasývape, omohendávo mba’e oñemotenondeva’erã ha omoĩvo recurso hekopete. Tenondete, ko perfil-pe, ndaha’éi tenda ñemotenonde añónte, ha’e katupyry natural ombojoaju hag̃ua tapichakuéra peteĩ objetivo peteĩme g̃uarã. Oipotaháicha omoheñói estrategia ha omboguata proceso ohechauka potencial mbarete ojapyhy hag̃ua decisión hekopete ha omomichĩ hag̃ua riesgo tenda corporativo ha económico oñemokañývape.",
-      "interest_area": "Nde reguereko espíritu tenondete, nde reikuaa remohenda, remboguata recurso ha remoheñói estrategia.",
-      "careers": "Administración, Economía, Ciencias Contables, Marketing, Logística ha Gestión de Recursos Humanos."
+      "component": "Perfil ha carrera mapa",
+      "basic_data": "Mba'ekuaarã ypykue: Espíritu tenondete activo, oipota omohenda tembiapo ñemohenda, omboguata mbae'ỹrã ha omoheñói ñemohenda pyahu. carrera ojoajúva: ñemohenda, pymare'ã kuaa, papapy kuaa, marketing, logístika ha tapicha ñangareko ñemohenda.",
+      "reflection": "Ahecha temimboépe ñemohenda cognitiva oñemotenondéva eficiencia, tembiapo hekopete ha pensamiento sistémico rehe. Iñakã ohechauka ndahasýi ohecha hag̃ua tesarái tuichakue escenario hasývape, omohendávo mba'e oñemotenondeva'erã ha omoĩvo mbae'ỹrã hekopete. Tenondete, ko perfil-pe, ndaha'éi tenda ñemotenonde añónte, ha'e katupyry natural ombojoaju hag̃ua tapichakuéra peteĩ hupytyrã peteĩme g̃uarã. Oipotaháicha omoheñói ñemohenda pyahu ha omboguata tembiapo ñemohenda ohechauka potencial mbarete ojapyhy hag̃ua ñemoneí hekopete ha omomichĩ hag̃ua riesgo tenda corporativo ha económico oñemokañývape.",
+      "interest_area": "Nde reguereko espíritu tenondete, nde reikuaa remohenda, remboguata mbae'ỹrã ha remoheñói ñemohenda pyahu.",
+      "careers": "Ñemohenda, pymare'ã kuaa, papapy kuaa, marketing, logístika ha tapicha ñangareko ñemohenda."
     },
     "m7_9": {
-      "component": "Perfil ha Carrera Mapa",
-      "basic_data": "Mba’ekuaarã ypykue: Perfil oñemopyendáva katupyry oñe’ẽ hag̃ua hesakãme, empatía mbarete oñemog̃uahẽ ha oipytyvõ hag̃ua ambuépe, avei oipotahápe oikumby crítica-pe sociedad estructura.\n\nCarrera ojoajúva: Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo ha Relaciones Internacionales.",
-      "reflection": "Ko perfil ñemoakãrapu’a tuichavéva ojoaju porãitépe tapicha rehe ha iñemoirũ colectivo hasy rehe. Temimbo’e ohechauka katupyry tuicháva ñehendu activo, empatía jejapo ha idea abstracta ñembojoaju ñe’ẽ rupive. Iñakã ojuhu ñemokyre’ỹ ohechase jave fenómeno social, derecho humano ha tembiasakue omoha’ãngáva ñande cultura. Ndaha’éi ñepotaiterei teórico añónte, ko perfil ohechauka inteligencia oñemotenondéva ñemoambue práctica ha apañuãi ñemombyte rehe. Mitãrusu oguereko potencial oĩva ojejapo hag̃ua tenondete tenda oikotevẽva responsabilidad ética, taha’e omomba’évo causa jurídica, ombo’évo, omokyre’ỹvo salud mental térã omomarandúvo marandu tuicháva comunidad-pe g̃uarã.",
-      "interest_area": "Nde reikuaa reñe’ẽ, reipytyvõ tapichakuérape ha reikuaa sociedad.",
-      "careers": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo ha Relaciones Internacionales."
+      "component": "Perfil ha carrera mapa",
+      "basic_data": "Mba'ekuaarã ypykue: Perfil oñemopyendáva katupyry oñe'ẽ hag̃ua hesakãme, empatía mbarete oñemog̃uahẽ ha oipytyvõ hag̃ua ambuépe, avei oipotahápe oikumby ñehecha porã-pe tapicha aty ñemohenda. carrera ojoajúva: tekog̃uahẽ, ñe'ẽporã, mbo'e kuaa, ñe'ẽlandu kuaa, tembiasakue, marandu kuatia ha tetãnguéra joaju.",
+      "reflection": "Ko perfil ñemoakãrapu'a tuichavéva ojoaju porãitépe tapicha rehe ha iñemoirũ aty rehegua hasy rehe. mbo'eharã ohechauka katupyry tuicháva ñehendu activo, empatía jejapo ha idea abstracta ñembojoaju ñe'ẽ rupive. Iñakã ojuhu ñemokyre'ỹ ohechase jave fenómeno aty rehegua, tekog̃uahẽ humano ha tembiasakue omoha'ãngáva ñande tetã reko. Ndaha'éi ñepotaiterei teórico añónte, ko perfil ohechauka inteligencia oñemotenondéva ñemoambue hekopete ha apañuãi ñemombyte rehe. Mitãrusu oguereko potencial oĩva ojejapo hag̃ua tenondete tenda oikotevẽva ñangareko ética, taha'e omomba'évo causa jurídika, ombo'évo, omokyre'ỹvo ñe'ẽlandu tesãi térã omomarandúvo marandu tuicháva comunidad-pe g̃uarã.",
+      "interest_area": "Nde reikuaa reñe'ẽ, reipytyvõ tapichakuérape ha reikuaa tapicha aty.",
+      "careers": "Tekog̃uahẽ, ñe'ẽporã, mbo'e kuaa, ñe'ẽlandu kuaa, tembiasakue, marandu kuatia ha tetãnguéra joaju."
     },
     "m7_5": {
-      "component": "Perfil ha Carrera Mapa",
-      "basic_data": "Mba’ekuaarã ypykue: Perfil omýiva creatividad rupi. Ohechauka kyre’ỹ mbarete omoheñói, omopyahu térã oipotaite oikuaa tekove, bienestar ha tesãi rehegua.\n\nCarrera ojoajúva: Medicina, Biología, Diseño, Publicidad, Artes Visuales, Educación Física ha Veterinaria.",
-      "reflection": "Ahecha temimboépe ñembojoaju peteĩha sensibilidad inventiva ha empatía orgánica rehegua. Ko perfil oñemomombyry cientificismo mbaretégui ha ypykueguígui; hendaguépe, ojuhu ñemokyre’ỹ oiporúvo solución creativa apañuãi oikóva tekove ha expresión humana reheguápe. Iñakã ojesarekóva tekotevẽ ojuhu hag̃ua tape pyahu, omonguera, omoheñói térã omoambue hag̃ua tekoha. Creatividad tuicha oĩva ko macroárea-pe ohechauka mitãrusu ndahasýi oimo’ã hag̃ua “kaja okápe” apañuãi tesãi térã comunicación visual rehegua renondépe, upévare iporã carrera oikotevẽva innovación tekove ñangareko térã concepto estético pyahu ñemoheñóipe.",
-      "interest_area": "Nde remyi creatividad rupi, reikuaa remoheñói, remopyahu térã reipotaite tekove ha tesãi rehegua.",
-      "careers": "Medicina, Biología, Diseño, Publicidad, Artes Visuales, Educación Física ha Veterinaria."
+      "component": "Perfil ha carrera mapa",
+      "basic_data": "Mba'ekuaarã ypykue: Perfil omýiva ñemoheñói pyahu rupi. Ohechauka kyre'ỹ mbarete omoheñói, omopyahu térã oipotaite oikuaa tekove, tekove porã ha tesãi rehegua. carrera ojoajúva: tesãi kuaa, tekove kuaa, tembiapy ñemohenda, Publicidad, ta'anga tembiporu, Educación tetepykuaa ha mymba tesãi.",
+      "reflection": "Ahecha temimboépe ñembojoaju peteĩha sensibilidad inventiva ha empatía orgánica rehegua. Ko perfil oñemomombyry cientificismo mbaretégui ha ypykueguígui; hendaguépe, ojuhu ñemokyre'ỹ oiporúvo ñemyatyrõ creativa apañuãi oikóva tekove ha expresión humana reheguápe. Iñakã ojesarekóva tekotevẽ ojuhu hag̃ua tape pyahu, omonguera, omoheñói térã omoambue hag̃ua tekoha. ñemoheñói pyahu tuicha oĩva ko macroárea-pe ohechauka mitãrusu ndahasýi oimo'ã hag̃ua \"kaja okápe\" apañuãi tesãi térã ñe'ẽjovái ñehecha rehegua renondépe, upévare iporã carrera oikotevẽva tembiapy pyahu tekove ñangareko térã ñemoimo'ã estético pyahu ñemoheñóipe.",
+      "interest_area": "Nde remyi ñemoheñói pyahu rupi, reikuaa remoheñói, remopyahu térã reipotaite tekove ha tesãi rehegua.",
+      "careers": "Tesãi kuaa, tekove kuaa, tembiapy ñemohenda, Publicidad, ta'anga tembiporu, Educación tetepykuaa ha mymba tesãi."
     }
   },
   "m9_perfis_pareceres": {
     "m9p_3": {
-      "basic_data": "Puntuación T 60 ári. Ñeñandu porã iporãitereíva bienestar rehegua.",
-      "reflection": "Ñeñandu iporãitereíva tesãi física, social ha familia pytyvõ rehegua. Ñañongatuva’erã pytyvõ joaju ha jepokuaa omanteneva bienestar."
+      "basic_data": "Puntos T 60 ári. Ñeñandu porã iporãitereíva tekove porã rehegua.",
+      "reflection": "Ñeñandu iporãitereíva tesãi tetepykuaa, aty rehegua ha ogaykue pytyvõ rehegua. Ñañongatuva'erã pytyvõ joaju ha jepokuaa omanteneva tekove porã."
     },
     "m9p_2": {
-      "basic_data": "Puntuación T 40 ha 60 mbytépe. Tesãi ñeñandu oñeha’arõva promedio-pe.",
-      "reflection": "Tesãi ñeñandu oĩva oñeha’arõháicha yvypóra hesãivápe. Ñamanteneva’erã jepokuaa ñangareko ha jehechajey jepivegua rehegua."
+      "basic_data": "Puntos T 40 ha 60 mbytépe. Tesãi ñeñandu oñeha'arõva mbyte-pe.",
+      "reflection": "Tesãi ñeñandu oĩva oñeha'arõháicha yvypóra hesãivápe. Ñamanteneva'erã jepokuaa ñangareko ha jehechajey jepivegua rehegua."
     },
     "m9p_1": {
-      "basic_data": "Puntuación T 40 guýpe. Alerta ñeñandu bienestar rehegua-pe.",
-      "reflection": "Ohechauka tekotevẽ ñangareko térã intervención psicológica/social. Ñe’ẽporã oñangareko ag̃ui temimbo’ére ha oñehendu hag̃ua chupe."
+      "basic_data": "Puntos T 40 guýpe. ñemongu'ẽ ñeñandu tekove porã rehegua-pe.",
+      "reflection": "Ohechauka tekotevẽ ñangareko térã ñe'ẽporã ñe'ẽlandu rehegua/aty rehegua. Ñe'ẽporã oñangareko ag̃ui temimbo'ére ha oñehendu hag̃ua chupe."
     }
   },
   "m10_perfis_pareceres": {
     "m10p_2": {
       "basic_data": "5 guive 8 peve punto HU-DBI-pe.",
-      "reflection": "Mba’épa he’ise: Mba’ekuaa mbyte rehegua.\nPerfil: Paciente oguereko oikuaa porã, ha katu ohapykueho gueteri peteĩva mito térã ojavy jepive mopotĩme. Kóva ombotuicha riesgo oiko hag̃ua apañuãi canal, tãingue térã cárie rehegua."
+      "reflection": "Mba'épa he'ise: Mba'ekuaa mbyte rehegua. Perfil: hasýva oguereko oikuaa porã, ha katu ohapykueho gueteri peteĩva jeimo'ã'ỹ térã ojavy jepive mopotĩme. Kóva ombotuicha riesgo oiko hag̃ua apañuãi tãi kuã, tãingue térã tãi apañuãi rehegua."
     },
     "m10p_3": {
       "basic_data": "0 guive 4 peve punto HU-DBI-pe.",
-      "reflection": "Mba’épa he’ise: Teko peligroso.\nPerfil: Oĩ posibilidad tuichaiterei oñembyaty hag̃ua ky’a ha placa bacteria rehegua tãime. Paciente oikotevẽ pya’e tape ñemopotĩ rehegua ha tratamiento preventivo dentista rendápe.\n"
+      "reflection": "Mba'épa he'ise: Teko peligroso. Perfil: Oĩ posibilidad tuichaiterei oñembyaty hag̃ua ky'a ha ky'a ñembyaty bacteria rehegua tãime. hasýva oikotevẽ pya'e tape ñemopotĩ rehegua ha ñangareko ypykue tãi ñangarekohára rendápe."
     },
     "m10p_1": {
       "basic_data": "9 guive 12 peve punto HU-DBI-pe.",
-      "reflection": "Mba’épa he’ise: Ñangareko jurúpe iporãitereíva.\nPerfil: Paciente oikuaa oñangareko porãiterei hese ára ha ára ha oguereko jepokuaa oñangarekóva tãi rehe hekopete.\n"
+      "reflection": "Mba'épa he'ise: Ñangareko jurúpe iporãitereíva. Perfil: hasýva oikuaa oñangareko porãiterei hese ára ha ára ha oguereko jepokuaa oñangarekóva tãi rehe hekopete."
     }
   },
   "m11_perfis_pareceres": {
     "m11p_2": {
-      "basic_data": "15 guive 25 peve punto escala Rosenberg-pe.",
-      "reflection": "Ohechauka estándar yvypóra hetavéva rehegua. Tapicha omantene joaju porã ijehe ndive ha oikuaa umi mba’e porã ha ikangyva ha’e orekóva añetehápe."
+      "basic_data": "15 guive 25 peve punto ñemohenda Rosenberg-pe.",
+      "reflection": "Ohechauka hekopete yvypóra hetavéva rehegua. Tapicha omantene joaju porã ijehe ndive ha oikuaa umi mba'e porã ha ikangyva ha'e orekóva añetehápe."
     },
     "m11p_3": {
-      "basic_data": "25 punto ári escala Rosenberg-pe.",
-      "reflection": "Jerovia ijehegui ha tekorosã mbarete. Puntuación 30-pe hi’ãva ikatu ohechauka estabilidad emocional mbarete, ha katu avei ikatu ohechauka teko ñemo’ã térã apañuãi ohecha hag̃ua tenda ikangyva."
+      "basic_data": "25 punto ári ñemohenda Rosenberg-pe.",
+      "reflection": "Jerovia ijehegui ha tekorosã mbarete. puntos 30-pe hi'ãva ikatu ohechauka estabilidad emocional mbarete, ha katu avei ikatu ohechauka teko ñemo'ã térã apañuãi ohecha hag̃ua tenda ikangyva."
     },
     "m11p_1": {
-      "basic_data": "15 punto guýpe escala Rosenberg-pe.",
-      "reflection": "Ohechauka oñemotenonde hetaiterei jejavy rehe, ñeñandu jepive vy’a’ỹ ijehe rehe ha sa’ive jerovia ikatupyry rehe."
+      "basic_data": "15 punto guýpe ñemohenda Rosenberg-pe.",
+      "reflection": "Ohechauka oñemotenonde hetaiterei jejavy rehe, ñeñandu jepive vy'a'ỹ ijehe rehe ha sa'ive jerovia ikatupyry rehe."
     }
   },
   "m12_perfis_pareceres": {
     "m12p_3": {
       "basic_data": "80 punto ári IAS-pe.",
-      "reflection": "Teko tembi’u rapykueho oĩ porãiterei tape oñeme’ẽvape. Oñemba’apo mba’e ñangarekóva ramo nde tesãi ha tekove pukukue-pe g̃uarã."
+      "reflection": "Teko tembi'u rapykueho oĩ porãiterei tape oñeme'ẽvape. Oñemba'apo mba'e ñangarekóva ramo nde tesãi ha tekove pukukue-pe g̃uarã."
     },
     "m12p_1": {
       "basic_data": "51 punto guýpe IAS-pe.",
-      "reflection": "Riesgo tuicháva oñemoakãrapu’ã hag̃ua carencia nutricional ha mba’asy pukukue (diabetes, hipertensión, apañuãi corazón rehegua). Oikotevẽ intervención pya’e."
+      "reflection": "Riesgo tuicháva oñemoakãrapu'ã hag̃ua carencia nutricional ha mba'asy pukukue (diabetes, hipertensión, apañuãi tymba'óga rehegua). Oikotevẽ ñe'ẽporã pya'e."
     },
     "m12p_2": {
       "basic_data": "51 guive 80 peve punto IAS-pe.",
-      "reflection": "Oguerekóma jepokuaa hesãiva, ha katu ojapo hetaiterei térã okañy tuicháva (asuka/sodio hetaiterei térã integral ha yva’ỹ)."
+      "reflection": "Oguerekóma jepokuaa hesãiva, ha katu ojapo hetaiterei térã okañy tuicháva (asuka/sodio hetaiterei térã integral ha yva'ỹ)."
     }
   },
   "m13_perfis_pareceres": {
     "m13p_3": {
-      "basic_data": "Sa’ivéramo 6 ítem clínico mokõive bloque-pe (Jesareko’ỹ ha Hiperactividad/Impulsividad).",
-      "reflection": "Oĩ techaukaha síntoma tuicháva mokõive dimensión-pe, ohechaukáva ikatuha patrón oñembojehe’áva. Kóva ha’e pe jehecha omombaretéva tekotevẽ oñeheka porã diagnóstico completo profesional especializado rupive."
+      "basic_data": "Sa'ivéramo 6 ítem kliniko mokõive bloke-pe (Jesareko'ỹ ha hiperactividad/impulsividad).",
+      "reflection": "Oĩ techaukaha techaukaha tuicháva mokõive ñemohenda-pe, ohechaukáva ikatuha patrón oñembojehe'áva. Kóva ha'e pe jehecha omombaretéva tekotevẽ oñeheka porã jehechakuaa completo katupyryhára katupyryhára rupive."
     },
     "m13p_4": {
-      "basic_data": "Sa’ive 6 ítem clínico-gui peteĩteĩ bloque-pe.",
-      "reflection": "Teko oñemombe’úva oĩ oñeha’arõháicha ary rehehápe, ndorekói techaukaha tuicháva síntoma TDAH rehegua ko jehechakuépe. Ñamanteneva’erã jepive rapykueho desarrollo rehegua."
+      "basic_data": "Sa'ive 6 ítem kliniko-gui peteĩteĩ bloke-pe.",
+      "reflection": "Teko oñemombe'úva oĩ oñeha'arõháicha ary rehehápe, ndorekói techaukaha tuicháva techaukaha TDAH rehegua ko jehechakuépe. Ñamanteneva'erã jepive rapykueho desarrollo rehegua."
     },
     "m13p_2": {
-      "basic_data": "Sa’ivéramo 6 umi 9 ítem-gui Bloque II-pe (10-18) oñembohérava “Hetaiterei” térã “Hetaitereiete”.",
-      "reflection": "Oĩ techaukaha hetave síntoma hiperactividad ha impulsividad rehegua oñeha’arõvagui ary rehehápe. Ñe’ẽporã oñemaña hag̃ua teko contexto hetápe ha oñehecha hag̃ua profesional especializado rupive."
+      "basic_data": "Sa'ivéramo 6 umi 9 ítem-gui bloke II-pe (10-18) oñembohérava \"Hetaiterei\" térã \"Hetaitereiete\".",
+      "reflection": "Oĩ techaukaha hetave techaukaha hiperactividad ha impulsividad rehegua oñeha'arõvagui ary rehehápe. Ñe'ẽporã oñemaña hag̃ua teko contexto hetápe ha oñehecha hag̃ua katupyryhára katupyryhára rupive."
     },
     "m13p_1": {
-      "basic_data": "Sa’ivéramo 6 umi 9 ítem-gui Bloque I-pe (1-9) oñembohérava “Hetaiterei” térã “Hetaitereiete”.",
-      "reflection": "Oĩ techaukaha hetave síntoma jesareko’ỹ rehegua oñeha’arõvagui ary rehehápe. Ñe’ẽporã oñemaña hag̃ua teko ógape ha mbo’ehaópe ha oñehecha hag̃ua profesional especializado rupive."
+      "basic_data": "Sa'ivéramo 6 umi 9 ítem-gui bloke I-pe (1-9) oñembohérava \"Hetaiterei\" térã \"Hetaitereiete\".",
+      "reflection": "Oĩ techaukaha hetave techaukaha jesareko'ỹ rehegua oñeha'arõvagui ary rehehápe. Ñe'ẽporã oñemaña hag̃ua teko ógape ha mbo'ehaópe ha oñehecha hag̃ua katupyryhára katupyryhára rupive."
     }
   },
   "m14_perfis_pareceres": {
     "m14p_2": {
-      "basic_data": "Puntuación total 7 guive 10 peve punto AQ-10-pe.",
-      "reflection": "Puntuación ohupyty nivel alerta rasgo TEA yvate rehegua. Ñe’ẽporã oñemondo pya’e jehechajey multidisciplinar especializado-pe (neuropediatra térã psiquiatra infantil ha neuropsicólogo) oñeheka hag̃ua diagnóstico formal. Jahechakuaa AQ-10 ndomyengoviái diagnóstico clínico."
+      "basic_data": "Puntos opaite 7 guive 10 peve punto AQ-10-pe.",
+      "reflection": "Puntos ohupyty nivel ñemongu'ẽ rasgo TEA yvate rehegua. Ñe'ẽporã oñemondo pya'e jehechajey aty heta rehegua katupyryhára-pe (neuropediatra térã mitã ñe'ẽlandu ñangarekohára ha neuropsicólogo) oñeheka hag̃ua jehechakuaa formal. Jahechakuaa AQ-10 ndomyengoviái jehechakuaa kliniko."
     },
     "m14p_1": {
-      "basic_data": "Puntuación total 0 guive 6 peve punto AQ-10-pe.",
-      "reflection": "Puntuación ojehupytýva oĩ promedio yvypóra tuichakue ryepýpe, ohechaukávo sa’ive probabilidad trastorno del espectro autista rehegua ko jehechakuépe. Upéicharõ jepe, AQ-10 ha’e tembipuru jehechajey añónte: opytaramo preocupación clínica tuvakuéra térã oñangarekóva rehegua, ñe’ẽporã oñembojoapy hag̃ua jehechajey profesional tesãi ikatupyrýva ndive."
+      "basic_data": "Puntos opaite 0 guive 6 peve punto AQ-10-pe.",
+      "reflection": "Puntos ojehupytýva oĩ mbyte yvypóra tuichakue ryepýpe, ohechaukávo sa'ive probabilidad autismo espectro apañuãi rehegua ko jehechakuépe. Upéicharõ jepe, AQ-10 ha'e tembipuru jehechajey añónte: opytaramo preocupación klinika tuvakuéra térã oñangarekóva rehegua, ñe'ẽporã oñembojoapy hag̃ua jehechajey katupyryhára tesãi ikatupyrýva ndive."
     }
   },
   "m15_pcd_grupos": {
     "pg6": {
-      "nome": "Discapacidad Intelectual",
-      "descricao": "Katupyry sensorial ha motriz estructura rehegua oĩ porã. Jejoko tenondegua oĩ cognición ha tembiapo táctica ñeikumbyme.",
-      "laudo": "Nivel funcionamiento adaptativo rehegua (sa’ive, mbyte térã mbarete) oñemoneĩva laudo psicológico térã pedagógico oficial rupive añónte."
+      "nome": "Ñeikũmby katupyry'ỹva",
+      "descricao": "Katupyry ñandu rehegua ha motriz ñemohenda rehegua oĩ porã. Jejoko tenondegua oĩ cognición ha tembiapo táctica ñeikumbyme.",
+      "laudo": "Nivel ñemohenda hekopete rehegua (sa'ive, mbyte térã mbarete) oñemoneĩva kuatia jehechakuaa ñe'ẽlandu rehegua térã pedagogika oficial rupive añónte."
     },
     "pg1": {
-      "nome": "Discapacidad Física (Jeku’e Ijeheguíva)",
-      "descricao": "Mitã oguata ijeheguiete térã pytyvõ sa’ive reheve (bengala, órtesis), orekóva apañuãi estructural ha ndorekói ñemoambue neurológico mbyte tuicháva.",
-      "laudo": "Diagnóstico clínico formal + clasificación gravedad rehegua. Emombe’u porã nivel amputación rehegua oĩramo."
+      "nome": "Tetepy katupyry'ỹva (Jeku'e ijeheguíva)",
+      "descricao": "Mitã oguata ijeheguiete térã pytyvõ sa'ive reheve (bengala, órtesis), orekóva apañuãi estructural ha ndorekói ñemoambue neurológico mbyte tuicháva.",
+      "laudo": "Jehechakuaa kliniko formal + ñemohenda hasýkue rehegua. Emombe'u porã nivel ñekytĩ rehegua oĩramo."
     },
     "pg2": {
-      "nome": "Discapacidad Física (Apyka Rueda rehegua)",
-      "descricao": "Apyka rueda ha’e mba’e tuichavéva térã peteĩha oñemyi hag̃ua. Ñeha’ã oñembohekopyahu térã oñemyengovia miembro superior-pe g̃uarã.",
-      "laudo": "Diagnóstico clínico formal + laudo médico. Emoneĩ apyka rueda jepuru ha’eha mba’e tuichavéva oñemyi hag̃ua."
+      "nome": "Tetepy katupyry'ỹva (Apyka rueda rehegua)",
+      "descricao": "Apyka rueda ha'e mba'e tuichavéva térã peteĩha oñemyi hag̃ua. Ñeha'ã oñembohekopyahu térã oñemyengovia jyva-pe g̃uarã.",
+      "laudo": "Jehechakuaa kliniko formal + kuatia jehechakuaa tesãi ñangarekohára. Emoneĩ apyka rueda jepuru ha'eha mba'e tuichavéva oñemyi hag̃ua."
     },
     "pg3": {
-      "nome": "Parálisis Cerebral (GMFCS)",
-      "descricao": "Clasificación tekotevẽva oñemotenonde Escala GMFCS rupive (nivel I guive V peve) ojejoko mboyve oimeraẽ ñeha’ã.",
-      "laudo": "Ojepuru va’erã ha oñemotenondeva’erã Escala GMFCS (I guive V peve) + laudo médico."
+      "nome": "Ñemongu'e'ỹ cerebral (GMFCS)",
+      "descricao": "Ñemohenda tekotevẽva oñemotenonde ñemohenda GMFCS rupive (nivel I guive V peve) ojejoko mboyve oimeraẽ ñeha'ã.",
+      "laudo": "Ojepuru va'erã ha oñemotenondeva'erã ñemohenda GMFCS (I guive V peve) + kuatia jehechakuaa tesãi ñangarekohára."
     },
     "pg4": {
-      "nome": "Discapacidad Visual (B1-B3)",
-      "descricao": "Estructura motriz tuichakue oñeñongatuva. Ñembohekopyahu tape ñe’ẽ, cinestésica ha orientación espacial-pe. Clasificación B1 (ojehecha’ỹ pavẽ) guive B3 (ojehecha sa’ive) peve.",
-      "laudo": "Ñemohenda nivel agudeza visual rehegua (B1, B2 térã B3) + laudo oftalmológico."
+      "nome": "Ñehecha katupyry'ỹva (B1-B3)",
+      "descricao": "Ñemohenda motriz tuichakue oñeñongatuva. Ñembohekopyahu tape ñe'ẽ, cinestésica ha orientación espacial-pe. ñemohenda B1 (ojehecha'ỹ pavẽ) guive B3 (ojehecha sa'ive) peve.",
+      "laudo": "Nivel ñehecha hatã (B1, B2 térã B3) + kuatia jehechakuaa ñehecha ñangarekohára rehegua."
     },
     "pg5": {
-      "nome": "Discapacidad Auditiva",
-      "descricao": "Tembiapo motriz ha orientación espacial rehegua oñeñongatuva. Ñembohekopyahu comunicación rape reheguánte (estímulo jehecháva, Ñe’ẽ Pópe – Libras).",
-      "laudo": "Ñemyesakã porã grado ñehendu ñehundi rehegua (sa’ive, mbyte, mbarete térã tuichaiterei) + laudo audiológico."
+      "nome": "Ñehendu katupyry'ỹva",
+      "descricao": "Tembiapo motriz ha orientación espacial rehegua oñeñongatuva. Ñembohekopyahu ñe'ẽjovái rape reheguánte (estímulo jehecháva, Ñe'ẽ Pópe – Libras).",
+      "laudo": "Ñemyesakã porã ñemohenda ñehendu ñehundi rehegua (sa'ive, mbyte, mbarete térã tuichaiterei) + kuatia jehechakuaa ñehendu ñeikũmby rehegua."
     }
   },
   "m15_pcd_adaptacoes": {
     "pa_g4_sal": {
-      "instrucao": "Ñepyrũha renda oñemombe’úva tape tapeguápe cinta oĩva ári; ñe’ẽ ñehendu hesakãva."
+      "instrucao": "Ñepyrũha pymare'ã oñemombe'úva tape tapeguápe cinta oĩva ári; ñe'ẽ ñehendu hesakãva."
     },
     "pa_g5_agi": {
-      "instrucao": "Jejapo estándar; estímulo jehecháva hesakã porã."
+      "instrucao": "Jejapo hekopete; estímulo jehecháva hesakã porã."
     },
     "pa_g6_abd": {
-      "instrucao": "Jehechauka tetepy rehegua je’ejey ha tape ñemboja’o peteĩteĩme hasy’ỹva."
+      "instrucao": "Jehechauka tetepy rehegua je'ejey ha tape ñemboja'o peteĩteĩme hasy'ỹva."
     },
     "pa_g3_sal_b": {
       "detalhe": "GMFCS III",
-      "instrucao": "Ojapo va’erã oĩramo katupyry funcional ha tekorosã. Ndaikatúiramo, oñeñamindu’u ñeha’ã ambuéva potencia miembro inferior rehegua."
+      "instrucao": "Ojapo va'erã oĩramo katupyry funcional ha tekorosã. Ndaikatúiramo, oñeñamindu'u ñeha'ã ambuéva mbaretete py rehegua."
     },
     "pa_g3_abd_a": {
       "detalhe": "GMFCS I-II",
-      "instrucao": "Ikatu ojepuru ñembohekopyahu michĩme oñemopyendáva hemicuerpo omotenondéva/espasticidad rehe."
+      "instrucao": "Ikatu ojepuru ñembohekopyahu michĩme oñemopyendáva tete mbyte peteĩ gotyo omotenondéva/espastisidad rehe."
     },
     "pa_g4_fle": {
-      "instrucao": "Tape ñe’ẽ ha cinestésica rupive; jehechauka tetepy rehegua."
+      "instrucao": "Tape ñe'ẽ ha cinestésica rupive; jehechauka tetepy rehegua."
     },
     "pa_g3_agi_a": {
       "detalhe": "GMFCS I-II",
-      "instrucao": "Ikatu ojepuru ñembohekopyahu michĩme oñemopyendáva hemicuerpo omotenondéva/espasticidad rehe."
+      "instrucao": "Ikatu ojepuru ñembohekopyahu michĩme oñemopyendáva tete mbyte peteĩ gotyo omotenondéva/espastisidad rehe."
     },
     "pa_g4_agi": {
-      "instrucao": "Tapicha ombohapéva térã sã ombohapéva; ñemombe’u tapeguápe ha ñe’ẽ ñehendu hesakãva."
+      "instrucao": "Tapicha ombohapéva térã sã ombohapéva; ñemombe'u tapeguápe ha ñe'ẽ ñehendu hesakãva."
     },
     "pa_g3_abd_c": {
       "detalhe": "GMFCS IV-V",
-      "instrucao": "Ikatu oñejapo pytyvõ ha postura tolerancia yvate guýpe añónte."
+      "instrucao": "Ikatu oñejapo pytyvõ ha jeku'e tolerancia yvate guýpe añónte."
     },
     "pa_g6_vel": {
-      "instrucao": "Jehechauka tetepy rehegua je’ejey; ñeha’ã práctica joapýva oñepuntuáva’ỹ."
+      "instrucao": "Jehechauka tetepy rehegua je'ejey; ñeha'ã hekopete joapýva oñepuntuáva'ỹ."
     },
     "pa_g1_fle": {
       "instrucao": "Jyva ñemoakã; versión tenyhẽ ñepytyvõ reheve tekotevẽramo."
     },
     "pa_g4_abd": {
-      "instrucao": "Jeku’e ojojaha estándar rehe; ñemombe’u tapeguápe ha ñe’ẽ hesakãva."
+      "instrucao": "Jeku'e ojojaha hekopete rehe; ñemombe'u tapeguápe ha ñe'ẽ hesakãva."
     },
     "pa_g6_fle": {
-      "instrucao": "Jehechauka tetepy rehegua je’ejey; tape ñemboja’o peteĩteĩme hasy’ỹva."
+      "instrucao": "Jehechauka tetepy rehegua je'ejey; tape ñemboja'o peteĩteĩme hasy'ỹva."
     },
     "pa_g5_fle": {
-      "instrucao": "Jejapo estándar; jehechauka jehecháva tuicháva ha pytyvõ Ñe’ẽ Pópe (Libras) rupive oĩramo."
+      "instrucao": "Jejapo hekopete; jehechauka jehecháva tuicháva ha pytyvõ Ñe'ẽ Pópe (Libras) rupive oĩramo."
     },
     "pa_g4_vel": {
-      "instrucao": "Tapicha ombohapéva térã sistema sã ombohapéva; ñe’ẽ ñehendu hesakãva; ñemombe’u tapeguápe ñepyrũha rendápe."
+      "instrucao": "Tapicha ombohapéva térã ñemohenda sã ombohapéva; ñe'ẽ ñehendu hesakãva; ñemombe'u tapeguápe ñepyrũha rendápe."
     },
     "pa_g5_sal": {
-      "instrucao": "Jejapo estándar; ñe’ẽ jehecháva rupive."
+      "instrucao": "Jejapo hekopete; ñe'ẽ jehecháva rupive."
     },
     "pa_g2_fle": {
-      "instrucao": "Ikatu ojepuru opaite (miembro superior heta jey oñeñongatu ha oikóva porã)."
+      "instrucao": "Ikatu ojepuru opaite (jyva heta jey oñeñongatu ha oikóva porã)."
     },
     "pa_g3_vel_b": {
       "detalhe": "GMFCS III",
       "instrucao": "Oikotevẽ jehechajey peteĩteĩva oñemotenonde (jeguata pytyvõ tembipuru reheve)."
     },
     "pa_g1_agi": {
-      "instrucao": "Ñani shuttle run 9,14m mokõi bloque reheve."
+      "instrucao": "Ñani shuttle run 9,14m mokõi bloke reheve."
     },
     "pa_g3_sal_a": {
       "detalhe": "GMFCS I-II",
-      "instrucao": "Ikatu ojepuru ñembohekopyahu michĩme oñemopyendáva hemicuerpo omotenondéva/espasticidad rehe."
+      "instrucao": "Ikatu ojepuru ñembohekopyahu michĩme oñemopyendáva tete mbyte peteĩ gotyo omotenondéva/espastisidad rehe."
     },
     "pa_g3_abd_b": {
       "detalhe": "GMFCS III",
       "instrucao": "Ikatu ojepuru; oikotevẽ jehechajey peteĩteĩva oñemotenonde."
     },
     "pa_g5_vel": {
-      "instrucao": "Jejapo estándar; oñemyengovia ta’anga ñehendu estímulo jehecháva hesakãva rehe."
+      "instrucao": "Jejapo hekopete; oñemyengovia ta'anga ñehendu estímulo jehecháva hesakãva rehe."
     },
     "pa_g3_agi_b": {
       "detalhe": "GMFCS III",
       "instrucao": "Oikotevẽ jehechajey peteĩteĩva oñemotenonde (jeguata pytyvõ tembipuru reheve)."
     },
     "pa_g1_sal": {
-      "instrucao": "Popo horizontal mokõive py rehe. Oñemaña porãva’erã articulación ikatu rehe oĩramo apañuãi tuicháva miembro inferior-pe."
+      "instrucao": "Popo horizontal mokõive py rehe. Oñemaña porãva'erã tete joaju ikatu rehe oĩramo apañuãi tuicháva py-pe."
     },
     "pa_g2_abd": {
-      "instrucao": "Pytyvõ, jepytu’u térã tronco estabilización mecánica rupive."
+      "instrucao": "Pytyvõ, jepytu'u térã tronco estabilización mecánica rupive."
     },
     "pa_g2_agi": {
-      "instrucao": "Tape karẽ’i propulsión pógui térã oñemyengovia opaite ñeha’ã agilidad apyka ruedápe rehegua rehe."
+      "instrucao": "Tape karẽ'i propulsión pógui térã oñemyengovia opaite ñeha'ã agilidad apyka ruedápe rehegua rehe."
     },
     "pa_g1_vel": {
       "instrucao": "Ñani 20m aceleración tuichavéva reheve."
     },
     "pa_g3_sal_c": {
       "detalhe": "GMFCS IV-V",
-      "instrucao": "Oñemotenondeva’erã jehechajey funcional clínica oñemba’apóva fisioterapia ndive."
+      "instrucao": "Oñemotenondeva'erã jehechajey funcional klinika oñemba'apóva fisioterapia ndive."
     },
     "pa_g2_vel": {
-      "instrucao": "Oñemyengovia propulsión pya’e apyka rueda rehegua rupive 20 metro pukukue oñearandúva aja."
+      "instrucao": "Oñemyengovia propulsión pya'e apyka rueda rehegua rupive 20 metro pukukue oñearandúva aja."
     },
     "pa_g3_fle_c": {
       "detalhe": "GMFCS IV-V",
-      "instrucao": "Estándar térã oñembohekopyahúva oĩramo katupyry funcional miembro superior rehegua; péicha’ỹramo, oñemotenondeva’erã jehechajey funcional clínica fisioterapia ndive."
+      "instrucao": "Hekopete térã oñembohekopyahúva oĩramo katupyry funcional jyva rehegua; péicha'ỹramo, oñemotenondeva'erã jehechajey funcional klinika fisioterapia ndive."
     },
     "pa_g5_abd": {
-      "instrucao": "Jejapo estándar; ñepyrũ estímulo jehecháva hesakãva reheve (poyvi, tesape, jepo)."
+      "instrucao": "Jejapo hekopete; ñepyrũ estímulo jehecháva hesakãva reheve (poyvi, tesape, jepo)."
     },
     "pa_g3_fle_b": {
       "detalhe": "GMFCS III",
@@ -1137,212 +1137,212 @@
     },
     "pa_g3_vel_c": {
       "detalhe": "GMFCS IV-V",
-      "instrucao": "Oñemotenondeva’erã jehechajey funcional clínica oñemba’apóva fisioterapia ndive."
+      "instrucao": "Oñemotenondeva'erã jehechajey funcional klinika oñemba'apóva fisioterapia ndive."
     },
     "pa_g3_fle_a": {
       "detalhe": "GMFCS I-II",
-      "instrucao": "Ikatu ojepuru ñembohekopyahu michĩme oñemopyendáva hemicuerpo omotenondéva/espasticidad rehe."
+      "instrucao": "Ikatu ojepuru ñembohekopyahu michĩme oñemopyendáva tete mbyte peteĩ gotyo omotenondéva/espastisidad rehe."
     },
     "pa_g1_abd": {
-      "instrucao": "Prancha ventral isométrica, ára paha 30s."
+      "instrucao": "Prancha ventral isométrika, ára paha 30s."
     },
     "pa_g2_sal": {
-      "instrucao": "Ojapo estándar oĩramo katupyry funcional ha tekorosã. Ndajapói apañuãi miembro inferior rehegua omoingove popo peligroso térã ndaikatúiramo; péicha oikóramo, oñeñamindu’u ñeha’ã ambuéva potencia miembro inferior rehegua, ikatúramo."
+      "instrucao": "Ojapo hekopete oĩramo katupyry funcional ha tekorosã. Ndajapói apañuãi py rehegua omoingove popo peligroso térã ndaikatúiramo; péicha oikóramo, oñeñamindu'u ñeha'ã ambuéva mbaretete py rehegua, ikatúramo."
     },
     "pa_g6_agi": {
-      "instrucao": "Jehechauka tetepy rehegua je’ejey; pytyvõ ñe’ẽ rehegua oñeipe’a mbeguekatúpe."
+      "instrucao": "Jehechauka tetepy rehegua je'ejey; pytyvõ ñe'ẽ rehegua oñeipe'a mbeguekatúpe."
     },
     "pa_g6_sal": {
-      "instrucao": "Jehechauka tetepy rehegua je’ejey; ñeha’ã práctica joapýva oñepuntuáva’ỹ."
+      "instrucao": "Jehechauka tetepy rehegua je'ejey; ñeha'ã hekopete joapýva oñepuntuáva'ỹ."
     },
     "pa_g3_vel_a": {
       "detalhe": "GMFCS I-II",
-      "instrucao": "Ikatu ojepuru ñembohekopyahu michĩme oñemopyendáva hemicuerpo omotenondéva/espasticidad rehe."
+      "instrucao": "Ikatu ojepuru ñembohekopyahu michĩme oñemopyendáva tete mbyte peteĩ gotyo omotenondéva/espastisidad rehe."
     },
     "pa_g3_agi_c": {
       "detalhe": "GMFCS IV-V",
-      "instrucao": "Oñemotenondeva’erã jehechajey funcional clínica oñemba’apóva fisioterapia ndive."
+      "instrucao": "Oñemotenondeva'erã jehechajey funcional klinika oñemba'apóva fisioterapia ndive."
     }
   },
   "m15_pcd_modalidades": {
     "pm2": {
-      "nome": "Baloncesto / Rugby Apyka Ruedápe",
-      "descricao": "Jeku’e, potencia ha jepuru mbarete miembro superior rehegua apyka ári."
+      "nome": "Balóncesto / Rugby apyka ruedápe",
+      "descricao": "Jeku'e, mbaretete ha jepuru mbarete jyva rehegua apyka ári."
     },
     "pm4": {
-      "nome": "Boccia (Bocha Oñembohekopyahúva)",
-      "descricao": "Ha’etéva tronco estabilidad reheve; sa’ive oikotevẽ jeku’e."
+      "nome": "Boccia (bocha oñembohekopyahúva)",
+      "descricao": "Ha'etéva tronco estabilidad reheve; sa'ive oikotevẽ jeku'e."
     },
     "pm1": {
-      "nome": "Atletismo (Pya’ekue)",
-      "descricao": "Pya’ekue ha potencia miembro inferior rehegua tuichaiterei mba’e."
+      "nome": "Atletismo (pya'ekue)",
+      "descricao": "Pya'ekue ha mbaretete py rehegua tuichaiterei mba'e."
     },
     "pm3": {
-      "nome": "Jeýta Oñembohekopyahúva",
-      "descricao": "Mbarete miembro superior rehegua ha tronco mbyte estabilidad omyesakã porãha."
+      "nome": "Jeýta oñembohekopyahúva",
+      "descricao": "Mbarete jyva rehegua ha tronco mbyte estabilidad omyesakã porãha."
     },
     "pm6": {
-      "nome": "Halterofilia Oñembohekopyahúva",
-      "descricao": "Potencia miembro superior ha inferior rehegua tronco estabilidad ndive."
+      "nome": "Halterofilia oñembohekopyahúva",
+      "descricao": "Mbaretete jyva ha inferior rehegua tronco estabilidad ndive."
     },
     "pm5": {
-      "nome": "Goalball / Fútbol 5",
-      "descricao": "Jeku’e oñesãmbyhýva, agilidad ha pya’ekue oñembohovái hag̃ua."
+      "nome": "Goalball / Futbol 5",
+      "descricao": "Jeku'e oñesãmbyhýva, agilidad ha pya'ekue oñembohovái hag̃ua."
     }
   },
   "m15_pcd_funil": {
     "pu4_1": {
-      "titulo": "Filtro Clínico/Aty",
-      "regra": "Estructura motriz oñeñongatuva: ojepuru modalidad perfil neuromotor rehehápe, jejoko postural’ỹre."
+      "titulo": "Ñembogua kliniko/aty",
+      "regra": "Ñemohenda motriz oñeñongatuva: ojepuru modalidad perfil neuromotor rehehápe, jejoko postural'ỹre."
     },
     "pu2_2": {
-      "titulo": "Filtro Cognitivo/Sensorial",
-      "regra": "Oñesãmbyhy hag̃ua agilidad rape apyka rueda rehegua ha oñembohekopyahu hag̃ua ñe’ẽ ñeikumby nivel rehehápe."
+      "titulo": "Ñembogua kognitivo/ñandu rehegua",
+      "regra": "Oñesãmbyhy hag̃ua agilidad rape apyka rueda rehegua ha oñembohekopyahu hag̃ua ñe'ẽ ñeikumby nivel rehehápe."
     },
     "pu6_3": {
-      "titulo": "Filtro Preferencia ha Tembipota Mba’eteéva",
-      "regra": "Oñemaña porãva’erã mitã/mitãrusu preferencia ha tembipota mba’eteéva modalidad jeporavo pahápe."
+      "titulo": "Ñembogua ñemoneí ha tembipota mba'eteéva",
+      "regra": "Oñemaña porãva'erã mitã/mitãrusu ñeiporã ha tembipota mba'eteéva modalidad jeporavo pahápe."
     },
     "pu5_3": {
-      "titulo": "Filtro Preferencia ha Tembipota Mba’eteéva",
-      "regra": "Oñemaña porãva’erã mitã/mitãrusu preferencia ha tembipota mba’eteéva modalidad jeporavo pahápe."
+      "titulo": "Ñembogua ñemoneí ha tembipota mba'eteéva",
+      "regra": "Oñemaña porãva'erã mitã/mitãrusu ñeiporã ha tembipota mba'eteéva modalidad jeporavo pahápe."
     },
     "pu3_1": {
-      "titulo": "Filtro Clínico/Aty",
-      "regra": "Oñembojoaju va’erã nivel GMFCS peteĩteĩ modalidad oñe’ẽporãva ndive; oñemomba’e va’erã contraindicación patrón motor rehegua (techapyrã: popo GMFCS III-pe ha upéi)."
+      "titulo": "Ñembogua kliniko/aty",
+      "regra": "Oñembojoaju va'erã nivel GMFCS peteĩteĩ modalidad oñe'ẽporãva ndive; oñemomba'e va'erã ñemoneí'ỹ jeku'e ñemohenda rehegua (techapyrã: popo GMFCS III-pe ha upéi)."
     },
     "pu4_2": {
-      "titulo": "Filtro Cognitivo/Sensorial",
-      "regra": "Ojehechava’erã tekotevẽ ñembohape/ñe’ẽ ñehendu ha ñemombe’u tapeguápe rehegua; oñemotenondeva’erã modalidad Goalball térã Fútbol 5 ichagua."
+      "titulo": "Ñembogua kognitivo/ñandu rehegua",
+      "regra": "Ojehechava'erã tekotevẽ ñembohape/ñe'ẽ ñehendu ha ñemombe'u tapeguápe rehegua; oñemotenondeva'erã modalidad Goalball térã Fútbol 5 ichagua."
     },
     "pu2_1": {
-      "titulo": "Filtro Clínico/Aty",
-      "regra": "Oñemotenondeva’erã ñeha’ã miembro superior ha tronco estabilización rehegua; oñemboyke va’erã tembiapo impacto yvategua."
+      "titulo": "Ñembogua kliniko/aty",
+      "regra": "Oñemotenondeva'erã ñeha'ã jyva ha tronco estabilización rehegua; oñemboyke va'erã tembiapo jehechakuaa yvategua."
     },
     "pu5_1": {
-      "titulo": "Filtro Clínico/Aty",
-      "regra": "Tembiapo motriz oñeñongatuva: ojepuru perfil neuromotor rehehápe; oñemotenonde ñembohekopyahu comunicación rape rehe."
+      "titulo": "Ñembogua kliniko/aty",
+      "regra": "Tembiapo motriz oñeñongatuva: ojepuru perfil neuromotor rehehápe; oñemotenonde ñembohekopyahu ñe'ẽjovái rape rehe."
     },
     "pu_all_3": {
-      "titulo": "Filtro Preferencia ha Tembipota Mba’eteéva",
-      "regra": "Oñemaña porãva’erã mitã/mitãrusu preferencia ha tembipota mba’eteéva modalidad jeporavo pahápe."
+      "titulo": "Ñembogua ñemoneí ha tembipota mba'eteéva",
+      "regra": "Oñemaña porãva'erã mitã/mitãrusu ñeiporã ha tembipota mba'eteéva modalidad jeporavo pahápe."
     },
     "pu5_2": {
-      "titulo": "Filtro Cognitivo/Sensorial",
-      "regra": "Ojeasegura va’erã estímulo jehecháva hesakã ha pytyvõ Ñe’ẽ Pópe (Libras) rupive; ojehechava’erã ñeikumby regla rehegua."
+      "titulo": "Ñembogua kognitivo/ñandu rehegua",
+      "regra": "Ojeasegura va'erã estímulo jehecháva hesakã ha pytyvõ Ñe'ẽ Pópe (Libras) rupive; ojehechava'erã ñeikumby regla rehegua."
     },
     "pu1_3": {
-      "titulo": "Filtro Preferencia ha Tembipota Mba’eteéva",
-      "regra": "Oñemaña porãva’erã mitã/mitãrusu preferencia ha tembipota mba’eteéva modalidad jeporavo pahápe."
+      "titulo": "Ñembogua ñemoneí ha tembipota mba'eteéva",
+      "regra": "Oñemaña porãva'erã mitã/mitãrusu ñeiporã ha tembipota mba'eteéva modalidad jeporavo pahápe."
     },
     "pu6_1": {
-      "titulo": "Filtro Clínico/Aty",
-      "regra": "Katupyry motriz oĩ porã: ojepuru modalidad perfil rehehápe; oñemaña va’erã kane’õ ha aprendizaje ritmo rehe."
+      "titulo": "Ñembogua kliniko/aty",
+      "regra": "Katupyry motriz oĩ porã: ojepuru modalidad perfil rehehápe; oñemaña va'erã kane'õ ha aprendizaje ñemboguata rehe."
     },
     "pu6_2": {
-      "titulo": "Filtro Cognitivo/Sensorial",
-      "regra": "Oñemboja’o va’erã tape, ojehechauka je’ejey ha oñeme’ẽ va’erã ñeha’ã práctica joapýva; oñemomichĩ va’erã regla hasy’ỹ."
+      "titulo": "Ñembogua kognitivo/ñandu rehegua",
+      "regra": "Oñemboja'o va'erã tape, ojehechauka je'ejey ha oñeme'ẽ va'erã ñeha'ã hekopete joapýva; oñemomichĩ va'erã regla hasy'ỹ."
     },
     "pu1_2": {
-      "titulo": "Filtro Cognitivo/Sensorial",
-      "regra": "Regla hasy ijeheguíva: tape hasy’ỹ ha jehechauka tenondegua tembiapo ñeikumby hag̃ua."
+      "titulo": "Ñembogua kognitivo/ñandu rehegua",
+      "regra": "Regla hasy ijeheguíva: tape hasy'ỹ ha jehechauka tenondegua tembiapo ñeikumby hag̃ua."
     },
     "pu1_1": {
-      "titulo": "Filtro Clínico/Aty",
-      "regra": "Ñemboheko postural ijeheguíva: oñehechava’erã articulación miembro inferior rehegua popo mboyve; ojepuru ñeha’ã jejoko estructural rehehápe."
+      "titulo": "Ñembogua kliniko/aty",
+      "regra": "Ñemboheko postural ijeheguíva: oñehechava'erã tete joaju py rehegua popo mboyve; ojepuru ñeha'ã jejoko estructural rehehápe."
     },
     "pu4_3": {
-      "titulo": "Filtro Preferencia ha Tembipota Mba’eteéva",
-      "regra": "Oñemaña porãva’erã mitã/mitãrusu preferencia ha tembipota mba’eteéva modalidad jeporavo pahápe."
+      "titulo": "Ñembogua ñemoneí ha tembipota mba'eteéva",
+      "regra": "Oñemaña porãva'erã mitã/mitãrusu ñeiporã ha tembipota mba'eteéva modalidad jeporavo pahápe."
     },
     "pu2_3": {
-      "titulo": "Filtro Preferencia ha Tembipota Mba’eteéva",
-      "regra": "Oñemaña porãva’erã mitã/mitãrusu preferencia ha tembipota mba’eteéva modalidad jeporavo pahápe."
+      "titulo": "Ñembogua ñemoneí ha tembipota mba'eteéva",
+      "regra": "Oñemaña porãva'erã mitã/mitãrusu ñeiporã ha tembipota mba'eteéva modalidad jeporavo pahápe."
     },
     "pu3_3": {
-      "titulo": "Filtro Preferencia ha Tembipota Mba’eteéva",
-      "regra": "Oñemaña porãva’erã mitã/mitãrusu preferencia ha tembipota mba’eteéva modalidad jeporavo pahápe."
+      "titulo": "Ñembogua ñemoneí ha tembipota mba'eteéva",
+      "regra": "Oñemaña porãva'erã mitã/mitãrusu ñeiporã ha tembipota mba'eteéva modalidad jeporavo pahápe."
     },
     "pu3_2": {
-      "titulo": "Filtro Cognitivo/Sensorial",
-      "regra": "Oñemaña va’erã espasticidad, coordinación ha regla ñeikumby rehe; oñembohekopyahu va’erã intensidad ha hasy’ỹ."
+      "titulo": "Ñembogua kognitivo/ñandu rehegua",
+      "regra": "Oñemaña va'erã espastisidad, coordinación ha regla ñeikumby rehe; oñembohekopyahu va'erã mbaretete ha hasy'ỹ."
     }
   },
   "vocational_assessments": {
     "Vocal-12": {
-      "interest_area": "Nde reipota remyatyrõ apañuãi lógico, reipuru papapy ha reikuaa mba’éichapa omba’apo tecnología.",
-      "suggested_career": "Ingeniería, Ciencia de la Computación, Matemática, Física, Arquitectura ha Tecnología de la Información.",
-      "technical_opinion": "Temimbo’e ohechauka pensamiento lógico oñemopyendáva hekopeteitépe, ndahasýi oipuru hag̃ua datos abstractos ha papapy rehegua, ha avei curiosidad natural oikuaa hag̃ua mba’éichapa omba’apo umi sistema complejo ha tecnología pyahu. Kóva ha’e perfil oñemotenondéva apañuãi ñemyatyrõ práctica, proceso ñemoporã ha innovación técnica rehe."
+      "interest_area": "Nde reipota remyatyrõ apañuãi lógico, reipuru papapy ha reikuaa mba'éichapa omba'apo teknología.",
+      "suggested_career": "Ingeniería, papapy'i ñembokatupyry, papapy, tetepykuaa, arquitectura ha teknología marandu rehegua.",
+      "technical_opinion": "Mbo'eharã ohechauka pensamiento lógico oñemopyendáva hekopeteitépe, ndahasýi oipuru hag̃ua mba'ekuaarã abstractos ha papapy rehegua, ha avei jeheka tee oikuaa hag̃ua mba'éichapa omba'apo umi ñemohenda complejo ha teknología pyahu. Kóva ha'e perfil oñemotenondéva apañuãi ñemyatyrõ hekopete, tembiapo ñemohenda ñemoporã ha tembiapy pyahu técnika rehe."
     },
     "Vocal-13": {
-      "interest_area": "Nde reikuaa reñe’ẽ, reipytyvõ tapichakuérape ha reikuaa sociedad.",
-      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo ha Relaciones Internacionales.",
-      "technical_opinion": "Temimbo’e ohechauka interés oñemotenondéva sociedad ñehecha crítica, apañuãi ñemombyte ha kuaa ñemomarandu rehe. Ikatupyry ojoaju porãitépe profesiones oikotevẽva ñehendu activo, jehai fluida ha pensamiento humanístico rehe."
+      "interest_area": "Nde reikuaa reñe'ẽ, reipytyvõ tapichakuérape ha reikuaa tapicha aty.",
+      "suggested_career": "Tekog̃uahẽ, ñe'ẽporã, mbo'e kuaa, ñe'ẽlandu kuaa, tembiasakue, marandu kuatia ha tetãnguéra joaju.",
+      "technical_opinion": "Mbo'eharã ohechauka interés oñemotenondéva tapicha aty ñehecha ñehecha porã, apañuãi ñemombyte ha kuaa ñemomarandu rehe. Ikatupyry ojoaju porãitépe profesiones oikotevẽva ñehendu activo, jehai fluida ha pensamiento humanístico rehe."
     },
     "Vocal-11": {
-      "interest_area": "Nde reikuaa reñe’ẽ, reipytyvõ tapichakuérape ha reikuaa sociedad.",
-      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo ha Relaciones Internacionales.",
-      "technical_opinion": "Temimbo’e ohechauka interés oñemotenondéva sociedad ñehecha crítica, apañuãi ñemombyte ha kuaa ñemomarandu rehe. Ikatupyry ojoaju porãitépe profesiones oikotevẽva ñehendu activo, jehai fluida ha pensamiento humanístico rehe."
+      "interest_area": "Nde reikuaa reñe'ẽ, reipytyvõ tapichakuérape ha reikuaa tapicha aty.",
+      "suggested_career": "Tekog̃uahẽ, ñe'ẽporã, mbo'e kuaa, ñe'ẽlandu kuaa, tembiasakue, marandu kuatia ha tetãnguéra joaju.",
+      "technical_opinion": "Mbo'eharã ohechauka interés oñemotenondéva tapicha aty ñehecha ñehecha porã, apañuãi ñemombyte ha kuaa ñemomarandu rehe. Ikatupyry ojoaju porãitépe profesiones oikotevẽva ñehendu activo, jehai fluida ha pensamiento humanístico rehe."
     },
     "Vocal-8": {
-      "interest_area": "Iporãitereíva diseño juego térã desarrollo web-pe g̃uarã.",
-      "suggested_career": "Híbrido",
-      "technical_opinion": "Temimbo’e ndojokói peteĩva kuaa rape añónte; oipuru creatividad omoheñói hag̃ua tecnología, omomyatyrõvo apañuãi interface, interatividad ha puruhára experiencia rehegua innovación rupive."
+      "interest_area": "Iporãitereíva tembiapy ñemohenda juego térã web ñemoheñói-pe g̃uarã.",
+      "suggested_career": "Mbojoajupy",
+      "technical_opinion": "Mbo'eharã ndojokói peteĩva kuaa rape añónte; oipuru ñemoheñói pyahu omoheñói hag̃ua teknología, omomyatyrõvo apañuãi interface, jehechajey ha puruhára jehechakuaa rehegua tembiapy pyahu rupive."
     },
     "Vocal-9": {
-      "interest_area": "Nde reikuaa reñe’ẽ, reipytyvõ tapichakuérape ha reikuaa sociedad.",
-      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo ha Relaciones Internacionales.",
-      "technical_opinion": "Temimbo’e ohechauka interés oñemotenondéva sociedad ñehecha crítica, apañuãi ñemombyte ha kuaa ñemomarandu rehe. Ikatupyry ojoaju porãitépe profesiones oikotevẽva ñehendu activo, jehai fluida ha pensamiento humanístico rehe."
+      "interest_area": "Nde reikuaa reñe'ẽ, reipytyvõ tapichakuérape ha reikuaa tapicha aty.",
+      "suggested_career": "Tekog̃uahẽ, ñe'ẽporã, mbo'e kuaa, ñe'ẽlandu kuaa, tembiasakue, marandu kuatia ha tetãnguéra joaju.",
+      "technical_opinion": "Mbo'eharã ohechauka interés oñemotenondéva tapicha aty ñehecha ñehecha porã, apañuãi ñemombyte ha kuaa ñemomarandu rehe. Ikatupyry ojoaju porãitépe profesiones oikotevẽva ñehendu activo, jehai fluida ha pensamiento humanístico rehe."
     },
     "Vocal-10": {
-      "interest_area": "Nde reikuaa reñe’ẽ, reipytyvõ tapichakuérape ha reikuaa sociedad.",
-      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo ha Relaciones Internacionales.",
-      "technical_opinion": "Temimbo’e ohechauka interés oñemotenondéva sociedad ñehecha crítica, apañuãi ñemombyte ha kuaa ñemomarandu rehe. Ikatupyry ojoaju porãitépe profesiones oikotevẽva ñehendu activo, jehai fluida ha pensamiento humanístico rehe."
+      "interest_area": "Nde reikuaa reñe'ẽ, reipytyvõ tapichakuérape ha reikuaa tapicha aty.",
+      "suggested_career": "Tekog̃uahẽ, ñe'ẽporã, mbo'e kuaa, ñe'ẽlandu kuaa, tembiasakue, marandu kuatia ha tetãnguéra joaju.",
+      "technical_opinion": "Mbo'eharã ohechauka interés oñemotenondéva tapicha aty ñehecha ñehecha porã, apañuãi ñemombyte ha kuaa ñemomarandu rehe. Ikatupyry ojoaju porãitépe profesiones oikotevẽva ñehendu activo, jehai fluida ha pensamiento humanístico rehe."
     },
     "Vocal-14": {
-      "interest_area": "Nde reikuaa reñe’ẽ, reipytyvõ tapichakuérape ha reikuaa sociedad.",
-      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo ha Relaciones Internacionales.",
-      "technical_opinion": "Temimbo’e ohechauka interés oñemotenondéva sociedad ñehecha crítica, apañuãi ñemombyte ha kuaa ñemomarandu rehe. Ikatupyry ojoaju porãitépe profesiones oikotevẽva ñehendu activo, jehai fluida ha pensamiento humanístico rehe."
+      "interest_area": "Nde reikuaa reñe'ẽ, reipytyvõ tapichakuérape ha reikuaa tapicha aty.",
+      "suggested_career": "Tekog̃uahẽ, ñe'ẽporã, mbo'e kuaa, ñe'ẽlandu kuaa, tembiasakue, marandu kuatia ha tetãnguéra joaju.",
+      "technical_opinion": "Mbo'eharã ohechauka interés oñemotenondéva tapicha aty ñehecha ñehecha porã, apañuãi ñemombyte ha kuaa ñemomarandu rehe. Ikatupyry ojoaju porãitépe profesiones oikotevẽva ñehendu activo, jehai fluida ha pensamiento humanístico rehe."
     },
     "Vocal-15": {
-      "interest_area": "Nde reipota remyatyrõ apañuãi lógico, reipuru papapy ha reikuaa mba’éichapa omba’apo tecnología.",
-      "suggested_career": "Ingeniería, Ciencia de la Computación, Matemática, Física, Arquitectura ha Tecnología de la Información.",
-      "technical_opinion": "Temimbo’e ohechauka pensamiento lógico oñemopyendáva hekopeteitépe, ndahasýi oipuru hag̃ua datos abstractos ha papapy rehegua, ha avei curiosidad natural oikuaa hag̃ua mba’éichapa omba’apo umi sistema complejo ha tecnología pyahu. Kóva ha’e perfil oñemotenondéva apañuãi ñemyatyrõ práctica, proceso ñemoporã ha innovación técnica rehe."
+      "interest_area": "Nde reipota remyatyrõ apañuãi lógico, reipuru papapy ha reikuaa mba'éichapa omba'apo teknología.",
+      "suggested_career": "Ingeniería, papapy'i ñembokatupyry, papapy, tetepykuaa, arquitectura ha teknología marandu rehegua.",
+      "technical_opinion": "Mbo'eharã ohechauka pensamiento lógico oñemopyendáva hekopeteitépe, ndahasýi oipuru hag̃ua mba'ekuaarã abstractos ha papapy rehegua, ha avei jeheka tee oikuaa hag̃ua mba'éichapa omba'apo umi ñemohenda complejo ha teknología pyahu. Kóva ha'e perfil oñemotenondéva apañuãi ñemyatyrõ hekopete, tembiapo ñemohenda ñemoporã ha tembiapy pyahu técnika rehe."
     },
     "Vocal-16": {
-      "interest_area": "Nde reikuaa reñe’ẽ, reipytyvõ tapichakuérape ha reikuaa sociedad.",
-      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo ha Relaciones Internacionales.",
-      "technical_opinion": "Ko perfil ñemoakãrapu’a tuichavéva ojoaju porãitépe tapicha rehe ha iñemoirũ colectivo hasy rehe. Temimbo’e ohechauka katupyry tuicháva ñehendu activo, empatía jejapo ha idea abstracta ñembojoaju ñe’ẽ rupive. Iñakã ojuhu ñemokyre’ỹ ohechase jave fenómeno social, derecho humano ha tembiasakue omoha’ãngáva ñande cultura. Ndaha’éi ñepotaiterei teórico añónte, ko perfil ohechauka inteligencia oñemotenondéva ñemoambue práctica ha apañuãi ñemombyte rehe. Mitãrusu oguereko potencial oĩva ojejapo hag̃ua tenondete tenda oikotevẽva responsabilidad ética, taha’e omomba’évo causa jurídica, ombo’évo, omokyre’ỹvo salud mental térã omomarandúvo marandu tuicháva comunidad-pe g̃uarã."
+      "interest_area": "Nde reikuaa reñe'ẽ, reipytyvõ tapichakuérape ha reikuaa tapicha aty.",
+      "suggested_career": "Tekog̃uahẽ, ñe'ẽporã, mbo'e kuaa, ñe'ẽlandu kuaa, tembiasakue, marandu kuatia ha tetãnguéra joaju.",
+      "technical_opinion": "Ko perfil ñemoakãrapu'a tuichavéva ojoaju porãitépe tapicha rehe ha iñemoirũ aty rehegua hasy rehe. mbo'eharã ohechauka katupyry tuicháva ñehendu activo, empatía jejapo ha idea abstracta ñembojoaju ñe'ẽ rupive. Iñakã ojuhu ñemokyre'ỹ ohechase jave fenómeno aty rehegua, tekog̃uahẽ humano ha tembiasakue omoha'ãngáva ñande tetã reko. Ndaha'éi ñepotaiterei teórico añónte, ko perfil ohechauka inteligencia oñemotenondéva ñemoambue hekopete ha apañuãi ñemombyte rehe. Mitãrusu oguereko potencial oĩva ojejapo hag̃ua tenondete tenda oikotevẽva ñangareko ética, taha'e omomba'évo causa jurídika, ombo'évo, omokyre'ỹvo ñe'ẽlandu tesãi térã omomarandúvo marandu tuicháva comunidad-pe g̃uarã."
     }
   },
   "snap_assessments": {
     "Snap-2": {
-      "technical_opinion": "Oĩ techaukaha síntoma tuicháva mokõive dimensión-pe, ohechaukáva ikatuha patrón oñembojehe’áva. Kóva ha’e pe jehecha omombaretéva tekotevẽ oñeheka porã diagnóstico completo profesional especializado rupive."
+      "technical_opinion": "Oĩ techaukaha techaukaha tuicháva mokõive ñemohenda-pe, ohechaukáva ikatuha patrón oñembojehe'áva. Kóva ha'e pe jehecha omombaretéva tekotevẽ oñeheka porã jehechakuaa completo katupyryhára katupyryhára rupive."
     }
   },
   "aq10_assessments": {
     "Aq10-2": {
-      "technical_opinion": "Puntuación ojehupytýva oĩ promedio yvypóra tuichakue ryepýpe, ohechaukávo sa’ive probabilidad trastorno del espectro autista rehegua ko jehechakuépe. Upéicharõ jepe, AQ-10 ha’e tembipuru jehechajey añónte: opytaramo preocupación clínica tuvakuéra térã oñangarekóva rehegua, ñe’ẽporã oñembojoapy hag̃ua jehechajey profesional tesãi ikatupyrýva ndive."
+      "technical_opinion": "Puntos ojehupytýva oĩ mbyte yvypóra tuichakue ryepýpe, ohechaukávo sa'ive probabilidad autismo espectro apañuãi rehegua ko jehechakuépe. Upéicharõ jepe, AQ-10 ha'e tembipuru jehechajey añónte: opytaramo preocupación klinika tuvakuéra térã oñangarekóva rehegua, ñe'ẽporã oñembojoapy hag̃ua jehechajey katupyryhára tesãi ikatupyrýva ndive."
     }
   },
   "ias_assessments": {
     "IAS-2": {
-      "technical_opinion": "Riesgo tuicháva oñemoakãrapu’ã hag̃ua carencia nutricional ha mba’asy pukukue (diabetes, hipertensión, apañuãi corazón rehegua). Oikotevẽ intervención pya’e."
+      "technical_opinion": "Riesgo tuicháva oñemoakãrapu'ã hag̃ua carencia nutricional ha mba'asy pukukue (diabetes, hipertensión, apañuãi tymba'óga rehegua). Oikotevẽ ñe'ẽporã pya'e."
     }
   },
   "health_assessments": {
     "Health-2": {
-      "technical_opinion": "Ohechauka tekotevẽ ñangareko térã intervención psicológica/social. Ñe’ẽporã oñangareko ag̃ui temimbo’ére ha oñehendu hag̃ua chupe."
+      "technical_opinion": "Ohechauka tekotevẽ ñangareko térã ñe'ẽporã ñe'ẽlandu rehegua/aty rehegua. Ñe'ẽporã oñangareko ag̃ui temimbo'ére ha oñehendu hag̃ua chupe."
     }
   },
   "autoconcept_assessments": {
     "Auto-2": {
-      "technical_opinion": "Ohechauka estándar yvypóra hetavéva rehegua. Tapicha omantene joaju porã ijehe ndive ha oikuaa umi mba’e porã ha ikangyva ha’e orekóva añetehápe."
+      "technical_opinion": "Ohechauka hekopete yvypóra hetavéva rehegua. Tapicha omantene joaju porã ijehe ndive ha oikuaa umi mba'e porã ha ikangyva ha'e orekóva añetehápe."
     }
   },
   "oral_assessments": {
     "Oral-2": {
-      "technical_opinion": "Mba’épa he’ise: Teko peligroso.\nPerfil: Oĩ posibilidad tuichaiterei oñembyaty hag̃ua ky’a ha placa bacteria rehegua tãime. Paciente oikotevẽ pya’e tape ñemopotĩ rehegua ha tratamiento preventivo dentista rendápe.\n"
+      "technical_opinion": "Mba'épa he'ise: Teko peligroso. Perfil: Oĩ posibilidad tuichaiterei oñembyaty hag̃ua ky'a ha ky'a ñembyaty bacteria rehegua tãime. hasýva oikotevẽ pya'e tape ñemopotĩ rehegua ha ñangareko ypykue tãi ñangarekohára rendápe."
     }
   },
   "sport_assessments": {
@@ -1376,28 +1376,28 @@
   },
   "pcd_assessments": {
     "PCD-2": {
-      "grupo_nome": "Discapacidad Física (Apyka Rueda rehegua)",
-      "classificacao_perfil": "Perfil Motor Mbyte",
-      "direcionamento": "Boccia (Bocha Oñembohekopyahúva); Atletismo (Pya’ekue); Jeýta Oñembohekopyahúva",
-      "technical_opinion": "Aty jehechajey 2 (Discapacidad Física (Apyka Rueda rehegua)). Perfil: Perfil Motor Mbyte. Direccionamiento deportivo sugerido: Boccia (Bocha Oñembohekopyahúva); Atletismo (Pya’ekue); Jeýta Oñembohekopyahúva."
+      "grupo_nome": "Tetepy katupyry'ỹva (Apyka rueda rehegua)",
+      "classificacao_perfil": "Perfil motor mbyte",
+      "direcionamento": "Boccia (Bocha Oñembohekopyahúva); Atletismo (Pya'ekue); Jeýta Oñembohekopyahúva",
+      "technical_opinion": "Aty jehechajey 2 (katupyry'ỹ tetepykuaa (Apyka Rueda rehegua)). Perfil: Perfil Motor Mbyte. Direccionamiento deportivo ñemoneíva: Boccia (Bocha Oñembohekopyahúva); Atletismo (Pya'ekue); Jeýta Oñembohekopyahúva."
     },
     "PCD-3": {
-      "grupo_nome": "Discapacidad Física (Jeku’e Ijeheguíva)",
-      "classificacao_perfil": "Perfil Motor Mbyte",
-      "direcionamento": "Preselección (matriz física): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Atletismo (Pya’ekue). Indicación preliminar, oñemotenonde va’erã funil cualitativo rupive (filtro clínico-funcional, cognitivo-sensorial ha preferencia participante rehegua).",
-      "technical_opinion": "Aty jehechajey 1 (Discapacidad Física (Jeku’e Ijeheguíva)). Perfil: Perfil Motor Mbyte. Direccionamiento deportivo sugerido: Preselección (matriz física): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Atletismo (Pya’ekue). Indicación preliminar, oñemotenonde va’erã funil cualitativo rupive (filtro clínico-funcional, cognitivo-sensorial ha preferencia participante rehegua).."
+      "grupo_nome": "Tetepy katupyry'ỹva (Jeku'e ijeheguíva)",
+      "classificacao_perfil": "Perfil motor mbyte",
+      "direcionamento": "Preseleksión (ñemohenda ypy tetepykuaa): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Atletismo (Pya'ekue). jehechakuaa ypykue, oñemotenonde va'erã ñembogua kualitativo rupive (ñembogua kliniko-funcional, ñemoimo'ã rehegua-ñandu rehegua ha ñeiporã oñeparticipáva rehegua).",
+      "technical_opinion": "Aty jehechajey 1 (katupyry'ỹ tetepykuaa (Jeku'e Ijeheguíva)). Perfil: Perfil Motor Mbyte. Direccionamiento deportivo ñemoneíva: preseleksión (ñemohenda ypy tetepykuaa): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Atletismo (Pya'ekue). jehechakuaa ypykue, oñemotenonde va'erã ñembogua kualitativo rupive (ñembogua kliniko-funcional, ñemoimo'ã rehegua-ñandu rehegua ha ñeiporã oñeparticipáva rehegua).."
     },
     "PCD-5": {
-      "grupo_nome": "Parálisis Cerebral (GMFCS)",
-      "classificacao_perfil": "Perfil Motor limitación ndive",
-      "direcionamento": "Preselección (matriz física): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Halterofilia Oñembohekopyahúva. Indicación preliminar, oñemotenonde va’erã funil cualitativo rupive (filtro clínico-funcional, cognitivo-sensorial ha preferencia participante rehegua).",
-      "technical_opinion": "Aty jehechajey 3 (Parálisis Cerebral (GMFCS)). Perfil: Perfil Motor limitación ndive. Direccionamiento deportivo sugerido: Preselección (matriz física): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Halterofilia Oñembohekopyahúva. Indicación preliminar, oñemotenonde va’erã funil cualitativo rupive (filtro clínico-funcional, cognitivo-sensorial ha preferencia participante rehegua).."
+      "grupo_nome": "Ñemongu'e'ỹ cerebral (GMFCS)",
+      "classificacao_perfil": "Perfil motor ñemboguejy ndive",
+      "direcionamento": "Preseleksión (ñemohenda ypy tetepykuaa): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Halterofilia Oñembohekopyahúva. jehechakuaa ypykue, oñemotenonde va'erã ñembogua kualitativo rupive (ñembogua kliniko-funcional, ñemoimo'ã rehegua-ñandu rehegua ha ñeiporã oñeparticipáva rehegua).",
+      "technical_opinion": "Aty jehechajey 3 (ñemongu'e'ỹ Cerebral (GMFCS)). Perfil: Perfil Motor limitación ndive. Direccionamiento deportivo ñemoneíva: preseleksión (ñemohenda ypy tetepykuaa): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Halterofilia Oñembohekopyahúva. jehechakuaa ypykue, oñemotenonde va'erã ñembogua kualitativo rupive (ñembogua kliniko-funcional, ñemoimo'ã rehegua-ñandu rehegua ha ñeiporã oñeparticipáva rehegua).."
     },
     "PCD-4": {
-      "grupo_nome": "Discapacidad Visual (B1-B3)",
-      "classificacao_perfil": "Perfil Motor Mbyte",
-      "direcionamento": "Preselección (matriz física): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Halterofilia Oñembohekopyahúva. Indicación preliminar, oñemotenonde va’erã funil cualitativo rupive (filtro clínico-funcional, cognitivo-sensorial ha preferencia participante rehegua).",
-      "technical_opinion": "Aty jehechajey 4 (Discapacidad Visual (B1-B3)). Perfil: Perfil Motor Mbyte. Direccionamiento deportivo sugerido: Preselección (matriz física): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Halterofilia Oñembohekopyahúva. Indicación preliminar, oñemotenonde va’erã funil cualitativo rupive (filtro clínico-funcional, cognitivo-sensorial ha preferencia participante rehegua).."
+      "grupo_nome": "Ñehecha katupyry'ỹva (B1-B3)",
+      "classificacao_perfil": "Perfil motor mbyte",
+      "direcionamento": "Preseleksión (ñemohenda ypy tetepykuaa): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Halterofilia Oñembohekopyahúva. jehechakuaa ypykue, oñemotenonde va'erã ñembogua kualitativo rupive (ñembogua kliniko-funcional, ñemoimo'ã rehegua-ñandu rehegua ha ñeiporã oñeparticipáva rehegua).",
+      "technical_opinion": "Aty jehechajey 4 (katupyry'ỹ ñehecha rehegua (B1-B3)). Perfil: Perfil Motor Mbyte. Direccionamiento deportivo ñemoneíva: preseleksión (ñemohenda ypy tetepykuaa): Jeýta Oñembohekopyahúva; Baloncesto / Rugby Apyka Ruedápe; Halterofilia Oñembohekopyahúva. jehechakuaa ypykue, oñemotenonde va'erã ñembogua kualitativo rupive (ñembogua kliniko-funcional, ñemoimo'ã rehegua-ñandu rehegua ha ñeiporã oñeparticipáva rehegua).."
     }
   }
 }
