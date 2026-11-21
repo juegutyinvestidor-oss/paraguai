@@ -3079,17 +3079,27 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
 
       const upsertOne = async (item: { fa: string; id: string; rid: string | null }) => {
         // Sempre regenera o corpo (texto atual das configs/registros) preservando a anotacao existente.
-        const existingObs = studentReports.find(r => r.id === item.id)?.observations ?? '';
+        const current = studentReports.find(r => r.id === item.id);
+        const existingObs = current?.observations ?? '';
         const reportCtx = makeReportCtx(item.fa, studentObj.name, studentObj.grade, existingObs, dateStr, existing);
         const built = locale === 'pt-BR'
           ? buildAssessmentReport(reportCtx)
           : localizeAssessmentReport(reportCtx, t as ReportTranslator, locale);
         if (!built) return;
+        if (locale !== 'pt-BR' && current?.report) {
+          if (current.observations !== existingObs) {
+            const { error } = await supabase.from('performance_reports').update({ observations: existingObs }).eq('id', item.id);
+            if (error) { console.error('Falha ao salvar anotacao:', error.message); return; }
+            const patch = (prev: PerformanceReport[]) => prev.some(r => r.id === item.id) ? prev.map(r => r.id === item.id ? { ...r, observations: existingObs } : r) : prev;
+            setSavedReports(patch);
+            setAllSavedReports(patch);
+          }
+          return;
+        }
         const report = cleanText(built.report);
         // Rede de seguranca: nunca rebaixa um relatorio ja bom para o texto de
         // config ausente (ex.: parecer ainda nao carregado ao abrir o aluno).
         const isFallbackText = /não cadastrad[oa]s?/i.test(report);
-        const current = studentReports.find(r => r.id === item.id);
         if (isFallbackText && current && !/não cadastrad[oa]s?/i.test(current.report)) {
           return;
         }

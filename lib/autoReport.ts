@@ -69,12 +69,13 @@ export async function ensurePerformanceReport(
 
   // Preserva a anotacao ja salva do educador (nao sobrescrever no re-salvar).
   let observations = params.existingObservations ?? '';
-  if (params.existingObservations === undefined) {
-    try {
-      const { data } = await supabase.from('performance_reports').select('observations').eq('id', reportId).limit(1);
-      observations = (data && data.length > 0 ? (data[0] as { observations?: string }).observations : '') ?? '';
-    } catch { /* tabela pode nao existir ainda */ }
-  }
+  let existingReport = '';
+  try {
+    const { data } = await supabase.from('performance_reports').select('report, observations').eq('id', reportId).limit(1);
+    const row = data && data.length > 0 ? (data[0] as { observations?: string; report?: string }) : undefined;
+    if (params.existingObservations === undefined) observations = row?.observations ?? '';
+    existingReport = row?.report ?? '';
+  } catch { /* tabela pode nao existir ainda */ }
 
   const uiLocale = currentUiLocale();
   const dateStr = new Date().toLocaleDateString(currentReportLocale());
@@ -146,6 +147,12 @@ export async function ensurePerformanceReport(
     const built = buildLocalized(ctx, uiLocale);
     if (!built) return false;
     evaluationResult = built.evaluationResult;
+    if (uiLocale !== 'pt-BR' && existingReport) {
+      const { error } = await supabase.from('performance_reports')
+        .update({ observations, evaluation_result: evaluationResult })
+        .eq('id', reportId);
+      return !error;
+    }
     const report = cleanText(built.report);
     const dateVal = String(params.record?.date ?? '') || new Date().toISOString().split('T')[0];
 
@@ -311,14 +318,16 @@ export async function backfillReportsForStudentIds(
   }
 
   // 3) Escrita em blocos com progresso.
-  const total = rows.length;
+  const existingIds = new Set((existingQ.data || []).map((r: { id: string }) => r.id));
+  const rowsToWrite = locale === 'pt-BR' ? rows : rows.filter(r => !existingIds.has(String(r.id)));
+  const total = rowsToWrite.length;
   let wrote = 0;
   opts?.onProgress?.(0, total);
-  for (let i = 0; i < rows.length; i += CHUNK) {
-    const chunk = rows.slice(i, i + CHUNK);
+  for (let i = 0; i < rowsToWrite.length; i += CHUNK) {
+    const chunk = rowsToWrite.slice(i, i + CHUNK);
     const { error } = await supabase.from('performance_reports').upsert(chunk);
     if (!error) wrote += chunk.length;
-    opts?.onProgress?.(Math.min(i + CHUNK, rows.length), total);
+    opts?.onProgress?.(Math.min(i + CHUNK, rowsToWrite.length), total);
   }
   return wrote;
 }

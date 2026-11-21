@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-21T00:14:33.169Z",
+  "generatedAt": "2026-11-21T16:11:47.926Z",
   "mode": "strict",
   "roots": [
     "app",
@@ -55,7 +55,7 @@
       "occurrences": 1,
       "items": [
         {
-          "line": 108,
+          "line": 109,
           "kind": "jsx-text",
           "value": "EDUKYNE",
           "context": "JSX"

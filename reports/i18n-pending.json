@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-21T00:14:35.092Z",
+  "generatedAt": "2026-11-21T15:58:39.951Z",
   "source": "reports/i18n-scan.json",
   "uniqueStrings": 4,
   "locales": [
@@ -22,7 +22,7 @@
         },
         {
           "file": "components/LoginView.tsx",
-          "line": 108
+          "line": 109
         },
         {
           "file": "components/Sidebar.tsx",

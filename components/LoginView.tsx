@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Shield, Lock, Mail, Eye, EyeOff, Sparkles } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '../i18n/navigation';
 import { setSessionToken } from '../lib/sessionClient';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -36,6 +36,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const t = useTranslations('login');
+  const locale = useLocale();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -226,7 +227,10 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
   return (
     <div className="w-full min-h-[100dvh] bg-[#03101d] select-none font-sans">
       {/* Fallback mobile: foto desfocada + card legível */}
-      <div className="login-fallback relative w-full min-h-[100dvh] items-center justify-center overflow-hidden">
+      <div
+        className="login-fallback relative w-full min-h-[100dvh] items-center justify-center overflow-hidden"
+        style={locale === 'pt-BR' ? undefined : { display: 'flex' }}
+      >
         <div
           className="absolute left-0 top-1/2 max-w-none"
           style={{ width: 'max(320vw,194vh,1400px)', transform: 'translate(-3%,-50%)' }}
@@ -246,22 +250,24 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
         </div>
       </div>
 
-      {/* Overlay desktop: imagem integral da mockup com o formulário real sobre o card branco */}
-      <div className="login-overlay w-full min-h-[100dvh] items-center justify-center overflow-hidden">
-        <div
-          className="relative shrink-0 overflow-hidden"
-          style={{
-            width: 'min(100vw, calc(100dvh * 1.9422))',
-            aspectRatio: '1748 / 900',
-            borderRadius: 'min(2.28vw, 4.43dvh)',
-          }}
-        >
-          <Image src="/login-bg.webp" alt="" fill sizes="(min-width: 194dvh) 194dvh, 100vw" priority className="object-cover" />
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[30.5%] min-h-[77%] flex">
-            {renderCard('ov')}
+      {locale === 'pt-BR' && (
+        /* Overlay desktop: imagem integral da mockup com o formulário real sobre o card branco */
+        <div className="login-overlay w-full min-h-[100dvh] items-center justify-center overflow-hidden">
+          <div
+            className="relative shrink-0 overflow-hidden"
+            style={{
+              width: 'min(100vw, calc(100dvh * 1.9422))',
+              aspectRatio: '1748 / 900',
+              borderRadius: 'min(2.28vw, 4.43dvh)',
+            }}
+          >
+            <Image src="/login-bg.webp" alt="" fill sizes="(min-width: 194dvh) 194dvh, 100vw" priority className="object-cover" />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[30.5%] min-h-[77%] flex">
+              {renderCard('ov')}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

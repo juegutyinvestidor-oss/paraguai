@@ -992,7 +992,7 @@
     },
     "m14p_1": {
       "basic_data": "Pontuação total de 0 a 6 pontos no AQ-10.",
-      "reflection": "A pontuação obtida situa-se dentro da média da população geral, indicando baixa probabilidade de perturbação do espectro do autismo neste rastreio. Contudo, o AQ-10 é apenas um instrumento de rastreio: caso persistam preocupações clínicas por parte dos pais ou dos encarregados de educação, recomenda-se prosseguir com a avaliação por um profissional de saúde habilitado."
+      "reflection": "A pontuação obtida situa-se dentro da média da população geral, indicando baixa probabilidade de perturbação do espetro do autismo neste rastreio. Contudo, o AQ-10 é apenas um instrumento de rastreio: caso persistam preocupações clínicas por parte dos pais ou dos encarregados de educação, recomenda-se prosseguir com a avaliação por um profissional de saúde habilitado."
     }
   },
   "m15_pcd_grupos": {
@@ -1322,7 +1322,7 @@
   },
   "aq10_assessments": {
     "Aq10-2": {
-      "technical_opinion": "A pontuação obtida situa-se dentro da média da população geral, indicando baixa probabilidade de transtorno do espetro autista neste rastreio. Contudo, o AQ-10 é apenas um instrumento de triagem: caso persistam preocupações clínicas por parte dos pais ou responsáveis, recomenda-se prosseguir com a avaliação por um profissional de saúde habilitado."
+      "technical_opinion": "A pontuação obtida situa-se dentro da média da população geral, indicando baixa probabilidade de perturbação do espetro autista neste rastreio. Contudo, o AQ-10 é apenas um instrumento de rastreio: caso persistam preocupações clínicas por parte dos pais ou dos encarregados de educação, recomenda-se prosseguir com a avaliação por um profissional de saúde habilitado."
     }
   },
   "ias_assessments": {
