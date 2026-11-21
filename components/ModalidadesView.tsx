@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Award, AlertTriangle, Plus, Trash2, Edit, UserPlus, X, Save, Lock, FileSpreadsheet, FileText } from 'lucide-react';
 import { nextModalityId, uuid } from '../lib/idGenerator';
 import { type Modality, type ContratoItem, type Student, type Professional, type EstHierarchical, type RegHierarchical, type LocHierarchical } from '../types/edukyne';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { addReportBackground } from '../lib/pdfUtils';
+import { setupPdfFont } from '../lib/pdfFont';
 import * as XLSX from 'xlsx';
 import { normalizeRole } from '../lib/rbac';
 import type { Permission } from '../lib/rbac';
@@ -44,6 +45,7 @@ export default function ModalidadesView({
   professionals = [],
   user
 }: ModalidadesViewProps) {
+  const locale = useLocale();
   const t = useTranslations('modalidades');
   const ta = useTranslations('alunos');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -458,21 +460,21 @@ export default function ModalidadesView({
     // Check if required fields are missing and alert the user
     const missingFields: string[] = [];
     if (!name || !name.trim()) {
-      missingFields.push('Nome da Modalidade');
+      missingFields.push(t('nomeModalidade'));
     }
     if (!addProfessorId) {
-      missingFields.push('Profissional');
+      missingFields.push(t('campoProfissional'));
     }
 
     if (missingFields.length > 0) {
-      alert(`Aviso: Para criar uma nova modalidade, é obrigatório preencher os seguintes campos:\n- ${missingFields.join('\n- ')}`);
+      alert(`${t('avisoCamposObrigatorios')}\n- ${missingFields.join('\n- ')}`);
       return;
     }
 
     runWithPermission('create:modalidades', async () => {
       // Find professional name
       const prof = professionals.find(p => p.id === addProfessorId);
-      const coachName = prof ? `Prof. ${prof.name}` : coach || 'Prof. Sem Nome';
+      const coachName = prof ? `${t('prefixoProf')} ${prof.name}` : coach || t('profSemNome');
 
       // Find contract name
       const contractObj = availableContracts.find(c => c.id === addContrato);
@@ -634,34 +636,35 @@ export default function ModalidadesView({
 
   const exportModalityToExcel = (mod: Modality, enrolledStudentsList: Student[]) => {
     const data = enrolledStudentsList.map(student => ({
-      'Nome': student.name,
-      'Matrícula': student.enrollmentId,
-      'Turma': student.grade,
-      'Status': student.status
+      [ta('expNome')]: student.name,
+      [ta('expMatricula')]: student.enrollmentId,
+      [ta('expTurma')]: student.grade,
+      [ta('expStatus')]: student.status
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Alunos Matriculados");
-    XLSX.writeFile(workbook, `Matriculados_${mod.name.replace(/\s+/g, '_')}.xlsx`);
+    XLSX.utils.book_append_sheet(workbook, worksheet, t('expAbaMatriculados'));
+    XLSX.writeFile(workbook, `${t('expArquivoMatriculados')}_${mod.name.replace(/\s+/g, '_')}.xlsx`);
     logExport(user?.id || 'unknown', user?.role || 'unknown', 'modalities', 'excel', enrolledStudentsList.length);
   };
 
-  const exportModalityToPDF = (mod: Modality, enrolledStudentsList: Student[]) => {
+  const exportModalityToPDF = async (mod: Modality, enrolledStudentsList: Student[]) => {
     const doc = new jsPDF();
+    await setupPdfFont(doc);
     addReportBackground(doc);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.setTextColor(11, 19, 38);
-    doc.text(`EDUKYNE - Matriculados em ${mod.name}`, 14, 15);
+    doc.text(t('expTituloPdfMatriculados', { p0: mod.name }), 14, 15);
     
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(100, 100, 100);
-    doc.text(`Professor/Treinador: ${mod.coach} | Categoria: ${mod.category}`, 14, 21);
-    doc.text(`Unidade: ${mod.locality || 'Centro'} | Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, 26);
+    doc.text(t('expProfessorCategoria', { p0: mod.coach || '-', p1: mod.category || '-' }), 14, 21);
+    doc.text(t('expUnidadeGerado', { p0: mod.locality || t('expLocalidadePadrao'), p1: new Date().toLocaleDateString(locale) }), 14, 26);
     
-    const tableColumn = ["Nome", "Matrícula", "Turma", "Status"];
+    const tableColumn = [ta('expNome'), ta('expMatricula'), ta('expTurma'), ta('expStatus')];
     const tableRows = enrolledStudentsList.map(student => [
       student.name,
       student.enrollmentId ?? '',
@@ -683,7 +686,7 @@ export default function ModalidadesView({
       }
     });
     
-    doc.save(`Alunos_Matriculados_${mod.name.replace(/\s+/g, '_')}.pdf`);
+    doc.save(`${t('expArquivoMatriculados')}_${mod.name.replace(/\s+/g, '_')}.pdf`);
     logExport(user?.id || 'unknown', user?.role || 'unknown', 'modalities', 'pdf', enrolledStudentsList.length);
   };
 

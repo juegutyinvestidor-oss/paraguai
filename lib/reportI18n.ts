@@ -101,9 +101,327 @@ const DISPLAY_KEYS: Record<string, string> = {
   '*Nenhum relatório de Índice Alimentar foi encontrado no histórico.*': 'valorSemRelatorioIas'
 };
 
-export function displayValue(value: unknown, t: (key: string) => string): string {
+const CANONICAL_KEYS: Record<string, string> = {
+  'velocidade': 'canonical.velocidade',
+  'INSUFICIENTE': 'canonical.nivelInsuficiente',
+  'EXCELENTE': 'canonical.nivelExcelente',
+  'forca_muscular': 'canonical.forcaMuscular',
+  'BOM': 'canonical.nivelBom',
+  'abdomen': 'canonical.abdomen',
+  'REGULAR': 'canonical.nivelRegular',
+  'impulsao': 'canonical.impulsao',
+  'agilidade': 'canonical.agilidade',
+  'O aluno possui uma força funcional para atividades rotineiras, mas falha ou perde o alinhamento corporal quando exposto a esforços um pouco mais prolongados. A estrutura de saúde é estável, porém a musculatura estabilizadora cansa rápido, gerando descompensações posturais durante os jogos.': 'canonical.forcaFuncionalRotina',
+  'Deficiência Intelectual': 'canonical.pcdIntelectual',
+  'Deficiência Física (Locomoção Independente)': 'canonical.pcdFisicaLocomocao',
+  'Deficiência Física (Cadeira de Rodas)': 'canonical.pcdFisicaCadeira',
+  'Paralisia Cerebral (GMFCS)': 'canonical.pcdParalisiaCerebral',
+  'Deficiência Visual (B1-B3)': 'canonical.pcdVisual',
+  'Deficiência Auditiva': 'canonical.pcdAuditiva',
+  'Basquete / Rugby em Cadeira': 'canonical.pcdBasqueteRugby',
+  'Boccia (Bocha Adaptada)': 'canonical.pcdBoccia',
+  'Atletismo (Velocidade)': 'canonical.pcdAtletismoVelocidade',
+  'Natação Adaptada': 'canonical.pcdNatacaoAdaptada',
+  'Halterofilismo Adaptado': 'canonical.pcdHalterofilismo',
+  'Goalball / Futebol de 5': 'canonical.pcdGoalball',
+  'salto': 'canonical.testeSalto',
+  'flexao': 'canonical.testeFlexao',
+  'Filtro Clínico/Grupo': 'canonical.filtroClinicoGrupo',
+  'Filtro Cognitivo/Sensorial': 'canonical.filtroCognitivoSensorial',
+  'Filtro de Preferência e Desejo Pessoal': 'canonical.filtroPreferencia',
+  'Perfil Motor Elevado': 'canonical.pcdPerfilElevado',
+  'Perfil Motor Mediano': 'canonical.pcdPerfilMediano',
+  'Perfil Motor com Limitações': 'canonical.pcdPerfilLimitacoes',
+  'Não definida': 'comparativo.naoDefinida',
+  'Aprimorar Habilidades Motoras': 'avaliacoes.sugeridoAprimorar',
+  'Humanas e Sociais': 'desempenho.uiHumanasESociais',
+  'Exatas e Tecnológicas': 'desempenho.uiExatasETecnologicas',
+  'Biológicas e Criativas': 'desempenho.uiBiologicasECriativas',
+  'Negócios e Gestão': 'desempenho.uiNegociosEGestao',
+  'Criativo e Tecnológico': 'desempenho.uiCriativoETecnologicoPerfilHibrido',
+  'Abaixo Peso': 'questionario.classAbaixoPeso',
+  'Abaixo do peso': 'questionario.classAbaixoPeso',
+  'Peso Ideal': 'canonical.pesoIdeal',
+  'Peso normal': 'questionario.classPesoNormal',
+  'Sobrepeso': 'questionario.classSobrepeso',
+  'Obesidade': 'questionario.classObesidade',
+  'Impulso': 'questionario.impulsao',
+  'Abdômen': 'questionario.abdomen',
+  'Agilidade': 'questionario.agilidade',
+  'Força': 'avaliacoes.areaForca',
+  'Velocidade': 'questionario.velocidade',
+  'Qualidade de Vida Baixa': 'avaliacoes.classSaudeBaixa',
+  'Qualidade de Vida Normal': 'avaliacoes.classSaudeNormal',
+  'Qualidade de Vida Alta': 'avaliacoes.classSaudeAlta',
+  'Alto Desempenho': 'avaliacoes.classOralAlta',
+  'Desempenho Moderado': 'avaliacoes.classOralModerada',
+  'Baixo Desempenho': 'avaliacoes.classOralBaixa',
+  'Autoestima Baixa': 'avaliacoes.classAutoBaixa',
+  'Autoestima Equilibrada': 'avaliacoes.classAutoEquilibrada',
+  'Autoestima Alta': 'avaliacoes.classAutoAlta',
+  'Dieta de Má Qualidade': 'avaliacoes.classIasBaixa',
+  'Necessita de Modificações': 'avaliacoes.classIasModificacoes',
+  'Boa Qualidade (Saudável)': 'avaliacoes.classIasBoa',
+  'Sinais de Desatenção': 'avaliacoes.classSnapDesatencao',
+  'Sinais de Hiperatividade/Impulsividade': 'avaliacoes.classSnapHiper',
+  'Sinais Combinados': 'avaliacoes.classSnapCombinados',
+  'Sem Indícios Significativos': 'avaliacoes.classSnapSemIndicios',
+  'Dentro da média populacional': 'canonical.aq10DentroMedia',
+  'Alerta de Traços Elevados de TEA': 'canonical.aq10AlertaTracos',
+  'Adolescente (12 a 15 anos)': 'desempenho.uiAdolescente12A15Anos',
+  'Criança (4 a 11 anos)': 'desempenho.uiCrianca4A11Anos',
+  'Pontuação de 0 a 6: traços comportamentais dentro da média da população geral; acompanhamento rotineiro do desenvolvimento.': 'desempenho.textoPontuacaoDe0A6TracosComportamentais',
+  'Pontuação de 7 a 10: alerta de traços elevados de TEA; recomendação de encaminhamento prioritário para avaliação multidisciplinar especializada (neuropediatra ou psiquiatra infantil e neuropsicólogo).': 'desempenho.textoPontuacaoDe7A10AlertaDe',
+  'Abdominal (Prancha)': 'canonical.testeAbdominalPrancha',
+  'Velocidade (Corrida 20m)': 'canonical.testeVelocidadeCorrida20m',
+  'Agilidade (Shuttle Run)': 'canonical.testeAgilidadeShuttleRun',
+  'Salto Horizontal': 'canonical.testeSaltoHorizontal',
+  'Flexão de Braço': 'canonical.testeFlexaoBraco',
+  'Força/Resistência (Membros Sup.)': 'canonical.pcdForcaResistenciaMembrosSup',
+  'Limitações Agudas': 'avaliacoes.notaPcd1',
+  'Desempenho Mediano': 'avaliacoes.notaPcd2',
+  'Desempenho Elevado': 'avaliacoes.notaPcd3',
+  'Padrão': 'avaliacoes.statusPadrao',
+  'Adaptado': 'avaliacoes.statusAdaptado',
+  'Substituído': 'avaliacoes.statusSubstituido',
+  'Não aplicável': 'avaliacoes.NaoAplicavel',
+  'CENÁRIO A': 'questionario.cenario_a',
+  'CENÁRIO B': 'questionario.cenario_b',
+  'CENÁRIO C': 'questionario.cenario_c',
+  'IMC': 'dashboard.imc',
+  'Capacidades': 'comparativo.dimMotor',
+  'Esportivo': 'comparativo.dimSport',
+  'Vocacional': 'comparativo.dimVoc',
+  'Saúde Global': 'dashboard.saudeGlobal',
+  'Higiene Bucal': 'dashboard.higieneBucal',
+  'Autoconceito': 'dashboard.autoconceito',
+  'Índice Alimentar': 'dashboard.indiceAlimentar',
+  'Rastreamento TDAH': 'avaliacoes.tituloSnapCurto',
+  'Rastreamento Precoce do TEA': 'avaliacoes.tituloAq10',
+  'Qualidade Motora PCD': 'dashboard.qualidadeMotoraPCD',
+  'Ativo': 'alunos.ativo',
+  'Inativo': 'alunos.inativo',
+  'Aguardando avaliação completa': 'avaliacoes.valorAguardandoAvaliacaoCompleta',
+};
+
+export function displayValue(value: unknown, t: (key: string) => string, locale?: string): string {
   const text = String(value ?? '');
-  return DISPLAY_KEYS[text] ? t(DISPLAY_KEYS[text]) : text;
+  if (DISPLAY_KEYS[text]) return t(DISPLAY_KEYS[text]);
+  if (locale && CANONICAL_KEYS[text]) return displayCanonical(text, locale);
+  return text;
+}
+
+const PROSE_ES: Record<string, string> = {
+  'prancha ventral isométrica': 'tabla ventral isométrica',
+  'teto de 30s': 'límite de 30 s',
+  'corrida 20m com aceleração máxima': 'carrera de 20 m con aceleración máxima',
+  'shuttle run 9,14m com dois blocos': 'shuttle run de 9,14 m con dos bloques',
+  'salto horizontal em base bilateral': 'salto horizontal con base bilateral',
+  'avaliar criteriosamente a viabilidade articular': 'evaluar cuidadosamente la viabilidad articular',
+  'acometimentos severos de membros inferiores': 'compromisos severos de miembros inferiores',
+  'flexão de braço': 'flexión de brazo',
+  'versão joelhos apoiados se necessário': 'versión con rodillas apoyadas si es necesario',
+  'mediante suporte, encosto ou estabilização mecânica de tronco': 'con soporte, respaldo o estabilización mecánica del tronco',
+  'propulsão rápida em cadeira de rodas ao longo dos 20m cronometrados': 'propulsión rápida en silla de ruedas a lo largo de los 20 m cronometrados',
+  'percurso sinuoso com propulsão manual ou teste de agilidade em cadeira': 'recorrido sinuoso con propulsión manual o prueba de agilidad en silla',
+  'realizar padrão quando houver capacidade funcional e segurança': 'realizar el estándar cuando haya capacidad funcional y seguridad',
+  'não realizar quando o comprometimento dos membros inferiores tornar o salto inseguro ou inviável': 'no realizar cuando el compromiso de los miembros inferiores haga el salto inseguro o inviable',
+  'considerar teste alternativo de potência dos membros inferiores, quando aplicável': 'considerar una prueba alternativa de potencia de miembros inferiores, cuando corresponda',
+  'aplicável na íntegra': 'aplicable íntegramente',
+  'ajustes mínimos pelo hemicorpo de maior dominância/espasticidade': 'ajustes mínimos según el hemicuerpo de mayor dominancia/espasticidad',
+  'aplicável; requer avaliação individual prévia': 'aplicable; requiere evaluación individual previa',
+  'exige avaliação individual prévia (deambulação com apoio instrumental)': 'exige evaluación individual previa (deambulación con apoyo instrumental)',
+  'realizar somente quando houver capacidade funcional e segurança': 'realizar solo cuando haya capacidad funcional y seguridad',
+  'quando não for viável, considerar teste alternativo de potência dos membros inferiores': 'cuando no sea viable, considerar una prueba alternativa de potencia de miembros inferiores',
+  'realizável apenas sob suporte e alta tolerância postural': 'realizable solo con soporte y alta tolerancia postural',
+  'priorizar avaliação funcional clínica com fisioterapia': 'priorizar la evaluación funcional clínica con fisioterapia',
+  'padrão ou adaptado quando houver capacidade funcional dos membros superiores; caso contrário, priorizar avaliação funcional clínica com fisioterapia': 'estándar o adaptado cuando haya capacidad funcional de miembros superiores; de lo contrario, priorizar la evaluación funcional clínica con fisioterapia',
+  'movimento idêntico; demarcação tátil e comando verbal claro': 'movimiento idéntico; delimitación táctil y comando verbal claro',
+  'guia humano ou corda-guia; comando sonoro; demarcação tátil na saída': 'guía humana o cuerda guía; comando sonoro; delimitación táctil en la salida',
+  'guia humano ou corda-guia; demarcação tátil e comandos sonoros': 'guía humana o cuerda guía; delimitación táctil y comandos sonoros',
+  'linha de partida tátil (fita em relevo); comando sonoro claro': 'línea de salida táctil (cinta en relieve); comando sonoro claro',
+  'instrução verbal e cinestésica; demonstração física': 'instrucción verbal y cinestésica; demostración física',
+  'execução padrão': 'ejecución estándar',
+  'largada com estímulo visual nítido': 'salida con estímulo visual nítido',
+  'substituir sinal sonoro por estímulo visual nítido': 'sustituir la señal sonora por un estímulo visual nítido',
+  'estímulos visuais nítidos': 'estímulos visuales nítidos',
+  'demonstração visual e suporte via libras quando disponível': 'demostración visual y apoyo vía lengua de señas cuando esté disponible',
+  'demonstração física repetida e instruções em passos simples': 'demostración física repetida e instrucciones en pasos simples',
+  'demonstração física repetida; tentativa prática extra não pontuada': 'demostración física repetida; intento práctico adicional no puntuado',
+  'demonstração física repetida; retirada gradual de apoio verbal': 'demostración física repetida; retirada gradual del apoyo verbal',
+  'velocidade e potência de membros inferiores são cruciais': 'la velocidad y la potencia de miembros inferiores son cruciales',
+  'deslocamento, potência e uso intenso de membros superiores sobre a cadeira': 'desplazamiento, potencia y uso intenso de miembros superiores sobre la silla',
+  'força de membros superiores e estabilidade central do tronco determinam o êxito': 'la fuerza de miembros superiores y la estabilidad central del tronco determinan el éxito',
+  'precisão com estabilidade de tronco; baixa exigência de deslocamento': 'precisión con estabilidad de tronco; baja exigencia de desplazamiento',
+  'deslocamento orientado, agilidade e velocidade de reação': 'desplazamiento orientado, agilidad y velocidad de reacción',
+  'potência de membros superiores e inferiores com estabilidade de tronco': 'potencia de miembros superiores e inferiores con estabilidad de tronco',
+  'adequação postural intrínseca': 'adecuación postural intrínseca',
+  'avaliar articulações de membros inferiores antes do salto': 'evaluar las articulaciones de miembros inferiores antes del salto',
+  'priorizar provas de membros superiores e estabilização de tronco; evitar impacto vertical': 'priorizar pruebas de miembros superiores y estabilización de tronco; evitar impacto vertical',
+  'orientar percurso de agilidade em cadeira e adaptar comandos ao nível de compreensão': 'orientar el recorrido de agilidad en silla y adaptar los comandos al nivel de comprensión',
+  'cruzar o nível gmfcs com cada modalidade': 'cruzar el nivel GMFCS con cada modalidad',
+  'respeitar contra-indicações por padrão motor': 'respetar las contraindicaciones por patrón motor',
+  'preferir modalidades como goalball ou futebol de 5': 'preferir modalidades como Goalball o Fútbol de 5',
+  'prever guia/comandos sonoros e demarcação tátil': 'prever guía/comandos sonoros y delimitación táctil',
+  'assegurar estímulos visuais nítidos e suporte via libras': 'asegurar estímulos visuales nítidos y apoyo vía lengua de señas',
+  'fragmentar instruções, demonstrar repetidamente e permitir tentativa prática extra': 'fragmentar instrucciones, demostrar repetidamente y permitir un intento práctico adicional',
+  'considerar soberanamente a preferência e o desejo pessoal da criança/adolescente na escolha final da modalidade': 'considerar soberanamente la preferencia y el deseo personal del niño/adolescente en la elección final de la modalidade',
+  'criança anda/caminha de forma autônoma ou com auxílio leve (bengala, órtese), com acometimento estrutural sem alteração neurológica central': 'el niño camina de forma autónoma o con ayuda leve (bastón, ortesis), con compromiso estructural sin alteración neurológica central',
+  'diagnóstico clínico formal + classificação de gravidade. detalhar nível de amputação se houver': 'diagnóstico clínico formal + clasificación de gravedad. detallar el nivel de amputación si lo hubiera',
+  'cadeira de rodas como mecanismo principal ou exclusivo de locomoção. testes adaptados ou substituídos': 'silla de ruedas como mecanismo principal o exclusivo de locomoción. pruebas adaptadas o sustituidas',
+  'diagnóstico clínico formal + laudo médico. confirmar uso de cadeira como meio principal': 'diagnóstico clínico formal + informe médico. confirmar el uso de silla como medio principal',
+  'classificação obrigatória prévia pela escala gmfcs (níveis i a v) antes de delimitar qualquer teste': 'clasificación obligatoria previa por la escala GMFCS (niveles I a V) antes de delimitar cualquier prueba',
+  'aplicação obrigatória da escala gmfcs + laudo médico': 'aplicación obligatoria de la escala GMFCS + informe médico',
+  'estrutura motora global preservada. ajustes na instrução verbal, cinestésica e orientação espacial': 'estructura motora global preservada. ajustes en la instrucción verbal, cinestésica y orientación espacial',
+  'mapeamento do nível de acuidade visual (b1, b2 ou b3) + laudo oftalmológico': 'mapeo del nivel de agudeza visual (B1, B2 o B3) + informe oftalmológico',
+  'funções motoras e de orientação espacial preservadas. adaptações nos canais de comunicação': 'funciones motoras y de orientación espacial preservadas. adaptaciones en los canales de comunicación',
+  'identificação do grau de perda auditiva (leve, moderada, severa ou profunda) + laudo audiológico': 'identificación del grado de pérdida auditiva (leve, moderada, severa o profunda) + informe audiológico',
+  'capacidades sensoriais e motoras íntegras. barreira primária na cognição e compreensão das tarefas': 'capacidades sensoriales y motoras íntegras. barrera primaria en la cognición y comprensión de las tareas',
+  'nível de funcionamento adaptativo (leve, moderado ou severo) respaldado por laudo psicológico/pedagógico': 'nivel de funcionamiento adaptativo (leve, moderado o severo) respaldado por informe psicológico/pedagógico',
+  'locomoção autônoma': 'locomoción autónoma',
+  'cadeira de rodas': 'silla de ruedas',
+  'b1 (cegueira total)': 'B1 (ceguera total)',
+  'perda auditiva severa': 'pérdida auditiva severa',
+  'colchonete e cronômetro de precisão': 'colchoneta y cronómetro de precisión',
+  'cronômetro de precisão': 'cronómetro de precisión',
+  'suporte via libras': 'apoyo vía lengua de señas',
+  'criança/adolescente': 'niño/adolescente',
+  'prática recomendada': 'práctica recomendada',
+  'não avaliado': 'no evaluado',
+  'biotipo corporal': 'biotipo corporal',
+  'aptidão predominante': 'aptitud predominante',
+  'foco de direcionamento': 'foco de direccionamiento',
+};
+
+const PROSE_EN: Record<string, string> = {
+  'prancha ventral isométrica': 'isometric ventral plank',
+  'teto de 30s': '30 s cap',
+  'corrida 20m com aceleração máxima': '20 m run with maximum acceleration',
+  'shuttle run 9,14m com dois blocos': '9.14 m shuttle run with two shuttles',
+  'salto horizontal em base bilateral': 'horizontal jump from a bilateral base',
+  'avaliar criteriosamente a viabilidade articular': 'carefully assess joint viability',
+  'acometimentos severos de membros inferiores': 'severe lower-limb impairments',
+  'flexão de braço': 'push-up',
+  'versão joelhos apoiados se necessário': 'knees-supported version if needed',
+  'mediante suporte, encosto ou estabilização mecânica de tronco': 'with support, backrest or mechanical trunk stabilization',
+  'propulsão rápida em cadeira de rodas ao longo dos 20m cronometrados': 'fast wheelchair propulsion over the timed 20 m',
+  'percurso sinuoso com propulsão manual ou teste de agilidade em cadeira': 'slalom course with manual propulsion or wheelchair agility test',
+  'realizar padrão quando houver capacidade funcional e segurança': 'perform the standard version when functional capacity and safety allow',
+  'não realizar quando o comprometimento dos membros inferiores tornar o salto inseguro ou inviável': 'do not perform when lower-limb impairment makes the jump unsafe or unfeasible',
+  'considerar teste alternativo de potência dos membros inferiores, quando aplicável': 'consider an alternative lower-limb power test when applicable',
+  'aplicável na íntegra': 'fully applicable',
+  'ajustes mínimos pelo hemicorpo de maior dominância/espasticidade': 'minimal adjustments for the more dominant/spastic body side',
+  'aplicável; requer avaliação individual prévia': 'applicable; requires prior individual assessment',
+  'exige avaliação individual prévia (deambulação com apoio instrumental)': 'requires prior individual assessment (walking with assistive device)',
+  'realizar somente quando houver capacidade funcional e segurança': 'perform only when functional capacity and safety allow',
+  'quando não for viável, considerar teste alternativo de potência dos membros inferiores': 'when not feasible, consider an alternative lower-limb power test',
+  'realizável apenas sob suporte e alta tolerância postural': 'feasible only with support and high postural tolerance',
+  'priorizar avaliação funcional clínica com fisioterapia': 'prioritize clinical functional assessment with physiotherapy',
+  'padrão ou adaptado quando houver capacidade funcional dos membros superiores; caso contrário, priorizar avaliação funcional clínica com fisioterapia': 'standard or adapted when upper-limb functional capacity allows; otherwise, prioritize clinical functional assessment with physiotherapy',
+  'movimento idêntico; demarcação tátil e comando verbal claro': 'same movement; tactile marking and clear verbal command',
+  'guia humano ou corda-guia; comando sonoro; demarcação tátil na saída': 'human guide or guide rope; sound command; tactile marking at the start',
+  'guia humano ou corda-guia; demarcação tátil e comandos sonoros': 'human guide or guide rope; tactile marking and sound commands',
+  'linha de partida tátil (fita em relevo); comando sonoro claro': 'tactile start line (raised tape); clear sound command',
+  'instrução verbal e cinestésica; demonstração física': 'verbal and kinesthetic instruction; physical demonstration',
+  'execução padrão': 'standard execution',
+  'largada com estímulo visual nítido': 'start with a clear visual cue',
+  'substituir sinal sonoro por estímulo visual nítido': 'replace the sound signal with a clear visual cue',
+  'estímulos visuais nítidos': 'clear visual cues',
+  'demonstração visual e suporte via libras quando disponível': 'visual demonstration and sign-language support when available',
+  'demonstração física repetida e instruções em passos simples': 'repeated physical demonstration and simple step-by-step instructions',
+  'demonstração física repetida; tentativa prática extra não pontuada': 'repeated physical demonstration; unscored extra practice attempt',
+  'demonstração física repetida; retirada gradual de apoio verbal': 'repeated physical demonstration; gradual withdrawal of verbal support',
+  'velocidade e potência de membros inferiores são cruciais': 'speed and lower-limb power are crucial',
+  'deslocamento, potência e uso intenso de membros superiores sobre a cadeira': 'movement, power and intense use of upper limbs on the chair',
+  'força de membros superiores e estabilidade central do tronco determinam o êxito': 'upper-limb strength and central trunk stability determine success',
+  'precisão com estabilidade de tronco; baixa exigência de deslocamento': 'precision with trunk stability; low movement demand',
+  'deslocamento orientado, agilidade e velocidade de reação': 'oriented movement, agility and reaction speed',
+  'potência de membros superiores e inferiores com estabilidade de tronco': 'upper- and lower-limb power with trunk stability',
+  'adequação postural intrínseca': 'intrinsic postural alignment',
+  'avaliar articulações de membros inferiores antes do salto': 'assess lower-limb joints before the jump',
+  'priorizar provas de membros superiores e estabilização de tronco; evitar impacto vertical': 'prioritize upper-limb tests and trunk stabilization; avoid vertical impact',
+  'orientar percurso de agilidade em cadeira e adaptar comandos ao nível de compreensão': 'guide the wheelchair agility course and adapt commands to the comprehension level',
+  'cruzar o nível gmfcs com cada modalidade': 'cross-reference the GMFCS level with each modality',
+  'respeitar contra-indicações por padrão motor': 'respect contraindications by motor pattern',
+  'preferir modalidades como goalball ou futebol de 5': 'prefer modalities such as Goalball or Football 5-a-side',
+  'prever guia/comandos sonoros e demarcação tátil': 'provide a guide/sound commands and tactile marking',
+  'assegurar estímulos visuais nítidos e suporte via libras': 'ensure clear visual cues and sign-language support',
+  'fragmentar instruções, demonstrar repetidamente e permitir tentativa prática extra': 'break instructions into steps, demonstrate repeatedly and allow an extra practice attempt',
+  'considerar soberanamente a preferência e o desejo pessoal da criança/adolescente na escolha final da modalidade': 'give full consideration to the child/adolescent personal preference and desire in the final modality choice',
+  'criança anda/caminha de forma autônoma ou com auxílio leve (bengala, órtese), com acometimento estrutural sem alteração neurológica central': 'the child walks independently or with light assistance (crutch, orthosis), with structural impairment and no central neurological alteration',
+  'diagnóstico clínico formal + classificação de gravidade. detalhar nível de amputação se houver': 'formal clinical diagnosis + severity classification. specify amputation level if applicable',
+  'cadeira de rodas como mecanismo principal ou exclusivo de locomoção. testes adaptados ou substituídos': 'wheelchair as the main or exclusive means of locomotion. adapted or substituted tests',
+  'diagnóstico clínico formal + laudo médico. confirmar uso de cadeira como meio principal': 'formal clinical diagnosis + medical report. confirm wheelchair use as the main means',
+  'classificação obrigatória prévia pela escala gmfcs (níveis i a v) antes de delimitar qualquer teste': 'mandatory prior classification using the GMFCS scale (levels I to V) before defining any test',
+  'aplicação obrigatória da escala gmfcs + laudo médico': 'mandatory GMFCS scale application + medical report',
+  'estrutura motora global preservada. ajustes na instrução verbal, cinestésica e orientação espacial': 'global motor structure preserved. adjustments to verbal, kinesthetic instruction and spatial orientation',
+  'mapeamento do nível de acuidade visual (b1, b2 ou b3) + laudo oftalmológico': 'visual acuity level mapping (B1, B2 or B3) + ophthalmological report',
+  'funções motoras e de orientação espacial preservadas. adaptações nos canais de comunicação': 'motor and spatial orientation functions preserved. adaptations in communication channels',
+  'identificação do grau de perda auditiva (leve, moderada, severa ou profunda) + laudo audiológico': 'hearing loss degree identification (mild, moderate, severe or profound) + audiological report',
+  'capacidades sensoriais e motoras íntegras. barreira primária na cognição e compreensão das tarefas': 'intact sensory and motor capacities. primary barrier in cognition and task comprehension',
+  'nível de funcionamento adaptativo (leve, moderado ou severo) respaldado por laudo psicológico/pedagógico': 'adaptive functioning level (mild, moderate or severe) supported by psychological/educational report',
+  'locomoção autônoma': 'independent locomotion',
+  'cadeira de rodas': 'wheelchair',
+  'b1 (cegueira total)': 'B1 (total blindness)',
+  'perda auditiva severa': 'severe hearing loss',
+  'colchonete e cronômetro de precisão': 'mat and precision stopwatch',
+  'cronômetro de precisão': 'precision stopwatch',
+  'suporte via libras': 'sign-language support',
+  'criança/adolescente': 'child/adolescent',
+  'prática recomendada': 'recommended practice',
+  'não avaliado': 'not assessed',
+  'biotipo corporal': 'body biotype',
+  'aptidão predominante': 'predominant aptitude',
+  'foco de direcionamento': 'guidance focus',
+};
+
+function translateProse(text: string, locale: string): string {
+  const dictionary = locale === 'en' ? PROSE_EN : PROSE_ES;
+  let output = text;
+  for (const [from, to] of Object.entries(dictionary).sort((a, b) => b[0].length - a[0].length)) {
+    const pattern = new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    output = output.replace(pattern, match => {
+      if (match === match.toUpperCase()) return to.toUpperCase();
+      if (match[0] === match[0].toUpperCase()) return to.charAt(0).toUpperCase() + to.slice(1);
+      return to;
+    });
+  }
+  return output;
+}
+
+export function displayCanonical(value: unknown, locale: string): string {
+  const text = String(value ?? '');
+  const resolved = (routing.locales as readonly string[]).includes(locale)
+    ? locale as AppLocale
+    : routing.defaultLocale as AppLocale;
+  const group = /^Grupo (\d+)$/.exec(text);
+  if (group) {
+    const questionario = messages[resolved].questionario as Record<string, unknown> | undefined;
+    return `${typeof questionario?.grupo === 'string' ? questionario.grupo : 'Grupo'} ${group[1]}`;
+  }
+  const direcionamento = /^Pré-seleção \(matriz física\): (.+)\. Indicação preliminar, sujeita ao funil qualitativo \(filtros clínico-funcional, cognitivo-sensorial e de preferência do participante\)\.$/.exec(text);
+  if (direcionamento) {
+    const avaliacoes = messages[resolved].avaliacoes as Record<string, unknown>;
+    const template = avaliacoes.tplPcdDirecionamento;
+    if (typeof template === 'string') {
+      const modalidades = direcionamento[1].split('; ').map(item => displayCanonical(item.trim(), locale)).join('; ');
+      return template.replace('{p0}', modalidades);
+    }
+  }
+  const key = DISPLAY_KEYS[text] ?? CANONICAL_KEYS[text];
+  if (!key) {
+    if (resolved !== 'pt-BR' && resolved !== 'pt-PT') {
+      const prose = translateProse(text, resolved);
+      if (prose !== text) return prose;
+    }
+    return text;
+  }
+  const dot = key.indexOf('.');
+  const namespace = key.slice(0, dot);
+  const section = (messages[resolved] as Record<string, unknown>)[namespace];
+  if (!section || typeof section !== 'object') return text;
+  const translated = (section as Record<string, unknown>)[key.slice(dot + 1)];
+  return typeof translated === 'string' ? translated : text;
 }
 
 export function createReportTranslator(locale: string): ReportTranslator {
@@ -113,8 +431,8 @@ export function createReportTranslator(locale: string): ReportTranslator {
   return createTranslator({locale: resolved, messages: messages[resolved], namespace: 'desempenho'}) as unknown as ReportTranslator;
 }
 
-export function localizeAssessmentReport(ctx: ReportBuildCtx, t: ReportTranslator): BuildResult | null {
-  const dv = (value: unknown) => displayValue(value, t);
+export function localizeAssessmentReport(ctx: ReportBuildCtx, t: ReportTranslator, locale?: string): BuildResult | null {
+  const dv = (value: unknown) => displayValue(value, t, locale);
   const formatDate = (value?: string) => (value ? value.split('-').reverse().join('/') : 'N/A');
   const {focusArea, studentName, observations, dateStr} = ctx;
 

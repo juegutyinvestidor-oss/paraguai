@@ -106,5 +106,1298 @@
       "status": "Factor de riesgo",
       "description": "El índice indica un factor de riesgo para la salud cardiovascular y articular. Se recomienda un plan de actividad física de bajo impacto (como natación o caminatas rápidas) junto con un seguimiento nutricional para garantizar la seguridad y el bienestar del estudiante."
     }
+  },
+  "m9_health_questions": {
+    "hq1": {
+      "statement": "¿Te has sentido bien y con energía?"
+    },
+    "hq2": {
+      "statement": "¿Te has sentido triste?"
+    },
+    "hq3": {
+      "statement": "¿Te has sentido solo(a)?"
+    },
+    "hq5": {
+      "statement": "¿Has podido hacer las cosas que quieres en tu tiempo libre?"
+    },
+    "hq4": {
+      "statement": "¿Has tenido suficiente tiempo para ti mismo(a)?"
+    },
+    "hq6": {
+      "statement": "¿Tus padres te han tratado con justicia?"
+    },
+    "hq7": {
+      "statement": "¿Te has divertido con tus amigos?"
+    },
+    "hq8": {
+      "statement": "¿Te ha ido bien en la escuela/los estudios?"
+    },
+    "hq9": {
+      "statement": "¿Has sido capaz de prestar atención/concentrarte?"
+    },
+    "hq10": {
+      "statement": "¿Te has sentido deprimido(a) o sin esperanza?"
+    }
+  },
+  "m10_oral_questions": {
+    "oq1": {
+      "statement": "No me preocupo mucho por ir al dentista."
+    },
+    "oq2": {
+      "statement": "Mis encías sangran cuando me cepillo los dientes."
+    },
+    "oq4": {
+      "statement": "Noto una capa pegajosa/suciedad (placa) en mis dientes."
+    },
+    "oq3": {
+      "statement": "Me preocupo mucho por el color de mis dientes."
+    },
+    "oq6": {
+      "statement": "Creo que es imposible evitar problemas en las encías solo con cepillarse los dientes."
+    },
+    "oq5": {
+      "statement": "Uso un cepillo de dientes con cerdas duras."
+    },
+    "oq7": {
+      "statement": "Suelo cepillarme los dientes justo después de cada comida."
+    },
+    "oq9": {
+      "statement": "Uso una técnica de cepillado recomendada por mi dentista."
+    },
+    "oq8": {
+      "statement": "Siento que ya limpio bien mis dientes sin necesidad de usar hilo dental."
+    },
+    "oq10": {
+      "statement": "Siento que mis dientes están empeorando, aunque me cepillo todos los días."
+    },
+    "oq11": {
+      "statement": "Me han dicho que tengo buen aliento."
+    },
+    "oq13": {
+      "statement": "Me preocupa la alineación o la forma de mis dientes."
+    },
+    "oq12": {
+      "statement": "Examino mis dientes detalladamente en el espejo después del cepillado."
+    },
+    "oq15": {
+      "statement": "Siento que mis dientes nunca quedan totalmente limpios."
+    },
+    "oq14": {
+      "statement": "Tengo miedo de sentir dolor en el dentista."
+    },
+    "oq16": {
+      "statement": "Me cepillo la lengua con frecuencia."
+    },
+    "oq17": {
+      "statement": "Uso enjuague bucal casi todos los días."
+    },
+    "oq18": {
+      "statement": "Siento que me cepillo los dientes con demasiada fuerza."
+    },
+    "oq19": {
+      "statement": "Uso hilo dental al menos una vez al día."
+    },
+    "oq20": {
+      "statement": "Solo voy al dentista cuando siento algún dolor."
+    }
+  },
+  "m11_autoconcept_questions": {
+    "aq1": {
+      "statement": "Siento que soy una persona de valor, al menos tanto como las demás."
+    },
+    "aq2": {
+      "statement": "Tengo una actitud positiva hacia mí mismo(a)."
+    },
+    "aq4": {
+      "statement": "Soy capaz de hacer las cosas tan bien como la mayoría de las personas."
+    },
+    "aq3": {
+      "statement": "En general, tiendo a pensar que soy un(a) fracasado(a)."
+    },
+    "aq5": {
+      "statement": "Siento que no tengo mucho de lo que enorgullecerme."
+    },
+    "aq7": {
+      "statement": "En general, estoy satisfecho(a) conmigo mismo(a)."
+    },
+    "aq6": {
+      "statement": "Siento que tengo cualidades positivas."
+    },
+    "aq8": {
+      "statement": "A veces pienso que no sirvo para nada."
+    },
+    "aq9": {
+      "statement": "A veces me siento inútil."
+    },
+    "aq10": {
+      "statement": "Me gustaría tener más respeto por mí mismo(a)."
+    }
+  },
+  "m13_snap_questions": {
+    "sq6": {
+      "statement": "Evita, no le gusta o se involucra en contra de su voluntad en tareas que requieren un esfuerzo mental prolongado."
+    },
+    "sq4": {
+      "statement": "No sigue las instrucciones hasta el final y no termina las tareas escolares, los deberes o las obligaciones."
+    },
+    "sq5": {
+      "statement": "Tiene dificultad para organizar tareas y actividades."
+    },
+    "sq7": {
+      "statement": "Pierde objetos necesarios para las actividades (p. ej.: juguetes, deberes escolares, lápices o libros)."
+    },
+    "sq8": {
+      "statement": "Se distrae con estímulos externos."
+    },
+    "sq9": {
+      "statement": "Es olvidadizo en las actividades cotidianas."
+    },
+    "sq12": {
+      "statement": "Corre de un lado a otro o sube demasiado a las cosas en situaciones en las que eso es inapropiado."
+    },
+    "sq13": {
+      "statement": "Tiene dificultad para jugar o participar en actividades de ocio de forma tranquila."
+    },
+    "sq11": {
+      "statement": "Se levanta del lugar en el aula o en otras situaciones en las que se espera que permanezca sentado."
+    },
+    "sq10": {
+      "statement": "Mueve las manos o los pies, o se agita en la silla."
+    },
+    "sq14": {
+      "statement": "No se detiene o está frecuentemente a “mil por hora”."
+    },
+    "sq15": {
+      "statement": "Habla en exceso."
+    },
+    "sq17": {
+      "statement": "Tiene dificultad para esperar su turno."
+    },
+    "sq18": {
+      "statement": "Interrumpe a los demás o se entromete (por ejemplo: se mete en conversaciones, juegos, etc.)."
+    },
+    "sq16": {
+      "statement": "Responde las preguntas de forma precipitada antes de que terminen de formularlas."
+    },
+    "sq1": {
+      "statement": "No logra prestar mucha atención a los detalles o comete errores por descuido en los trabajos escolares o las tareas."
+    },
+    "sq3": {
+      "statement": "Parece no escuchar cuando se le habla directamente."
+    },
+    "sq2": {
+      "statement": "Tiene dificultad para mantener la atención en tareas o actividades de ocio."
+    }
+  },
+  "m14_aq10_questions": {
+    "aq10q11": {
+      "statement": "Él(ella) siempre percibe patrones/categorías en las cosas."
+    },
+    "aq10q1": {
+      "statement": "Él/ella nota con frecuencia pequeños ruidos que pasan desapercibidos para las demás personas."
+    },
+    "aq10q12": {
+      "statement": "Él(ella) suele centrarse más en la imagen o la situación en su conjunto que en los pequeños detalles."
+    },
+    "aq10q2": {
+      "statement": "Habitualmente, él/ella se concentra más en la imagen o la situación en su conjunto que en sus pequeños detalles."
+    },
+    "aq10q3": {
+      "statement": "Cuando está en un grupo social, él/ella logra seguir fácilmente conversaciones de varias personas."
+    },
+    "aq10q13": {
+      "statement": "Cuando está en un grupo social, él(ella) logra seguir fácilmente conversaciones de varias personas."
+    },
+    "aq10q4": {
+      "statement": "Él/ella logra hacer fácilmente más de una cosa al mismo tiempo."
+    },
+    "aq10q14": {
+      "statement": "En caso de interrupción, él(ella) logra volver rápidamente a lo que estaba haciendo."
+    },
+    "aq10q5": {
+      "statement": "Él/ella no sabe cómo mantener una conversación con sus pares."
+    },
+    "aq10q15": {
+      "statement": "Frecuentemente, él(ella) percibe que no sabe cómo mantener una conversación."
+    },
+    "aq10q16": {
+      "statement": "Socialmente, él(ella) es un(a) buen(buena) conversador(a)."
+    },
+    "aq10q6": {
+      "statement": "Socialmente, él/ella es buen/buena conversador/a."
+    },
+    "aq10q17": {
+      "statement": "Cuando era más joven, él(ella) gustaba de jugar a fingir con otros niños."
+    },
+    "aq10q7": {
+      "statement": "Durante la lectura de una historia, él/ella tiene dificultad para comprender las intenciones y las emociones de los personajes."
+    },
+    "aq10q8": {
+      "statement": "En el preescolar, él/ella gustaba de los juegos de fingimiento con los otros niños."
+    },
+    "aq10q18": {
+      "statement": "Él(ella) tiene dificultad para imaginarse cómo sería ser otra persona."
+    },
+    "aq10q9": {
+      "statement": "Él/ella percibe fácilmente lo que alguien está pensando o sintiendo, solo con mirarle la cara."
+    },
+    "aq10q19": {
+      "statement": "Él(ella) encuentra fáciles las situaciones sociales."
+    },
+    "aq10q20": {
+      "statement": "Él(ella) tiene dificultad para hacer nuevos amigos."
+    },
+    "aq10q10": {
+      "statement": "Él/ella tiene dificultad para hacer nuevos amigos."
+    }
+  },
+  "ias_questions": {
+    "iq1": {
+      "statement": "Frutas totales (incluidos los jugos naturales)",
+      "option_1_text": "Rara vez o nunca consumo frutas.",
+      "option_2_text": "Consumo 1 porción por día (p. ej.: una rodaja de sandía o una manzana).",
+      "option_3_text": "Consumo 2 o más porciones de frutas todos los días."
+    },
+    "iq3": {
+      "statement": "Verduras totales (hortalizas y legumbres crudas o cocidas)",
+      "option_1_text": "Rara vez o nunca como verduras.",
+      "option_2_text": "Consumo verduras solo en 1 comida (solo el almuerzo o solo la cena).",
+      "option_3_text": "Consumo verduras en el almuerzo y en la cena todos los días."
+    },
+    "iq2": {
+      "statement": "Frutas enteras (solo fruta entera/en trozos, sin jugos)",
+      "option_1_text": "Solo tomo jugo o no como frutas.",
+      "option_2_text": "Consumo al menos 1 fruta entera la mayoría de los días.",
+      "option_3_text": "Consumo 2 o más frutas enteras todos los días (asegura fibra)."
+    },
+    "iq4": {
+      "statement": "Verduras oscuras y legumbres (brócoli, col rizada, espinaca, frijoles, lentejas...)",
+      "option_1_text": "Rara vez o nunca consumo esos alimentos.",
+      "option_2_text": "Como frijoles o verduras oscuras de 3 a 4 veces por semana.",
+      "option_3_text": "Como frijoles y/o verduras verde oscuro prácticamente todos los días."
+    },
+    "iq5": {
+      "statement": "Cereales integrales (arroz integral, avena, pan integral, linaza, chia)",
+      "option_1_text": "Solo consumo cereales refinados (arroz blanco, pan blanco, fideos comunes).",
+      "option_2_text": "Consumo al menos 1 porción de cereal integral o semillas por día.",
+      "option_3_text": "La mayor parte de mis cereales diarios son integrales (2 o más porciones/día)."
+    },
+    "iq6": {
+      "statement": "Lácteos (leche, queso, yogur; preferiblemente con menos grasa)",
+      "option_1_text": "No consumo lácteos (ni equivalentes vegetales fortificados con calcio).",
+      "option_2_text": "Consumo de 1 a 2 porciones por día.",
+      "option_3_text": "Consumo 3 porciones por día (recomendación estándar de calcio)."
+    },
+    "iq7": {
+      "statement": "Carnes, huevos y legumbres (fuentes de proteína en general)",
+      "option_1_text": "Consumo muy bajo de proteínas a lo largo del día.",
+      "option_2_text": "Consumo proteínas solo en una de las comidas principales.",
+      "option_3_text": "Consumo fuentes saludables repartidas en el almuerzo, la cena y los refrigerios."
+    },
+    "iq9": {
+      "statement": "Sodio (sal de cocina y alimentos salados)",
+      "option_1_text": "Uso mucha sal, uso condimentos preparados (cubitos) y como muchos embutidos/saladitos.",
+      "option_2_text": "Uso sal moderadamente, pero todavía consumo algunos productos salados industrializados.",
+      "option_3_text": "Como poca sal, priorizo condimentos naturales y evito los ultraprocesados."
+    },
+    "iq8": {
+      "statement": "Pescados y fuentes de grasas buenas (sardinas/atún, aceite de oliva, frutos secos, palta)",
+      "option_1_text": "No consumo esos alimentos o uso solo aceites vegetales comunes.",
+      "option_2_text": "Uso aceite de oliva regularmente, o como frutos secos/palta algunas veces por semana.",
+      "option_3_text": "Como pescado al menos 2 veces por semana y uso grasas buenas a diario."
+    },
+    "iq10": {
+      "statement": "Grasa saturada (carnes grasas, piel de pollo, mantequilla, aceite de coco, quesos amarillos)",
+      "option_1_text": "Consumo carnes muy grasas, frituras y quesos grasos casi a diario.",
+      "option_2_text": "Consumo moderado; alterno carnes magras y grasas, y controlo el uso de mantequilla.",
+      "option_3_text": "Alimentación muy baja en grasa saturada (priorizo carnes magras y alimentos a la parrilla)."
+    },
+    "iq11": {
+      "statement": "Calorías de fuentes vacías (azúcar añadido, dulces, gaseosas, alcohol y grasas sólidas)",
+      "option_1_text": "Consumo dulces, gaseosas o bebidas azucaradas/alcohólicas todos los días.",
+      "option_2_text": "Consumo esos productos de forma moderada (2 a 3 veces por semana).",
+      "option_3_text": "Rara vez consumo (menos de 1 vez por semana) azúcar refinada, gaseosas o alcohol."
+    }
+  },
+  "m2_modalidades_config": {
+    "m2-7": {},
+    "m2-4": {},
+    "m2-5": {},
+    "m2-6": {},
+    "m2-8": {},
+    "m2-1": {},
+    "m2-2": {},
+    "m2-3": {}
+  },
+  "m3_cenarios": {
+    "c3": {
+      "cenario": "ESCENARIO C",
+      "condicao": "No hay presencia ni inasistencia registrada",
+      "frequencia": "Hasta el momento, no se han identificado registros de presencia o ausencia del estudiante en el sistema durante este período. La ausencia de datos impide una evaluación precisa del seguimiento escolar, por lo que resulta indispensable verificar de inmediato con la secretaría o el equipo pedagógico para regularizar los registros.",
+      "mensagem": "Solicitamos que se comunique con la secretaría escolar para regularizar los registros. Hemos constatado que hasta el momento no hay registros de presencia ni de inasistencia, lo que imposibilita el seguimiento adecuado de la rutina del estudiante."
+    },
+    "c1": {
+      "cenario": "ESCENARIO A",
+      "condicao": "Más presencias que inasistencias",
+      "frequencia": "El estudiante demostró una excelente regularidad y compromiso con la rutina escolar durante este mes. La baja tasa de absentismo refleja una actitud participativa y comprometida con el entorno de aprendizaje.",
+      "mensagem": "Felicitaciones por el incentivo y la colaboración. La asistencia constante ha sido el pilar de los buenos resultados alcanzados hasta ahora."
+    },
+    "c2": {
+      "cenario": "ESCENARIO B",
+      "condicao": "Más inasistencias que presencias",
+      "frequencia": "Hemos identificado un número crítico de ausencias en este período, superior a los días de asistencia a clase. Este patrón de inasistencias excesivas activa una alerta pedagógica, ya que interrumpe la secuencia didáctica y perjudica la asimilación de los contenidos impartidos.",
+      "mensagem": "Solicitamos especial atención y un diálogo familiar para identificar el motivo de las ausencias. Es fundamental restablecer la rutina de asistencia a la escuela para evitar perjuicios graves en la evaluación final de este ciclo."
+    }
+  },
+  "m3_impactos": {
+    "i1": {
+      "tipo": "Ventaja (Punto Fuerte)",
+      "indicador": "Continuidad Pedagógica, Socialización y Ritmo de Evaluación",
+      "descricao": "Cuando está presente, el estudiante sigue las explicaciones paso a paso, lo que facilita la realización de tareas complejas. La convivencia diaria fortalece los vínculos con los docentes y los compañeros, y desarrolla la inteligencia emocional y el trabajo en equipo. Menor necesidad de aplicar pruebas sustitutivas o trabajos de recuperación de nota por pérdida de plazos."
+    },
+    "i2": {
+      "tipo": "Desventaja (Punto de Atención)",
+      "indicador": "Lagunas de Contenido, Desvinculación Escolar y Sobrecarga de Tareas",
+      "descricao": "Cada ausencia genera la pérdida de conceptos clave, acumulando dudas para las unidades siguientes. El exceso de inasistencias rompe la rutina del estudiante y genera desmotivación y sensación de aislamiento respecto del grupo. Acumulación de actividades pendientes que deben realizarse en casa para cumplir con los requisitos del año escolar."
+    }
+  },
+  "m5_capacidades_config": {
+    "v1": {
+      "health_status": "La capacidad de desplazamiento rápido y el tiempo de reacción están por debajo de lo esperado para la edad. En términos de salud, esto indica un sistema neuromuscular con respuestas lentas a los estímulos externos y baja eficiencia cardiovascular en esfuerzos explosivos, lo que genera cansancio precoz y falta de aire en carreras cortas.",
+      "to_improve": "El estudiante necesita desarrollar la eficiencia de la zancada y la ganancia de ritmo. El enfoque inicial debe estar en ejercicios educativos de carrera (como elevar las rodillas y los talones), coordinando la respiración y el movimiento de los brazos para destrabar la agilidad de los pies y mejorar el acondicionamiento aeróbico básico.",
+      "recommendation": "Incentivamos el estímulo en casa mediante juegos que exijan arranques rápidos, como la carrera de banderas, una carrera de obstáculos en el patio o circuitos cronometrados."
+    },
+    "v4": {
+      "health_status": "Desempeño físico excepcional. El estudiante tiene un tiempo de reacción muy breve y una aceleración impresionante, y alcanza la velocidad máxima con facilidad. El sistema cardiorrespiratorio y la musculatura esquelética muestran una eficiencia metabólica altísima y una coordinación neuromuscular perfecta.",
+      "to_improve": "Ahora el objetivo es preservar este alto rendimiento y evitar lesiones. Como genera mucha fuerza y velocidad, el estudiante debe centrarse en un calentamiento riguroso antes de entrenar y en ejercicios de flexibilidad para mantener los músculos largos, elásticos y protegidos contra distensiones.",
+      "recommendation": "Felicitamos por el excelente vigor físico. Seguiremos ofreciendo desafíos de alta intensidad en clase para mantener al estudiante motivado y saludable."
+    },
+    "f3": {
+      "health_status": "Nivel saludable y totalmente adecuado para la edad. El estudiante presenta una densidad y un tono muscular excelentes, y sostiene movimientos de impacto con seguridad. Esta fuerza actúa como un escudo protector para las articulaciones, acelera el metabolismo y garantiza una excelente postura corporal.",
+      "to_improve": "Aunque el nivel es seguro, el estudiante puede mejorar la simetría de la fuerza (equilibrio entre el lado derecho y el lado izquierdo del cuerpo). Los ejercicios unilaterales ayudarán a refinar el movimiento y a preparar el cuerpo para la transición hacia el nivel excelente.",
+      "recommendation": "Felicitamos por el excelente soporte físico. Seguiremos con estímulos desafiantes en clase para preservar la integridad de la salud muscular del estudiante."
+    },
+    "ab2": {
+      "health_status": "El estudiante tiene una fuerza abdominal básica, pero se cansa muy rápido al intentar mantener el esfuerzo. Esta fatiga precoz hace que empiece a compensar el movimiento con otras partes del cuerpo, desestabilizando el tronco durante carreras y juegos.",
+      "to_improve": "El enfoque debe ser el aumento gradual del tiempo de ejecución de los ejercicios. Entrenar la constancia y el ritmo de las repeticiones ayudará a estabilizar el tronco y a proteger la columna durante períodos más largos.",
+      "recommendation": "Incentivamos el premio o el estímulo diario mediante desafíos rápidos en casa, como juegos que impliquen la posición de plancha o la elevación de piernas."
+    },
+    "i3": {
+      "health_status": "El nivel es saludable y adecuado. El estudiante presenta una buena respuesta neuromuscular y logra vencer la gravedad con facilidad. Esta condición protege la columna y amortigua los impactos de forma segura durante juegos y carreras.",
+      "to_improve": "Aunque se encuentra en un nivel seguro, el estudiante puede mejorar la estabilidad en el momento del aterrizaje. El entrenamiento debe centrarse en el equilibrio para evolucionar del nivel bueno al excelente.",
+      "recommendation": "Felicitamos por el óptimo historial físico. Seguiremos desafiando al estudiante en clase para mantener este patrón de excelencia."
+    },
+    "i1": {
+      "health_status": "El índice de impulso está por debajo de lo esperado para el grupo de edad. Esto indica baja potencia y falta de activación de los músculos de las piernas. En términos de salud, compromete la amortiguación de impactos y debilita la estructura de las articulaciones de la rodilla y el tobillo.",
+      "to_improve": "El estudiante necesita desarrollar con urgencia la fuerza de arranque. Es necesario corregir la postura de la sentadilla y la mecánica del salto para evitar lesiones en actividades simples de la vida diaria.",
+      "recommendation": "Incentivamos el apoyo en actividades dinámicas en casa, como saltar la cuerda y juegos de salto."
+    },
+    "v3": {
+      "health_status": "Nivel saludable y totalmente adecuado para el grupo de edad. El estudiante reacciona rápido a los estímulos y mantiene una excelente velocidad de desplazamiento. Este patrón refleja un corazón fuerte, una excelente capacidad respiratoria y músculos acondicionados, lo que favorece un gasto energético óptimo y vitalidad en la vida diaria.",
+      "to_improve": "Aunque se encuentra en un rango seguro y saludable, el estudiante puede trabajar en mantener esa velocidad durante distancias un poco mayores. El enfoque debe ser entrenar la resistencia a la velocidad para evitar caídas abruptas del rendimiento al final de las actividades.",
+      "recommendation": "Felicitamos por el excelente vigor físico. Seguiremos ofreciendo desafíos de alta intensidad en clase para mantener al estudiante motivado y saludable."
+    },
+    "ab3": {
+      "health_status": "Nivel saludable y dentro del patrón recomendado. El estudiante presenta una buena sustentación del tronco, lo que garantiza estabilidad corporal, mejora el equilibrio y protege la región lumbar contra los impactos generados por saltos y carreras.",
+      "to_improve": "Aunque el nivel es seguro, el estudiante puede equilibrar el entrenamiento trabajando las variaciones del abdomen (como la región lateral u oblicua). Esto perfeccionará la rotación del tronco en los deportes y consolidará el avance hacia el nivel excelente.",
+      "recommendation": "Felicitamos por la excelente condición de salud física. Mantendremos los estímulos en clase para preservar este óptimo soporte postural."
+    },
+    "v2": {
+      "health_status": "El estudiante logra correr a un ritmo estable, pero tiene dificultad para acelerar rápidamente en la salida o cambiar el ritmo de forma brusca. La salud cardiovascular tolera el esfuerzo, pero la musculatura de las piernas gasta demasiada energía por falta de coordinación fina y de potencia en la zancada.",
+      "to_improve": "El enfoque debe ser la ganancia de aceleración y la técnica de explosión. Se recomienda entrenar series cortas de carrera con descanso completo entre ellas, además de juegos de reacción rápida, enseñando al cuerpo a reclutar fibras musculares veloces de forma más eficiente.",
+      "recommendation": "Incentivamos el estímulo en casa mediante juegos que exijan arranques rápidos, como la carrera de banderas, una carrera de obstáculos en el patio o circuitos cronometrados."
+    },
+    "a2": {
+      "health_status": "El estudiante logra cambiar de dirección, pero pierde el equilibrio o la velocidad durante el movimiento. Existe una base motora funcional, pero falta eficiencia en las articulaciones para transferir el peso corporal de un lado a otro de forma fluida, gastando más energía de lo necesario.",
+      "to_improve": "El enfoque debe ser el refinamiento técnico. Se recomienda entrenar con circuitos de conos y escaleras de agilidad para mejorar el trabajo de pies y la transición rápida entre movimientos, aumentando la seguridad articular.",
+      "recommendation": "Incentivamos la práctica de juegos tradicionales de la calle en casa, como la persecución, el quemado o circuitos en zigzag dibujados en el suelo."
+    },
+    "ab4": {
+      "health_status": "Desempeño físico excepcional. El estudiante tiene una excelente resistencia muscular en la zona central del cuerpo. Esto se traduce en una postura impecable, una eficiencia de movimientos altísima y una protección máxima de la columna vertebral ante cualquier tipo de carga o esfuerzo.",
+      "to_improve": "Ahora el objetivo es mantener el patrón. Se recomienda integrar la fuerza de este abdomen con ejercicios de flexibilidad y estiramiento de la cadena posterior para evitar cualquier tipo de rigidez muscular.",
+      "recommendation": "Felicitamos por la excelente condición de salud física. Mantendremos los estímulos en clase para preservar este óptimo soporte postural."
+    },
+    "i2": {
+      "health_status": "El estudiante tiene una base de fuerza, pero le falta explosión muscular. El rendimiento físico oscila y gasta más energía de lo necesario para realizar saltos. La estructura de salud es estable, pero presenta fatiga rápida en circuitos.",
+      "to_improve": "El enfoque debe ser la coordinación entre el movimiento de los brazos y las piernas durante el salto. Los ejercicios repetitivos de saltos bajos ayudarán a transformar la fuerza actual en potencia real.",
+      "recommendation": "Incentivamos el apoyo en actividades dinámicas en casa, como saltar la cuerda y juegos de salto."
+    },
+    "a4": {
+      "health_status": "Desempeño físico excepcional. El estudiante muestra una velocidad de reacción impresionante y un control del centro de gravedad perfecto al cambiar de dirección. Su sistema propioceptivo (capacidad del cuerpo de reconocer su propia posición) es altamente eficaz y garantiza una protección máxima contra lesiones.",
+      "to_improve": "El objetivo actual es mantener este alto rendimiento. Se recomienda integrar movimientos de agilidad con la toma de decisiones complejas y el uso de implementos (como pelotas), preparando al estudiante para un alto rendimiento en escenarios de juego reales.",
+      "recommendation": "Felicitamos por la excelente agilidad y prontitud motora. Seguiremos desafiando al estudiante con dinámicas complejas en clase."
+    },
+    "i4": {
+      "health_status": "Desempeño físico excepcional. El estudiante tiene una excelente potencia de miembros inferiores y una coordinación motora impecable. El sistema musculoesquelético está altamente protegido y preparado para desafíos físicos de alta intensidad.",
+      "to_improve": "Ahora el enfoque es mantener esta valencia. Se recomienda ganar flexibilidad para que la alta potencia no genere rigidez muscular.",
+      "recommendation": "Felicitamos por el óptimo historial físico. Seguiremos desafiando al estudiante en clase para mantener este patrón de excelencia."
+    },
+    "ab1": {
+      "health_status": "La resistencia de la región abdominal está por debajo de lo esperado. Un core (centro de gravedad del cuerpo) débil perjudica directamente la postura, sobrecarga la columna lumbar y aumenta el riesgo de dolor de espalda y desviaciones posturales a mediano plazo.",
+      "to_improve": "El estudiante debe iniciar con urgencia el fortalecimiento de la musculatura central. Es necesario centrarse en la activación del abdomen mediante ejercicios estáticos simples, corrigiendo la respiración y evitando tirar del cuello durante la ejecución.",
+      "recommendation": "Incentivamos el estímulo diario mediante desafíos rápidos en casa, como juegos que impliquen la posición de plancha o la elevación de piernas."
+    },
+    "f1": {
+      "health_status": "La capacidad de vencer resistencias y sostener el propio cuerpo está por debajo de lo esperado. En términos de salud, la falta de tono muscular genera una sobrecarga directa sobre los huesos y los ligamentos, además de provocar un cansancio extremo en tareas simples, como cargar la mochila o mantener la postura en el pupitre escolar.",
+      "to_improve": "El estudiante necesita desarrollar con urgencia la fuerza básica. El enfoque inicial debe ser en ejercicios calisténicos simples (que usan el peso del propio cuerpo), como apoyos de rodillas en el suelo y sentadillas libres adaptadas, con estricto enfoque en la ejecución correcta para ganar masa magra protectora.",
+      "recommendation": "Incentivamos actividades lúdicas de fuerza en casa, como juegos de tira y afloja, escalar juegos del parque (jaulas) o juegos de cargar objetos ligeros."
+    },
+    "f2": {
+      "health_status": "El estudiante tiene una fuerza funcional para actividades cotidianas, pero falla o pierde la alineación corporal cuando se expone a esfuerzos un poco más prolongados. La estructura de salud es estable, pero la musculatura estabilizadora se cansa rápido y genera descompensaciones posturales durante los juegos.",
+      "to_improve": "El enfoque debe ser el aumento gradual de la resistencia de fuerza. Se recomienda incluir circuitos funcionales con pequeños implementos (como bandas elásticas o balones medicinales ligeros) para consolidar la estructura muscular y proteger el sistema esquelético.",
+      "recommendation": "Incentivamos actividades lúdicas de fuerza en casa, como juegos de tira y afloja, escalar juegos del parque (jaulas) o juegos de cargar objetos ligeros."
+    },
+    "a1": {
+      "health_status": "La capacidad de cambiar de dirección rápidamente está por debajo de lo esperado. El estudiante tiene dificultad para frenar y reajustar el cuerpo con control. En términos de salud, la falta de agilidad y coordinación aumenta significativamente el riesgo de caídas, esguinces de tobillo y lesiones en los ligamentos de la rodilla ante movimientos bruscos.",
+      "to_improve": "El estudiante necesita desarrollar con urgencia el tiempo de reacción y la conciencia corporal. El enfoque inicial debe ser en ejercicios de desaceleración controlada y ejercicios educativos de zancadas laterales, aprendiendo a bajar el centro de gravedad para ganar estabilidad.",
+      "recommendation": "Incentivamos la práctica de juegos tradicionales de la calle en casa, como la persecución, el quemado o circuitos en zigzag dibujados en el suelo."
+    },
+    "f4": {
+      "health_status": "Desempeño físico excepcional. El estudiante demuestra una altísima capacidad de generar tensión muscular y potencia. Su sistema esquelético está totalmente protegido contra lesiones por impacto y la musculatura presenta una excelente eficiencia metabólica y capacidad de recuperación.",
+      "to_improve": "Ahora el objetivo es velar por la longevidad de este rendimiento. Se recomienda combinar el entrenamiento de fuerza máxima con sesiones rigurosas de estiramiento y flexibilidad, evitando el acortamiento muscular y la pérdida de amplitud de movimiento en las articulaciones.",
+      "recommendation": "Felicitamos por el excelente soporte físico. Seguiremos con estímulos desafiantes en clase para mantener la integridad de la salud muscular del estudiante."
+    },
+    "a3": {
+      "health_status": "Nivel saludable y totalmente adecuado para el grupo de edad. El estudiante demuestra un excelente control corporal, logra frenar y cambiar de rumbo con seguridad y estabilidad. Esta agilidad protege las articulaciones contra sobrecargas y refleja un sistema neuromuscular bien desarrollado.",
+      "to_improve": "Aunque el nivel es seguro y protector, el estudiante puede mejorar la eficiencia del movimiento reduciendo el tiempo de duda antes de cambiar de dirección. Introducir estímulos visuales o sonoros sorpresa ayudará a refinar aún más el tiempo de reacción.",
+      "recommendation": "Felicitamos por la excelente agilidad y prontitud motora. Seguiremos desafiando al estudiante con dinámicas complejas en clase."
+    }
+  },
+  "m6_modalidades_direcionamento": {
+    "m6_v1": {
+      "valencias": "Impulso, Agilidad y Abdomen.",
+      "condition": "Niveles Bueno / Excelente en Impulso y Agilidad",
+      "report": "Se destaca por su alta capacidad de impulso y sus excelentes tiempos en las pruebas de agilidad, y responde muy bien a estímulos que exigen reacciones rápidas."
+    },
+    "m6_a1": {
+      "valencias": "Velocidad, Impulso y Fuerza Muscular.",
+      "condition": "Niveles Bueno / Excelente en Velocidad e Impulso",
+      "report": "Presenta excelentes índices de velocidad e impulso en las pruebas. Esta combinación indica una óptima capacidad de explosión y potencia física para la disciplina."
+    },
+    "m6_f1": {
+      "valencias": "Velocidad, Agilidad e Impulso.",
+      "condition": "Niveles Bueno / Excelente en Velocidad y Agilidad",
+      "report": "Demuestra un excelente desempeño en las pruebas de velocidad y agilidad. Muestra gran facilidad para acelerar y cambiar de dirección rápidamente."
+    },
+    "m6_g1": {
+      "valencias": "Abdomen, Fuerza Muscular y Agilidad.",
+      "condition": "Niveles Bueno / Excelente en Abdomen y Fuerza Muscular",
+      "report": "Presenta óptimos resultados en las pruebas de fuerza y resistencia abdominal. Esta base garantiza una excelente sustentación, firmeza y control corporal estable."
+    },
+    "m6_b1": {
+      "valencias": "Impulso, Agilidad y Velocidad.",
+      "condition": "Niveles Bueno / Excelente en Impulso y Velocidad",
+      "report": "Se destaca por su óptimo rendimiento en las pruebas de impulso y velocidad. Demuestra la capacidad de realizar arranques rápidos y saltos verticales eficientes."
+    },
+    "m6_n1": {
+      "valencias": "Fuerza Muscular, Abdomen y Velocidad.",
+      "condition": "Niveles Bueno / Excelente en Fuerza Muscular y Abdomen",
+      "report": "Evidencia óptimos niveles de fuerza muscular y resistencia abdominal en las pruebas. Esta estructura física ofrece un excelente soporte para mantener el cuerpo firme y potente."
+    },
+    "m6_h1": {
+      "valencias": "Velocidad, Agilidad y Fuerza Muscular.",
+      "condition": "Niveles Bueno / Excelente en Velocidad y Fuerza Muscular",
+      "report": "Las pruebas de velocidad y fuerza indican un perfil físico altamente potente. Tiene una excelente capacidad de aceleración y de aplicación de fuerza muscular."
+    },
+    "m6_l1": {
+      "valencias": "Fuerza Muscular, Abdomen y Agilidad.",
+      "condition": "Niveles Bueno / Excelente en Fuerza Muscular y Abdomen",
+      "report": "Muestra un alto rendimiento en las pruebas de fuerza y resistencia abdominal. Tiene una musculatura central firme, ideal para la estabilidad corporal y la resistencia."
+    }
+  },
+  "m6_diretrizes_intervencao": {
+    "m6_d1": {
+      "diretriz": "PERFECCIONAR HABILIDADES MOTORAS",
+      "criterio": "Esta vía debe adoptarse si tres o más valencias físicas se encuentran en niveles Insuficiente o Regular.",
+      "conduta": "No recomendamos que el/la joven se centre en un solo deporte ni participe de competiciones rígidas en este momento. Lo ideal ahora es priorizar circuitos funcionales, actividades que mezclen varios deportes y juegos cooperativos, estimulando el desarrollo motor general.",
+      "objetivo": "El objetivo principal es fortalecer y preparar el cuerpo del/de la joven de forma segura. Nos centraremos en ganar masa magra, mejorar la postura y la coordinación general, asegurando que el cuerpo esté protegido antes de pasar a entrenamientos más intensos."
+    }
+  },
+  "aptidao_referenciais": {
+    "f-1": {
+      "insuficiente": "0 a 1",
+      "regular": "2",
+      "bom": "3",
+      "excelente": "4 o más"
+    },
+    "f-2": {
+      "insuficiente": "0 a 1",
+      "regular": "2",
+      "bom": "3",
+      "excelente": "4 o más"
+    },
+    "f-3": {
+      "insuficiente": "0 a 2",
+      "regular": "3 a 4",
+      "bom": "5 a 6",
+      "excelente": "7 o más"
+    },
+    "f-4": {
+      "insuficiente": "0 a 1",
+      "regular": "2 a 3",
+      "bom": "4 a 5",
+      "excelente": "6 o más"
+    },
+    "f-5": {
+      "insuficiente": "0 a 3",
+      "regular": "4 a 5",
+      "bom": "6 a 7",
+      "excelente": "8 o más"
+    },
+    "f-6": {
+      "insuficiente": "0 a 2",
+      "regular": "3 a 4",
+      "bom": "5 a 6",
+      "excelente": "7 o más"
+    },
+    "f-7": {
+      "insuficiente": "0 a 4",
+      "regular": "5 a 6",
+      "bom": "7 a 8",
+      "excelente": "9 o más"
+    },
+    "f-8": {
+      "insuficiente": "0 a 4",
+      "regular": "5 a 6",
+      "bom": "7 a 8",
+      "excelente": "9 o más"
+    },
+    "f-9": {
+      "insuficiente": "0 a 6",
+      "regular": "7 a 9",
+      "bom": "10 a 11",
+      "excelente": "12 o más"
+    },
+    "f-10": {
+      "insuficiente": "0 a 6",
+      "regular": "7 a 9",
+      "bom": "10 a 11",
+      "excelente": "12 o más"
+    },
+    "i-1": {
+      "insuficiente": "0 a 30",
+      "regular": "31 a 40",
+      "bom": "41 a 80",
+      "excelente": "81 o más"
+    },
+    "i-2": {
+      "insuficiente": "0 a 30",
+      "regular": "31 a 40",
+      "bom": "41 a 80",
+      "excelente": "81 o más"
+    },
+    "i-3": {
+      "insuficiente": "0 a 60",
+      "regular": "61 a 90",
+      "bom": "91 a 140",
+      "excelente": "141 o más"
+    },
+    "i-4": {
+      "insuficiente": "0 a 60",
+      "regular": "61 a 90",
+      "bom": "91 a 140",
+      "excelente": "141 o más"
+    },
+    "i-5": {
+      "insuficiente": "0 a 80",
+      "regular": "81 a 100",
+      "bom": "101 a 150",
+      "excelente": "151 o más"
+    },
+    "i-6": {
+      "insuficiente": "0 a 80",
+      "regular": "81 a 100",
+      "bom": "101 a 150",
+      "excelente": "151 o más"
+    },
+    "i-7": {
+      "insuficiente": "81 a 100",
+      "regular": "101 a 120",
+      "bom": "121 a 180",
+      "excelente": "181 o más"
+    },
+    "i-8": {
+      "insuficiente": "81 a 100",
+      "regular": "101 a 120",
+      "bom": "121 a 180",
+      "excelente": "181 o más"
+    },
+    "i-9": {
+      "insuficiente": "101 a 120",
+      "regular": "121 a 180",
+      "bom": "181 a 200",
+      "excelente": "201 o más"
+    },
+    "i-10": {
+      "insuficiente": "101 a 120",
+      "regular": "121 a 180",
+      "bom": "181 a 200",
+      "excelente": "201 o más"
+    },
+    "ag-1": {
+      "insuficiente": "17 o más",
+      "regular": "15 a 16",
+      "bom": "12 a 14",
+      "excelente": "11 o menos"
+    },
+    "ag-2": {
+      "insuficiente": "17 o más",
+      "regular": "15 a 16",
+      "bom": "12 a 14",
+      "excelente": "11 o menos"
+    },
+    "ag-3": {
+      "insuficiente": "16 o más",
+      "regular": "14 a 15",
+      "bom": "11 a 13",
+      "excelente": "10 o menos"
+    },
+    "ag-4": {
+      "insuficiente": "16 o más",
+      "regular": "14 a 15",
+      "bom": "11 a 13",
+      "excelente": "10 o menos"
+    },
+    "ag-9": {
+      "insuficiente": "14 o más",
+      "regular": "11 a 13",
+      "bom": "9 a 10",
+      "excelente": "8 o menos"
+    },
+    "v-9": {
+      "insuficiente": "7,00 o más",
+      "regular": "5,81 a 6,99",
+      "bom": "3,81 a 5,80",
+      "excelente": "3,80 o menos"
+    },
+    "ag-5": {
+      "insuficiente": "15 o más",
+      "regular": "13 a 14",
+      "bom": "12 a 10",
+      "excelente": "9 o menos"
+    },
+    "ag-6": {
+      "insuficiente": "15 o más",
+      "regular": "13 a 14",
+      "bom": "12 a 10",
+      "excelente": "9 o menos"
+    },
+    "ag-7": {
+      "insuficiente": "14 o más",
+      "regular": "11 a 13",
+      "bom": "9 a 10",
+      "excelente": "8 o menos"
+    },
+    "ag-8": {
+      "insuficiente": "14 o más",
+      "regular": "11 a 13",
+      "bom": "9 a 10",
+      "excelente": "8 o menos"
+    },
+    "v-1": {
+      "insuficiente": "7,00 o más",
+      "regular": "6,12 a 6,99",
+      "bom": "4,11 a 6,11",
+      "excelente": "4,10 o menos"
+    },
+    "v-2": {
+      "insuficiente": "7,00 o más",
+      "regular": "6,12 a 6,99",
+      "bom": "4,11 a 6,11",
+      "excelente": "4,10 o menos"
+    },
+    "v-3": {
+      "insuficiente": "7,00 o más",
+      "regular": "5,61 a 6,99",
+      "bom": "3,61 a 5,60",
+      "excelente": "3,60 o menos"
+    },
+    "v-4": {
+      "insuficiente": "7,00 o más",
+      "regular": "5,81 a 6,99",
+      "bom": "3,81 a 5,80",
+      "excelente": "3,80 o menos"
+    },
+    "v-5": {
+      "insuficiente": "7,00 o más",
+      "regular": "5,47 a 6,99",
+      "bom": "3,46 a 5,46",
+      "excelente": "3,45 o menos"
+    },
+    "v-6": {
+      "insuficiente": "7,00 o más",
+      "regular": "5,69 a 6,99",
+      "bom": "3,68 a 5,68",
+      "excelente": "3,68 o menos"
+    },
+    "v-7": {
+      "insuficiente": "7,00 o más",
+      "regular": "5,81 a 6,99",
+      "bom": "3,81 a 5,80",
+      "excelente": "3,80 o menos"
+    },
+    "v-8": {
+      "insuficiente": "7,00 o más",
+      "regular": "5,17 a 6,99",
+      "bom": "3,16 a 5,16",
+      "excelente": "3,15 o menos"
+    },
+    "a-1": {
+      "insuficiente": "No se aplica",
+      "regular": "0 a 29",
+      "bom": "No se aplica",
+      "excelente": "30 o más"
+    }
+  },
+  "m7_perfis_pareceres": {
+    "m7_4": {
+      "component": "Recomendaciones Pedagógicas",
+      "basic_data": "Proyectos integradores: incentivar la coordinación de equipos en ferias de ciencias, gincanas escolares o en el consejo estudiantil, donde él/ella deba aplicar conceptos de planificación, delegación de tareas y cumplimiento de metas.",
+      "reflection": "Inmersión en el mercado: promover visitas técnicas a empresas locales o conversaciones con profesionales de las áreas de finanzas, marketing y gestión para alinear las expectativas de la carrera con la realidad práctica del mercado."
+    },
+    "m7_1": {
+      "component": "Mapa de Perfiles y Carreras",
+      "basic_data": "Vocación para entornos innovadores. Potencial para trabajar en diseño de juegos o desarrollo web.",
+      "reflection": "Identifico en el/la estudiante una mente que opera en la intersección entre la lógica estructurada y la sensibilidad estética. Su gran ventaja competitiva es la capacidad de humanizar la tecnología. Áreas como el diseño de juegos y el desarrollo web exigen exactamente esa flexibilidad, pues requieren a alguien capaz de comprender códigos complejos sin perder de vista la experiencia, la belleza y la interactividad necesarias para el usuario final.",
+      "interest_area": "Excelente para diseño de juegos o desarrollo web.",
+      "careers": "Híbrido"
+    },
+    "m7_2": {
+      "component": "Recomendaciones Pedagógicas",
+      "basic_data": "Proyectos integradores: incentivar la participación en ferias de ciencias, consejos estudiantiles o muestras culturales donde él/ella deba aplicar planificación, creatividad y comunicación al mismo tiempo.",
+      "reflection": "Inmersión en el mercado: promover visitas técnicas a universidades o conversaciones con profesionales que trabajan en las áreas de mayor relevancia para alinear las expectativas de la carrera con la realidad del mercado."
+    },
+    "m7_8": {
+      "component": "Recomendaciones Pedagógicas",
+      "basic_data": "Proyectos integradores: incentivar el liderazgo en olimpiadas de matemáticas, competencias de robótica, desarrollo de aplicaciones pequeñas o talleres de maquetas y modelado 3D, estimulando el pensamiento algorítmico y espacial.",
+      "reflection": "Inmersión en el mercado: promover visitas guiadas a polos tecnológicos, laboratorios académicos y estudios de ingeniería o arquitectura, acercando al/la joven a los desafíos reales de infraestructura, código e innovación."
+    },
+    "m7_6": {
+      "component": "Recomendaciones Pedagógicas",
+      "basic_data": "Proyectos integradores: incentivar la participación en ferias de ciencias con enfoque ecológico/sostenible o en muestras culturales y artísticas, permitiendo que él/ella combine la investigación biológica con la expresión creativa.",
+      "reflection": "Inmersión en el mercado: promover visitas guiadas a laboratorios de investigación, clínicas o agencias de comunicación y estudios de diseño para que el/la joven comprenda la labor práctica y cotidiana de estas áreas en el mercado actual."
+    },
+    "m7_10": {
+      "component": "Recomendaciones Pedagógicas",
+      "basic_data": "Proyectos integradores: incentivar el protagonismo en debates escolares, simulaciones de comités internacionales (como los modelos de la ONU), la redacción de periódicos internos de la escuela o la coordinación de campañas y proyectos sociales de carácter comunitario.",
+      "reflection": "Inmersión en el mercado: fomentar el contacto con la realidad profesional mediante visitas guiadas a tribunales, institutos de psicología, agencias de comunicación o espacios de innovación pedagógica, ayudando al/la joven a comprender el impacto real de estas carreras."
+    },
+    "m7_7": {
+      "component": "Mapa de Perfiles y Carreras",
+      "basic_data": "Datos básicos: Perfil estimulado por la resolución de problemas lógicos, facilidad para manejar datos numéricos y profundo interés por descifrar el funcionamiento de las nuevas tecnologías.\n\nCarreras asociadas: Ingenierías, Ciencia de la Computación, Matemáticas, Física, Arquitectura y Tecnología de la Información.",
+      "reflection": "Diagnosticamos en el/la estudiante una estructura cognitiva predominantemente abstracta, analítica y deductiva. Su mente opera de forma sistémica y encuentra motivación en el descubrimiento de patrones, ecuaciones y arquitecturas de datos. El/la joven no se conforma con ser solo un usuario pasivo de las herramientas digitales y de las construcciones del mundo moderno; hay una curiosidad intelectual intrínseca por comprender el \\\"cómo\\\" y el \\\"por qué\\\" detrás de los engranajes tecnológicos y estructurales. Esta inclinación hacia la precisión metodológica ofrece una base sólida para carreras en desarrollo de software o ingeniería, entornos donde el rigor lógico sirve como materia prima para diseñar y construir las soluciones del mañana.",
+      "interest_area": "Te gusta resolver problemas lógicos, manejar números y entender cómo funcionan las tecnologías.",
+      "careers": "Ingenierías, Ciencia de la Computación, Matemáticas, Física, Arquitectura y Tecnología de la Información."
+    },
+    "m7_3": {
+      "component": "Mapa de Perfiles y Carreras",
+      "basic_data": "Datos básicos: Espíritu de liderazgo activo, interés por organizar procesos, gestionar recursos y trazar estrategias.\n\nCarreras asociadas: Administración, Economía, Ciencias Contables, Marketing, Logística y Gestión de Recursos Humanos.",
+      "reflection": "Observo en el/la estudiante una estructura cognitiva esencialmente orientada a la eficiencia, el pragmatismo y el pensamiento sistémico. Su mente muestra facilidad para ver el panorama general de escenarios complejos, ordenando prioridades y distribuyendo recursos con precisión. El liderazgo, en este perfil, no es solo una posición de mando, sino una habilidad natural para articular personas en torno a un objetivo común. Su inclinación a trazar estrategias y gestionar procesos indica un potencial sólido para asumir decisiones asertivas y mitigar riesgos en entornos corporativos y económicos dinámicos.",
+      "interest_area": "Tienes espíritu de liderazgo, te gusta organizar, gestionar recursos y trazar estrategias.",
+      "careers": "Administración, Economía, Ciencias Contables, Marketing, Logística y Gestión de Recursos Humanos."
+    },
+    "m7_9": {
+      "component": "Mapa de Perfiles y Carreras",
+      "basic_data": "Datos básicos: Perfil basado en la habilidad de comunicarse con claridad, fuerte empatía para acoger y ayudar al prójimo, además de interés crítico por comprender las estructuras de la sociedad.\n\nCarreras asociadas: Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo y Relaciones Internacionales.",
+      "reflection": "El eje central de desarrollo de este perfil está totalmente alineado con el factor humano y sus complejas interacciones colectivas. El/la estudiante demuestra una aptitud notable para la escucha activa, el ejercicio de la empatía y la articulación verbal de ideas abstractas. Su mente encuentra estímulo al analizar los fenómenos sociales, los derechos humanos y las narrativas que moldean nuestra cultura. Lejos de ser solo una inclinación teórica, este perfil refleja una inteligencia orientada a la transformación práctica y a la mediación de conflictos. El/la joven presenta un potencial latente para ejercer liderazgo en entornos que exigen responsabilidad ética, ya sea defendiendo causas jurídicas, educando, promoviendo la salud mental o comunicando información esencial para la colectividad.",
+      "interest_area": "Te gusta comunicarte, ayudar a las personas y entender la sociedad.",
+      "careers": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo y Relaciones Internacionales."
+    },
+    "m7_5": {
+      "component": "Mapa de Perfiles y Carreras",
+      "basic_data": "Datos básicos: Perfil movido por la creatividad. Muestra un fuerte deseo de inventar, innovar o tiene un profundo interés por el estudio de la vida, el bienestar y la salud.\n\nCarreras asociadas: Medicina, Biología, Diseño, Publicidad, Artes Visuales, Educación Física y Veterinaria.",
+      "reflection": "Observo en el/la estudiante una combinación singular entre la sensibilidad inventiva y la empatía innata. Este perfil se aparta del cientificismo estricto y tradicional; en cambio, encuentra motivación en aplicar soluciones creativas a los desafíos que involucran a los seres vivos y la expresión humana. Su mente se guía por la necesidad de descubrir nuevas alternativas, curar, diseñar o transformar el entorno. La presencia marcada de la creatividad en esta macroárea indica que el/la joven tiene facilidad para pensar \\\"fuera de la caja\\\" ante problemas complejos de salud o comunicación visual, siendo ideal para carreras que exigen innovación en el cuidado de la vida o en el desarrollo de nuevos conceptos estéticos.",
+      "interest_area": "Te mueve la creatividad, te gusta inventar, innovar o tienes un fuerte interés por la vida y la salud.",
+      "careers": "Medicina, Biología, Diseño, Publicidad, Artes Visuales, Educación Física y Veterinaria."
+    }
+  },
+  "m9_perfis_pareceres": {
+    "m9p_3": {
+      "basic_data": "Puntuación T por encima de 60. Excelente percepción de bienestar.",
+      "reflection": "Excelente percepción de salud física, social y de apoyo familiar. Preservar la red de apoyo y los hábitos que sostienen el bienestar."
+    },
+    "m9p_2": {
+      "basic_data": "Puntuación T entre 40 y 60. Percepción de salud esperada para el promedio.",
+      "reflection": "Percepción de salud dentro de lo esperado para la población saludable. Mantener hábitos de cuidado y seguimiento de rutina."
+    },
+    "m9p_1": {
+      "basic_data": "Puntuación T por debajo de 40. Señal de alerta en la percepción de bienestar.",
+      "reflection": "Indica necesidad de atención o intervención psicológica/social. Se recomienda un seguimiento cercano y la escucha activa del estudiante."
+    }
+  },
+  "m10_perfis_pareceres": {
+    "m10p_2": {
+      "basic_data": "De 5 a 8 puntos en el HU-DBI.",
+      "reflection": "Qué significa: Conocimiento intermedio.\nPerfil: El paciente tiene una buena noción, pero aún sigue algunos mitos o comete errores en su rutina de limpieza. Esto aumenta el riesgo de que aparezca algún problema de conducto, encía o caries."
+    },
+    "m10p_3": {
+      "basic_data": "De 0 a 4 puntos en el HU-DBI.",
+      "reflection": "Qué significa: Comportamiento de riesgo.\nPerfil: Hay una probabilidad muy alta de acumulación de suciedad y placas bacterianas en los dientes. El paciente necesita con urgencia orientaciones de limpieza y tratamiento preventivo con el dentista.\n"
+    },
+    "m10p_1": {
+      "basic_data": "De 9 a 12 puntos en el HU-DBI.",
+      "reflection": "Qué significa: Excelente cuidado bucal.\nPerfil: El paciente sabe cuidarse muy bien en su día a día y adopta hábitos que protegen los dientes de forma eficiente.\n"
+    }
+  },
+  "m11_perfis_pareceres": {
+    "m11p_2": {
+      "basic_data": "De 15 a 25 puntos en la escala de Rosenberg.",
+      "reflection": "Representa el patrón de la mayor parte de la población. La persona mantiene una buena relación consigo misma y reconoce sus cualidades y debilidades de forma realista."
+    },
+    "m11p_3": {
+      "basic_data": "Más de 25 puntos en la escala de Rosenberg.",
+      "reflection": "Fuerte autoconfianza y seguridad. Las puntuaciones muy cercanas a 30 pueden indicar una gran estabilidad emocional, pero también pueden reflejar una actitud defensiva o dificultad para afrontar puntos vulnerables."
+    },
+    "m11p_1": {
+      "basic_data": "Menos de 15 puntos en la escala de Rosenberg.",
+      "reflection": "Indica un enfoque excesivo en los defectos, sentimientos frecuentes de insatisfacción personal y menor confianza en la propia capacidad."
+    }
+  },
+  "m12_perfis_pareceres": {
+    "m12p_3": {
+      "basic_data": "Más de 80 puntos en el IAS.",
+      "reflection": "El patrón alimentario cumple muy bien las directrices. Actúa como factor protector para su salud y longevidad."
+    },
+    "m12p_1": {
+      "basic_data": "Menos de 51 puntos en el IAS.",
+      "reflection": "Alto riesgo de desarrollar carencias nutricionales y enfermedades crónicas (diabetes, hipertensión, problemas cardíacos). Exige intervención rápida."
+    },
+    "m12p_2": {
+      "basic_data": "De 51 a 80 puntos en el IAS.",
+      "reflection": "Ya tiene algunos hábitos saludables, pero comete excesos o tiene faltas graves (exceso de azúcar/sodio o falta de integrales y frutas)."
+    }
+  },
+  "m13_perfis_pareceres": {
+    "m13p_3": {
+      "basic_data": "Al menos 6 ítems clínicos en ambos bloques (Desatención e Hiperactividad/Impulsividad).",
+      "reflection": "Hay indicios de síntomas significativos en ambas dimensiones, lo que sugiere un posible patrón combinado. Este es el cuadro que más refuerza la necesidad de una investigación diagnóstica completa por parte de un profesional especializado."
+    },
+    "m13p_4": {
+      "basic_data": "Menos de 6 ítems clínicos en cada bloque.",
+      "reflection": "Los comportamientos informados están dentro de lo esperado para la edad, sin indicios significativos de síntomas de TDAH en este tamizaje. Mantener el seguimiento rutinario del desarrollo."
+    },
+    "m13p_2": {
+      "basic_data": "Al menos 6 de los 9 ítems del Bloque II (10-18) marcados como “Bastante” o “Demasiado”.",
+      "reflection": "Hay indicios de más síntomas de hiperactividad e impulsividad de lo esperado para la edad. Se recomienda observar el comportamiento en múltiples contextos y la evaluación por un profesional especializado."
+    },
+    "m13p_1": {
+      "basic_data": "Al menos 6 de los 9 ítems del Bloque I (1-9) marcados como “Bastante” o “Demasiado”.",
+      "reflection": "Hay indicios de más síntomas de desatención de lo esperado para la edad. Se recomienda observar el comportamiento en casa y en la escuela y la evaluación por un profesional especializado."
+    }
+  },
+  "m14_perfis_pareceres": {
+    "m14p_2": {
+      "basic_data": "Puntuación total de 7 a 10 puntos en el AQ-10.",
+      "reflection": "La puntuación alcanzó el nivel de alerta por rasgos elevados de TEA. Se recomienda la derivación prioritaria para una evaluación multidisciplinar especializada (neuropediatra o psiquiatra infantil y neuropsicólogo) con fines de investigación diagnóstica formal. Se refuerza que el AQ-10 no sustituye el diagnóstico clínico."
+    },
+    "m14p_1": {
+      "basic_data": "Puntuación total de 0 a 6 puntos en el AQ-10.",
+      "reflection": "La puntuación obtenida se sitúa dentro del promedio de la población general, lo que indica baja probabilidad de trastorno del espectro autista en este tamizaje. Sin embargo, el AQ-10 es solo un instrumento de tamizaje: si persisten las preocupaciones clínicas por parte de los padres o responsables, se recomienda continuar con la evaluación por un profesional de salud habilitado."
+    }
+  },
+  "m15_pcd_grupos": {
+    "pg6": {
+      "nome": "Discapacidad Intelectual",
+      "descricao": "Capacidades sensoriales y motoras estructuralmente íntegras. Barrera principal en la cognición y en la comprensión táctica de las tareas.",
+      "laudo": "Nivel de funcionamiento adaptativo (leve, moderado o severo) respaldado exclusivamente por dictamen psicológico o pedagógico oficial."
+    },
+    "pg1": {
+      "nome": "Discapacidad Física (Movilidad Independiente)",
+      "descricao": "El niño camina de forma autónoma o con ayuda leve (bastón, ortesis), con afección estructural sin alteración neurológica central.",
+      "laudo": "Diagnóstico clínico formal + clasificación de gravedad. Especificar el nivel de amputación si lo hubiera."
+    },
+    "pg2": {
+      "nome": "Discapacidad Física (Silla de Ruedas)",
+      "descricao": "La silla de ruedas es el mecanismo principal o exclusivo de movilidad. Pruebas adaptadas o sustituidas para los miembros superiores.",
+      "laudo": "Diagnóstico clínico formal + dictamen médico. Confirmar el uso de la silla como medio principal de movilidad."
+    },
+    "pg3": {
+      "nome": "Parálisis Cerebral (GMFCS)",
+      "descricao": "Clasificación obligatoria previa con la Escala GMFCS (niveles I a V) antes de definir cualquier prueba.",
+      "laudo": "Aplicación obligatoria y previa de la Escala GMFCS (I a V) + dictamen médico."
+    },
+    "pg4": {
+      "nome": "Discapacidad Visual (B1-B3)",
+      "descricao": "Estructura motora global conservada. Ajustes en la instrucción verbal, cinestésica y en la orientación espacial. Clasificación de B1 (ceguera total) a B3 (baja visión).",
+      "laudo": "Mapeo del nivel de agudeza visual (B1, B2 o B3) + dictamen oftalmológico."
+    },
+    "pg5": {
+      "nome": "Discapacidad Auditiva",
+      "descricao": "Funciones motoras y de orientación espacial conservadas. Adaptaciones exclusivas en los canales de comunicación (estímulos visuales, lengua de señas).",
+      "laudo": "Identificación precisa del grado de pérdida auditiva (leve, moderada, severa o profunda) + dictamen audiológico."
+    }
+  },
+  "m15_pcd_adaptacoes": {
+    "pa_g4_sal": {
+      "instrucao": "Línea de salida con demarcación táctil mediante cinta en relieve; consigna sonora clara."
+    },
+    "pa_g5_agi": {
+      "instrucao": "Ejecución estándar; estímulos visuales nítidos."
+    },
+    "pa_g6_abd": {
+      "instrucao": "Demostración física repetida y fragmentación de las instrucciones en pasos simples."
+    },
+    "pa_g3_sal_b": {
+      "detalhe": "GMFCS III",
+      "instrucao": "Realizar solo si existe capacidad funcional y seguridad. Cuando no sea viable, considerar una prueba alternativa de potencia de miembros inferiores."
+    },
+    "pa_g3_abd_a": {
+      "detalhe": "GMFCS I-II",
+      "instrucao": "Aplicable con ajustes mínimos basados en el hemicuerpo de mayor dominancia/espasticidad."
+    },
+    "pa_g4_fle": {
+      "instrucao": "Instrucción verbal y cinestésica; demostración física."
+    },
+    "pa_g3_agi_a": {
+      "detalhe": "GMFCS I-II",
+      "instrucao": "Aplicable con ajustes mínimos basados en el hemicuerpo de mayor dominancia/espasticidad."
+    },
+    "pa_g4_agi": {
+      "instrucao": "Guía humana o cuerda guía; demarcación táctil y consignas sonoras claras."
+    },
+    "pa_g3_abd_c": {
+      "detalhe": "GMFCS IV-V",
+      "instrucao": "Realizable únicamente con apoyo y alta tolerancia postural."
+    },
+    "pa_g6_vel": {
+      "instrucao": "Demostración física repetida; intento práctico adicional no puntuado."
+    },
+    "pa_g1_fle": {
+      "instrucao": "Flexión de brazo; versión con las rodillas apoyadas si es necesario."
+    },
+    "pa_g4_abd": {
+      "instrucao": "Movimiento idéntico al patrón; demarcación táctil y consigna verbal clara."
+    },
+    "pa_g6_fle": {
+      "instrucao": "Demostración física repetida; fragmentación de las instrucciones en pasos simples."
+    },
+    "pa_g5_fle": {
+      "instrucao": "Ejecución estándar; amplia demostración visual y apoyo mediante lengua de señas cuando esté disponible."
+    },
+    "pa_g4_vel": {
+      "instrucao": "Guía humana o sistema de cuerda guía; consigna sonora clara; demarcación táctil en la línea de salida."
+    },
+    "pa_g5_sal": {
+      "instrucao": "Ejecución estándar; consigna visual."
+    },
+    "pa_g2_fle": {
+      "instrucao": "Aplicable íntegramente (los miembros superiores suelen estar conservados y funcionales)."
+    },
+    "pa_g3_vel_b": {
+      "detalhe": "GMFCS III",
+      "instrucao": "Exige evaluación individual previa (deambulación con apoyo instrumental)."
+    },
+    "pa_g1_agi": {
+      "instrucao": "Shuttle run 9,14m con dos bloques."
+    },
+    "pa_g3_sal_a": {
+      "detalhe": "GMFCS I-II",
+      "instrucao": "Aplicable con ajustes mínimos basados en el hemicuerpo de mayor dominancia/espasticidad."
+    },
+    "pa_g3_abd_b": {
+      "detalhe": "GMFCS III",
+      "instrucao": "Aplicable; exige evaluación individual previa."
+    },
+    "pa_g5_vel": {
+      "instrucao": "Ejecución estándar; sustituir la señal sonora por un estímulo visual nítido."
+    },
+    "pa_g3_agi_b": {
+      "detalhe": "GMFCS III",
+      "instrucao": "Exige evaluación individual previa (deambulación con apoyo instrumental)."
+    },
+    "pa_g1_sal": {
+      "instrucao": "Salto horizontal con base bilateral. Evaluar cuidadosamente la viabilidad articular si hay afección grave de los miembros inferiores."
+    },
+    "pa_g2_abd": {
+      "instrucao": "Con apoyo, respaldo o estabilización mecánica del tronco."
+    },
+    "pa_g2_agi": {
+      "instrucao": "Recorrido sinuoso con propulsión manual o sustitución completa por una prueba de agilidad en silla."
+    },
+    "pa_g1_vel": {
+      "instrucao": "Carrera 20m con aceleración máxima."
+    },
+    "pa_g3_sal_c": {
+      "detalhe": "GMFCS IV-V",
+      "instrucao": "Priorizar la evaluación funcional clínica conjunta con fisioterapia."
+    },
+    "pa_g2_vel": {
+      "instrucao": "Sustituir por propulsión rápida en silla de ruedas a lo largo de los 20 metros cronometrados."
+    },
+    "pa_g3_fle_c": {
+      "detalhe": "GMFCS IV-V",
+      "instrucao": "Patrón o adaptado si hay capacidad funcional de los miembros superiores; de lo contrario, priorizar la evaluación funcional clínica con fisioterapia."
+    },
+    "pa_g5_abd": {
+      "instrucao": "Ejecución estándar; salida con estímulo visual nítido (bandera, luz, gesto)."
+    },
+    "pa_g3_fle_b": {
+      "detalhe": "GMFCS III",
+      "instrucao": "Aplicable."
+    },
+    "pa_g3_vel_c": {
+      "detalhe": "GMFCS IV-V",
+      "instrucao": "Priorizar la evaluación funcional clínica conjunta con fisioterapia."
+    },
+    "pa_g3_fle_a": {
+      "detalhe": "GMFCS I-II",
+      "instrucao": "Aplicable con ajustes mínimos basados en el hemicuerpo de mayor dominancia/espasticidad."
+    },
+    "pa_g1_abd": {
+      "instrucao": "Plancha ventral isométrica, tope de 30s."
+    },
+    "pa_g2_sal": {
+      "instrucao": "Realizar el patrón si hay capacidad funcional y seguridad. No realizarlo cuando el compromiso de los miembros inferiores haga el salto inseguro o inviable; en ese caso, considerar una prueba alternativa de potencia de miembros inferiores, cuando sea aplicable."
+    },
+    "pa_g6_agi": {
+      "instrucao": "Demostración física repetida; retirada gradual del apoyo verbal."
+    },
+    "pa_g6_sal": {
+      "instrucao": "Demostración física repetida; intento práctico adicional no puntuado."
+    },
+    "pa_g3_vel_a": {
+      "detalhe": "GMFCS I-II",
+      "instrucao": "Aplicable con ajustes mínimos basados en el hemicuerpo de mayor dominancia/espasticidad."
+    },
+    "pa_g3_agi_c": {
+      "detalhe": "GMFCS IV-V",
+      "instrucao": "Priorizar la evaluación funcional clínica conjunta con fisioterapia."
+    }
+  },
+  "m15_pcd_modalidades": {
+    "pm2": {
+      "nome": "Básquetbol / Rugby en Silla de Ruedas",
+      "descricao": "Desplazamiento, potencia y uso intensivo de los miembros superiores sobre la silla."
+    },
+    "pm4": {
+      "nome": "Boccia (Bocha Adaptada)",
+      "descricao": "Precisión con estabilidad del tronco; baja exigencia de desplazamiento."
+    },
+    "pm1": {
+      "nome": "Atletismo (Velocidad)",
+      "descricao": "La velocidad y la potencia de los miembros inferiores son cruciales."
+    },
+    "pm3": {
+      "nome": "Natación Adaptada",
+      "descricao": "La fuerza de los miembros superiores y la estabilidad central del tronco determinan el éxito."
+    },
+    "pm6": {
+      "nome": "Halterofilia Adaptada",
+      "descricao": "Potencia de miembros superiores e inferiores con estabilidad del tronco."
+    },
+    "pm5": {
+      "nome": "Goalball / Fútbol 5",
+      "descricao": "Desplazamiento orientado, agilidad y velocidad de reacción."
+    }
+  },
+  "m15_pcd_funil": {
+    "pu4_1": {
+      "titulo": "Filtro Clínico/Grupo",
+      "regra": "Estructura motora conservada: autorizar disciplinas según el perfil neuromotor, sin barreras posturales."
+    },
+    "pu2_2": {
+      "titulo": "Filtro Cognitivo/Sensorial",
+      "regra": "Orientar el recorrido de agilidad en silla y adaptar las consignas al nivel de comprensión."
+    },
+    "pu6_3": {
+      "titulo": "Filtro de Preferencia y Deseo Personal",
+      "regra": "Considerar de forma soberana la preferencia y el deseo personal del niño/adolescente en la elección final de la disciplina."
+    },
+    "pu5_3": {
+      "titulo": "Filtro de Preferencia y Deseo Personal",
+      "regra": "Considerar de forma soberana la preferencia y el deseo personal del niño/adolescente en la elección final de la disciplina."
+    },
+    "pu3_1": {
+      "titulo": "Filtro Clínico/Grupo",
+      "regra": "Cruzar el nivel GMFCS con cada disciplina sugerida; respetar las contraindicaciones según el patrón motor (p. ej.: salto en GMFCS III+)."
+    },
+    "pu4_2": {
+      "titulo": "Filtro Cognitivo/Sensorial",
+      "regra": "Verificar la necesidad de guía/consignas sonoras y demarcación táctil; preferir disciplinas como Goalball o Fútbol 5."
+    },
+    "pu2_1": {
+      "titulo": "Filtro Clínico/Grupo",
+      "regra": "Priorizar pruebas de miembros superiores y estabilización del tronco; evitar tareas con impacto vertical."
+    },
+    "pu5_1": {
+      "titulo": "Filtro Clínico/Grupo",
+      "regra": "Funciones motoras conservadas: autorizar según el perfil neuromotor; concentrar los ajustes en el canal de comunicación."
+    },
+    "pu_all_3": {
+      "titulo": "Filtro de Preferencia y Deseo Personal",
+      "regra": "Considerar de forma soberana la preferencia y el deseo personal del niño/adolescente en la elección final de la disciplina."
+    },
+    "pu5_2": {
+      "titulo": "Filtro Cognitivo/Sensorial",
+      "regra": "Asegurar estímulos visuales nítidos y apoyo mediante lengua de señas; verificar la comprensión de las reglas."
+    },
+    "pu1_3": {
+      "titulo": "Filtro de Preferencia y Deseo Personal",
+      "regra": "Considerar de forma soberana la preferencia y el deseo personal del niño/adolescente en la elección final de la disciplina."
+    },
+    "pu6_1": {
+      "titulo": "Filtro Clínico/Grupo",
+      "regra": "Capacidades motoras íntegras: autorizar disciplinas según el perfil; atender la fatiga y el ritmo de aprendizaje."
+    },
+    "pu6_2": {
+      "titulo": "Filtro Cognitivo/Sensorial",
+      "regra": "Fragmentar las instrucciones, demostrar repetidamente y permitir un intento práctico adicional; reducir la complejidad de las reglas."
+    },
+    "pu1_2": {
+      "titulo": "Filtro Cognitivo/Sensorial",
+      "regra": "Complejidad inherente a las reglas: instrucciones simples y demostración previa para la comprensión de las tareas."
+    },
+    "pu1_1": {
+      "titulo": "Filtro Clínico/Grupo",
+      "regra": "Adecuación postural intrínseca: evaluar las articulaciones de los miembros inferiores antes del salto; autorizar las pruebas según la limitación estructural."
+    },
+    "pu4_3": {
+      "titulo": "Filtro de Preferencia y Deseo Personal",
+      "regra": "Considerar de forma soberana la preferencia y el deseo personal del niño/adolescente en la elección final de la disciplina."
+    },
+    "pu2_3": {
+      "titulo": "Filtro de Preferencia y Deseo Personal",
+      "regra": "Considerar de forma soberana la preferencia y el deseo personal del niño/adolescente en la elección final de la disciplina."
+    },
+    "pu3_3": {
+      "titulo": "Filtro de Preferencia y Deseo Personal",
+      "regra": "Considerar de forma soberana la preferencia y el deseo personal del niño/adolescente en la elección final de la disciplina."
+    },
+    "pu3_2": {
+      "titulo": "Filtro Cognitivo/Sensorial",
+      "regra": "Considerar la espasticidad, la coordinación y la comprensión de las reglas; ajustar la intensidad y la complejidad."
+    }
+  },
+  "vocational_assessments": {
+    "Vocal-12": {
+      "interest_area": "Te gusta resolver problemas lógicos, manejar números y entender cómo funcionan las tecnologías.",
+      "suggested_career": "Ingenierías, Ciencia de la Computación, Matemáticas, Física, Arquitectura y Tecnología de la Información.",
+      "technical_opinion": "El estudiante manifiesta un razonamiento lógico altamente estructurado, facilidad para manejar datos abstractos y numéricos, además de una curiosidad natural por comprender el funcionamiento de sistemas complejos y de nuevas tecnologías. Se trata de un perfil enfocado en la resolución práctica de problemas, la optimización de procesos y la innovación técnica."
+    },
+    "Vocal-13": {
+      "interest_area": "Te gusta comunicarte, ayudar a las personas y entender la sociedad.",
+      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo y Relaciones Internacionales.",
+      "technical_opinion": "El estudiante demuestra un interés orientado al análisis crítico de la sociedad, la mediación de conflictos y la transmisión de conocimientos. Sus competencias se alinean perfectamente con profesiones que exigen escucha activa, escritura fluida y pensamiento humanístico."
+    },
+    "Vocal-11": {
+      "interest_area": "Te gusta comunicarte, ayudar a las personas y entender la sociedad.",
+      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo y Relaciones Internacionales.",
+      "technical_opinion": "El estudiante demuestra un interés orientado al análisis crítico de la sociedad, la mediación de conflictos y la transmisión de conocimientos. Sus competencias se alinean perfectamente con profesiones que exigen escucha activa, escritura fluida y pensamiento humanístico."
+    },
+    "Vocal-8": {
+      "interest_area": "Excelente para diseño de juegos o desarrollo web.",
+      "suggested_career": "Híbrido",
+      "technical_opinion": "El estudiante no se limita a un solo campo del saber; él utiliza la creatividad para dar forma a la tecnología, resolviendo problemas de interfaz, interactividad y experiencia del usuario de manera innovadora."
+    },
+    "Vocal-9": {
+      "interest_area": "Te gusta comunicarte, ayudar a las personas y entender la sociedad.",
+      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo y Relaciones Internacionales.",
+      "technical_opinion": "El estudiante demuestra un interés orientado al análisis crítico de la sociedad, la mediación de conflictos y la transmisión de conocimientos. Sus competencias se alinean perfectamente con profesiones que exigen escucha activa, escritura fluida y pensamiento humanístico."
+    },
+    "Vocal-10": {
+      "interest_area": "Te gusta comunicarte, ayudar a las personas y entender la sociedad.",
+      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo y Relaciones Internacionales.",
+      "technical_opinion": "El estudiante demuestra un interés orientado al análisis crítico de la sociedad, la mediación de conflictos y la transmisión de conocimientos. Sus competencias se alinean perfectamente con profesiones que exigen escucha activa, escritura fluida y pensamiento humanístico."
+    },
+    "Vocal-14": {
+      "interest_area": "Te gusta comunicarte, ayudar a las personas y entender la sociedad.",
+      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo y Relaciones Internacionales.",
+      "technical_opinion": "El estudiante demuestra un interés orientado al análisis crítico de la sociedad, la mediación de conflictos y la transmisión de conocimientos. Sus competencias se alinean perfectamente con profesiones que exigen escucha activa, escritura fluida y pensamiento humanístico."
+    },
+    "Vocal-15": {
+      "interest_area": "Te gusta resolver problemas lógicos, manejar números y entender cómo funcionan las tecnologías.",
+      "suggested_career": "Ingenierías, Ciencia de la Computación, Matemáticas, Física, Arquitectura y Tecnología de la Información.",
+      "technical_opinion": "El estudiante manifiesta un razonamiento lógico altamente estructurado, facilidad para manejar datos abstractos y numéricos, además de una curiosidad natural por comprender el funcionamiento de sistemas complejos y de nuevas tecnologías. Se trata de un perfil enfocado en la resolución práctica de problemas, la optimización de procesos y la innovación técnica."
+    },
+    "Vocal-16": {
+      "interest_area": "Te gusta comunicarte, ayudar a las personas y entender la sociedad.",
+      "suggested_career": "Derecho, Letras, Pedagogía, Psicología, Historia, Periodismo y Relaciones Internacionales.",
+      "technical_opinion": "El eje central de desarrollo de este perfil está totalmente alineado con el factor humano y sus complejas interacciones colectivas. El/la estudiante demuestra una aptitud notable para la escucha activa, el ejercicio de la empatía y la articulación verbal de ideas abstractas. Su mente encuentra estímulo al analizar los fenómenos sociales, los derechos humanos y las narrativas que moldean nuestra cultura. Lejos de ser solo una inclinación teórica, este perfil refleja una inteligencia orientada a la transformación práctica y a la mediación de conflictos. El/la joven presenta un potencial latente para ejercer liderazgo en entornos que exigen responsabilidad ética, ya sea defendiendo causas jurídicas, educando, promoviendo la salud mental o comunicando información esencial para la colectividad."
+    }
+  },
+  "snap_assessments": {
+    "Snap-2": {
+      "technical_opinion": "Hay indicios de síntomas significativos en ambas dimensiones, lo que sugiere un posible patrón combinado. Este es el cuadro que más refuerza la necesidad de una investigación diagnóstica completa por parte de un profesional especializado."
+    }
+  },
+  "aq10_assessments": {
+    "Aq10-2": {
+      "technical_opinion": "La puntuación obtenida se sitúa dentro del promedio de la población general, lo que indica baja probabilidad de trastorno del espectro autista en este tamizaje. Sin embargo, el AQ-10 es solo un instrumento de tamizaje: si persisten las preocupaciones clínicas por parte de los padres o responsables, se recomienda continuar con la evaluación por un profesional de salud habilitado."
+    }
+  },
+  "ias_assessments": {
+    "IAS-2": {
+      "technical_opinion": "Alto riesgo de desarrollar carencias nutricionales y enfermedades crónicas (diabetes, hipertensión, problemas cardíacos). Exige intervención rápida."
+    }
+  },
+  "health_assessments": {
+    "Health-2": {
+      "technical_opinion": "Indica necesidad de atención o intervención psicológica/social. Se recomienda un seguimiento cercano y la escucha activa del estudiante."
+    }
+  },
+  "autoconcept_assessments": {
+    "Auto-2": {
+      "technical_opinion": "Representa el patrón de la mayor parte de la población. La persona mantiene una buena relación consigo misma y reconoce sus cualidades y debilidades de forma realista."
+    }
+  },
+  "oral_assessments": {
+    "Oral-2": {
+      "technical_opinion": "Qué significa: Comportamiento de riesgo.\nPerfil: Hay una probabilidad muy alta de acumulación de suciedad y placas bacterianas en los dientes. El paciente necesita con urgencia orientaciones de limpieza y tratamiento preventivo con el dentista.\n"
+    }
+  },
+  "sport_assessments": {
+    "Esporte-1": {
+      "recommended_practice": "3 h por semana"
+    },
+    "Esporte-2": {
+      "recommended_practice": "3 h por semana"
+    },
+    "Esporte-3": {
+      "recommended_practice": "3 h por semana"
+    },
+    "Esporte-4": {
+      "recommended_practice": "3 h por semana"
+    },
+    "Esporte-5": {
+      "recommended_practice": "3 h por semana"
+    },
+    "Esporte-7": {
+      "recommended_practice": "3 h por semana"
+    },
+    "Esporte-8": {
+      "recommended_practice": "3 h por semana"
+    },
+    "Esporte-11": {
+      "recommended_practice": "3 h por semana"
+    },
+    "Esporte-12": {
+      "recommended_practice": "3 h por semana"
+    }
+  },
+  "pcd_assessments": {
+    "PCD-2": {
+      "grupo_nome": "Discapacidad Física (Silla de Ruedas)",
+      "classificacao_perfil": "Perfil Motor Medio",
+      "direcionamento": "Boccia (Bocha Adaptada); Atletismo (Velocidad); Natación Adaptada",
+      "technical_opinion": "Grupo de tamizaje 2 (Discapacidad Física (Silla de Ruedas)). Perfil: Perfil Motor Medio. Orientación deportiva sugerida: Boccia (Bocha Adaptada); Atletismo (Velocidad); Natación Adaptada."
+    },
+    "PCD-3": {
+      "grupo_nome": "Discapacidad Física (Movilidad Independiente)",
+      "classificacao_perfil": "Perfil Motor Medio",
+      "direcionamento": "Preselección (matriz física): Natación Adaptada; Básquetbol / Rugby en Silla de Ruedas; Atletismo (Velocidad). Indicación preliminar, sujeta al embudo cualitativo (filtros clínico-funcional, cognitivo-sensorial y de preferencia del participante).",
+      "technical_opinion": "Grupo de tamizaje 1 (Discapacidad Física (Movilidad Independiente)). Perfil: Perfil Motor Medio. Orientación deportiva sugerida: Preselección (matriz física): Natación Adaptada; Básquetbol / Rugby en Silla de Ruedas; Atletismo (Velocidad). Indicación preliminar, sujeta al embudo cualitativo (filtros clínico-funcional, cognitivo-sensorial y de preferencia del participante).."
+    },
+    "PCD-5": {
+      "grupo_nome": "Parálisis Cerebral (GMFCS)",
+      "classificacao_perfil": "Perfil Motor con Limitaciones",
+      "direcionamento": "Preselección (matriz física): Natación Adaptada; Básquetbol / Rugby en Silla de Ruedas; Halterofilia Adaptada. Indicación preliminar, sujeta al embudo cualitativo (filtros clínico-funcional, cognitivo-sensorial y de preferencia del participante).",
+      "technical_opinion": "Grupo de tamizaje 3 (Parálisis Cerebral (GMFCS)). Perfil: Perfil Motor con Limitaciones. Orientación deportiva sugerida: Preselección (matriz física): Natación Adaptada; Básquetbol / Rugby en Silla de Ruedas; Halterofilia Adaptada. Indicación preliminar, sujeta al embudo cualitativo (filtros clínico-funcional, cognitivo-sensorial y de preferencia del participante).."
+    },
+    "PCD-4": {
+      "grupo_nome": "Discapacidad Visual (B1-B3)",
+      "classificacao_perfil": "Perfil Motor Medio",
+      "direcionamento": "Preselección (matriz física): Natación Adaptada; Básquetbol / Rugby en Silla de Ruedas; Halterofilia Adaptada. Indicación preliminar, sujeta al embudo cualitativo (filtros clínico-funcional, cognitivo-sensorial y de preferencia del participante).",
+      "technical_opinion": "Grupo de tamizaje 4 (Discapacidad Visual (B1-B3)). Perfil: Perfil Motor Medio. Orientación deportiva sugerida: Preselección (matriz física): Natación Adaptada; Básquetbol / Rugby en Silla de Ruedas; Halterofilia Adaptada. Indicación preliminar, sujeta al embudo cualitativo (filtros clínico-funcional, cognitivo-sensorial y de preferencia del participante).."
+    }
   }
 }

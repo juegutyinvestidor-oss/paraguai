@@ -96,32 +96,33 @@ function categorySentence(
   recortes: RecorteInput[],
   polarity: number,
   tr: AnalysisTranslator,
+  localizeLabel: (label: string) => string,
 ): string {
   if (recortes.length === 2) {
     const [gA, gB] = recortes;
     const a = pcts[0];
     const b = pcts[1];
     if (a == null || b == null) {
-      if (a == null && b == null) return tr('catsSemAvaliacaoAmbos', { cat, gA: gA.id, gB: gB.id });
-      if (a == null) return tr('catsSemAvaliacaoA', { cat, gA: gA.id, b: b as number, gB: gB.id });
-      return tr('catsSemAvaliacaoB', { cat, gA: gA.id, a, gB: gB.id });
+      if (a == null && b == null) return tr('catsSemAvaliacaoAmbos', { cat: localizeLabel(cat), gA: gA.id, gB: gB.id });
+      if (a == null) return tr('catsSemAvaliacaoA', { cat: localizeLabel(cat), gA: gA.id, b: b as number, gB: gB.id });
+      return tr('catsSemAvaliacaoB', { cat: localizeLabel(cat), gA: gA.id, a, gB: gB.id });
     }
     const d = b - a;
     const small = Math.abs(d) < ANALYSIS_CONFIG.minDeltaPp;
     if (polarity > 0) {
-      if (small) return tr('positivoParecido', { cat, a, gA: gA.id, b, gB: gB.id });
+      if (small) return tr('positivoParecido', { cat: localizeLabel(cat), a, gA: gA.id, b, gB: gB.id });
       return a > b
-        ? tr('positivoMelhorA', { gA: gA.id, a, cat, gB: gB.id, b })
-        : tr('positivoMelhorB', { gB: gB.id, b, cat, gA: gA.id, a });
+        ? tr('positivoMelhorA', { gA: gA.id, a, cat: localizeLabel(cat), gB: gB.id, b })
+        : tr('positivoMelhorB', { gB: gB.id, b, cat: localizeLabel(cat), gA: gA.id, a });
     }
     if (polarity < 0) {
-      if (small) return tr('negativoParecido', { cat, a, gA: gA.id, b, gB: gB.id });
+      if (small) return tr('negativoParecido', { cat: localizeLabel(cat), a, gA: gA.id, b, gB: gB.id });
       return d > 0
-        ? tr('negativoMaisB', { cat, gB: gB.id, b, gA: gA.id, a })
-        : tr('negativoMaisA', { cat, gA: gA.id, a, gB: gB.id, b });
+        ? tr('negativoMaisB', { cat: localizeLabel(cat), gB: gB.id, b, gA: gA.id, a })
+        : tr('negativoMaisA', { cat: localizeLabel(cat), gA: gA.id, a, gB: gB.id, b });
     }
-    if (small) return tr('neutroParecido', { cat, a, gA: gA.id, b, gB: gB.id });
-    return tr('neutroDiferente', { cat, a, gA: gA.id, b, gB: gB.id, diff: Math.abs(Math.round(d)) });
+    if (small) return tr('neutroParecido', { cat: localizeLabel(cat), a, gA: gA.id, b, gB: gB.id });
+    return tr('neutroDiferente', { cat: localizeLabel(cat), a, gA: gA.id, b, gB: gB.id, diff: Math.abs(Math.round(d)) });
   }
 
   const values = pcts
@@ -129,13 +130,14 @@ function categorySentence(
       ? tr('multiSemAvaliacao', { id: recortes[i].id })
       : tr('multiComAvaliacao', { p, id: recortes[i].id })))
     .join(', ');
-  return tr('multiFrase', { cat, values });
+  return tr('multiFrase', { cat: localizeLabel(cat), values });
 }
 
 export function buildComparativeAnalysis(
   recortes: RecorteInput[],
   stats: StatsInput[],
   tr: AnalysisTranslator,
+  localizeLabel: (label: string) => string = (label) => label,
 ): AnalysisBlock[] {
   const blocks: AnalysisBlock[] = [];
 
@@ -186,7 +188,7 @@ export function buildComparativeAnalysis(
         grupo: recortes[0].id,
       }));
       cats.forEach((c, ci) => {
-        analysisParas.push(categorySentence(dim.label, c, pcts[ci], recortes, polarityOfLocal(c), tr));
+        analysisParas.push(categorySentence(dim.label, c, pcts[ci], recortes, polarityOfLocal(c), tr, localizeLabel));
         analysisParas.push(tr('sugestao', { texto: suggestFor(dim.key, c, tr) }));
       });
 
@@ -210,7 +212,7 @@ export function buildComparativeAnalysis(
         parecer = tr('parecerIndefinido');
       }
       if (concerns.length) {
-        parecer += ` ${tr('atencaoPrioritaria', { categorias: concerns.join('; ') })}`;
+        parecer += ` ${tr('atencaoPrioritaria', { categorias: concerns.map(localizeLabel).join('; ') })}`;
       }
       if (parecer) analysisParas.push(tr('parecerDimensao', { texto: parecer }));
     });
@@ -232,8 +234,8 @@ export function buildComparativeAnalysis(
         destaques.push({
           score: (pol > 0 ? 1 : pol < 0 ? -1 : 0) * d,
           txt: tr('destaqueLinha', {
-            categoria: cat.label,
-            dim: dim.label,
+            categoria: localizeLabel(cat.label),
+            dim: localizeLabel(dim.label),
             a,
             grupoA: recortes[0].id,
             b,
@@ -267,7 +269,7 @@ export function buildComparativeAnalysis(
     if (!(dimsIn[0]?.coverage || 0)) return;
     if (dimsIn[0].coveragePct < 50) {
       const txt = tr('reavaliarCobertura', {
-        dim: dim.label.toLowerCase(),
+        dim: localizeLabel(dim.label).toLowerCase(),
         cobertura: dimsIn[0].coveragePct,
         grupo: recortes[0].id,
       });
@@ -279,8 +281,8 @@ export function buildComparativeAnalysis(
       const pol = polarityOfLocal(cat.label);
       if (pol < 0 || (pol === 0 && share > 0)) {
         const txt = tr('recomendacaoDimensao', {
-          dim: dim.label,
-          categoria: cat.label,
+          dim: localizeLabel(dim.label),
+          categoria: localizeLabel(cat.label),
           sugestao: suggestFor(dim.key, cat.label, tr),
         });
         if (!recSet.has(txt)) { recSet.add(txt); recs.push(txt); }
@@ -301,7 +303,7 @@ export function buildComparativeAnalysis(
     stats.forEach((s, i) => {
       const d = s.dims[dIdx];
       if (!d || d.coverage === 0) {
-        lim.push(tr('limiteSemAvaliacao', { dim: dim.label, grupo: recortes[i].id }));
+        lim.push(tr('limiteSemAvaliacao', { dim: localizeLabel(dim.label), grupo: recortes[i].id }));
       }
     });
   });

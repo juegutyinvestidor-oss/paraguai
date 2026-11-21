@@ -3,7 +3,7 @@
 ## Objetivo
 Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrão), `pt-PT`, `es-PY`, `gn-PY` (Guarani) e `en`. Critério de aceite: nenhuma string visível ao usuário permaneça em pt-BR quando o locale não for pt-BR, exceto dados inseridos pelo próprio usuário e textos explicitamente marcados como pendentes.
 
-## PONTO DE CONTINUAÇÃO — MARCADOR (20/11/2026)
+## PONTO DE CONTINUAÇÃO — MARCADOR (20/11/2026 — atualizado para 2.503 chaves/idioma)
 ### Estado atual (última sessão)
 - Infraestrutura i18n completa: `next-intl`, `[locale]`, middleware, navegação, 5 dicionários, seletor de idioma e camada de conteúdo com fallback pt-BR.
 - UI zerada no scan strict: `DashboardView`, `AlunosView`, `ProfissionaisView`, `ContratosView`, `PresencaView`, `ModalidadesView`, `PlanoAcaoView`, `PerfilView`, `ConfiguracoesView`, `ComparativeStudyView`, `app/[locale]/page.tsx`, `AvaliacoesView`, `QuestionarioView`, `PerformanceView` e `global-error.tsx`.
@@ -13,14 +13,67 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
 - API localizada: `lib/apiI18n.ts` resolve locale por `x-locale` → cookie `NEXT_LOCALE` → referer → `Accept-Language`; 103 ocorrências em 10 rotas usam o namespace `api`, incluindo ICU `{name}` em `plano-acao`.
 - **Relatórios localizados nesta sessão**: criado `lib/reportI18n.ts` com `createReportTranslator`, `displayValue`/`DISPLAY_KEYS` e `localizeAssessmentReport`; reusa 115 chaves do namespace `desempenho` e cobre todos os focos (`Corporal`, `Capacidades Físicas`, `Esportivas`, `Vocacional`, `Saúde Global`, `Higiene Bucal`, `Autoconceito`, `Índice Alimentar`, `TDAH`, `TEA`, `Qualidade Motora PCD`, `Escolar`, `Completo`).
 - `lib/reportBuilder.ts` permanece inalterado e é usado apenas em `pt-BR`; `PerformanceView` e `lib/autoReport.ts` chamam `localizeAssessmentReport` para os demais locales. `autoReport.ts` preserva `gn-PY` bruto para mensagens (`currentUiLocale`) e usa o mapeamento `gn-PY` → `es-PY` apenas em `Intl` (`currentReportLocale`).
-- Valores canônicos gravados no Supabase seguem em pt-BR; apenas a exibição é traduzida. Os 69 `performance_reports.report` já salvos **não** foram retro-traduzidos.
-- Validações finais da sessão: `npm run i18n:check` → **2.413 chaves por idioma**; `npm run i18n:scan` → **6 ocorrências em 4 arquivos** (todas intencionais); `npm run i18n:extract` → **4 strings únicas**; `npm run lint` → 0 erros/2 avisos prévios; `npx tsc --noEmit` limpo; `npm run build` OK (13 páginas, middleware 46,4 kB); teste de `createTranslator` com `api` e com as 115 chaves de `reportI18n` → 0 falhas nos 5 idiomas.
-- `readm.md`, `reports/i18n-scan.json` e `reports/i18n-pending.json` atualizados; scripts temporários removidos. **Nada foi commitado nesta sessão**; o commit anterior (`bb47b5a`) continha o trabalho até `ProfissionaisView`.
+- Valores canônicos gravados no Supabase seguem em pt-BR; apenas a exibição é traduzida. Os 69 `performance_reports.report` passam a ser regenerados no locale ativo; o texto antigo em pt-BR é substituído ao abrir/regenerar no idioma escolhido.
+- Validações finais da sessão: `npm run i18n:check` → **2.503 chaves por idioma**; `npm run i18n:scan` → **6 ocorrências em 4 arquivos** (todas intencionais); `npm run i18n:extract` → **4 strings únicas**; `npm run lint` → 0 erros/2 avisos prévios; `npx tsc --noEmit` limpo; `npm run build` OK (13 páginas, middleware 46,4 kB); teste de `createTranslator` com `api` e com as 115 chaves de `reportI18n` → 0 falhas nos 5 idiomas.
+- `readm.md`, `reports/i18n-scan.json` e `reports/i18n-pending.json` atualizados; scripts temporários removidos. O trabalho da sessão anterior foi commitado como `94f7630 attv4` (o commit `bb47b5a` continha apenas o trabalho até `ProfissionaisView`).
 
-### Próximo ponto exato para retomar
-1. **Conteúdo do Supabase**: ampliar `content/<locale>.json` para perguntas/configs/pareceres/PCD/assessments; avaliar separadamente os 69 `performance_reports.report` já salvos (decisão de produto: retro-traduzir ou manter pt-BR). Evitar write-back de valores localizados via facade/`QuestionarioView`.
-2. **Documentos gerados e revisão final**: fontes Unicode para PDF/DOCX (`ã`, `ñ`, `’`), conferência visual por idioma, `content:build`, reexecutar `i18n:check`/`scan`/`extract`, lint, tsc, build e revisão humana do Guarani.
-3. Não traduzir as 6 ocorrências restantes do scan sem decisão de produto: marca `EDUKYNE` (Header/Login/Sidebar) e `EDU`/`KYNE`/`lgpd@edukyne.com.br` em `politica-privacidade`.
+### Atualização (20/11/2026 — continuação)
+- `content/<locale>.json` ampliado com **6 tabelas de perguntas** (122 strings/idioma), **18 tabelas de configuração, pareceres e PCD** (461 strings/idioma) e **9 tabelas de assessments** (58 strings/idioma: pareceres técnicos de vocacional/saúde/bucal/autoconceito/IAS/TDAH/TEA/PCD, prática recomendada e direcionamento). `content:build` gera **551 entradas por idioma**.
+- Foram traduzidos apenas campos de texto exibido; campos usados como valor canônico em filtros/comparações (`name`, `category`, `level`, `profile`, `classification`, `grupo`, `teste`, `status`, `requirements`, `idade`, `sexo`) permanecem em pt-BR. `m2_modalidades_config.requirements` é um JSON de classificações canônicas e não deve ser traduzido.
+- `lib/contentI18n.ts` ganhou `delocalizeRows`; `lib/dbFacade.ts` converte valores traduzidos de volta ao canônico antes de qualquer `upsert`/`insert`, eliminando o risco de a edição de configs em outro idioma gravar texto localizado no Supabase.
+- Rótulos canônicos: novo namespace `canonical` (31 chaves por idioma) e helper `displayCanonical` em `lib/reportI18n.ts`. `displayValue` ganhou fallback canônico. Aplicado em `DashboardView` (gráficos de esporte, vocação e PCD), `ComparativeStudyView` (matriz/PDF/chart), `AvaliacoesView` (esporte sugerido, PDF/Excel/tabela) e `QuestionarioView` (tabelas de configuração e selects PCD). Os valores gravados permanecem canônicos; a tradução é apenas de exibição.
+- Relatórios: `lib/reportI18n.ts` já contém `localizeAssessmentReport` com 115 chaves `tpl*`/`texto*`/`valor*` por idioma. `localizeAssessmentReport` agora recebe `locale`, e `displayValue` usa `displayCanonical` nos valores dinâmicos (classificações, perfis, modalidades, grupos/testes PCD) sem traduzir `evaluationResult` gravado. `PerformanceView` (prévia e auto-save) e `autoReport` passam o locale ativo; `buildAssessmentReport` permanece como fonte pt-BR.
+- Validações após a mudança: `i18n:check` 2.444 chaves/idioma; `i18n:scan` 6 ocorrências/4 arquivos (intencionais); `i18n:extract` 4 strings; `content:build` 551 entradas/idioma; `lint` 0 erros/2 avisos prévios; `tsc --noEmit` limpo; `build` OK (13 páginas, middleware 46,4 kB).
+- Estado do git: `94f7630 attv4` contém todo o trabalho de i18n até a sessão anterior; as mudanças desta continuação ainda **não** foram commitadas.
+
+### Atualização (20/11/2026 — rótulos remanescentes e PDF Unicode)
+- Namespace `canonical` ampliado para **40 chaves por idioma** (`Peso Ideal`, AQ-10, testes PCD e `Força/Resistência (Membros Sup.)`); `i18n:check` agora reporta **2.454 chaves por idioma**.
+- `displayValue`/`displayCanonical` passaram a cobrir IMC, níveis motores, classificações de Saúde Global/Higiene Bucal/Autoestima/IAS/TDAH/TEA, perfis PCD, status de adaptação, notas PCD, cenários e dimensões do Dashboard.
+- Rótulos crus eliminados em exports/tabelas de `AvaliacoesView` (PDF/Excel/JSX), selects/tabelas de `QuestionarioView`, gráficos de `DashboardView` e ternários AQ-10 em `PerformanceView`. Parecer PCD padrão gerado no frontend usa `avaliacoes.tplParecerPcdPadrao`, preservando o valor gravado como texto já localizado no ato do save.
+- `buildComparativeAnalysis` recebe um quarto argumento opcional `localizeLabel`; `ComparativeStudyView` passa `displayCanonical(label, locale)`. A polaridade continua calculada sobre rótulos canônicos, mas títulos/frases/PDF exibem o idioma ativo.
+- PDF Unicode: `public/fonts/NotoSans-Regular.ttf` e `NotoSans-Bold.ttf` embedados por `lib/pdfFont.ts` (`setupPdfFont`), registrados como `helvetica` normal/bold para que `autoTable` herde a fonte. Todos os fluxos de PDF passaram a fazer `await setupPdfFont(doc)`. Não há geração DOCX real no código (dependência `docx` existe, mas não é usada).
+- Validações desta fase: `i18n:check` 2.454 chaves/idioma; `i18n:scan` 6 ocorrências/4 arquivos (intencionais); `i18n:extract` 4 strings; `content:build` 551 entradas/idioma; `lint` 0 erros/2 avisos prévios; `tsc --noEmit` limpo; `build` OK (13 páginas, middleware 46,4 kB).
+
+### Atualização (20/11/2026 — exports, prosa PCD e validação)
+- Exports Excel/PDF localizados em `AlunosView`, `PresencaView`, `ModalidadesView` e `AvaliacoesView`: cabeçalhos, abas, títulos, filtros, nomes de arquivo e datas via namespace `exp*` + `useLocale()`.
+- Texto gerado PCD localizado: `avaliacoes.tplPcdDirecionamento`, `valorAguardandoAvaliacaoCompleta`, templates de funil/adaptações; `displayCanonical` agora traduz prosa canônica residual para `es-PY`/`gn-PY`/`en`.
+- `AvaliacoesView` e `QuestionarioView`: detalhes, unidades, notas, descrições de grupos/modalidades e laudos passam por `displayValue`/`displayCanonical`; `PlanoAcaoView` usa datas por locale e `planoAcao.nomeArquivoPadrao`.
+- Validações finais desta fase: `i18n:check` **2.503 chaves por idioma**; `i18n:scan` 6/4 (intencionais); `i18n:extract` 4; `content:build` 551/idioma; `lint` 0 erros/2 avisos prévios; `tsc --noEmit` limpo; `build` OK (13 páginas, middleware 46,4 kB).
+- Pendência conhecida: algumas traduções antigas geradas por glossário em `desempenho` ainda soam como pt-BR/inglês misto; revisar antes de considerar o texto de relatório definitivo.
+
+### Fechamento da sessão (20/11/2026) — inventário completo do que foi feito
+- **Dicionários (`messages/<locale>.json`)**: paridade em 5 idiomas subiu de 2.413 → 2.503 chaves. Namespace `canonical` ficou com 40 chaves. Foram adicionadas/consolidadas chaves para:
+  - `canonical`: `pesoIdeal`, níveis/capacidades, testes PCD, AQ-10, PCD, cenários, dimensões e status/notas PCD.
+  - `alunos`: `expNome`, `expEmail`, `expMatricula`, `expTurma`, `expLocalidade`, `expLocalidadePadrao`, `expContrato`, `expEstado`, `expRegiao`, `expCpf`, `expTelefone`, `expResponsavel`, `expNascimento`, `expStatus`, `expGeradoEmAs`, `expFiltrosAtivosAlunos`, `expTituloPdfAlunos`, `expAbaAlunos`, `expArquivoAlunos`.
+  - `presenca`: `expPresencas`, `expFaltas`, `expFrequencia`, `expFrequenciaSimples`, `expDatasPresenca`, `expDatasFalta`, `expAbaPresenca`, `expArquivoPresenca`, `expTituloPdfPresenca`, `expFiltrosAtivosPresenca`.
+  - `modalidades`: `campoProfissional`, `avisoCamposObrigatorios`, `prefixoProf`, `profSemNome`, `expAbaMatriculados`, `expArquivoMatriculados`, `expTituloPdfMatriculados`, `expProfessorCategoria`, `expUnidadeGerado`, `expLocalidadePadrao`.
+  - `avaliacoes`: `tplParecerPcdPadrao`, `tplIarBruto`, `tplPcdDirecionamento`, `valorAguardandoAvaliacaoCompleta`, `tplPcdFunilItem`, `tplPcdAdaptacaoItem`, `tplExemploValor`, `expArquivoAvaliacoes`.
+  - `desempenho`: `tplPcdFunilItem`, `tplPcdAdaptacaoItem`.
+  - `planoAcao`: `nomeArquivoPadrao`.
+- **`lib/reportI18n.ts`**: `DISPLAY_KEYS`/`CANONICAL_KEYS` ampliados; `displayValue`/`displayCanonical` passaram a cobrir IMC, níveis motores, classificações, perfis/status/notas PCD, cenários, dimensões, AQ-10, `Ativo`/`Inativo`, `Aguardando avaliação completa` e `Abaixo do peso`. `displayCanonical` também traduz prosa canônica residual para `es-PY`/`gn-PY`/`en` via dicionários locais (`PROSE_ES`/`PROSE_EN`) e trata frases de `Pré-seleção (matriz física): ...` com `tplPcdDirecionamento`.
+- **`lib/comparativeAnalysis.ts` / `components/ComparativeStudyView.tsx`**: `buildComparativeAnalysis` ganhou 4º argumento opcional `localizeLabel`; polaridade continua sobre rótulos canônicos, mas saída textual/PDF usa `displayCanonical(label, locale)`.
+- **`lib/autoReport.ts` / `lib/pdfFont.ts` / `public/fonts/`**: regeneração no locale ativo preservando observações do educador; PDFs com fonte Unicode `NotoSans` registrada como `helvetica` para `jsPDF`/`autoTable`. Não existe geração DOCX real.
+- **`lib/contentI18n.ts` / `lib/dbFacade.ts`**: `delocalizeRows` converte valores traduzidos de volta ao canônico antes de escrita no Supabase; somente texto descritivo é traduzido.
+- **`components/AlunosView.tsx`**: Excel/PDF localizados (cabeçalhos, aba, título, filtros, data e nomes de arquivo) e `useLocale()` adicionado.
+- **`components/PresencaView.tsx`**: Excel/PDF localizados (cabeçalhos, presenças/faltas/frequência, datas, aba, título, filtros e nomes de arquivo) e `useLocale()` adicionado.
+- **`components/ModalidadesView.tsx`**: alerta de campos obrigatórios e professor localizados; Excel/PDF de matriculados localizados; `useLocale()` adicionado; fallback `coach`/`category` com `-`.
+- **`components/AvaliacoesView.tsx`**: rótulos canônicos em PDF/Excel/tabela/JSX, parecer PCD padrão, tooltip `tplIarBruto`, `direcionamento`/funil/adaptações PCD, detalhes, unidades, notas e nomes de arquivo localizados.
+- **`components/QuestionarioView.tsx`**: rótulos PCD, IMC (`Abaixo do peso` incluído), descrições/laudos de grupos e modalidades, unidades de testes e placeholders locais via `displayValue`/`displayCanonical`. Inputs editáveis de regras PCD foram preservados como dados canônicos para não corromper o Supabase.
+- **`components/DashboardView.tsx`**: dimensões e labels de gráficos via `displayCanonical`; série de frequência trocada para `matriculasAcumuladas`/`frequenciaPct`/`ausenciaPct`; tooltips usam `matriculas`/`frequencia`/`ausencia`; `TooltipEntry.dataKey` tipado.
+- **`components/PerformanceView.tsx`**: ternários AQ-10 por chaves `t`; fallbacks de parecer/observação por chaves; funil e adaptações PCD localizados; preview/auto-save usam `localizeAssessmentReport`.
+- **`components/PlanoAcaoView.tsx`**: `formatDate(date, locale)` e fallback `planoAcao.nomeArquivoPadrao`.
+- **Validações executadas ao final**: `i18n:check` OK (5 idiomas, 2.503 chaves); `i18n:scan` 6 ocorrências/4 arquivos (intencionais); `i18n:extract` 4 strings; `content:build` 551 entradas/idioma; `lint` 0 erros/2 avisos prévios (`AlunosView.tsx:445`, `ProfissionaisView.tsx:353`); `npx tsc --noEmit` limpo; `npm run build` OK (13 páginas, middleware 46,4 kB).
+- **Git**: HEAD permanece `94f7630 attv4`; nenhum commit foi criado. Há alterações não commitadas nos arquivos listados acima, mais `lib/pdfFont.ts` e `public/fonts/` como untracked.
+
+### MARCADOR PARA CONTINUAR DEPOIS (20/11/2026)
+- **Estado congelado**: 5 idiomas com 2.503 chaves/idioma; scan/extract/content/lint/tsc/build passando; alterações ainda não commitadas.
+- **Próximo trabalho imediato, nesta ordem**:
+  1. Revisar e corrigir traduções antigas geradas por glossário no namespace `desempenho`, especialmente `textoParabenizamosPeloOtimoHistoricoFisicoContinuaremosDesafiando`, `textoOIndiceIndicaUmFatorDeRisco`, `textoDiagnosticamosNoAEstudanteUmaEstruturaCognitiva`, `tplDownloadConcluidoAddedcountRelatoriosForamExportados`, `uiConsultandoFrequenciaDoEstudanteNoSistemaEletronico` e `tplFrequenciaEscolarAcumuladaRateStatusResumoDo`.
+  2. Fazer a conferência visual por idioma: telas, PDFs (`ã`, `ñ`, `’`), Excel e gráficos; validar especialmente exports e tooltips alterados nesta sessão.
+  3. Regenerar os 69 `performance_reports.report` no locale ativo pela tela de Performance (“Preencher relatórios”); observações do educador devem ser preservadas.
+  4. Revisão humana obrigatória do Guarani antes de declarar a tradução definitiva.
+  5. Não traduzir as 6 ocorrências restantes do scan: marca `EDUKYNE` (Header/Login/Sidebar) e `EDU`/`KYNE`/`lgpd@edukyne.com.br` em `politica-privacidade`.
+  6. Ao finalizar, rodar novamente `npm run i18n:check`, `npm run i18n:scan`, `npm run i18n:extract`, `npm run content:build`, `npm run lint`, `npx tsc --noEmit`, `npm run build`; só commitar se o usuário pedir explicitamente.
 
 ## Decisões já tomadas
 - Supabase permanece em pt-BR. Traduções de conteúdo ficam no front, com fallback para o texto original.
@@ -28,8 +81,11 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
 - `pt-BR` é o default em `/`; os demais usam prefixo (`/pt-PT`, `/es-PY`, `/gn-PY`, `/en`). `/pt-BR` redireciona 307 para `/` — isso é esperado (`localePrefix: 'as-needed'`).
 - Seletor de idioma disponível na tela de login e no sidebar (após login).
 - Guarani será revisado por falante nativo; a versão atual usa empréstimos do espanhol e já teve alguns erros grosseiros corrigidos, mas não é definitiva.
-- Valores canônicos de geometria (`ESTADOS_LIST`, séries pré-definidas e o fallback `São Paulo` em `ContratosView`) permanecem em pt-BR de propósito: são gravados no Supabase e usados em filtros; traduzi-los geraria dados incompatíveis entre idiomas. Pendente: estratégia de rótulos localizados com valores canônicos preservados.
+- Valores canônicos de geometria (`ESTADOS_LIST`, séries pré-definidas e o fallback `São Paulo` em `ContratosView`) permanecem em pt-BR de propósito: são gravados no Supabase e usados em filtros; traduzi-los geraria dados incompatíveis entre idiomas. A estratégia de rótulos localizados com valores canônicos preservados usa `displayCanonical` e `delocalizeRows`.
 - Em `AvaliacoesView`, classificações, níveis motores, respostas e itens de questionários permanecem em pt-BR como valores gravados/comparados; o helper `displayValue` + `DISPLAY_KEYS` traduz apenas a exibição, inclusive em PDF/Excel, sem alterar a lógica.
+- Nos dicionários de conteúdo, apenas texto descritivo é traduzido. Identificadores, classificações, níveis e demais valores usados em filtros/gravações permanecem canônicos em pt-BR; `delocalizeRows` garante que edições feitas em outro idioma não persistam valores traduzidos.
+- Relatórios de performance já salvos serão regenerados no locale ativo (decisão do usuário); `buildAssessmentReport` permanece a fonte canônica em pt-BR e `localizeAssessmentReport` produz o texto exibido/gravado por idioma. As anotações do educador sempre são preservadas.
+- Marca/identidade (`EDUKYNE`, `EDU`, `KYNE`, `lgpd@edukyne.com.br`) não é traduzida (decisão do usuário); as 6 ocorrências do scan são intencionais.
 - Não usar `git commit` sem pedido explícito.
 
 ## Contexto anterior (antes do i18n)
@@ -111,11 +167,11 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
 - Regenerar sempre que uma tela for traduzida. Meta final: **0 ocorrências** no modo strict, exceto marca `EDUKYNE` (`Header`, `LoginView`, `Sidebar`), fragmentos `EDU`/`KYNE` e e-mail em `politica-privacidade`, todos intencionais.
 
 ## Validações já executadas (todas passaram)
-- `npm run i18n:check` → 5 idiomas, 2.413 chaves cada.
-- `npm run content:build` → 72 entradas/idioma; cobertura informada por tabela.
+- `npm run i18n:check` → 5 idiomas, 2.503 chaves cada.
+- `npm run content:build` → 551 entradas/idioma; cobertura informada por tabela.
 - `npm run i18n:scan` → 6 ocorrências em 4 arquivos (strict); `ComparativeStudyView`, `app/[locale]/page.tsx`, `AvaliacoesView`, `QuestionarioView`, `PerformanceView` e `global-error.tsx` não aparecem mais.
 - `npm run i18n:extract` → 4 strings únicas em `reports/i18n-pending.json`.
-- `npm run lint` → 0 erros; 2 avisos `react-hooks/exhaustive-deps` no efeito da câmera (`AlunosView.tsx:443`, `ProfissionaisView.tsx:353`).
+- `npm run lint` → 0 erros; 2 avisos `react-hooks/exhaustive-deps` no efeito da câmera (`AlunosView.tsx:445`, `ProfissionaisView.tsx:353`).
 - `npx tsc --noEmit` → limpo.
 - `npm run build` → compilou, 13 páginas estáticas, middleware 46,4 kB.
 - Teste rápido de `createTranslator` com namespace `api`: mensagens e ICU `{name}` renderizam corretamente nos 5 idiomas.
@@ -129,15 +185,16 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
 ## O que falta (ordem recomendada)
 1. **Ocorrências restantes do scan (intencionais)**: `politica-privacidade` (3: `EDU`, `KYNE` e `lgpd@edukyne.com.br`) e marca `EDUKYNE` em Header/Login/Sidebar. Não traduzir sem decisão de produto; `reports/i18n-pending.json` contém apenas essas 4 strings.
 2. **Conteúdo do Supabase restante**, ampliando `content/<locale>.json` por tabela:
-   - Perguntas curtas: `m9_health_questions`, `m10_oral_questions`, `m11_autoconcept_questions`, `m13_snap_questions`, `m14_aq10_questions`, `ias_questions`
-   - Configs: `m2_modalidades_config`, `m3_cenarios`, `m3_impactos`, `m5_capacidades_config`, `m6_modalidades_direcionamento`, `m6_diretrizes_intervencao`
-   - Pareceres: `m7_perfis_pareceres`, `m9_perfis_pareceres`, `m10_perfis_pareceres`, `m11_perfis_pareceres`, `m12_perfis_pareceres`, `m13_perfis_pareceres`, `m14_perfis_pareceres`
-   - PCD: `m15_pcd_grupos`, `m15_pcd_adaptacoes`, `m15_pcd_modalidades`, `m15_pcd_funil`
-   - Assessments e `performance_reports.report` (69 relatórios salvos)
-   - Observação: `reportBuilder.ts` ainda gera o corpo dos relatórios em pt-BR; `autoReport.ts` já aplica o locale ativo na data. `comparativeAnalysis.ts` foi localizado via `AnalysisTranslator`. O ideal é localizar os templates restantes e regenerar os relatórios, mantendo o dicionário de conteúdo como ponte para os já salvos.
-3. **Documentos gerados**: PDF/DOCX (jspdf/docx) precisam de fonte Unicode para `ã`, `ñ`, `’`; conferir saída em cada idioma.
+   - ~~Perguntas curtas: `m9_health_questions`, `m10_oral_questions`, `m11_autoconcept_questions`, `m13_snap_questions`, `m14_aq10_questions`, `ias_questions`~~ (concluído)
+   - ~~Configs (texto descritivo), pareceres e PCD~~ (concluído; campos canônicos preservados)
+   - ~~Assessments (texto de sistema de 9 tabelas)~~ (concluído)
+   - ~~`performance_reports.report` (69 relatórios salvos)~~ (regeneração no locale ativo decidida e implementada); `rbac_permissions` com rótulos já traduzidos no front.
+    - ~~Rótulos canônicos principais (`m2.name`, níveis/categorias, perfis/classificações, grupos/testes/status PCD)~~ (concluído via `canonical`/`displayCanonical` em UI, PDF, Excel e análise automática; `reportBuilder.ts` continua canônico em pt-BR por decisão de produto).
+    - Observação: `reportBuilder.ts` gera o corpo canônico em pt-BR; `reportI18n.ts` localiza os templates via `localizeAssessmentReport` e `autoReport.ts`/`PerformanceView` já aplicam o locale ativo. `comparativeAnalysis.ts` usa `AnalysisTranslator` e `localizeLabel`. Os 69 relatórios salvos são regenerados no locale ativo preservando observações.
+3. **Documentos gerados**: PDF já usa fonte Unicode (`NotoSans`; `ã`, `ñ`, `’`) via `lib/pdfFont.ts`; conferir a saída final por idioma. Não existe geração DOCX real no código (dependência `docx` não é usada).
 4. **Imagens/texto embutido**: verificar se `login-bg.webp` contém texto; se sim, criar versões por idioma ou overlay.
-5. **Revisão final**: `i18n:check`, `content:build`, `i18n:scan` com apenas as 6 ocorrências intencionais, lint, tsc, build e checklist manual por idioma.
+5. **Revisão de qualidade textual**: revisar traduções antigas geradas por glossário no namespace `desempenho` (especialmente pareceres e cabeçalhos de relatório) e confirmar a prosa PCD em `es-PY`/`gn-PY`/`en`.
+6. **Revisão final**: `i18n:check`, `content:build`, `i18n:scan` com apenas as 6 ocorrências intencionais, lint, tsc, build e checklist manual por idioma.
 
 ## Como retomar
 ```powershell

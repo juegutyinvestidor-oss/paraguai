@@ -33,6 +33,8 @@ import { scoreIas, isCompleteIasAnswers, type IasQuestion, type IasClassificatio
 import { scoreSnap, isCompleteSnapAnswers, snapThresholdForAge, SNAP_LIKERT_LABELS, SNAP_RESPONDENT_LABELS, type SnapSubscale, type SnapClassification } from '../lib/snapScore';
 import { scoreAq10, isCompleteAq10Answers, AQ10_LIKERT_LABELS, AQ10_RESPONDENT_LABELS, AQ10_VERSION_LABELS, aq10VersionForAge, type Aq10Version, type Aq10Classification } from '../lib/aq10Score';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
+import { displayCanonical } from '../lib/reportI18n';
+import { setupPdfFont } from '../lib/pdfFont';
 import { computePcdScore, PCD_TESTES, PCD_GRUPO_NOMES, PCD_DETALHES_POR_GRUPO, PCD_NOTAS_LABELS, DEFAULT_M15_ADAPTACOES, DEFAULT_M15_FAIXAS, DEFAULT_M15_MODALIDADES, DEFAULT_M15_FUNIL, M15_GRUPOS_PADRAO, type PcdScoreResult } from '../lib/pcdScore';
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, BarChart, Bar, XAxis, YAxis, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { jsPDF } from 'jspdf';
@@ -1255,11 +1257,16 @@ export default function AvaliacoesView({
   const t = useTranslations('avaliacoes');
   const ta = useTranslations('alunos');
 
+  const displaySport = (value: unknown): string =>
+    String(value ?? '').split(',').map(part => displayCanonical(part.trim(), locale)).join(', ');
+
   const displayValue = (value: unknown): string => {
     if (value == null) return '';
     const raw = String(value);
     const key = DISPLAY_KEYS[raw];
     if (key) return t(key);
+    const canonical = displayCanonical(raw, locale);
+    if (canonical !== raw) return canonical;
     return raw
       .replace(/ a /g, ` ${t('conectorIntervalo')} `)
       .replace(/ ou mais/g, ` ${t('ouMais')}`)
@@ -2905,7 +2912,7 @@ export default function AvaliacoesView({
       return;
     }
     const grupoNome = pcdConfigs.grupos.find(g => g.grupo === pcdGrupo)?.nome || PCD_GRUPO_NOMES[pcdGrupo] || `Grupo ${pcdGrupo}`;
-    const opinion = pcdOpinion.trim() || `Grupo de triagem ${pcdGrupo} (${grupoNome}). Perfil: ${pcdResult.classificacaoPerfil}. Direcionamento esportivo sugerido: ${pcdResult.direcionamento}.`;
+    const opinion = pcdOpinion.trim() || t('tplParecerPcdPadrao', { p0: String(pcdGrupo), p1: displayValue(grupoNome), p2: displayValue(pcdResult.classificacaoPerfil), p3: displayValue(pcdResult.direcionamento) });
 
     const numOrNull = (s: string, invertido: boolean): number | null => {
       if (s === '') return null;
@@ -3580,10 +3587,10 @@ export default function AvaliacoesView({
         const itemMotor = item as MotorRecord;
         return {
           [t('colunaNomeAluno')]: itemMotor.studentName,
-          [t('colunaImpulsao')]: itemMotor.impulsao || itemMotor.flexibility,
-          [t('colunaAbdomen')]: itemMotor.abdomen || itemMotor.coordination,
-          [t('colunaAgilidade')]: itemMotor.agility,
-          [t('areaForca')]: itemMotor.strength,
+          [t('colunaImpulsao')]: displayValue(itemMotor.impulsao || itemMotor.flexibility),
+          [t('colunaAbdomen')]: displayValue(itemMotor.abdomen || itemMotor.coordination),
+          [t('colunaAgilidade')]: displayValue(itemMotor.agility),
+          [t('areaForca')]: displayValue(itemMotor.strength),
           [t('colunaVelocidade')]: displayValue(itemMotor.speed || 'Excelente'),
           [t('colunaClassificacaoGeral')]: displayValue(itemMotor.generalClass),
           [t('colunaData')]: itemMotor.date ? itemMotor.date.split('-').reverse().join('/') : ''
@@ -3596,7 +3603,7 @@ export default function AvaliacoesView({
           [t('colunaNomeAluno')]: itemSport.studentName,
           [t('colunaIndiceCorporal')]: displayValue(itemSport.biotype),
           [t('colunaFisicoMotor')]: displayValue(itemSport.mainSkill),
-          [t('colunaEsporteSugerido')]: itemSport.suggestedSport,
+          [t('colunaEsporteSugerido')]: displaySport(itemSport.suggestedSport),
           [t('colunaRecomendacoes')]: displayValue(itemSport.recommendedPractice),
           [t('colunaData')]: itemSport.date ? itemSport.date.split('-').reverse().join('/') : ''
         };
@@ -3708,7 +3715,7 @@ export default function AvaliacoesView({
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, `${t('avaliacoesLabel')} ${activeSubTab.toUpperCase()}`);
-    XLSX.writeFile(workbook, `Avaliacoes_${activeSubTab}_${selectedGrade}.xlsx`);
+    XLSX.writeFile(workbook, `${t('expArquivoAvaliacoes')}_${activeSubTab}_${selectedGrade}.xlsx`);
     const exportTarget: 'imc_assessments' | 'motor_assessments' | 'sport_assessments' | 'vocational_assessments' | 'health_assessments' | 'oral_assessments' | 'autoconcept_assessments' | 'ias_assessments' | 'snap_assessments' | 'aq10_assessments' | 'pcd_assessments' =
       activeSubTab === 'imc' ? 'imc_assessments' :
       activeSubTab === 'motor' ? 'motor_assessments' :
@@ -3723,8 +3730,9 @@ export default function AvaliacoesView({
     logExport(user?.id || 'unknown', user?.role || 'unknown', exportTarget, 'excel', list.length);
   };
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     const doc = new jsPDF();
+    await setupPdfFont(doc);
     addReportBackground(doc);
     const list = getSubTabMatchedRecords();
     
@@ -3777,9 +3785,9 @@ export default function AvaliacoesView({
         const itemMotor = item as MotorRecord;
         return [
           itemMotor.studentName ?? '',
-          itemMotor.impulsao || itemMotor.flexibility || '',
-          itemMotor.abdomen || itemMotor.coordination || '',
-          itemMotor.agility ?? '',
+          displayValue(itemMotor.impulsao || itemMotor.flexibility || ''),
+          displayValue(itemMotor.abdomen || itemMotor.coordination || ''),
+          displayValue(itemMotor.agility ?? ''),
           displayValue(itemMotor.strength ?? ''),
           displayValue(itemMotor.speed || 'Excelente'),
           displayValue(itemMotor.generalClass ?? ''),
@@ -3794,7 +3802,7 @@ export default function AvaliacoesView({
           itemSport.studentName,
           displayValue(itemSport.biotype),
           displayValue(itemSport.mainSkill),
-          itemSport.suggestedSport,
+          displaySport(itemSport.suggestedSport),
           displayValue(itemSport.recommendedPractice),
           itemSport.date ? itemSport.date.split('-').reverse().join('/') : ''
         ];
@@ -3805,9 +3813,9 @@ export default function AvaliacoesView({
         const itemVoc = item as VocationalRecord;
         return [
           itemVoc.studentName,
-          itemVoc.profile,
-          itemVoc.interestArea,
-          itemVoc.suggestedCareer,
+          displayValue(itemVoc.profile),
+          displayValue(itemVoc.interestArea),
+          displayValue(itemVoc.suggestedCareer),
           itemVoc.date ? itemVoc.date.split('-').reverse().join('/') : ''
         ];
       });
@@ -3895,7 +3903,7 @@ export default function AvaliacoesView({
           String(itemP.notaForcaExplosiva),
           String(itemP.notaMembrosSup),
           String(itemP.notaCore),
-          top,
+          displayValue(top),
           itemP.date ? itemP.date.split('-').reverse().join('/') : ''
         ];
       });
@@ -3915,7 +3923,7 @@ export default function AvaliacoesView({
       }
     });
     
-    doc.save(`Avaliacoes_${activeSubTab}_${selectedGrade}.pdf`);
+    doc.save(`${t('expArquivoAvaliacoes')}_${activeSubTab}_${selectedGrade}.pdf`);
     const pdfExportTarget: 'imc_assessments' | 'motor_assessments' | 'sport_assessments' | 'vocational_assessments' | 'health_assessments' | 'oral_assessments' | 'autoconcept_assessments' | 'ias_assessments' | 'snap_assessments' | 'aq10_assessments' | 'pcd_assessments' =
       activeSubTab === 'imc' ? 'imc_assessments' :
       activeSubTab === 'motor' ? 'motor_assessments' :
@@ -3930,8 +3938,9 @@ export default function AvaliacoesView({
     logExport(user?.id || 'unknown', user?.role || 'unknown', pdfExportTarget, 'pdf', list.length);
   };
 
-  const exportAllStudentDataToPDF = () => {
+  const exportAllStudentDataToPDF = async () => {
     const doc = new jsPDF();
+    await setupPdfFont(doc);
     addReportBackground(doc);
     const studentName = loggedInStudentObj?.name || user?.name || t('palavraEstudante');
     const studentGrade = displayValue(loggedInStudentObj?.grade || t('NaoInformada'));
@@ -4006,9 +4015,9 @@ export default function AvaliacoesView({
     const motorColumns = [t('colunaAferidoEm'), t('colunaImpulsao'), t('colunaAbdomen'), t('colunaAgilidade'), t('colunaForcaMuscular'), t('colunaVelocidade'), t('colunaGeral')];
     const motorRows = studentMotor.map(rec => [
       rec.date || '',
-      rec.impulsao || rec.flexibility || '',
-      rec.abdomen || rec.coordination || '',
-      rec.agility || '',
+      displayValue(rec.impulsao || rec.flexibility || ''),
+      displayValue(rec.abdomen || rec.coordination || ''),
+      displayValue(rec.agility || ''),
       displayValue(rec.strength || ''),
       displayValue(rec.speed || 'Excelente'),
       displayValue(rec.generalClass || '')
@@ -4049,7 +4058,7 @@ export default function AvaliacoesView({
       rec.date || '',
       displayValue(rec.biotype || ''),
       displayValue(rec.mainSkill || ''),
-      rec.suggestedSport || '',
+      displaySport(rec.suggestedSport),
       displayValue(rec.recommendedPractice || '')
     ]);
 
@@ -4365,14 +4374,14 @@ export default function AvaliacoesView({
                       return (
                         <tr key={rec.id} className="hover:bg-[#131b2e]/40 transition-all text-xs">
                           <td className="px-6 py-3.5 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
-                          <td className="px-6 py-3.5 text-center text-white">{rec.impulsao || rec.flexibility}</td>
-                          <td className="px-6 py-3.5 text-center text-white">{rec.abdomen || rec.coordination}</td>
-                          <td className="px-6 py-3.5 text-center text-white">{rec.agility}</td>
-                          <td className="px-6 py-3.5 text-center text-white">{rec.strength}</td>
+                          <td className="px-6 py-3.5 text-center text-white">{displayValue(rec.impulsao || rec.flexibility)}</td>
+                          <td className="px-6 py-3.5 text-center text-white">{displayValue(rec.abdomen || rec.coordination)}</td>
+                          <td className="px-6 py-3.5 text-center text-white">{displayValue(rec.agility)}</td>
+                          <td className="px-6 py-3.5 text-center text-white">{displayValue(rec.strength)}</td>
                           <td className="px-6 py-3.5 text-center text-white">{displayValue(rec.speed || 'Excelente')}</td>
                           <td className="px-6 py-3.5">
                             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${motorBadgeColor}`}>
-                              {rec.generalClass}
+                              {displayValue(rec.generalClass)}
                             </span>
                           </td>
                         </tr>
@@ -4421,7 +4430,7 @@ export default function AvaliacoesView({
                         <td className="px-6 py-3.5 text-[#bdc8d1] font-medium">{displayValue(rec.mainSkill)}</td>
                         <td className="px-6 py-3.5 font-bold text-[#38bdf8] flex items-center gap-1.5">
                           <Activity className="w-3.5 h-3.5 text-[#38bdf8]" />
-                          <span>{rec.suggestedSport}</span>
+                          <span>{displaySport(rec.suggestedSport)}</span>
                         </td>
                         <td className="px-6 py-3.5 text-[#dae2fd]">{displayValue(rec.recommendedPractice)}</td>
                       </tr>
@@ -4463,7 +4472,7 @@ export default function AvaliacoesView({
                         <td className="px-6 py-3.5 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
                         <td className="px-6 py-3.5 font-bold text-[#38bdf8] text-xs">{displayValue(rec.profile)}</td>
                         <td className="px-6 py-3.5 text-[#dae2fd]">{displayValue(rec.interestArea)}</td>
-                        <td className="px-6 py-3.5 font-bold text-[#8ed5ff]">{rec.suggestedCareer}</td>
+                        <td className="px-6 py-3.5 font-bold text-[#8ed5ff]">{displayValue(rec.suggestedCareer)}</td>
                         <td className="px-6 py-3.5 text-[#bdc8d1] max-w-sm whitespace-pre-wrap">{displayValue(rec.technicalOpinion)}</td>
                       </tr>
                     ))
@@ -5027,7 +5036,7 @@ export default function AvaliacoesView({
                         return (
                           <tr key={rec.id} className="hover:bg-[#131b2e]/60 transition-all font-sans text-xs">
                             <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
-                            <td className="px-6 py-4 text-[#bdc8d1]">{rec.classGroup}</td>
+                            <td className="px-6 py-4 text-[#bdc8d1]">{displayValue(rec.classGroup)}</td>
                             <td className="px-6 py-4 text-center text-[#dae2fd]">{rec.weight} {t('unidadeKg')}</td>
                             <td className="px-6 py-4 text-center text-[#dae2fd]">{rec.height} {t('unidadeM')}</td>
                             <td className="px-6 py-4 text-center font-bold text-[#38bdf8] font-mono">{rec.imc}</td>
@@ -5094,14 +5103,14 @@ export default function AvaliacoesView({
                         return (
                           <tr key={rec.id} className="hover:bg-[#131b2e]/60 transition-all font-sans text-xs">
                             <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
-                            <td className="px-6 py-4 text-center">{rec.impulsao || rec.flexibility}</td>
-                            <td className="px-6 py-4 text-center">{rec.abdomen || rec.coordination}</td>
-                            <td className="px-6 py-4 text-center">{rec.agility}</td>
-                            <td className="px-6 py-4 text-center">{rec.strength}</td>
+                            <td className="px-6 py-4 text-center">{displayValue(rec.impulsao || rec.flexibility)}</td>
+                            <td className="px-6 py-4 text-center">{displayValue(rec.abdomen || rec.coordination)}</td>
+                            <td className="px-6 py-4 text-center">{displayValue(rec.agility)}</td>
+                            <td className="px-6 py-4 text-center">{displayValue(rec.strength)}</td>
                             <td className="px-6 py-4 text-center">{displayValue(rec.speed || 'Excelente')}</td>
                             <td className="px-6 py-4">
                               <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${motorBadgeColor}`}>
-                                {rec.generalClass}
+                                {displayValue(rec.generalClass)}
                               </span>
                             </td>
                             <td className="px-6 py-4 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
@@ -5159,7 +5168,7 @@ export default function AvaliacoesView({
                             </span>
                           </td>
                           <td className="px-6 py-4 text-[#bdc8d1]">{displayValue(rec.mainSkill)}</td>
-                          <td className="px-6 py-4 font-bold text-[#38bdf8]">{rec.suggestedSport}</td>
+                          <td className="px-6 py-4 font-bold text-[#38bdf8]">{displaySport(rec.suggestedSport)}</td>
                           <td className="px-6 py-4 text-[#dae2fd]">{displayValue(rec.recommendedPractice)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]">{formatDateBR(rec.date)}</td>
                           {user?.role !== 'Aluno' && (
@@ -5211,7 +5220,7 @@ export default function AvaliacoesView({
                           <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
                           <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{displayValue(rec.profile)}</td>
                           <td className="px-6 py-4 text-[#dae2fd]">{displayValue(rec.interestArea)}</td>
-                          <td className="px-6 py-4 font-bold text-[#8ed5ff]">{rec.suggestedCareer}</td>
+                          <td className="px-6 py-4 font-bold text-[#8ed5ff]">{displayValue(rec.suggestedCareer)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={displayValue(rec.technicalOpinion)}>{displayValue(rec.technicalOpinion)}</td>
                           <td className="px-6 py-4 text-[#bdc8d1]/80">{formatDateBR(rec.date)}</td>
                           {user?.role !== 'Aluno' && (
@@ -5314,9 +5323,9 @@ export default function AvaliacoesView({
                         return (
                           <tr key={rec.id} className="hover:bg-[#131b2e]/60 transition-all font-sans text-xs">
                             <td className="px-6 py-4 font-semibold text-[#dae2fd]">{rec.studentName}</td>
-                            <td className="px-6 py-4 text-[#dae2fd]">{rec.grupoNome || `Grupo ${rec.grupo}`}</td>
-                            <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{rec.classificacaoPerfil}</td>
-                            <td className="px-6 py-4 text-[#dae2fd]">{top ? (top.modalidade + (top.iar ? ` (IAR ${top.iar.toFixed(2)})` : '')) : '—'}</td>
+                            <td className="px-6 py-4 text-[#dae2fd]">{displayValue(rec.grupoNome || `Grupo ${rec.grupo}`)}</td>
+                            <td className="px-6 py-4 font-bold text-[#38bdf8] text-xs">{displayValue(rec.classificacaoPerfil)}</td>
+                            <td className="px-6 py-4 text-[#dae2fd]">{top ? (displayValue(top.modalidade) + (top.iar ? ` (IAR ${top.iar.toFixed(2)})` : '')) : '—'}</td>
                             <td className="px-6 py-4 text-[#bdc8d1] max-w-md whitespace-pre-wrap leading-relaxed" title={displayValue(rec.technicalOpinion)}>{displayValue(rec.technicalOpinion)}</td>
                             <td className="px-6 py-4 text-[#bdc8d1]/80">{formatDateBR(rec.date)}</td>
                             {user?.role !== 'Aluno' && (
@@ -6786,7 +6795,7 @@ export default function AvaliacoesView({
                     className="w-full bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd]"
                   >
                     <option value="">{t('geralParenteses')}</option>
-                    {(PCD_DETALHES_POR_GRUPO[pcdGrupo] ?? []).map(d => <option key={d} value={d}>{d}</option>)}
+                    {(PCD_DETALHES_POR_GRUPO[pcdGrupo] ?? []).map(d => <option key={d} value={d}>{displayCanonical(d, locale)}</option>)}
                   </select>
                 </div>
               </div>
@@ -6813,13 +6822,13 @@ export default function AvaliacoesView({
                         type="number"
                         step="any"
                         min={0}
-                        placeholder={`Ex.: ${testeCfg.unidade === 'cm' ? '150' : '12.5'}`}
+                        placeholder={t('tplExemploValor', { p0: testeCfg.unidade === 'cm' ? '150' : '12.5' })}
                         value={value}
                         onChange={(e) => setter(e.target.value)}
                         className="w-full sm:w-28 bg-[#0b1326] border border-[#3e484f] rounded-lg px-3 py-2 text-xs text-[#dae2fd] focus:border-[#38bdf8] outline-none"
                       />
                       <span className="text-[10px] text-[#bdc8d1]/60 sm:w-16 sm:shrink-0">{displayValue(testeCfg.unidade)}</span>
-                      <span className={`text-[11px] font-black rounded px-2 py-0.5 self-start sm:self-auto ${nota && nota > 0 ? 'bg-[#38bdf8]/10 text-[#38bdf8]' : 'bg-[#3e484f]/20 text-[#bdc8d1]/50'}`}>{nota ? PCD_NOTAS_LABELS[nota] : '—'}</span>
+                      <span className={`text-[11px] font-black rounded px-2 py-0.5 self-start sm:self-auto ${nota && nota > 0 ? 'bg-[#38bdf8]/10 text-[#38bdf8]' : 'bg-[#3e484f]/20 text-[#bdc8d1]/50'}`}>{nota ? displayValue(PCD_NOTAS_LABELS[nota]) : '—'}</span>
                       {invalido && <span className="text-[10px] font-bold text-rose-400 sm:self-auto">{t('avisoValorInvalido')}</span>}
                     </div>
                   );
@@ -6829,7 +6838,7 @@ export default function AvaliacoesView({
                   <div className="mt-2 space-y-1">
                     <p className="text-[10px] font-bold text-[#38bdf8] uppercase tracking-wider">{t('tituloTestesAdaptados')}</p>
                     {pcdResult.adaptacoesAplicadas.filter(a => a.status === 'Adaptado' || a.status === 'Substituído').map(a => (
-                      <p key={displayValue(a.teste)} className="text-[10px] text-[#bdc8d1]/70"><span className="font-bold text-[#dae2fd]">{PCD_TESTES.find(t => t.key === a.teste)?.label ?? a.teste} ({displayValue(a.status)}):</span> {displayValue(a.instrucao)}</p>
+                      <p key={displayValue(a.teste)} className="text-[10px] text-[#bdc8d1]/70"><span className="font-bold text-[#dae2fd]">{displayValue(PCD_TESTES.find(t => t.key === a.teste)?.label ?? a.teste)} ({displayValue(a.status)}):</span> {displayValue(a.instrucao)}</p>
                     ))}
                     <p className="text-[10px] text-[#bdc8d1]/50">{t('notaTesteAlternativo')}</p>
                   </div>
@@ -6859,8 +6868,8 @@ export default function AvaliacoesView({
                       </div>
                     </div>
                     <div className="bg-[#0b1326] border border-[#3e484f] rounded-lg p-3">
-                      <p className="text-[10px] text-[#bdc8d1]/70"><span className="font-bold text-[#dae2fd]">{t('campoPerfil')}</span> {pcdResult.classificacaoPerfil}</p>
-                      <p className="text-[10px] text-[#bdc8d1]/70 mt-1"><span className="font-bold text-[#dae2fd]">{t('campoDirecionamento')}</span> {pcdResult.direcionamento}</p>
+                      <p className="text-[10px] text-[#bdc8d1]/70"><span className="font-bold text-[#dae2fd]">{t('campoPerfil')}</span> {displayValue(pcdResult.classificacaoPerfil)}</p>
+                      <p className="text-[10px] text-[#bdc8d1]/70 mt-1"><span className="font-bold text-[#dae2fd]">{t('campoDirecionamento')}</span> {displayValue(pcdResult.direcionamento)}</p>
                     </div>
                   </div>
                 ) : (
@@ -6900,11 +6909,12 @@ export default function AvaliacoesView({
                           margin={{ top: 4, right: 24, bottom: 4, left: 8 }}
                         >
                           <XAxis type="number" domain={[0, 'dataMax']} tick={{ fill: '#bdc8d1', fontSize: 10 }} />
-                          <YAxis type="category" dataKey="modalidade" width={150} tick={{ fill: '#dae2fd', fontSize: 10 }} />
+                          <YAxis type="category" dataKey="modalidade" width={150} tick={{ fill: '#dae2fd', fontSize: 10 }} tickFormatter={(v) => displayValue(String(v))} />
                           <Tooltip
                             contentStyle={{ backgroundColor: '#131b2e', border: '1px solid #3e484f', borderRadius: 8, fontSize: 11 }}
                             labelStyle={{ color: '#dae2fd' }}
-                            formatter={(v) => [`IAR ${Number(v).toFixed(2)} (bruto)`, t('colunaCompatibilidade')]}
+                            labelFormatter={(v) => displayValue(String(v))}
+                            formatter={(v) => [t('tplIarBruto', { p0: Number(v).toFixed(2) }), t('colunaCompatibilidade')]}
                           />
                           <Bar dataKey="iar" radius={[0, 6, 6, 0]} label={{ position: 'right', fill: '#38bdf8', fontSize: 10, formatter: (v) => Number(v).toFixed(2) }}>
                             {[...pcdResult.compatibilidade].sort((a, b) => b.iar - a.iar).map((c, i) => (
@@ -6935,8 +6945,8 @@ export default function AvaliacoesView({
                   <ol className="space-y-1">
                     {pcdResult.funil.map((f) => (
                       <li key={f.momento} className="bg-[#0b1326] border border-[#3e484f]/60 rounded-lg px-3 py-1.5">
-                        <p className="text-[10px] font-black text-[#38bdf8] uppercase tracking-wider">{f.momento}. {f.titulo}</p>
-                        <p className="text-[10px] text-[#bdc8d1]/70 mt-0.5">{f.regra}</p>
+                        <p className="text-[10px] font-black text-[#38bdf8] uppercase tracking-wider">{f.momento}. {displayValue(f.titulo)}</p>
+                        <p className="text-[10px] text-[#bdc8d1]/70 mt-0.5">{displayValue(f.regra)}</p>
                       </li>
                     ))}
                   </ol>

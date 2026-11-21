@@ -16,6 +16,8 @@ import { normalizeRole } from '../lib/rbac';
 import { logExport } from '../lib/auditLog';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import { buildComparativeAnalysis, ANALYSIS_CONFIG, type AnalysisTranslator } from '../lib/comparativeAnalysis';
+import { displayCanonical } from '../lib/reportI18n';
+import { setupPdfFont } from '../lib/pdfFont';
 
 interface M2Modality {
   id: string;
@@ -465,11 +467,13 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
       recortes.map(r => ({ id: r.id, label: describeRecorte(r) })),
       statsList,
       trAnalise,
+      label => displayCanonical(label, locale),
     );
-  }, [recortes, statsList, describeRecorte, trAnalise]);
+  }, [recortes, statsList, describeRecorte, trAnalise, locale]);
 
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = async () => {
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    await setupPdfFont(doc);
     doc.setFontSize(15); doc.setTextColor(11, 19, 38);
     doc.text(t('tituloPdf'), 40, 42);
     doc.setFontSize(9); doc.setTextColor(90);
@@ -499,7 +503,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
         const txt = row.kind === 'pct' ? `${d > 0 ? '+' : ''}${Math.round(d)} p.p.` : `${d > 0 ? '+' : ''}${fmtNum(d)}`;
         return txt;
       });
-      return [row.group, row.cat, ...cells, ...deltas];
+      return [row.group, displayCanonical(row.cat, locale), ...cells, ...deltas];
     });
     autoTable(doc, {
       startY: y,
@@ -691,7 +695,7 @@ healthRecords, oralRecords, autoconceptRecords, iasRecords, snapRecords, aq10Rec
                 return (
                   <tr key={`${row.group}-${row.cat}-${i}`} className="border-b border-[#3e484f]/15 hover:bg-[#0b1326]/40">
                     <td className="py-2 pr-3 text-[#8ed5ff] font-bold whitespace-nowrap">{showGroup ? row.group : ''}</td>
-                    <td className="py-2 pr-3 text-[#bdc8d1] whitespace-nowrap">{row.cat}</td>
+                    <td className="py-2 pr-3 text-[#bdc8d1] whitespace-nowrap">{displayCanonical(row.cat, locale)}</td>
                     {row.values.map((v, j) => (
                       <td key={j} className="py-2 px-3 text-center text-[#dae2fd] font-semibold whitespace-nowrap">
                         {v === null ? '—' : row.kind === 'pct'
@@ -756,6 +760,7 @@ function ComparisonChart({ title, recortes, statsList, dimIdx }: {
   statsList: RecorteStats[];
   dimIdx: number;
 }) {
+  const locale = useLocale();
   const t = useTranslations('comparativo');
   const cats = useMemo(() => {
     const unionCounts = new Map<string, number>();
@@ -843,7 +848,7 @@ function ComparisonChart({ title, recortes, statsList, dimIdx }: {
                   return (
                     <text x={x - 8} y={y + 4} textAnchor="end" fill="#bdc8d1" fontSize={12}>
                       {lines.map((line, i) => (
-                        <tspan key={i} x={x - 8} dy={i === 0 ? `${-totalH / 2}px` : `${lineH}px`}>{line}</tspan>
+                        <tspan key={i} x={x - 8} dy={i === 0 ? `${-totalH / 2}px` : `${lineH}px`}>{displayCanonical(line, locale)}</tspan>
                       ))}
                     </text>
                   );

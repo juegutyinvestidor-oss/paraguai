@@ -2,7 +2,7 @@
 
 import {getSupabase} from './supabase';
 import {getSessionToken} from './sessionClient';
-import {currentLocale, loadContentTranslations, localizeRows} from './contentI18n';
+import {currentLocale, delocalizeRows, loadContentTranslations, localizeRows} from './contentI18n';
 import type {SupabaseClient} from '@supabase/supabase-js';
 
 type QueryResult = {data: unknown; error: {message: string} | null};
@@ -14,8 +14,12 @@ function notifySessionExpired(): void {
   }
 }
 
-async function dataWrite(body: Record<string, unknown>): Promise<QueryResult> {
+async function dataWrite(body: Record<string, unknown>, locale: string): Promise<QueryResult> {
   try {
+    if (Array.isArray(body.rows)) {
+      const dictionary = await loadContentTranslations(locale);
+      body = {...body, rows: delocalizeRows(String(body.table), body.rows, dictionary)};
+    }
     const token = getSessionToken();
     const res = await fetch('/api/data', {
       method: 'POST',
@@ -38,9 +42,9 @@ async function dataWrite(body: Record<string, unknown>): Promise<QueryResult> {
   }
 }
 
-function deleteChain(table: string) {
+function deleteChain(table: string, locale: string) {
   const ids: string[] = [];
-  const run = () => dataWrite({table, op: 'delete', ids});
+  const run = () => dataWrite({table, op: 'delete', ids}, locale);
   return {
     eq: (col: string, val: unknown): Promise<QueryResult> | QueryResult => {
       if (col !== 'id') {
@@ -92,11 +96,11 @@ function wrapReadBuilder(table: string, target: Builder, locale: string): Builde
 }
 
 function tableFacade(table: string, real: SupabaseClient, locale: string): Builder {
-  const upsert = (rows: unknown): Promise<QueryResult> => dataWrite({table, op: 'upsert', rows});
+  const upsert = (rows: unknown): Promise<QueryResult> => dataWrite({table, op: 'upsert', rows}, locale);
   const writes: Builder = {
     upsert,
     insert: upsert,
-    delete: () => deleteChain(table),
+    delete: () => deleteChain(table, locale),
   };
   return new Proxy({} as Builder, {
     get(_t, key: string) {

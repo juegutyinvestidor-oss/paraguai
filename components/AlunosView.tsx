@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '../i18n/navigation';
 import { nextStudentId, uuid } from '../lib/idGenerator';
 import { 
@@ -26,6 +26,7 @@ import { uploadAvatar, deleteAvatarByUrl, getAvatarPath } from '../lib/storage';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { addReportBackground } from '../lib/pdfUtils';
+import { setupPdfFont } from '../lib/pdfFont';
 import * as XLSX from 'xlsx';
 import { logExport, registerConsent } from '../lib/auditLog';
 
@@ -50,6 +51,7 @@ interface AlunosViewProps {
 }
 
 export default function AlunosView({ students, setStudents, isAddModalOpen, setIsAddModalOpen, runWithPermission, contratos, user }: AlunosViewProps) {
+  const locale = useLocale();
   const t = useTranslations('alunos');
   const [filterStatus, setFilterStatus] = useState<'Todos' | 'Ativos' | 'Inativos'>('Todos');
   const [localSearch, setLocalSearch] = useState('');
@@ -854,42 +856,43 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
 
   const exportToExcel = () => {
     const data = filteredStudents.map(student => ({
-      'Nome': student.name,
-      'E-mail': student.email,
-      'Matrícula': student.enrollmentId,
-      'Turma': student.grade,
-      'Localidade': student.locality || '',
-      'Contrato': student.contrato || '',
-      'Estado': student.estado || '',
-      'Região': student.regiao || '',
-      'CPF': maskCPF(student.cpf),
-      'Telefone': student.phone || '',
-      'Responsável': student.parentName || '',
-      'Nascimento': student.birthDate || '',
-      'Status': student.status
+      [t('expNome')]: student.name,
+      [t('expEmail')]: student.email,
+      [t('expMatricula')]: student.enrollmentId,
+      [t('expTurma')]: student.grade,
+      [t('expLocalidade')]: student.locality || '',
+      [t('expContrato')]: student.contrato || '',
+      [t('expEstado')]: student.estado || '',
+      [t('expRegiao')]: student.regiao || '',
+      [t('expCpf')]: maskCPF(student.cpf),
+      [t('expTelefone')]: student.phone || '',
+      [t('expResponsavel')]: student.parentName || '',
+      [t('expNascimento')]: student.birthDate || '',
+      [t('expStatus')]: student.status
     }));
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Alunos");
-    XLSX.writeFile(workbook, "Alunos_Filtrados.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, t('expAbaAlunos'));
+    XLSX.writeFile(workbook, `${t('expArquivoAlunos')}.xlsx`);
     logExport(user?.id || 'unknown', user?.role || 'unknown', 'students', 'excel', filteredStudents.length);
   };
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     const doc = new jsPDF();
+    await setupPdfFont(doc);
     addReportBackground(doc);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.setTextColor(11, 19, 38);
-    doc.text("EDUKYNE - Relatório de Alunos", 14, 15);
+    doc.text(t('expTituloPdfAlunos'), 14, 15);
     
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(100, 100, 100);
-    doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, 14, 21);
-    doc.text(`Filtros Ativos - Status: ${filterStatus} | Contrato: ${contract} | Série: ${selectedGrade}`, 14, 26);
+    doc.text(t('expGeradoEmAs', { p0: new Date().toLocaleDateString(locale), p1: new Date().toLocaleTimeString(locale) }), 14, 21);
+    doc.text(t('expFiltrosAtivosAlunos', { p0: filterStatus, p1: contract, p2: selectedGrade }), 14, 26);
     
-    const tableColumn = ["Nome", "Matrícula", "Turma", "Localidade", "Status"];
+    const tableColumn = [t('expNome'), t('expMatricula'), t('expTurma'), t('expLocalidade'), t('expStatus')];
     const tableRows = filteredStudents.map(student => [
       student.name,
       student.enrollmentId ?? '',
@@ -911,7 +914,7 @@ export default function AlunosView({ students, setStudents, isAddModalOpen, setI
         }
       }
     });
-    doc.save("Alunos_Filtrados.pdf");
+    doc.save(`${t('expArquivoAlunos')}.pdf`);
     logExport(user?.id || 'unknown', user?.role || 'unknown', 'students', 'pdf', filteredStudents.length);
   };
 

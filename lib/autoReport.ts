@@ -26,12 +26,10 @@ const currentReportLocale = () => {
   return INTL_LOCALE[locale] ?? locale;
 };
 
-const buildLocalized = (ctx: ReportBuildCtx) => {
-  const locale = currentUiLocale();
-  return locale === 'pt-BR'
+const buildLocalized = (ctx: ReportBuildCtx, locale = currentUiLocale()) =>
+  locale === 'pt-BR'
     ? buildAssessmentReport(ctx)
-    : localizeAssessmentReport(ctx, createReportTranslator(locale));
-};
+    : localizeAssessmentReport(ctx, createReportTranslator(locale), locale);
 
 const BASE_CTX = (focusArea: string, studentName: string, observations: string, dateStr: string): ReportBuildCtx => ({
   focusArea, studentName, observations, dateStr,
@@ -78,6 +76,7 @@ export async function ensurePerformanceReport(
     } catch { /* tabela pode nao existir ainda */ }
   }
 
+  const uiLocale = currentUiLocale();
   const dateStr = new Date().toLocaleDateString(currentReportLocale());
   const ctx = BASE_CTX(focusArea, params.studentName, observations, dateStr);
   let evaluationResult = '';
@@ -144,7 +143,7 @@ export async function ensurePerformanceReport(
       return false;
     }
 
-    const built = buildLocalized(ctx);
+    const built = buildLocalized(ctx, uiLocale);
     if (!built) return false;
     evaluationResult = built.evaluationResult;
     const report = cleanText(built.report);
@@ -176,7 +175,7 @@ const CHUNK = 200;
 // escreve em blocos com progresso. Preserva a anotacao dos relatorios ja salvos.
 export async function backfillReportsForStudentIds(
   studentIds: string[],
-  opts?: { onProgress?: (done: number, total: number) => void }
+  opts?: { onProgress?: (done: number, total: number) => void; locale?: string }
 ): Promise<number> {
   const supabase = getDb();
   if (!supabase) return 0;
@@ -243,6 +242,7 @@ export async function backfillReportsForStudentIds(
     attStats.set(a.student_id, e);
   });
 
+  const locale = opts?.locale ?? currentUiLocale();
   const dateStr = new Date().toLocaleDateString(currentReportLocale());
   const today = new Date().toISOString().split('T')[0];
   const ensureMap = (sid: string) => { let m = studentReports.get(sid); if (!m) { m = new Map(); studentReports.set(sid, m); } return m; };
@@ -273,7 +273,7 @@ export async function backfillReportsForStudentIds(
     else if (j.kind === 'snap') { ctx.snapRecords = [{ id: j.rec.id, studentId: j.rec.student_id, studentName: j.rec.student_name, inattentionScore: Number(j.rec.inattention_score), hyperactivityScore: Number(j.rec.hyperactivity_score), classification: j.rec.classification, technicalOpinion: j.rec.technical_opinion, respondent: j.rec.respondent ?? undefined, date: j.rec.date }] as unknown as ReportBuildCtx['snapRecords']; ctx.selectedSnapId = rid; ctx.m13Rows = m13Rows; }
     else if (j.kind === 'aq10') { ctx.aq10Records = [{ id: j.rec.id, studentId: j.rec.student_id, studentName: j.rec.student_name, version: (j.rec.version === 'adolescente' ? 'adolescente' : 'crianca'), totalScore: Number(j.rec.total_score), classification: j.rec.classification, technicalOpinion: j.rec.technical_opinion, respondent: j.rec.respondent ?? undefined, date: j.rec.date }] as unknown as ReportBuildCtx['aq10Records']; ctx.selectedAq10Id = rid; ctx.m14Rows = m14Rows; }
     else if (j.kind === 'pcd') { ctx.pcdRecords = [{ id: j.rec.id, studentId: j.rec.student_id, studentName: j.rec.student_name, grupo: Number(j.rec.grupo), grupoNome: j.rec.grupo_nome ?? '', detalheClassificacao: j.rec.detalhe_classificacao ?? '', abdominalS: j.rec.abdominal_s ?? null, velocidadeS: j.rec.velocidade_s ?? null, agilidadeS: j.rec.agilidade_s ?? null, saltoCm: j.rec.salto_cm ?? null, flexaoRep: j.rec.flexao_rep ?? null, notaAbdominal: Number(j.rec.nota_abdominal ?? 0), notaVelocidade: Number(j.rec.nota_velocidade ?? 0), notaAgilidade: Number(j.rec.nota_agilidade ?? 0), notaSalto: Number(j.rec.nota_salto ?? 0), notaFlexao: Number(j.rec.nota_flexao ?? 0), notaVelAgil: Number(j.rec.nota_vel_agil ?? 0), notaForcaExplosiva: Number(j.rec.nota_forca_explosiva ?? 0), notaMembrosSup: Number(j.rec.nota_membros_sup ?? 0), notaCore: Number(j.rec.nota_core ?? 0), compatibilidade: Array.isArray(j.rec.compatibilidade) ? j.rec.compatibilidade : [], direcionamento: j.rec.direcionamento ?? '', classificacaoPerfil: j.rec.classificacao_perfil ?? '', funil: Array.isArray(j.rec.funil) ? j.rec.funil : [], adaptacoesAplicadas: Array.isArray(j.rec.adaptacoes_aplicadas) ? j.rec.adaptacoes_aplicadas : [], technicalOpinion: j.rec.technical_opinion ?? '', date: j.rec.date ?? '' }] as unknown as ReportBuildCtx['pcdRecords']; ctx.selectedPcdId = rid; }
-    const built = buildLocalized(ctx);
+    const built = buildLocalized(ctx, locale);
     if (!built) continue;
     const report = cleanText(built.report);
     rows.push({ id: `REP-${rid}`, student_id: j.studentId, student_name: j.studentName, grade: gradeMap.get(j.studentId) ?? '', focus_area: focusArea, observations, report, date: today, evaluation_id: rid, evaluation_result: built.evaluationResult || null });
@@ -291,7 +291,7 @@ export async function backfillReportsForStudentIds(
     if (rate !== null) {
       const ctx = BASE_CTX('Desempenho Escolar', name, obsMap.get(escolarId) ?? '', dateStr);
       ctx.attendanceRate = rate; ctx.presenceCount = a!.present; ctx.totalCount = a!.total; ctx.m3Analysis = null;
-      const built = buildLocalized(ctx);
+      const built = buildLocalized(ctx, locale);
       if (built) {
         const report = cleanText(built.report);
         rows.push({ id: escolarId, student_id: sid, student_name: name, grade, focus_area: 'Desempenho Escolar', observations: obsMap.get(escolarId) ?? '', report, date: today, evaluation_id: null, evaluation_result: null });
@@ -303,7 +303,7 @@ export async function backfillReportsForStudentIds(
       const ctx = BASE_CTX('Desempenho Completo', name, obsMap.get(compId) ?? '', dateStr);
       ctx.studentGrade = grade;
       ctx.existingReports = Array.from(m.entries()).map(([focusArea, report]) => ({ focusArea, report }));
-      const built = buildLocalized(ctx);
+      const built = buildLocalized(ctx, locale);
       if (built) {
         rows.push({ id: compId, student_id: sid, student_name: name, grade, focus_area: 'Desempenho Completo', observations: obsMap.get(compId) ?? '', report: cleanText(built.report), date: today, evaluation_id: null, evaluation_result: null });
       }

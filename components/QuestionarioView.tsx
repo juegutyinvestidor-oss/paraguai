@@ -33,6 +33,7 @@ import { IAS_CLASSIFICATIONS, type IasQuestion } from "../lib/iasScore";
 import { SNAP_CLASSIFICATIONS, SNAP_LIKERT_LABELS, SNAP_CLINICAL_THRESHOLD, SNAP_CLINICAL_THRESHOLD_17, type SnapSubscale } from "../lib/snapScore";
 import { AQ10_CLASSIFICATIONS, AQ10_LIKERT_LABELS, AQ10_ALERT_FROM, type Aq10Version } from "../lib/aq10Score";
 import { PCD_TESTES, PCD_TESTES_MAP, PCD_DETALHES_POR_GRUPO, PCD_NOTAS_LABELS, PCD_STATUS_ADAPTACAO, DEFAULT_M15_ADAPTACOES, DEFAULT_M15_FAIXAS, DEFAULT_M15_MODALIDADES, DEFAULT_M15_FUNIL, M15_GRUPOS_PADRAO, type PcdTesteKey } from "../lib/pcdScore";
+import { displayCanonical } from "../lib/reportI18n";
 
 interface LocalUser {
   id?: string;
@@ -477,7 +478,8 @@ export default function QuestionarioView({
     if (value == null) return "";
     const raw = String(value);
     const key = DISPLAY_KEYS[raw];
-    return key ? t(key) : raw;
+    if (key) return t(key);
+    return displayCanonical(raw, locale);
   };
 
   const periodoExemplo = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date());
@@ -4378,7 +4380,7 @@ export default function QuestionarioView({
                         <td className="py-4 px-3 font-bold text-black align-top border-r border-slate-300">
                           <div className="flex items-center gap-2 mb-2">
                             <div className={`w-4 h-4 rounded-full ${colorInfo.bg} shadow-md border border-black/20`}></div> 
-                            <span className="font-extrabold text-black tracking-tight">{row.level}</span>
+                            <span className="font-extrabold text-black tracking-tight">{displayCanonical(row.level, locale)}</span>
                           </div>
                         </td>
                         <td className="py-4 px-3 text-slate-900 font-medium leading-relaxed text-justify align-top border-r border-slate-300">{row.healthStatus}</td>
@@ -4423,7 +4425,7 @@ export default function QuestionarioView({
               <p className="text-sm text-slate-700 mb-6 leading-relaxed">
                 {t('tem_certeza_de_que_deseja_excluir_permanentemente_a_classificacao')}{" "}
                 <span className="text-black font-extrabold font-mono bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
-                  {m5RowToDelete.level}
+                  {displayCanonical(m5RowToDelete.level, locale)}
                 </span>{" "}
                 {t('desta_capacidade_fisica_esta_acao_nao_pode_ser_desfeita')}</p>
               <div className="flex gap-2 justify-end">
@@ -6184,7 +6186,7 @@ export default function QuestionarioView({
                         }`}
                       >
                         {f.label === "Índice Corporal" && f.matchVal
-                          ? getImcDisplayLabel(f.matchVal)
+                          ? displayCanonical(getImcDisplayLabel(f.matchVal), locale)
                           : f.val || f.matchVal}
                       </span>
                     </div>
@@ -6247,7 +6249,7 @@ export default function QuestionarioView({
                     {/* Modality Name and Matching Badge */}
                     <td className="p-3 py-3.5 align-middle">
                       <div className="font-semibold text-white text-sm">
-                        {mod.name}
+                        {displayCanonical(mod.name, locale)}
                       </div>
                       {match && (
                         <div className="mt-1 flex flex-col gap-0.5 items-start">
@@ -6341,7 +6343,7 @@ export default function QuestionarioView({
                                   <div className="flex items-center justify-center gap-0.5">
                                     <span>
                                       {testKey === "imc"
-                                        ? getImcDisplayLabel(lvl)
+                                        ? displayCanonical(getImcDisplayLabel(lvl), locale)
                                         : lvl}
                                     </span>
                                     {isStudLvl && (
@@ -6486,7 +6488,7 @@ export default function QuestionarioView({
               <p className="text-xs text-[#bdc8d1] mb-5 leading-relaxed">
                 {t('tem_certeza_de_que_deseja_remover_permanentemente_a_modalidade')}{" "}
                 <span className="text-white font-bold">
-                  {m2ModalityToDelete.name}
+                  {displayCanonical(m2ModalityToDelete.name, locale)}
                 </span>{" "}
                 {t('e_todas_as_suas_configuracoes_de_aptidao_esta_acao_nao_pode_ser_desfei')}</p>
               <div className="flex gap-2 justify-end">
@@ -7918,7 +7920,7 @@ export default function QuestionarioView({
               const isEditing = m12ParecerEditingId === cls;
               return (
                 <div key={cls} className="border-2 border-slate-300 rounded-xl p-4 bg-slate-50">
-                  <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
+                  <h4 className="font-black text-sm text-black mb-2">{displayCanonical(cls, locale)}</h4>
                   {isEditing && m12ParecerEditData ? (
                     <div className="space-y-2">
                       <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder={t('dados_basicos_faixa_de_pontos')} value={m12ParecerEditData.basicData} onChange={e => setM12ParecerEditData({ ...m12ParecerEditData, basicData: e.target.value })} />
@@ -8061,7 +8063,7 @@ export default function QuestionarioView({
               const isEditing = m14ParecerEditingId === cls;
               return (
                 <div key={cls} className="border-2 border-slate-300 rounded-xl p-4 bg-slate-50">
-                  <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
+                  <h4 className="font-black text-sm text-black mb-2">{displayCanonical(cls, locale)}</h4>
                   {isEditing && m14ParecerEditData ? (
                     <div className="space-y-2">
                       <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder={t('criterio_da_pontuacao')} value={m14ParecerEditData.basicData} onChange={e => setM14ParecerEditData({ ...m14ParecerEditData, basicData: e.target.value })} />
@@ -8205,7 +8207,7 @@ export default function QuestionarioView({
               const isEditing = m13ParecerEditingId === cls;
               return (
                 <div key={cls} className="border-2 border-slate-300 rounded-xl p-4 bg-slate-50">
-                  <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
+                  <h4 className="font-black text-sm text-black mb-2">{displayCanonical(cls, locale)}</h4>
                   {isEditing && m13ParecerEditData ? (
                     <div className="space-y-2">
                       <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder={t('criterio_do_bloco')} value={m13ParecerEditData.basicData} onChange={e => setM13ParecerEditData({ ...m13ParecerEditData, basicData: e.target.value })} />
@@ -8331,7 +8333,7 @@ export default function QuestionarioView({
               const isEditing = m11ParecerEditingId === cls;
               return (
                 <div key={cls} className="border-2 border-slate-300 rounded-xl p-4 bg-slate-50">
-                  <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
+                  <h4 className="font-black text-sm text-black mb-2">{displayCanonical(cls, locale)}</h4>
                   {isEditing && m11ParecerEditData ? (
                     <div className="space-y-2">
                       <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder={t('dados_basicos_faixa_de_pontos')} value={m11ParecerEditData.basicData} onChange={e => setM11ParecerEditData({ ...m11ParecerEditData, basicData: e.target.value })} />
@@ -8459,7 +8461,7 @@ export default function QuestionarioView({
               const isEditing = m10ParecerEditingId === cls;
               return (
                 <div key={cls} className="border-2 border-slate-300 rounded-xl p-4 bg-slate-50">
-                  <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
+                  <h4 className="font-black text-sm text-black mb-2">{displayCanonical(cls, locale)}</h4>
                   {isEditing && m10ParecerEditData ? (
                     <div className="space-y-2">
                       <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={2} placeholder={t('dados_basicos_faixa_de_pontos')} value={m10ParecerEditData.basicData} onChange={e => setM10ParecerEditData({ ...m10ParecerEditData, basicData: e.target.value })} />
@@ -8580,7 +8582,7 @@ export default function QuestionarioView({
               const isEditing = m9ParecerEditingId === cls;
               return (
                 <div key={cls} className="border-2 border-slate-300 rounded-xl p-4 bg-slate-50">
-                  <h4 className="font-black text-sm text-black mb-2">{cls}</h4>
+                  <h4 className="font-black text-sm text-black mb-2">{displayCanonical(cls, locale)}</h4>
                   {isEditing && m9ParecerEditData ? (
                     <div className="space-y-2">
                       <textarea className="p-2 border-2 border-slate-500 bg-white text-black rounded text-xs w-full font-bold focus:ring-2 focus:ring-blue-600 outline-none" rows={3} placeholder={t('dados_basicos')} value={m9ParecerEditData.basicData} onChange={e => setM9ParecerEditData({ ...m9ParecerEditData, basicData: e.target.value })} />
@@ -8636,7 +8638,7 @@ export default function QuestionarioView({
 
         <div className="mb-8 p-6 bg-indigo-50 border-2 border-indigo-300 rounded-xl space-y-2 text-sm text-slate-800">
           <p><span className="font-black">{t('oQueE')}</span> {t('bateria_motora_adaptada_para_alunos_com_deficiencia_4_a_18_anos_com_tr')}</p>
-          <p><span className="font-black">{t('testes')}</span> {PCD_TESTES.map(t => t.label).join(" · ")}{t('notas_relativas_de_1_a_3_por_teste_conforme_as_faixas_de_referencia_co')}</p>
+          <p><span className="font-black">{t('testes')}</span> {PCD_TESTES.map(item => displayValue(item.label)).join(" · ")}{t('notas_relativas_de_1_a_3_por_teste_conforme_as_faixas_de_referencia_co')}</p>
           <p><span className="font-black">{t('valencias')}</span> {t('velocidade_agilidade_media_das_notas_forca_explosiva_salto_forca_de_me')}</p>
           <p className="text-xs font-bold text-indigo-700">{t('configure_abaixo_os_grupos_de_triagem_as_adaptacoes_por_grupo_as_faixa')}</p>
         </div>
@@ -8692,9 +8694,9 @@ export default function QuestionarioView({
                   {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => (
                     <tr key={g.id} className="hover:bg-slate-50 transition-colors">
                       <td className="py-3 px-3 border-r border-slate-300 font-bold">{g.grupo}</td>
-                      <td className="py-3 px-3 border-r border-slate-300 font-bold">{g.nome}</td>
-                      <td className="py-3 px-3 border-r border-slate-300">{g.descricao || "—"}</td>
-                      <td className="py-3 px-3 border-r border-slate-300">{g.laudo || "—"}</td>
+                      <td className="py-3 px-3 border-r border-slate-300 font-bold">{displayCanonical(g.nome, locale)}</td>
+                      <td className="py-3 px-3 border-r border-slate-300">{g.descricao ? displayCanonical(g.descricao, locale) : "—"}</td>
+                      <td className="py-3 px-3 border-r border-slate-300">{g.laudo ? displayCanonical(g.laudo, locale) : "—"}</td>
                       <td className="py-3 px-3 text-right">
                         <div className="flex gap-2 justify-end">
                           <button onClick={() => setM15GrupoEditing(g)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400 cursor-pointer">{t('editar')}</button>
@@ -8714,7 +8716,7 @@ export default function QuestionarioView({
               <div className="flex flex-col gap-1.5 sm:w-64">
                 <label className="text-xs font-black text-black uppercase tracking-wider">{t('grupoTriagem')}</label>
                 <select className={selectInputCls} value={m15AdaptGrupoSel} onChange={e => setM15AdaptGrupoSel(Number(e.target.value))}>
-                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>{t('grupo')}{g.grupo} — {g.nome}</option>)}
+                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>{t('grupo')}{g.grupo} — {displayCanonical(g.nome, locale)}</option>)}
                 </select>
               </div>
               <div className="flex flex-col gap-1.5 sm:w-80">
@@ -8740,10 +8742,10 @@ export default function QuestionarioView({
                 <tbody className="divide-y divide-slate-300 text-sm text-black">
                   {m15Adaptacoes.filter(a => a.grupo === m15AdaptGrupoSel && (a.detalhe || "").trim() === (m15AdaptDetalheSel || "").trim()).map(a => (
                     <tr key={a.id} className="hover:bg-slate-50 transition-colors align-top">
-                      <td className="py-3 px-3 border-r border-slate-300 font-bold whitespace-nowrap">{PCD_TESTES_MAP[a.teste as PcdTesteKey]?.label ?? a.teste}</td>
+                      <td className="py-3 px-3 border-r border-slate-300 font-bold whitespace-nowrap">{displayValue(PCD_TESTES_MAP[a.teste as PcdTesteKey]?.label ?? a.teste)}</td>
                       <td className="py-3 px-3 border-r border-slate-300">
                         <select className={selectInputCls} value={a.status} onChange={e => saveM15Adaptacao({ ...a, status: e.target.value })}>
-                          {PCD_STATUS_ADAPTACAO.map(s => <option key={s} value={s}>{s}</option>)}
+                          {PCD_STATUS_ADAPTACAO.map(s => <option key={s} value={s}>{displayCanonical(s, locale)}</option>)}
                         </select>
                       </td>
                       <td className="py-3 px-3 border-r border-slate-300">
@@ -8769,7 +8771,7 @@ export default function QuestionarioView({
               <div className="flex flex-col gap-1.5 sm:w-56">
                 <label className="text-xs font-black text-black uppercase tracking-wider">{t('grupoTriagem')}</label>
                 <select className={selectInputCls} value={m15FaixasGrupoSel} onChange={e => setM15FaixasGrupoSel(Number(e.target.value))}>
-                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>{t('grupo')}{g.grupo} — {g.nome}</option>)}
+                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>{t('grupo')}{g.grupo} — {displayCanonical(g.nome, locale)}</option>)}
                 </select>
               </div>
               <div className="flex flex-col gap-1.5 sm:w-64">
@@ -8782,7 +8784,7 @@ export default function QuestionarioView({
               <div className="flex flex-col gap-1.5 sm:w-72">
                 <label className="text-xs font-black text-black uppercase tracking-wider">{t('teste')}</label>
                 <select className={selectInputCls} value={m15FaixasTesteSel} onChange={e => setM15FaixasTesteSel(e.target.value as PcdTesteKey)}>
-                  {PCD_TESTES.map(t => <option key={t.key} value={t.key}>{displayValue(t.label)} ({t.unidade})</option>)}
+                  {PCD_TESTES.map(testeCfg => <option key={testeCfg.key} value={testeCfg.key}>{displayValue(testeCfg.label)} ({displayValue(testeCfg.unidade)})</option>)}
                 </select>
               </div>
               <button onClick={() => ensureM15Faixas(m15FaixasGrupoSel, m15FaixasDetalheSel, m15FaixasTesteSel)} className="bg-black hover:bg-slate-900 text-white px-5 py-3 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black">{t('aplicar_faixas_de_referencia')}</button>
@@ -8806,7 +8808,7 @@ export default function QuestionarioView({
                       return (
                         <tr key={n} className="hover:bg-slate-50">
                           <td className="py-3 px-3 border-r border-slate-300 font-bold">{t('nota')}{n}</td>
-                          <td className="py-3 px-3 border-r border-slate-300 text-xs">{PCD_NOTAS_LABELS[n]}</td>
+                          <td className="py-3 px-3 border-r border-slate-300 text-xs">{displayValue(PCD_NOTAS_LABELS[n])}</td>
                           <td className="py-3 px-3 border-r border-slate-300 text-slate-400" colSpan={2}>{t('nao_configurada')}</td>
                           <td className="py-3 px-3 text-right">
                             <button onClick={() => addM15Faixa(m15FaixasGrupoSel, m15FaixasDetalheSel, m15FaixasTesteSel, n)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400 cursor-pointer">{t('criar')}</button>
@@ -8889,12 +8891,12 @@ export default function QuestionarioView({
                 <tbody className="divide-y divide-slate-300 text-sm text-black">
                   {m15Modalidades.map(m => (
                     <tr key={m.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-3 px-3 border-r border-slate-300 font-bold">{m.nome}</td>
+                      <td className="py-3 px-3 border-r border-slate-300 font-bold">{displayCanonical(m.nome, locale)}</td>
                       <td className="py-3 px-3 border-r border-slate-300 text-center font-black">{m.pesoVelAgil}</td>
                       <td className="py-3 px-3 border-r border-slate-300 text-center font-black">{m.pesoForcaExp}</td>
                       <td className="py-3 px-3 border-r border-slate-300 text-center font-black">{m.pesoMembrosSup}</td>
                       <td className="py-3 px-3 border-r border-slate-300 text-center font-black">{m.pesoCore}</td>
-                      <td className="py-3 px-3 border-r border-slate-300 text-xs">{m.descricao || "—"}</td>
+                      <td className="py-3 px-3 border-r border-slate-300 text-xs">{m.descricao ? displayCanonical(m.descricao, locale) : "—"}</td>
                       <td className="py-3 px-3 text-right">
                         <div className="flex gap-2 justify-end">
                           <button onClick={() => setM15MatrizEditing(m)} className="text-blue-700 hover:text-white font-bold text-xs bg-blue-100 hover:bg-blue-700 px-3 py-2 rounded-md border border-blue-400 cursor-pointer">{t('editar')}</button>
@@ -8915,7 +8917,7 @@ export default function QuestionarioView({
               <div className="flex flex-col gap-1.5 sm:w-72">
                 <label className="text-xs font-black text-black uppercase tracking-wider">{t('grupoTriagem')}</label>
                 <select className={selectInputCls} value={m15FunilGrupoSel} onChange={e => setM15FunilGrupoSel(Number(e.target.value))}>
-                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>{t('grupo')}{g.grupo} — {g.nome}</option>)}
+                  {[...m15Grupos].sort((a, b) => a.grupo - b.grupo).map(g => <option key={g.id} value={g.grupo}>{t('grupo')}{g.grupo} — {displayCanonical(g.nome, locale)}</option>)}
                 </select>
               </div>
               <button onClick={() => ensureM15Funil(m15FunilGrupoSel)} className="bg-black hover:bg-slate-900 text-white px-5 py-3 rounded-lg text-sm font-black transition-all shadow-md active:scale-95 cursor-pointer border border-black">{t('aplicar_regras_de_referencia')}</button>
@@ -9290,7 +9292,7 @@ export default function QuestionarioView({
                           <td className="py-4 px-4 align-top border-r border-slate-300">
                             <span className={`inline-flex items-center gap-1 px-2.5 py-1 border rounded-full text-[11px] font-black tracking-tight ${badgeStyle}`}>
                               <span>{emoji}</span>
-                              <span>{row.profile}</span>
+                              <span>{displayCanonical(row.profile, locale)}</span>
                             </span>
                           </td>
                           <td className="py-4 px-4 font-black text-slate-800 text-xs align-top border-r border-slate-300">

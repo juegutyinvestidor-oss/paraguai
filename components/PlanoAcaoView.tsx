@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   Folder,
   FolderOpen,
@@ -79,14 +79,15 @@ function formatSize(size?: number | null): string {
   return `${(size / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function formatDate(date?: string | null): string {
+function formatDate(date?: string | null, locale?: string): string {
   if (!date) return '—';
   const d = new Date(date);
   if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleDateString('pt-BR');
+  return d.toLocaleDateString(locale);
 }
 
 export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoViewProps) {
+  const locale = useLocale();
   const t = useTranslations('planoAcao');
   const ta = useTranslations('alunos');
   const [folders, setFolders] = React.useState<PlanoAcaoFolder[]>([]);
@@ -237,7 +238,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
       const objectUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = objectUrl;
-      a.download = file.name || 'plano.pdf';
+      a.download = file.name || t('nomeArquivoPadrao');
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -328,7 +329,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                 <div className="min-w-0">
                   <h3 className="text-sm font-bold text-[#dae2fd] truncate">{selectedFolder.name}</h3>
                   <p className="text-[10px] text-[#bdc8d1]/70">
-                    {t('arquivosCriada', { total: folderFiles.length, data: formatDate(selectedFolder.created_at) })}
+                    {t('arquivosCriada', { total: folderFiles.length, data: formatDate(selectedFolder.created_at, locale) })}
                   </p>
                 </div>
               </div>
@@ -379,7 +380,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                           </div>
                         </td>
                         <td className="px-5 py-3 text-xs text-[#bdc8d1]/70 whitespace-nowrap">{formatSize(file.size)}</td>
-                        <td className="px-5 py-3 text-xs text-[#bdc8d1]/70 whitespace-nowrap">{formatDate(file.created_at)}</td>
+                        <td className="px-5 py-3 text-xs text-[#bdc8d1]/70 whitespace-nowrap">{formatDate(file.created_at, locale)}</td>
                         <td className="px-5 py-3">
                           <div className="flex items-center justify-end gap-1.5">
                             <button
@@ -468,7 +469,7 @@ export default function PlanoAcaoView({ user, runWithPermission }: PlanoAcaoView
                       </div>
                       <h3 className="mt-4 text-sm font-bold text-[#dae2fd] truncate">{folder.name}</h3>
                       <p className="mt-1 text-[11px] text-[#bdc8d1]/70">
-                        {t('arquivosData', { total: count, data: formatDate(folder.created_at) })}
+                        {t('arquivosData', { total: count, data: formatDate(folder.created_at, locale) })}
                       </p>
                       <p className="mt-3 text-[10px] font-semibold text-[#38bdf8] group-hover:underline">{t('abrirPasta')}</p>
                     </button>

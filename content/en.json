@@ -106,5 +106,1298 @@
       "status": "Risk factor",
       "description": "The index indicates a risk factor for cardiovascular and joint health. A low-impact physical activity plan (such as swimming or brisk walking) is recommended, combined with nutritional monitoring to ensure the student's safety and well-being."
     }
+  },
+  "m9_health_questions": {
+    "hq1": {
+      "statement": "Have you been feeling well and energetic?"
+    },
+    "hq2": {
+      "statement": "Have you been feeling sad?"
+    },
+    "hq3": {
+      "statement": "Have you been feeling lonely?"
+    },
+    "hq5": {
+      "statement": "Have you been able to do the things you want in your free time?"
+    },
+    "hq4": {
+      "statement": "Have you had enough time for yourself?"
+    },
+    "hq6": {
+      "statement": "Have your parents treated you fairly?"
+    },
+    "hq7": {
+      "statement": "Have you been having fun with your friends?"
+    },
+    "hq8": {
+      "statement": "Have you been doing well at school/with your studies?"
+    },
+    "hq9": {
+      "statement": "Have you been able to pay attention/concentrate?"
+    },
+    "hq10": {
+      "statement": "Have you been feeling depressed or hopeless?"
+    }
+  },
+  "m10_oral_questions": {
+    "oq1": {
+      "statement": "I don't worry much about going to the dentist."
+    },
+    "oq2": {
+      "statement": "My gums bleed when I brush my teeth."
+    },
+    "oq4": {
+      "statement": "I notice a sticky film/dirt (plaque) on my teeth."
+    },
+    "oq3": {
+      "statement": "I worry a lot about the color of my teeth."
+    },
+    "oq6": {
+      "statement": "I think it's impossible to prevent gum problems just by brushing my teeth."
+    },
+    "oq5": {
+      "statement": "I use a toothbrush with hard bristles."
+    },
+    "oq7": {
+      "statement": "I usually brush my teeth right after every meal."
+    },
+    "oq9": {
+      "statement": "I use a brushing technique recommended by my dentist."
+    },
+    "oq8": {
+      "statement": "I feel I already clean my teeth well without needing to use dental floss."
+    },
+    "oq10": {
+      "statement": "I feel my teeth are getting worse even though I brush every day."
+    },
+    "oq11": {
+      "statement": "I've been told I have fresh breath."
+    },
+    "oq13": {
+      "statement": "I worry about the alignment or shape of my teeth."
+    },
+    "oq12": {
+      "statement": "I examine my teeth closely in the mirror after brushing."
+    },
+    "oq15": {
+      "statement": "I feel my teeth never get completely clean."
+    },
+    "oq14": {
+      "statement": "I'm afraid of feeling pain at the dentist."
+    },
+    "oq16": {
+      "statement": "I brush my tongue frequently."
+    },
+    "oq17": {
+      "statement": "I use mouthwash almost every day."
+    },
+    "oq18": {
+      "statement": "I feel I brush my teeth too hard."
+    },
+    "oq19": {
+      "statement": "I use dental floss at least once a day."
+    },
+    "oq20": {
+      "statement": "I only go to the dentist when I'm feeling some pain."
+    }
+  },
+  "m11_autoconcept_questions": {
+    "aq1": {
+      "statement": "I feel I am a person of worth, at least as much as others."
+    },
+    "aq2": {
+      "statement": "I have a positive attitude toward myself."
+    },
+    "aq4": {
+      "statement": "I am able to do things as well as most other people."
+    },
+    "aq3": {
+      "statement": "Overall, I tend to think I am a failure."
+    },
+    "aq5": {
+      "statement": "I feel there isn't much I can be proud of."
+    },
+    "aq7": {
+      "statement": "Overall, I am satisfied with myself."
+    },
+    "aq6": {
+      "statement": "I feel I have positive qualities."
+    },
+    "aq8": {
+      "statement": "Sometimes I think I'm no good at anything."
+    },
+    "aq9": {
+      "statement": "Sometimes I feel useless."
+    },
+    "aq10": {
+      "statement": "I wish I had more respect for myself."
+    }
+  },
+  "m13_snap_questions": {
+    "sq6": {
+      "statement": "Avoids, dislikes, or takes part reluctantly in tasks that require prolonged mental effort."
+    },
+    "sq4": {
+      "statement": "Does not follow instructions to the end and does not finish schoolwork, chores, or duties."
+    },
+    "sq5": {
+      "statement": "Has difficulty organizing tasks and activities."
+    },
+    "sq7": {
+      "statement": "Loses things needed for activities (e.g., toys, schoolwork, pencils, or books)."
+    },
+    "sq8": {
+      "statement": "Is distracted by external stimuli."
+    },
+    "sq9": {
+      "statement": "Is forgetful in daily activities."
+    },
+    "sq12": {
+      "statement": "Runs about or climbs excessively in situations where it is inappropriate."
+    },
+    "sq13": {
+      "statement": "Has difficulty playing or engaging in leisure activities calmly."
+    },
+    "sq11": {
+      "statement": "Leaves their seat in the classroom or in other situations where sitting is expected."
+    },
+    "sq10": {
+      "statement": "Fidgets with their hands or feet or squirms in their seat."
+    },
+    "sq14": {
+      "statement": "Does not stop or is often “going a mile a minute”."
+    },
+    "sq15": {
+      "statement": "Talks excessively."
+    },
+    "sq17": {
+      "statement": "Has difficulty waiting their turn."
+    },
+    "sq18": {
+      "statement": "Interrupts others or intrudes (for example: intrudes on conversations, games, etc.)."
+    },
+    "sq16": {
+      "statement": "Answers questions hastily before they have been finished."
+    },
+    "sq1": {
+      "statement": "Cannot pay close attention to details or makes careless mistakes in schoolwork or tasks."
+    },
+    "sq3": {
+      "statement": "Seems not to be listening when spoken to directly."
+    },
+    "sq2": {
+      "statement": "Has difficulty sustaining attention in tasks or leisure activities."
+    }
+  },
+  "m14_aq10_questions": {
+    "aq10q11": {
+      "statement": "He/she always notices patterns/categories in things."
+    },
+    "aq10q1": {
+      "statement": "He/she often notices small sounds that go unnoticed by other people."
+    },
+    "aq10q12": {
+      "statement": "He/she usually focuses more on the image or situation as a whole than on small details."
+    },
+    "aq10q2": {
+      "statement": "He/she usually focuses more on the image or situation as a whole than on its small details."
+    },
+    "aq10q3": {
+      "statement": "When in a social group, he/she can easily follow conversations with several people."
+    },
+    "aq10q13": {
+      "statement": "When in a social group, he/she can easily follow conversations with several people."
+    },
+    "aq10q4": {
+      "statement": "He/she can easily do more than one thing at a time."
+    },
+    "aq10q14": {
+      "statement": "If interrupted, he/she can quickly return to what they were doing."
+    },
+    "aq10q5": {
+      "statement": "He/she does not know how to maintain a conversation with peers."
+    },
+    "aq10q15": {
+      "statement": "He/she often realizes they do not know how to maintain a conversation."
+    },
+    "aq10q16": {
+      "statement": "Socially, he/she is a good conversationalist."
+    },
+    "aq10q6": {
+      "statement": "Socially, he/she is a good conversationalist."
+    },
+    "aq10q17": {
+      "statement": "When he/she was younger, he/she liked to play make-believe with other children."
+    },
+    "aq10q7": {
+      "statement": "While reading a story, he/she has difficulty understanding the intentions and emotions of the characters."
+    },
+    "aq10q8": {
+      "statement": "In preschool, he/she liked to play make-believe games with other children."
+    },
+    "aq10q18": {
+      "statement": "He/she has difficulty imagining what it would be like to be another person."
+    },
+    "aq10q9": {
+      "statement": "He/she can easily tell what someone is thinking or feeling just by looking at their face."
+    },
+    "aq10q19": {
+      "statement": "He/she finds social situations easy."
+    },
+    "aq10q20": {
+      "statement": "He/she has difficulty making new friends."
+    },
+    "aq10q10": {
+      "statement": "He/she has difficulty making new friends."
+    }
+  },
+  "ias_questions": {
+    "iq1": {
+      "statement": "Total Fruits (including natural juices)",
+      "option_1_text": "I rarely or never eat fruit.",
+      "option_2_text": "I eat 1 serving per day (e.g., 1 slice of watermelon or 1 apple).",
+      "option_3_text": "I eat 2 or more servings of fruit every day."
+    },
+    "iq3": {
+      "statement": "Total Vegetables (raw or cooked greens and vegetables)",
+      "option_1_text": "I rarely or never eat vegetables.",
+      "option_2_text": "I eat vegetables in only 1 meal (lunch or dinner only).",
+      "option_3_text": "I eat vegetables at lunch and dinner every day."
+    },
+    "iq2": {
+      "statement": "Whole Fruits (only whole fruit/pieces, no juices)",
+      "option_1_text": "I only drink juice or do not eat fruit.",
+      "option_2_text": "I eat at least 1 whole fruit on most days.",
+      "option_3_text": "I eat 2 or more whole fruits every day (ensuring fiber)."
+    },
+    "iq4": {
+      "statement": "Dark Vegetables and Legumes (broccoli, kale, spinach, beans, lentils...)",
+      "option_1_text": "I rarely or never eat these foods.",
+      "option_2_text": "I eat beans or dark vegetables 3 to 4 times a week.",
+      "option_3_text": "I eat beans and/or dark green vegetables almost every day."
+    },
+    "iq5": {
+      "statement": "Whole Grains (brown rice, oats, whole wheat bread, flaxseed, chia)",
+      "option_1_text": "I only eat refined grains (white rice, white bread, regular pasta).",
+      "option_2_text": "I eat at least 1 serving of a whole grain or seeds per day.",
+      "option_3_text": "Most of my daily grains are whole (2 or more servings per day)."
+    },
+    "iq6": {
+      "statement": "Dairy (milk, cheese, yogurt - preferably lower in fat)",
+      "option_1_text": "I do not consume dairy (or calcium-fortified plant-based alternatives).",
+      "option_2_text": "I consume 1 to 2 servings per day.",
+      "option_3_text": "I consume 3 servings per day (the standard calcium recommendation)."
+    },
+    "iq7": {
+      "statement": "Meats, Eggs, and Legumes (general sources of protein)",
+      "option_1_text": "Very low protein intake throughout the day.",
+      "option_2_text": "I eat protein in only one of the main meals.",
+      "option_3_text": "I eat healthy sources spread across lunch, dinner, and snacks."
+    },
+    "iq9": {
+      "statement": "Sodium (table salt and salty foods)",
+      "option_1_text": "I use a lot of salt, use ready-made seasonings (cubes), and eat many processed meats/salty snacks.",
+      "option_2_text": "I use salt moderately, but still consume some salty processed foods.",
+      "option_3_text": "I eat low-salt foods, favor natural seasonings, and avoid ultra-processed foods."
+    },
+    "iq8": {
+      "statement": "Fish and Sources of Healthy Fats (sardines/tuna, olive oil, nuts, avocado)",
+      "option_1_text": "I do not eat these foods or use only common vegetable oils.",
+      "option_2_text": "I use olive oil regularly, or eat nuts/avocado a few times a week.",
+      "option_3_text": "I eat fish at least 2 times a week AND use healthy fats daily."
+    },
+    "iq10": {
+      "statement": "Saturated Fat (fatty meats, chicken skin, butter, coconut oil, yellow cheeses)",
+      "option_1_text": "I eat very fatty meats, fried foods, and fatty cheeses almost daily.",
+      "option_2_text": "I consume it moderately; I alternate lean/fatty meats and limit butter.",
+      "option_3_text": "Very low saturated fat diet (I favor lean meats and grilled foods)."
+    },
+    "iq11": {
+      "statement": "Calories from Empty Sources (added sugar, sweets, soft drinks, alcohol, and solid fats)",
+      "option_1_text": "I eat sweets, drink soda, or consume sugary/alcoholic beverages every day.",
+      "option_2_text": "I consume these items moderately (2 to 3 times a week).",
+      "option_3_text": "I rarely consume (less than once a week) refined sugar, soda, or alcohol."
+    }
+  },
+  "m2_modalidades_config": {
+    "m2-7": {},
+    "m2-4": {},
+    "m2-5": {},
+    "m2-6": {},
+    "m2-8": {},
+    "m2-1": {},
+    "m2-2": {},
+    "m2-3": {}
+  },
+  "m3_cenarios": {
+    "c3": {
+      "cenario": "SCENARIO C",
+      "condicao": "No attendance or absence recorded",
+      "frequencia": "To date, no attendance or absence records have been identified for the student in the system during this period. The absence of data prevents an accurate assessment of school monitoring, making immediate verification with the school office or pedagogical team essential to regularize the records.",
+      "mensagem": "We ask you to contact the school office to regularize the records. We have found that no attendance or absence entries have been made to date, which prevents proper monitoring of the student's routine."
+    },
+    "c1": {
+      "cenario": "SCENARIO A",
+      "condicao": "More attendances than absences",
+      "frequencia": "The student demonstrated excellent regularity and commitment to the school routine throughout this month. The low absentee rate reflects a participatory and engaged attitude toward the learning environment.",
+      "mensagem": "Congratulations on your encouragement and partnership. Consistent attendance has been the pillar of the good results achieved so far."
+    },
+    "c2": {
+      "cenario": "SCENARIO B",
+      "condicao": "More absences than attendances",
+      "frequencia": "We identified a critical number of absences in this period, exceeding the days attended in class. This pattern of excessive absences raises a pedagogical alert, as it interrupts the teaching sequence and hinders the absorption of the content taught.",
+      "mensagem": "We request special attention and a family dialogue to identify the reason for the absences. It is essential to restore the routine of attending school to avoid severe setbacks in the final assessment of this cycle."
+    }
+  },
+  "m3_impactos": {
+    "i1": {
+      "tipo": "Advantage (Strength)",
+      "indicador": "Pedagogical Continuity, Socialization and Assessment Pace",
+      "descricao": "When present, the student follows explanations step by step, making it easier to carry out complex tasks. Daily interaction strengthens bonds with teachers and peers, developing emotional intelligence and teamwork. Less need for substitute tests or grade-recovery assignments due to missed deadlines."
+    },
+    "i2": {
+      "tipo": "Disadvantage (Point of Attention)",
+      "indicador": "Content Gaps, School Disengagement and Task Overload",
+      "descricao": "Each absence results in the loss of key concepts, accumulating doubts for the following units. Excessive absences disrupt the student's routine, leading to demotivation and a sense of isolation from the class. Pending activities pile up and must be completed at home to meet the requirements of the school year."
+    }
+  },
+  "m5_capacidades_config": {
+    "v1": {
+      "health_status": "The ability to move quickly and reaction time are below expectations for the age. In health terms, this indicates a neuromuscular system with slow responses to external stimuli and low cardiovascular efficiency in explosive efforts, causing early fatigue and shortness of breath in short runs.",
+      "to_improve": "The student needs to develop stride efficiency and pace gain. The initial focus should be on running drills (such as lifting the knees and heels), coordinating breathing and arm movement to unlock foot agility and improve basic aerobic conditioning.",
+      "recommendation": "We encourage stimulation at home through games that require quick starts, such as capture the flag, backyard obstacle courses, or timed circuits."
+    },
+    "v4": {
+      "health_status": "Exceptional physical performance. The student has a very short reaction time and impressive acceleration, reaching maximum speed with ease. The cardiorespiratory system and skeletal muscles show very high metabolic efficiency and perfect neuromuscular coordination.",
+      "to_improve": "The goal now is to preserve this high performance and prevent injuries. Because this generates a great deal of force and speed, the student should focus on thorough warm-ups before training and on flexibility exercises to keep muscles long, elastic, and protected against strains.",
+      "recommendation": "Congratulations on the excellent physical vigor. We will continue to offer high-intensity challenges in class to keep the student motivated and healthy."
+    },
+    "f3": {
+      "health_status": "Healthy level and fully appropriate for the age. The student shows excellent muscle density and tone, safely sustaining impact movements. This strength acts as a protective shield for the joints, boosting metabolism and ensuring excellent posture.",
+      "to_improve": "Although the level is safe, the student can improve strength symmetry (balance between the right and left sides of the body). Unilateral exercises will help refine the movement and prepare the body for the transition to the excellent level.",
+      "recommendation": "Congratulations on the excellent physical support. We will continue with challenging stimuli in class to maintain the student's muscular health."
+    },
+    "ab2": {
+      "health_status": "The student has basic abdominal strength but tires very quickly when trying to sustain the effort. This early fatigue causes them to compensate with other parts of the body, destabilizing the trunk during runs and games.",
+      "to_improve": "The focus should be on gradually increasing the duration of the exercises. Training consistency and the rhythm of repetitions will help stabilize the trunk and protect the spine for longer periods.",
+      "recommendation": "We encourage daily stimulation at home through quick challenges, such as games involving the plank position or leg raises."
+    },
+    "i3": {
+      "health_status": "The level is healthy and adequate. The student shows a good neuromuscular response and can overcome gravity with ease. This condition protects the spine and absorbs impacts safely during games and runs.",
+      "to_improve": "Although at a safe level, the student can improve stability at landing. Training should focus on balance to progress from the good level to the excellent level.",
+      "recommendation": "Congratulations on the excellent physical record. We will continue challenging the student in class to maintain this standard of excellence."
+    },
+    "i1": {
+      "health_status": "The jump index is below expectations for the age group. This indicates low power and lack of activation of the leg muscles. In health terms, this compromises impact absorption and weakens the structure of the knee and ankle joints.",
+      "to_improve": "The student urgently needs to develop takeoff strength. It is necessary to correct squat posture and jumping mechanics to prevent injuries in simple everyday activities.",
+      "recommendation": "We encourage support for dynamic activities at home, such as jumping rope and jumping games."
+    },
+    "v3": {
+      "health_status": "Healthy level and fully appropriate for the age group. The student reacts quickly to stimuli and maintains excellent movement speed. This pattern reflects a strong heart, great respiratory capacity, and conditioned muscles, promoting excellent energy expenditure and vitality in daily life.",
+      "to_improve": "Although within a safe and healthy range, the student can work on maintaining this speed over slightly longer distances. The focus should be on training speed endurance to avoid abrupt drops in performance at the end of activities.",
+      "recommendation": "Congratulations on the excellent physical vigor. We will continue to offer high-intensity challenges in class to keep the student motivated and healthy."
+    },
+    "ab3": {
+      "health_status": "Healthy level and within the recommended standard. The student shows good trunk support, which ensures body stability, improves balance, and protects the lower back against impacts generated by jumps and runs.",
+      "to_improve": "Although the level is safe, the student can balance training by working on abdominal variations (such as the lateral/oblique region). This will improve trunk rotation in sports and consolidate progress toward the excellent level.",
+      "recommendation": "Congratulations on the excellent physical condition. We will maintain challenging stimuli in class to preserve this excellent postural support."
+    },
+    "v2": {
+      "health_status": "The student can run at a steady pace but has difficulty accelerating quickly at the start or changing pace abruptly. Cardiovascular health supports the effort, but the leg muscles waste excess energy due to poor fine coordination and stride power.",
+      "to_improve": "The focus should be on gaining acceleration and explosive technique. Short sprints with full recovery between them are recommended, along with quick-reaction games, teaching the body to recruit fast muscle fibers more efficiently.",
+      "recommendation": "We encourage stimulation at home through games that require quick starts, such as capture the flag, backyard obstacle courses, or timed circuits."
+    },
+    "a2": {
+      "health_status": "The student can change direction but loses balance or speed during the movement. There is a functional motor base, but the joints lack efficiency in transferring body weight from one side to the other smoothly, using more energy than necessary.",
+      "to_improve": "The focus should be on technical refinement. Training with cone circuits and agility ladders is recommended to improve footwork and rapid movement transitions, increasing joint safety.",
+      "recommendation": "We encourage practicing traditional street games at home, such as tag, dodgeball, or zigzag circuits drawn on the floor."
+    },
+    "ab4": {
+      "health_status": "Exceptional physical performance. The student has excellent muscular endurance in the central region of the body. This results in impeccable posture, very high movement efficiency, and maximum protection of the spine under any type of load or effort.",
+      "to_improve": "The goal now is to maintain the standard. Integrating this abdominal strength with flexibility exercises and stretching of the posterior chain is recommended to avoid any type of muscle stiffness.",
+      "recommendation": "Congratulations on the excellent physical condition. We will maintain challenging stimuli in class to preserve this excellent postural support."
+    },
+    "i2": {
+      "health_status": "The student has a strength base but lacks muscular explosiveness. Physical performance fluctuates and uses more energy than necessary to perform jumps. The health structure is stable, but fatigue sets in quickly during circuits.",
+      "to_improve": "The focus should be on coordinating arm and leg movement during the jump. Repetitive low-jump exercises will help turn current strength into real power.",
+      "recommendation": "We encourage support for dynamic activities at home, such as jumping rope and jumping games."
+    },
+    "a4": {
+      "health_status": "Exceptional physical performance. The student shows an impressive reaction speed and perfect control of the center of gravity when changing direction. Their proprioceptive system (the body's ability to recognize its own position) is highly effective, ensuring maximum protection against injuries.",
+      "to_improve": "The current goal is to maintain this high performance. Integrating agility movements with complex decision-making and the use of implements (such as balls) is recommended, preparing the student for high performance in real game scenarios.",
+      "recommendation": "Congratulations on the excellent agility and motor readiness. We will continue challenging the student with complex dynamics in class."
+    },
+    "i4": {
+      "health_status": "Exceptional physical performance. The student has excellent lower-limb power and impeccable motor coordination. The musculoskeletal system is highly protected and prepared for high-intensity physical challenges.",
+      "to_improve": "The focus now is maintaining this capacity. Increasing flexibility is recommended so that high power does not lead to muscle stiffness.",
+      "recommendation": "Congratulations on the excellent physical record. We will continue challenging the student in class to maintain this standard of excellence."
+    },
+    "ab1": {
+      "health_status": "Abdominal endurance is below expectations. A weak core (the body's center of gravity) directly impairs posture, overloads the lumbar spine, and increases the risk of back pain and postural deviations in the medium term.",
+      "to_improve": "The student urgently needs to begin strengthening the core muscles. The focus should be on activating the abdomen through simple static exercises, correcting breathing and avoiding pulling on the neck during execution.",
+      "recommendation": "We encourage daily stimulation through quick challenges at home, such as games involving the plank position or leg raises."
+    },
+    "f1": {
+      "health_status": "The ability to overcome resistance and support one's own body is below expectations. In health terms, lack of muscle tone places direct overload on bones and ligaments and causes extreme fatigue in simple tasks, such as carrying a backpack or maintaining posture at the school desk.",
+      "to_improve": "The student urgently needs to develop foundational strength. The initial focus should be on simple calisthenic exercises (using body weight), such as knee push-ups on the floor and adapted free squats, strictly focusing on correct execution to gain protective lean mass.",
+      "recommendation": "We encourage playful strength activities at home, such as tug-of-war, climbing playground equipment (jungle gyms), or games involving carrying light objects."
+    },
+    "f2": {
+      "health_status": "The student has functional strength for routine activities but fails or loses body alignment when exposed to slightly longer efforts. The health structure is stable, but the stabilizing muscles tire quickly, causing postural compensations during games.",
+      "to_improve": "The focus should be on gradually increasing strength endurance. Functional circuits with small implements (such as resistance bands or light medicine balls) are recommended to consolidate the muscle structure and protect the skeletal system.",
+      "recommendation": "We encourage playful strength activities at home, such as tug-of-war, climbing playground equipment (jungle gyms), or games involving carrying light objects."
+    },
+    "a1": {
+      "health_status": "The ability to change direction quickly is below expectations. The student has difficulty braking and readjusting the body with control. In health terms, lack of agility and coordination significantly increases the risk of falls, ankle sprains, and knee ligament injuries during abrupt movements.",
+      "to_improve": "The student urgently needs to develop reaction time and body awareness. The initial focus should be on controlled deceleration exercises and lateral stride drills, learning to lower the center of gravity to gain stability.",
+      "recommendation": "We encourage practicing traditional street games at home, such as tag, dodgeball, or zigzag circuits drawn on the floor."
+    },
+    "f4": {
+      "health_status": "Exceptional physical performance. The student demonstrates a very high capacity to generate muscle tension and power. The skeletal system is fully protected against impact injuries, and the muscles show excellent metabolic efficiency and recovery capacity.",
+      "to_improve": "The goal now is to ensure the longevity of this performance. Maximum-strength training should be combined with rigorous stretching and flexibility sessions, avoiding muscle shortening and loss of joint range of motion.",
+      "recommendation": "Congratulations on the excellent physical support. We will continue with challenging stimuli in class to maintain the student's muscular health."
+    },
+    "a3": {
+      "health_status": "Healthy level and fully appropriate for the age group. The student demonstrates excellent body control, braking and changing direction safely and with stability. This agility protects the joints against overload and reflects a well-developed neuromuscular system.",
+      "to_improve": "Although the level is safe and protective, the student can improve movement efficiency by reducing hesitation time before changing direction. Introducing surprise visual or auditory stimuli will further refine reaction time.",
+      "recommendation": "Congratulations on the excellent agility and motor readiness. We will continue challenging the student with complex dynamics in class."
+    }
+  },
+  "m6_modalidades_direcionamento": {
+    "m6_v1": {
+      "valencias": "Jump Power, Agility and Abdominals.",
+      "condition": "Good / Excellent levels in Jump Power and Agility",
+      "report": "Stands out for high jump power and excellent times in agility tests, responding very well to stimuli that require quick reactions."
+    },
+    "m6_a1": {
+      "valencias": "Speed, Jump Power and Muscle Strength.",
+      "condition": "Good / Excellent levels in Speed and Jump Power",
+      "report": "Shows excellent speed and jump power indices in the tests. This combination indicates a great capacity for explosive power for the sport."
+    },
+    "m6_f1": {
+      "valencias": "Speed, Agility and Jump Power.",
+      "condition": "Good / Excellent levels in Speed and Agility",
+      "report": "Demonstrates excellent performance in speed and agility tests. Shows great ease in accelerating and changing direction quickly."
+    },
+    "m6_g1": {
+      "valencias": "Abdominals, Muscle Strength and Agility.",
+      "condition": "Good / Excellent levels in Abdominals and Muscle Strength",
+      "report": "Shows excellent results in strength and abdominal endurance tests. This base ensures excellent support, firmness, and stable body control."
+    },
+    "m6_b1": {
+      "valencias": "Jump Power, Agility and Speed.",
+      "condition": "Good / Excellent levels in Jump Power and Speed",
+      "report": "Stands out for excellent performance in jump power and speed tests. Demonstrates the ability to perform quick starts and efficient vertical jumps."
+    },
+    "m6_n1": {
+      "valencias": "Muscle Strength, Abdominals and Speed.",
+      "condition": "Good / Excellent levels in Muscle Strength and Abdominals",
+      "report": "Shows excellent levels of muscle strength and abdominal endurance in the tests. This physical structure offers excellent support for keeping the body firm and powerful."
+    },
+    "m6_h1": {
+      "valencias": "Speed, Agility and Muscle Strength.",
+      "condition": "Good / Excellent levels in Speed and Muscle Strength",
+      "report": "Speed and strength tests indicate a highly powerful physical profile. Has excellent acceleration capacity and muscle force application."
+    },
+    "m6_l1": {
+      "valencias": "Muscle Strength, Abdominals and Agility.",
+      "condition": "Good / Excellent levels in Muscle Strength and Abdominals",
+      "report": "Shows high performance in strength and abdominal endurance tests. Has a firm core, ideal for body stability and endurance."
+    }
+  },
+  "m6_diretrizes_intervencao": {
+    "m6_d1": {
+      "diretriz": "REFINE MOTOR SKILLS",
+      "criterio": "This pathway should be adopted if three or more physical capacities are at Insufficient or Regular levels.",
+      "conduta": "We do not recommend that the young person focus on a single sport or take part in rigid competitions at this time. The ideal now is to prioritize functional circuits, activities that mix several sports, and cooperative games, stimulating general motor development.",
+      "objetivo": "The main goal is to strengthen and prepare the young person's body safely. We will focus on gaining lean mass, improving posture and overall coordination, ensuring the body is protected before moving on to heavier training."
+    }
+  },
+  "aptidao_referenciais": {
+    "f-1": {
+      "insuficiente": "0 to 1",
+      "regular": "2",
+      "bom": "3",
+      "excelente": "4 or more"
+    },
+    "f-2": {
+      "insuficiente": "0 to 1",
+      "regular": "2",
+      "bom": "3",
+      "excelente": "4 or more"
+    },
+    "f-3": {
+      "insuficiente": "0 to 2",
+      "regular": "3 to 4",
+      "bom": "5 to 6",
+      "excelente": "7 or more"
+    },
+    "f-4": {
+      "insuficiente": "0 to 1",
+      "regular": "2 to 3",
+      "bom": "4 to 5",
+      "excelente": "6 or more"
+    },
+    "f-5": {
+      "insuficiente": "0 to 3",
+      "regular": "4 to 5",
+      "bom": "6 to 7",
+      "excelente": "8 or more"
+    },
+    "f-6": {
+      "insuficiente": "0 to 2",
+      "regular": "3 to 4",
+      "bom": "5 to 6",
+      "excelente": "7 or more"
+    },
+    "f-7": {
+      "insuficiente": "0 to 4",
+      "regular": "5 to 6",
+      "bom": "7 to 8",
+      "excelente": "9 or more"
+    },
+    "f-8": {
+      "insuficiente": "0 to 4",
+      "regular": "5 to 6",
+      "bom": "7 to 8",
+      "excelente": "9 or more"
+    },
+    "f-9": {
+      "insuficiente": "0 to 6",
+      "regular": "7 to 9",
+      "bom": "10 to 11",
+      "excelente": "12 or more"
+    },
+    "f-10": {
+      "insuficiente": "0 to 6",
+      "regular": "7 to 9",
+      "bom": "10 to 11",
+      "excelente": "12 or more"
+    },
+    "i-1": {
+      "insuficiente": "0 to 30",
+      "regular": "31 to 40",
+      "bom": "41 to 80",
+      "excelente": "81 or more"
+    },
+    "i-2": {
+      "insuficiente": "0 to 30",
+      "regular": "31 to 40",
+      "bom": "41 to 80",
+      "excelente": "81 or more"
+    },
+    "i-3": {
+      "insuficiente": "0 to 60",
+      "regular": "61 to 90",
+      "bom": "91 to 140",
+      "excelente": "141 or more"
+    },
+    "i-4": {
+      "insuficiente": "0 to 60",
+      "regular": "61 to 90",
+      "bom": "91 to 140",
+      "excelente": "141 or more"
+    },
+    "i-5": {
+      "insuficiente": "0 to 80",
+      "regular": "81 to 100",
+      "bom": "101 to 150",
+      "excelente": "151 or more"
+    },
+    "i-6": {
+      "insuficiente": "0 to 80",
+      "regular": "81 to 100",
+      "bom": "101 to 150",
+      "excelente": "151 or more"
+    },
+    "i-7": {
+      "insuficiente": "81 to 100",
+      "regular": "101 to 120",
+      "bom": "121 to 180",
+      "excelente": "181 or more"
+    },
+    "i-8": {
+      "insuficiente": "81 to 100",
+      "regular": "101 to 120",
+      "bom": "121 to 180",
+      "excelente": "181 or more"
+    },
+    "i-9": {
+      "insuficiente": "101 to 120",
+      "regular": "121 to 180",
+      "bom": "181 to 200",
+      "excelente": "201 or more"
+    },
+    "i-10": {
+      "insuficiente": "101 to 120",
+      "regular": "121 to 180",
+      "bom": "181 to 200",
+      "excelente": "201 or more"
+    },
+    "ag-1": {
+      "insuficiente": "17 or more",
+      "regular": "15 to 16",
+      "bom": "12 to 14",
+      "excelente": "11 or less"
+    },
+    "ag-2": {
+      "insuficiente": "17 or more",
+      "regular": "15 to 16",
+      "bom": "12 to 14",
+      "excelente": "11 or less"
+    },
+    "ag-3": {
+      "insuficiente": "16 or more",
+      "regular": "14 to 15",
+      "bom": "11 to 13",
+      "excelente": "10 or less"
+    },
+    "ag-4": {
+      "insuficiente": "16 or more",
+      "regular": "14 to 15",
+      "bom": "11 to 13",
+      "excelente": "10 or less"
+    },
+    "ag-9": {
+      "insuficiente": "14 or more",
+      "regular": "11 to 13",
+      "bom": "9 to 10",
+      "excelente": "8 or less"
+    },
+    "v-9": {
+      "insuficiente": "7.00 or more",
+      "regular": "5.81 to 6.99",
+      "bom": "3.81 to 5.80",
+      "excelente": "3.80 or less"
+    },
+    "ag-5": {
+      "insuficiente": "15 or more",
+      "regular": "13 to 14",
+      "bom": "12 to 10",
+      "excelente": "9 or less"
+    },
+    "ag-6": {
+      "insuficiente": "15 or more",
+      "regular": "13 to 14",
+      "bom": "12 to 10",
+      "excelente": "9 or less"
+    },
+    "ag-7": {
+      "insuficiente": "14 or more",
+      "regular": "11 to 13",
+      "bom": "9 to 10",
+      "excelente": "8 or less"
+    },
+    "ag-8": {
+      "insuficiente": "14 or more",
+      "regular": "11 to 13",
+      "bom": "9 to 10",
+      "excelente": "8 or less"
+    },
+    "v-1": {
+      "insuficiente": "7.00 or more",
+      "regular": "6.12 to 6.99",
+      "bom": "4.11 to 6.11",
+      "excelente": "4.10 or less"
+    },
+    "v-2": {
+      "insuficiente": "7.00 or more",
+      "regular": "6.12 to 6.99",
+      "bom": "4.11 to 6.11",
+      "excelente": "4.10 or less"
+    },
+    "v-3": {
+      "insuficiente": "7.00 or more",
+      "regular": "5.61 to 6.99",
+      "bom": "3.61 to 5.60",
+      "excelente": "3.60 or less"
+    },
+    "v-4": {
+      "insuficiente": "7.00 or more",
+      "regular": "5.81 to 6.99",
+      "bom": "3.81 to 5.80",
+      "excelente": "3.80 or less"
+    },
+    "v-5": {
+      "insuficiente": "7.00 or more",
+      "regular": "5.47 to 6.99",
+      "bom": "3.46 to 5.46",
+      "excelente": "3.45 or less"
+    },
+    "v-6": {
+      "insuficiente": "7.00 or more",
+      "regular": "5.69 to 6.99",
+      "bom": "3.68 to 5.68",
+      "excelente": "3.68 or less"
+    },
+    "v-7": {
+      "insuficiente": "7.00 or more",
+      "regular": "5.81 to 6.99",
+      "bom": "3.81 to 5.80",
+      "excelente": "3.80 or less"
+    },
+    "v-8": {
+      "insuficiente": "7.00 or more",
+      "regular": "5.17 to 6.99",
+      "bom": "3.16 to 5.16",
+      "excelente": "3.15 or less"
+    },
+    "a-1": {
+      "insuficiente": "Not applicable",
+      "regular": "0 to 29",
+      "bom": "Not applicable",
+      "excelente": "30 or more"
+    }
+  },
+  "m7_perfis_pareceres": {
+    "m7_4": {
+      "component": "Pedagogical Recommendations",
+      "basic_data": "Integrative Projects: Encourage coordinating teams at science fairs, school rallies, or the student council, where they need to apply concepts of planning, task delegation, and goal achievement.",
+      "reflection": "Market Immersion: Promote technical visits to local companies or conversations with professionals in finance, marketing, and management to align career expectations with the practical reality of the market."
+    },
+    "m7_1": {
+      "component": "Profile and Career Map",
+      "basic_data": "Aptitude for innovative environments. Potential to work in game design or web development.",
+      "reflection": "I identify in the student a mind that operates at the intersection of structured logic and aesthetic sensitivity. Their greatest competitive advantage is the ability to humanize technology. Fields such as game design and web development demand exactly this flexibility, since they require someone able to understand complex code without losing sight of the experience, beauty, and interactivity needed by the end user.",
+      "interest_area": "Excellent for game design or web development.",
+      "careers": "Hybrid"
+    },
+    "m7_2": {
+      "component": "Pedagogical Recommendations",
+      "basic_data": "Integrative Projects: Encourage participation in science fairs, student councils, or cultural exhibitions where they need to apply planning, creativity, and communication simultaneously.",
+      "reflection": "Market Immersion: Promote technical visits to universities or conversations with professionals in the most prominent fields to align career expectations with market reality."
+    },
+    "m7_8": {
+      "component": "Pedagogical Recommendations",
+      "basic_data": "Integrative Projects: Encourage leadership in math Olympiads, robotics competitions, development of small apps, or scale model and 3D modeling workshops, stimulating algorithmic and spatial thinking.",
+      "reflection": "Market Immersion: Promote guided visits to technology hubs, academic laboratories, and engineering or architecture offices, bringing the young person closer to the real challenges of infrastructure, code, and innovation."
+    },
+    "m7_6": {
+      "component": "Pedagogical Recommendations",
+      "basic_data": "Integrative Projects: Encourage involvement in science fairs with an ecological/sustainable focus or cultural and artistic exhibitions, allowing them to combine biological research with creative expression.",
+      "reflection": "Market Immersion: Promote guided tours of research laboratories, clinics, communication agencies, and design studios so the young person can understand the practical, day-to-day work of these fields in today's market."
+    },
+    "m7_10": {
+      "component": "Pedagogical Recommendations",
+      "basic_data": "Integrative Projects: Encourage a leading role in school debates, simulations of international committees (such as UN models), writing for school newspapers, or coordinating community-based social campaigns and projects.",
+      "reflection": "Market Immersion: Foster contact with professional reality through guided visits to courts, psychology institutes, communication agencies, or spaces for pedagogical innovation, helping the young person understand the real impact of these careers."
+    },
+    "m7_7": {
+      "component": "Profile and Career Map",
+      "basic_data": "Basic Data: Profile stimulated by solving logical problems, ease with numerical data, and a deep interest in deciphering how new technologies work.\n\nAssociated Careers: Engineering, Computer Science, Mathematics, Physics, Architecture, and Information Technology.",
+      "reflection": "We diagnose in the student a predominantly abstract, analytical, and deductive cognitive structure. Their mind operates systemically and finds motivation in discovering patterns, equations, and data architecture. The young person is not content to be merely a passive user of digital tools and modern world constructions; there is an intrinsic intellectual curiosity to understand the \"how\" and \"why\" behind technological and structural mechanisms. This inclination toward methodological precision provides a solid foundation for careers in software development or engineering, environments where logical rigor serves as the raw material for designing and building tomorrow's solutions.",
+      "interest_area": "You enjoy solving logical problems, working with numbers, and understanding how technologies work.",
+      "careers": "Engineering, Computer Science, Mathematics, Physics, Architecture, and Information Technology."
+    },
+    "m7_3": {
+      "component": "Profile and Career Map",
+      "basic_data": "Basic Data: Active leadership spirit, interest in organizing processes, managing resources, and devising strategies.\n\nAssociated Careers: Business Administration, Economics, Accounting, Marketing, Logistics, and Human Resource Management.",
+      "reflection": "I observe in the student a cognitive structure essentially oriented toward efficiency, pragmatism, and systemic thinking. Their mind easily grasps the big picture of complex scenarios, ordering priorities and distributing resources with precision. Leadership, in this profile, is not merely a position of command but a natural ability to bring people together around a common goal. Their inclination to devise strategies and manage processes indicates a robust potential for making assertive decisions and mitigating risks in dynamic corporate and economic environments.",
+      "interest_area": "You have a leadership spirit, enjoy organizing, managing resources, and devising strategies.",
+      "careers": "Business Administration, Economics, Accounting, Marketing, Logistics, and Human Resource Management."
+    },
+    "m7_9": {
+      "component": "Profile and Career Map",
+      "basic_data": "Basic Data: Profile grounded in the ability to communicate clearly, strong empathy for welcoming and helping others, and a critical interest in understanding the structures of society.\n\nAssociated Careers: Law, Languages and Literature, Education, Psychology, History, Journalism, and International Relations.",
+      "reflection": "The central axis of this profile's development is entirely aligned with the human factor and its complex collective interactions. The student demonstrates a remarkable aptitude for active listening, the practice of empathy, and the verbal articulation of abstract ideas. Their mind is stimulated by analyzing social phenomena, human rights, and the narratives that shape our culture. Far from being merely a theoretical inclination, this profile reflects an intelligence oriented toward practical transformation and conflict mediation. The young person shows latent potential to exercise leadership in environments that demand ethical responsibility, whether defending legal causes, educating, promoting mental health, or communicating essential information to the community.",
+      "interest_area": "You enjoy communicating, helping people, and understanding society.",
+      "careers": "Law, Languages and Literature, Education, Psychology, History, Journalism, and International Relations."
+    },
+    "m7_5": {
+      "component": "Profile and Career Map",
+      "basic_data": "Basic Data: Profile driven by creativity. Shows a strong desire to invent, innovate, or has a deep interest in the study of life, well-being, and health.\n\nAssociated Careers: Medicine, Biology, Design, Advertising, Visual Arts, Physical Education, and Veterinary Medicine.",
+      "reflection": "I observe in the student a unique combination of inventive sensitivity and organic empathy. This profile moves away from strict, traditional scientism; instead, it finds motivation in applying creative solutions to challenges involving living beings and human expression. Their mind is guided by the need to discover new alternatives, to heal, to design, or to transform the environment. The strong presence of creativity in this macro-area indicates that the young person can think \"outside the box\" when facing complex health or visual communication problems, making them ideal for careers that require innovation in caring for life or developing new aesthetic concepts.",
+      "interest_area": "You are driven by creativity, enjoy inventing, innovating, or have a strong interest in life and health.",
+      "careers": "Medicine, Biology, Design, Advertising, Visual Arts, Physical Education, and Veterinary Medicine."
+    }
+  },
+  "m9_perfis_pareceres": {
+    "m9p_3": {
+      "basic_data": "T score above 60. Excellent perception of well-being.",
+      "reflection": "Excellent perception of physical and social health and family support. Preserve the support network and the habits that sustain well-being."
+    },
+    "m9p_2": {
+      "basic_data": "T score between 40 and 60. Health perception in line with the average.",
+      "reflection": "Health perception within the expected range for a healthy population. Maintain self-care habits and routine monitoring."
+    },
+    "m9p_1": {
+      "basic_data": "T score below 40. Warning sign in the perception of well-being.",
+      "reflection": "Indicates a need for attention or psychological/social intervention. Close monitoring and active listening to the student are recommended."
+    }
+  },
+  "m10_perfis_pareceres": {
+    "m10p_2": {
+      "basic_data": "5 to 8 points on the HU-DBI.",
+      "reflection": "What it means: Intermediate knowledge.\nProfile: The patient has a good understanding but still follows some myths or makes mistakes in their cleaning routine. This increases the risk of developing a root canal problem, gum disease, or tooth decay."
+    },
+    "m10p_3": {
+      "basic_data": "0 to 4 points on the HU-DBI.",
+      "reflection": "What it means: Risk behavior.\nProfile: There is a very high chance of dirt and bacterial plaque building up on the teeth. The patient urgently needs cleaning guidance and preventive dental treatment.\n"
+    },
+    "m10p_1": {
+      "basic_data": "9 to 12 points on the HU-DBI.",
+      "reflection": "What it means: Excellent oral care.\nProfile: The patient takes very good care of themselves daily and adopts habits that protect their teeth effectively.\n"
+    }
+  },
+  "m11_perfis_pareceres": {
+    "m11p_2": {
+      "basic_data": "15 to 25 points on the Rosenberg scale.",
+      "reflection": "Represents the pattern of most of the population. The individual maintains a good relationship with themselves and recognizes their qualities and weaknesses realistically."
+    },
+    "m11p_3": {
+      "basic_data": "More than 25 points on the Rosenberg scale.",
+      "reflection": "Strong self-confidence and security. Scores very close to 30 may indicate strong emotional stability but may also reflect a defensive stance or difficulty facing vulnerable points."
+    },
+    "m11p_1": {
+      "basic_data": "Less than 15 points on the Rosenberg scale.",
+      "reflection": "Indicates excessive focus on flaws, frequent feelings of personal dissatisfaction, and less confidence in one's own abilities."
+    }
+  },
+  "m12_perfis_pareceres": {
+    "m12p_3": {
+      "basic_data": "More than 80 points on the IAS.",
+      "reflection": "The dietary pattern meets the guidelines very well. It acts as a protective factor for your health and longevity."
+    },
+    "m12p_1": {
+      "basic_data": "Less than 51 points on the IAS.",
+      "reflection": "High risk of developing nutritional deficiencies and chronic diseases (diabetes, hypertension, heart problems). Requires prompt intervention."
+    },
+    "m12p_2": {
+      "basic_data": "51 to 80 points on the IAS.",
+      "reflection": "Already has some healthy habits but also overindulges or has serious gaps (excess sugar/sodium or lack of whole grains and fruits)."
+    }
+  },
+  "m13_perfis_pareceres": {
+    "m13p_3": {
+      "basic_data": "At least 6 clinical items in both blocks (Inattention and Hyperactivity/Impulsivity).",
+      "reflection": "There is an indication of significant symptoms in both dimensions, suggesting a possible combined pattern. This is the presentation that most reinforces the need for a complete diagnostic investigation by a qualified professional."
+    },
+    "m13p_4": {
+      "basic_data": "Fewer than 6 clinical items in each block.",
+      "reflection": "The reported behaviors are within expectations for the age, with no significant indications of ADHD symptoms in this screening. Continue routine developmental monitoring."
+    },
+    "m13p_2": {
+      "basic_data": "At least 6 of the 9 items in Block II (10-18) marked as \"Quite a bit\" or \"Very much\".",
+      "reflection": "There is an indication of more hyperactivity and impulsivity symptoms than expected for the age. Observation of behavior in multiple settings and assessment by a qualified professional are recommended."
+    },
+    "m13p_1": {
+      "basic_data": "At least 6 of the 9 items in Block I (1-9) marked as \"Quite a bit\" or \"Very much\".",
+      "reflection": "There is an indication of more inattention symptoms than expected for the age. Observation of behavior at home and at school and assessment by a qualified professional are recommended."
+    }
+  },
+  "m14_perfis_pareceres": {
+    "m14p_2": {
+      "basic_data": "Total score of 7 to 10 points on the AQ-10.",
+      "reflection": "The score reached the alert level for elevated ASD traits. Priority referral for specialized multidisciplinary assessment (pediatric neurologist or child psychiatrist and neuropsychologist) for formal diagnostic investigation is recommended. The AQ-10 does not replace clinical diagnosis."
+    },
+    "m14p_1": {
+      "basic_data": "Total score of 0 to 6 points on the AQ-10.",
+      "reflection": "The score obtained is within the range of the general population, indicating a low probability of autism spectrum disorder in this screening. However, the AQ-10 is only a screening tool: if clinical concerns persist on the part of parents or guardians, assessment by a qualified health professional is recommended."
+    }
+  },
+  "m15_pcd_grupos": {
+    "pg6": {
+      "nome": "Intellectual Disability",
+      "descricao": "Sensory and motor capacities structurally intact. Primary barrier in cognition and practical understanding of tasks.",
+      "laudo": "Level of adaptive functioning (mild, moderate, or severe) supported exclusively by an official psychological or pedagogical report."
+    },
+    "pg1": {
+      "nome": "Physical Disability (Independent Mobility)",
+      "descricao": "The child walks independently or with light assistance (cane, brace), with structural involvement without centralized central neurological alteration.",
+      "laudo": "Formal clinical diagnosis + severity classification. Specify amputation level if applicable."
+    },
+    "pg2": {
+      "nome": "Physical Disability (Wheelchair)",
+      "descricao": "Wheelchair as the primary or exclusive means of mobility. Tests adapted or replaced for upper limbs.",
+      "laudo": "Formal clinical diagnosis + medical report. Confirm use of a wheelchair as the primary means of mobility."
+    },
+    "pg3": {
+      "nome": "Cerebral Palsy (GMFCS)",
+      "descricao": "Mandatory prior classification using the GMFCS Scale (levels I to V) before defining any test.",
+      "laudo": "Mandatory prior administration of the GMFCS Scale (I to V) + medical report."
+    },
+    "pg4": {
+      "nome": "Visual Impairment (B1-B3)",
+      "descricao": "Overall motor structure preserved. Adjustments to verbal and kinesthetic instruction and spatial orientation. Classification from B1 (total blindness) to B3 (low vision).",
+      "laudo": "Mapping of visual acuity level (B1, B2, or B3) + ophthalmological report."
+    },
+    "pg5": {
+      "nome": "Hearing Impairment",
+      "descricao": "Motor functions and spatial orientation preserved. Adaptations exclusively in communication channels (visual stimuli, Brazilian Sign Language).",
+      "laudo": "Precise identification of the degree of hearing loss (mild, moderate, severe, or profound) + audiological report."
+    }
+  },
+  "m15_pcd_adaptacoes": {
+    "pa_g4_sal": {
+      "instrucao": "Starting line with tactile marking using raised tape; clear auditory command."
+    },
+    "pa_g5_agi": {
+      "instrucao": "Standard execution; clear visual stimuli."
+    },
+    "pa_g6_abd": {
+      "instrucao": "Repeated physical demonstration and breakdown of instructions into simple steps."
+    },
+    "pa_g3_sal_b": {
+      "detalhe": "GMFCS III",
+      "instrucao": "Perform only when functional capacity and safety are present. If not feasible, consider an alternative lower-limb power test."
+    },
+    "pa_g3_abd_a": {
+      "detalhe": "GMFCS I-II",
+      "instrucao": "Applicable with minimal adjustments based on the more dominant/spastic body side."
+    },
+    "pa_g4_fle": {
+      "instrucao": "Verbal and kinesthetic instruction; physical demonstration."
+    },
+    "pa_g3_agi_a": {
+      "detalhe": "GMFCS I-II",
+      "instrucao": "Applicable with minimal adjustments based on the more dominant/spastic body side."
+    },
+    "pa_g4_agi": {
+      "instrucao": "Human guide or guide rope; tactile marking and clear auditory commands."
+    },
+    "pa_g3_abd_c": {
+      "detalhe": "GMFCS IV-V",
+      "instrucao": "Feasible only with support and high postural tolerance."
+    },
+    "pa_g6_vel": {
+      "instrucao": "Repeated physical demonstration; one extra practice attempt that is not scored."
+    },
+    "pa_g1_fle": {
+      "instrucao": "Arm flexion; knee-supported version if needed."
+    },
+    "pa_g4_abd": {
+      "instrucao": "Movement identical to the standard; tactile marking and clear verbal command."
+    },
+    "pa_g6_fle": {
+      "instrucao": "Repeated physical demonstration; breakdown of instructions into simple steps."
+    },
+    "pa_g5_fle": {
+      "instrucao": "Standard execution; ample visual demonstration and support via Brazilian Sign Language when available."
+    },
+    "pa_g4_vel": {
+      "instrucao": "Human guide or guide-rope system; clear auditory command; tactile marking at the starting line."
+    },
+    "pa_g5_sal": {
+      "instrucao": "Standard execution; visual command."
+    },
+    "pa_g2_fle": {
+      "instrucao": "Applicable in full (upper limbs tend to be preserved and functional)."
+    },
+    "pa_g3_vel_b": {
+      "detalhe": "GMFCS III",
+      "instrucao": "Requires prior individual assessment (walking with instrumental support)."
+    },
+    "pa_g1_agi": {
+      "instrucao": "9.14 m shuttle run with two blocks."
+    },
+    "pa_g3_sal_a": {
+      "detalhe": "GMFCS I-II",
+      "instrucao": "Applicable with minimal adjustments based on the more dominant/spastic body side."
+    },
+    "pa_g3_abd_b": {
+      "detalhe": "GMFCS III",
+      "instrucao": "Applicable; requires prior individual assessment."
+    },
+    "pa_g5_vel": {
+      "instrucao": "Standard execution; replace the auditory signal with a clear visual stimulus."
+    },
+    "pa_g3_agi_b": {
+      "detalhe": "GMFCS III",
+      "instrucao": "Requires prior individual assessment (walking with instrumental support)."
+    },
+    "pa_g1_sal": {
+      "instrucao": "Horizontal jump from a bilateral base. Carefully assess joint feasibility if there is severe lower-limb involvement."
+    },
+    "pa_g2_abd": {
+      "instrucao": "With support, backrest, or mechanical trunk stabilization."
+    },
+    "pa_g2_agi": {
+      "instrucao": "Winding course with manual propulsion or complete replacement by a wheelchair agility test."
+    },
+    "pa_g1_vel": {
+      "instrucao": "20 m run with maximum acceleration."
+    },
+    "pa_g3_sal_c": {
+      "detalhe": "GMFCS IV-V",
+      "instrucao": "Prioritize joint clinical functional assessment with physical therapy."
+    },
+    "pa_g2_vel": {
+      "instrucao": "Replace with rapid wheelchair propulsion over the 20 timed meters."
+    },
+    "pa_g3_fle_c": {
+      "detalhe": "GMFCS IV-V",
+      "instrucao": "Standard or adapted when upper-limb functional capacity is present; otherwise, prioritize clinical functional assessment with physical therapy."
+    },
+    "pa_g5_abd": {
+      "instrucao": "Standard execution; start with a clear visual stimulus (flag, light, gesture)."
+    },
+    "pa_g3_fle_b": {
+      "detalhe": "GMFCS III",
+      "instrucao": "Applicable."
+    },
+    "pa_g3_vel_c": {
+      "detalhe": "GMFCS IV-V",
+      "instrucao": "Prioritize joint clinical functional assessment with physical therapy."
+    },
+    "pa_g3_fle_a": {
+      "detalhe": "GMFCS I-II",
+      "instrucao": "Applicable with minimal adjustments based on the more dominant/spastic body side."
+    },
+    "pa_g1_abd": {
+      "instrucao": "Isometric prone plank, 30s cap."
+    },
+    "pa_g2_sal": {
+      "instrucao": "Perform the standard version when functional capacity and safety are present. Do not perform when lower-limb involvement makes the jump unsafe or unfeasible; in that case, consider an alternative lower-limb power test when applicable."
+    },
+    "pa_g6_agi": {
+      "instrucao": "Repeated physical demonstration; gradual withdrawal of verbal support."
+    },
+    "pa_g6_sal": {
+      "instrucao": "Repeated physical demonstration; one extra practice attempt that is not scored."
+    },
+    "pa_g3_vel_a": {
+      "detalhe": "GMFCS I-II",
+      "instrucao": "Applicable with minimal adjustments based on the more dominant/spastic body side."
+    },
+    "pa_g3_agi_c": {
+      "detalhe": "GMFCS IV-V",
+      "instrucao": "Prioritize joint clinical functional assessment with physical therapy."
+    }
+  },
+  "m15_pcd_modalidades": {
+    "pm2": {
+      "nome": "Wheelchair Basketball / Rugby",
+      "descricao": "Movement, power, and intense use of upper limbs over the wheelchair."
+    },
+    "pm4": {
+      "nome": "Boccia (Adapted Bocce)",
+      "descricao": "Precision with trunk stability; low demand for movement."
+    },
+    "pm1": {
+      "nome": "Athletics (Speed)",
+      "descricao": "Lower-limb speed and power are crucial."
+    },
+    "pm3": {
+      "nome": "Adapted Swimming",
+      "descricao": "Upper-limb strength and central trunk stability determine success."
+    },
+    "pm6": {
+      "nome": "Adapted Weightlifting",
+      "descricao": "Upper- and lower-limb power with trunk stability."
+    },
+    "pm5": {
+      "nome": "Goalball / Football 5-a-side",
+      "descricao": "Oriented movement, agility, and reaction speed."
+    }
+  },
+  "m15_pcd_funil": {
+    "pu4_1": {
+      "titulo": "Clinical/Group Filter",
+      "regra": "Motor structure preserved: clear sports based on the neuromotor profile, with no postural barriers."
+    },
+    "pu2_2": {
+      "titulo": "Cognitive/Sensory Filter",
+      "regra": "Guide the wheelchair agility course and adapt commands to the comprehension level."
+    },
+    "pu6_3": {
+      "titulo": "Personal Preference and Desire Filter",
+      "regra": "Give full consideration to the child/adolescent's personal preference and desire in the final choice of sport."
+    },
+    "pu5_3": {
+      "titulo": "Personal Preference and Desire Filter",
+      "regra": "Give full consideration to the child/adolescent's personal preference and desire in the final choice of sport."
+    },
+    "pu3_1": {
+      "titulo": "Clinical/Group Filter",
+      "regra": "Cross-reference the GMFCS level with each suggested sport; respect contraindications based on motor pattern (e.g., jumping at GMFCS III+)."
+    },
+    "pu4_2": {
+      "titulo": "Cognitive/Sensory Filter",
+      "regra": "Check the need for a guide/auditory commands and tactile marking; prefer sports such as Goalball or Football 5-a-side."
+    },
+    "pu2_1": {
+      "titulo": "Clinical/Group Filter",
+      "regra": "Prioritize upper-limb tests and trunk stabilization; avoid vertical-impact tasks."
+    },
+    "pu5_1": {
+      "titulo": "Clinical/Group Filter",
+      "regra": "Motor functions preserved: clear participation based on neuromotor profile; focus adjustments on the communication channel."
+    },
+    "pu_all_3": {
+      "titulo": "Personal Preference and Desire Filter",
+      "regra": "Give full consideration to the child/adolescent's personal preference and desire in the final choice of sport."
+    },
+    "pu5_2": {
+      "titulo": "Cognitive/Sensory Filter",
+      "regra": "Ensure clear visual stimuli and support via Brazilian Sign Language; check understanding of the rules."
+    },
+    "pu1_3": {
+      "titulo": "Personal Preference and Desire Filter",
+      "regra": "Give full consideration to the child/adolescent's personal preference and desire in the final choice of sport."
+    },
+    "pu6_1": {
+      "titulo": "Clinical/Group Filter",
+      "regra": "Motor capacities intact: clear sports based on profile; pay attention to fatigue and learning pace."
+    },
+    "pu6_2": {
+      "titulo": "Cognitive/Sensory Filter",
+      "regra": "Break down instructions, demonstrate repeatedly, and allow an extra practice attempt; reduce rule complexity."
+    },
+    "pu1_2": {
+      "titulo": "Cognitive/Sensory Filter",
+      "regra": "Inherent complexity of the rules: simple instructions and prior demonstration for task comprehension."
+    },
+    "pu1_1": {
+      "titulo": "Clinical/Group Filter",
+      "regra": "Inherent postural suitability: assess lower-limb joints before jumping; clear tests according to structural limitation."
+    },
+    "pu4_3": {
+      "titulo": "Personal Preference and Desire Filter",
+      "regra": "Give full consideration to the child/adolescent's personal preference and desire in the final choice of sport."
+    },
+    "pu2_3": {
+      "titulo": "Personal Preference and Desire Filter",
+      "regra": "Give full consideration to the child/adolescent's personal preference and desire in the final choice of sport."
+    },
+    "pu3_3": {
+      "titulo": "Personal Preference and Desire Filter",
+      "regra": "Give full consideration to the child/adolescent's personal preference and desire in the final choice of sport."
+    },
+    "pu3_2": {
+      "titulo": "Cognitive/Sensory Filter",
+      "regra": "Consider spasticity, coordination, and rule comprehension; adjust intensity and complexity."
+    }
+  },
+  "vocational_assessments": {
+    "Vocal-12": {
+      "interest_area": "You enjoy solving logical problems, working with numbers, and understanding how technologies work.",
+      "suggested_career": "Engineering, Computer Science, Mathematics, Physics, Architecture, and Information Technology.",
+      "technical_opinion": "The student demonstrates highly structured logical reasoning, ease in working with abstract and numerical data, and a natural curiosity to understand how complex systems and new technologies work. This is a profile focused on practical problem solving, process optimization, and technical innovation."
+    },
+    "Vocal-13": {
+      "interest_area": "You enjoy communicating, helping people, and understanding society.",
+      "suggested_career": "Law, Literature, Education, Psychology, History, Journalism, and International Relations.",
+      "technical_opinion": "The student shows an interest in the critical analysis of society, conflict mediation, and the transmission of knowledge. Their competencies align perfectly with professions that require active listening, fluent writing, and humanistic thinking."
+    },
+    "Vocal-11": {
+      "interest_area": "You enjoy communicating, helping people, and understanding society.",
+      "suggested_career": "Law, Literature, Education, Psychology, History, Journalism, and International Relations.",
+      "technical_opinion": "The student shows an interest in the critical analysis of society, conflict mediation, and the transmission of knowledge. Their competencies align perfectly with professions that require active listening, fluent writing, and humanistic thinking."
+    },
+    "Vocal-8": {
+      "interest_area": "Great for game design or web development.",
+      "suggested_career": "Hybrid",
+      "technical_opinion": "The student is not limited to a single field of knowledge; they use creativity to give shape to technology, solving interface, interactivity, and user experience problems in an innovative way."
+    },
+    "Vocal-9": {
+      "interest_area": "You enjoy communicating, helping people, and understanding society.",
+      "suggested_career": "Law, Literature, Education, Psychology, History, Journalism, and International Relations.",
+      "technical_opinion": "The student shows an interest in the critical analysis of society, conflict mediation, and the transmission of knowledge. Their competencies align perfectly with professions that require active listening, fluent writing, and humanistic thinking."
+    },
+    "Vocal-10": {
+      "interest_area": "You enjoy communicating, helping people, and understanding society.",
+      "suggested_career": "Law, Literature, Education, Psychology, History, Journalism, and International Relations.",
+      "technical_opinion": "The student shows an interest in the critical analysis of society, conflict mediation, and the transmission of knowledge. Their competencies align perfectly with professions that require active listening, fluent writing, and humanistic thinking."
+    },
+    "Vocal-14": {
+      "interest_area": "You enjoy communicating, helping people, and understanding society.",
+      "suggested_career": "Law, Literature, Education, Psychology, History, Journalism, and International Relations.",
+      "technical_opinion": "The student shows an interest in the critical analysis of society, conflict mediation, and the transmission of knowledge. Their competencies align perfectly with professions that require active listening, fluent writing, and humanistic thinking."
+    },
+    "Vocal-15": {
+      "interest_area": "You enjoy solving logical problems, working with numbers, and understanding how technologies work.",
+      "suggested_career": "Engineering, Computer Science, Mathematics, Physics, Architecture, and Information Technology.",
+      "technical_opinion": "The student demonstrates highly structured logical reasoning, ease in working with abstract and numerical data, and a natural curiosity to understand how complex systems and new technologies work. This is a profile focused on practical problem solving, process optimization, and technical innovation."
+    },
+    "Vocal-16": {
+      "interest_area": "You enjoy communicating, helping people, and understanding society.",
+      "suggested_career": "Law, Literature, Education, Psychology, History, Journalism, and International Relations.",
+      "technical_opinion": "The central axis of development for this profile is entirely aligned with the human factor and its complex collective interactions. The student demonstrates a remarkable aptitude for active listening, the practice of empathy, and the verbal articulation of abstract ideas. Their mind finds stimulation in analyzing social phenomena, human rights, and the narratives that shape our culture. Far from being merely a theoretical inclination, this profile reflects an intelligence oriented toward practical transformation and conflict mediation. The young person shows latent potential to exercise leadership in environments that demand ethical responsibility, whether defending legal causes, educating, promoting mental health, or communicating essential information to the community."
+    }
+  },
+  "snap_assessments": {
+    "Snap-2": {
+      "technical_opinion": "There are indications of significant symptoms in both dimensions, suggesting a possible combined pattern. This is the presentation that most strongly reinforces the need for a complete diagnostic investigation by a qualified professional."
+    }
+  },
+  "aq10_assessments": {
+    "Aq10-2": {
+      "technical_opinion": "The score obtained falls within the average range of the general population, indicating a low probability of autism spectrum disorder in this screening. However, the AQ-10 is only a screening instrument: if clinical concerns persist on the part of parents or guardians, it is recommended to proceed with an assessment by a licensed healthcare professional."
+    }
+  },
+  "ias_assessments": {
+    "IAS-2": {
+      "technical_opinion": "High risk for the development of nutritional deficiencies and chronic diseases (diabetes, hypertension, heart problems). Requires prompt intervention."
+    }
+  },
+  "health_assessments": {
+    "Health-2": {
+      "technical_opinion": "Indicates a need for psychological/social attention or intervention. Close follow-up and active listening to the student are recommended."
+    }
+  },
+  "autoconcept_assessments": {
+    "Auto-2": {
+      "technical_opinion": "Represents the pattern of the majority of the population. The individual maintains a good relationship with themselves and recognizes their strengths and weaknesses in a realistic way."
+    }
+  },
+  "oral_assessments": {
+    "Oral-2": {
+      "technical_opinion": "What it means: Risk behavior.\nProfile: There is a very high chance of debris and bacterial plaque accumulating on the teeth. The patient urgently needs oral hygiene guidance and preventive treatment at the dentist.\n"
+    }
+  },
+  "sport_assessments": {
+    "Esporte-1": {
+      "recommended_practice": "3 hours per week"
+    },
+    "Esporte-2": {
+      "recommended_practice": "3 hours per week"
+    },
+    "Esporte-3": {
+      "recommended_practice": "3 hours per week"
+    },
+    "Esporte-4": {
+      "recommended_practice": "3 hours per week"
+    },
+    "Esporte-5": {
+      "recommended_practice": "3 hours per week"
+    },
+    "Esporte-7": {
+      "recommended_practice": "3 hours per week"
+    },
+    "Esporte-8": {
+      "recommended_practice": "3 hours per week"
+    },
+    "Esporte-11": {
+      "recommended_practice": "3 hours per week"
+    },
+    "Esporte-12": {
+      "recommended_practice": "3 hours per week"
+    }
+  },
+  "pcd_assessments": {
+    "PCD-2": {
+      "grupo_nome": "Physical Disability (Wheelchair)",
+      "classificacao_perfil": "Average Motor Profile",
+      "direcionamento": "Boccia (Adapted Bocce); Athletics (Sprint); Adapted Swimming",
+      "technical_opinion": "Screening group 2 (Physical Disability (Wheelchair)). Profile: Average Motor Profile. Suggested sport direction: Boccia (Adapted Bocce); Athletics (Sprint); Adapted Swimming."
+    },
+    "PCD-3": {
+      "grupo_nome": "Physical Disability (Independent Mobility)",
+      "classificacao_perfil": "Average Motor Profile",
+      "direcionamento": "Pre-selection (physical matrix): Adapted Swimming; Wheelchair Basketball / Wheelchair Rugby; Athletics (Sprint). Preliminary indication, subject to the qualitative funnel (clinical-functional, cognitive-sensory, and participant-preference filters).",
+      "technical_opinion": "Screening group 1 (Physical Disability (Independent Mobility)). Profile: Average Motor Profile. Suggested sport direction: Pre-selection (physical matrix): Adapted Swimming; Wheelchair Basketball / Wheelchair Rugby; Athletics (Sprint). Preliminary indication, subject to the qualitative funnel (clinical-functional, cognitive-sensory, and participant-preference filters).."
+    },
+    "PCD-5": {
+      "grupo_nome": "Cerebral Palsy (GMFCS)",
+      "classificacao_perfil": "Motor Profile with Limitations",
+      "direcionamento": "Pre-selection (physical matrix): Adapted Swimming; Wheelchair Basketball / Wheelchair Rugby; Adapted Weightlifting. Preliminary indication, subject to the qualitative funnel (clinical-functional, cognitive-sensory, and participant-preference filters).",
+      "technical_opinion": "Screening group 3 (Cerebral Palsy (GMFCS)). Profile: Motor Profile with Limitations. Suggested sport direction: Pre-selection (physical matrix): Adapted Swimming; Wheelchair Basketball / Wheelchair Rugby; Adapted Weightlifting. Preliminary indication, subject to the qualitative funnel (clinical-functional, cognitive-sensory, and participant-preference filters).."
+    },
+    "PCD-4": {
+      "grupo_nome": "Visual Impairment (B1-B3)",
+      "classificacao_perfil": "Average Motor Profile",
+      "direcionamento": "Pre-selection (physical matrix): Adapted Swimming; Wheelchair Basketball / Wheelchair Rugby; Adapted Weightlifting. Preliminary indication, subject to the qualitative funnel (clinical-functional, cognitive-sensory, and participant-preference filters).",
+      "technical_opinion": "Screening group 4 (Visual Impairment (B1-B3)). Profile: Average Motor Profile. Suggested sport direction: Pre-selection (physical matrix): Adapted Swimming; Wheelchair Basketball / Wheelchair Rugby; Adapted Weightlifting. Preliminary indication, subject to the qualitative funnel (clinical-functional, cognitive-sensory, and participant-preference filters).."
+    }
   }
 }

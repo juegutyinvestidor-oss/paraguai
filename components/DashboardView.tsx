@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { displayCanonical } from '../lib/reportI18n';
 import { createPortal } from 'react-dom';
 import {
   ResponsiveContainer,
@@ -39,6 +40,7 @@ interface SupabaseM2Row {
 interface TooltipEntry {
   name: string;
   value: number;
+  dataKey?: string | number;
 }
 
 type MotorLevel = 'Excelente' | 'Bom' | 'Regular' | 'Insuficiente';
@@ -133,6 +135,7 @@ export default function DashboardView({
   contratos,
   user
 }: DashboardViewProps) {
+  const locale = useLocale();
   const t = useTranslations('dashboard');
 
   // Security Context checks: Lock filters if they have single value, restrict if multiple values
@@ -634,17 +637,17 @@ export default function DashboardView({
 
   // 4f. Cobertura de avaliacoes: % dos alunos (no escopo filtrado) que possuem cada dimensao
   const coverageDims: { label: string; recs: { studentId: string }[]; c: [string, string] }[] = [
-    { label: 'IMC', recs: filteredImcRecords, c: ['#38bdf8', '#0369a1'] },
-    { label: 'Capacidades', recs: filteredMotorRecords, c: ['#a78bfa', '#6d28d9'] },
-    { label: 'Esportivo', recs: filteredSportRecords, c: ['#f59e0b', '#b45309'] },
-    { label: 'Vocacional', recs: filteredVocationalRecords, c: ['#34d399', '#059669'] },
-    { label: 'Saúde Global', recs: filteredHealthRecords, c: ['#fb7185', '#be123c'] },
-    { label: 'Higiene Bucal', recs: filteredOralRecords, c: ['#fbbf24', '#d97706'] },
-    { label: 'Autoconceito', recs: filteredAutoconceptRecords, c: ['#60a5fa', '#2563eb'] },
-    { label: 'Índice Alimentar', recs: filteredIasRecords, c: ['#2dd4bf', '#0f766e'] },
-    { label: 'Rastreamento TDAH', recs: filteredSnapRecords, c: ['#c084fc', '#7e22ce'] },
-    { label: 'Rastreamento Precoce do TEA', recs: filteredAq10Records, c: ['#e879f9', '#a21caf'] },
-    { label: 'Qualidade Motora PCD', recs: filteredPcdRecords, c: ['#22d3ee', '#0e7490'] },
+    { label: displayCanonical('IMC', locale), recs: filteredImcRecords, c: ['#38bdf8', '#0369a1'] },
+    { label: displayCanonical('Capacidades', locale), recs: filteredMotorRecords, c: ['#a78bfa', '#6d28d9'] },
+    { label: displayCanonical('Esportivo', locale), recs: filteredSportRecords, c: ['#f59e0b', '#b45309'] },
+    { label: displayCanonical('Vocacional', locale), recs: filteredVocationalRecords, c: ['#34d399', '#059669'] },
+    { label: displayCanonical('Saúde Global', locale), recs: filteredHealthRecords, c: ['#fb7185', '#be123c'] },
+    { label: displayCanonical('Higiene Bucal', locale), recs: filteredOralRecords, c: ['#fbbf24', '#d97706'] },
+    { label: displayCanonical('Autoconceito', locale), recs: filteredAutoconceptRecords, c: ['#60a5fa', '#2563eb'] },
+    { label: displayCanonical('Índice Alimentar', locale), recs: filteredIasRecords, c: ['#2dd4bf', '#0f766e'] },
+    { label: displayCanonical('Rastreamento TDAH', locale), recs: filteredSnapRecords, c: ['#c084fc', '#7e22ce'] },
+    { label: displayCanonical('Rastreamento Precoce do TEA', locale), recs: filteredAq10Records, c: ['#e879f9', '#a21caf'] },
+    { label: displayCanonical('Qualidade Motora PCD', locale), recs: filteredPcdRecords, c: ['#22d3ee', '#0e7490'] },
   ];
   const coverageChartData = coverageDims.map(d => {
     const seen = new Set<string>();
@@ -685,10 +688,10 @@ export default function DashboardView({
   });
 
   let imcChartData = [
-    { label: 'Abaixo Peso', value: imcGroups.abaixo.total, maleCount: imcGroups.abaixo.male, femaleCount: imcGroups.abaixo.female, startColor: '#fb7185', endColor: '#e11d48' },
-    { label: 'Peso Ideal', value: imcGroups.ideal.total, maleCount: imcGroups.ideal.male, femaleCount: imcGroups.ideal.female, startColor: '#34d399', endColor: '#059669' },
-    { label: 'Sobrepeso', value: imcGroups.sobrepeso.total, maleCount: imcGroups.sobrepeso.male, femaleCount: imcGroups.sobrepeso.female, startColor: '#fbbf24', endColor: '#d97706' },
-    { label: 'Obesidade', value: imcGroups.obesidade.total, maleCount: imcGroups.obesidade.male, femaleCount: imcGroups.obesidade.female, startColor: '#f87171', endColor: '#dc2626' }
+    { label: displayCanonical('Abaixo Peso', locale), value: imcGroups.abaixo.total, maleCount: imcGroups.abaixo.male, femaleCount: imcGroups.abaixo.female, startColor: '#fb7185', endColor: '#e11d48' },
+    { label: displayCanonical('Peso Ideal', locale), value: imcGroups.ideal.total, maleCount: imcGroups.ideal.male, femaleCount: imcGroups.ideal.female, startColor: '#34d399', endColor: '#059669' },
+    { label: displayCanonical('Sobrepeso', locale), value: imcGroups.sobrepeso.total, maleCount: imcGroups.sobrepeso.male, femaleCount: imcGroups.sobrepeso.female, startColor: '#fbbf24', endColor: '#d97706' },
+    { label: displayCanonical('Obesidade', locale), value: imcGroups.obesidade.total, maleCount: imcGroups.obesidade.male, femaleCount: imcGroups.obesidade.female, startColor: '#f87171', endColor: '#dc2626' }
   ];
 
   if (isAluno) {
@@ -701,7 +704,7 @@ export default function DashboardView({
   // 2. Qualidade Motora Detailed Matrix Calculations using filtered lists
   const motorMatrix = {
     impulsao: {
-      label: 'Impulso',
+      label: displayCanonical('Impulso', locale),
       counts: { Excelente: 0, Bom: 0, Regular: 0, Insuficiente: 0 },
       colors: {
         Excelente: { bg: 'bg-[#032f30]', text: 'text-[#14b8a6]', border: 'border-[#115e59]/30' },
@@ -711,7 +714,7 @@ export default function DashboardView({
       }
     },
     abdomen: {
-      label: 'Abdômen',
+      label: displayCanonical('Abdômen', locale),
       counts: { Excelente: 0, Bom: 0, Regular: 0, Insuficiente: 0 },
       colors: {
         Excelente: { bg: 'bg-[#172554]', text: 'text-[#60a5fa]', border: 'border-[#1e3a8a]/30' },
@@ -721,7 +724,7 @@ export default function DashboardView({
       }
     },
     agilidade: {
-      label: 'Agilidade',
+      label: displayCanonical('Agilidade', locale),
       counts: { Excelente: 0, Bom: 0, Regular: 0, Insuficiente: 0 },
       colors: {
         Excelente: { bg: 'bg-[#451a03]', text: 'text-[#fbbf24]', border: 'border-[#78350f]/30' },
@@ -731,7 +734,7 @@ export default function DashboardView({
       }
     },
     forca: {
-      label: 'Força',
+      label: displayCanonical('Força', locale),
       counts: { Excelente: 0, Bom: 0, Regular: 0, Insuficiente: 0 },
       colors: {
         Excelente: { bg: 'bg-[#431407]', text: 'text-[#fb923c]', border: 'border-[#7c2d12]/30' },
@@ -741,7 +744,7 @@ export default function DashboardView({
       }
     },
     velocidade: {
-      label: 'Velocidade',
+      label: displayCanonical('Velocidade', locale),
       counts: { Excelente: 0, Bom: 0, Regular: 0, Insuficiente: 0 },
       colors: {
         Excelente: { bg: 'bg-[#4c0519]', text: 'text-[#f472b6]', border: 'border-[#881337]/30' },
@@ -852,7 +855,7 @@ export default function DashboardView({
     const color = PRESET_COLORS[index % PRESET_COLORS.length];
     const group = sportGroups[mod.name] || { total: 0, male: 0, female: 0 };
     return {
-      label: mod.name,
+      label: displayCanonical(mod.name, locale),
       value: group.total,
       maleCount: group.male,
       femaleCount: group.female,
@@ -862,7 +865,7 @@ export default function DashboardView({
   });
 
   sportChartData.push({
-    label: 'Aprimorar Habilidades Motoras',
+    label: displayCanonical('Aprimorar Habilidades Motoras', locale),
     value: sportGroups['Aprimorar Habilidades Motoras']?.total || 0,
     maleCount: sportGroups['Aprimorar Habilidades Motoras']?.male || 0,
     femaleCount: sportGroups['Aprimorar Habilidades Motoras']?.female || 0,
@@ -921,11 +924,11 @@ export default function DashboardView({
   });
 
   let vocationalChartData = [
-    { label: 'Humanas e Sociais', value: vocationalGroups['Humanas e Sociais'].total, maleCount: vocationalGroups['Humanas e Sociais'].male, femaleCount: vocationalGroups['Humanas e Sociais'].female, startColor: '#f472b6', endColor: '#db2777' },
-    { label: 'Exatas e Tecnológicas', value: vocationalGroups['Exatas e Tecnológicas'].total, maleCount: vocationalGroups['Exatas e Tecnológicas'].male, femaleCount: vocationalGroups['Exatas e Tecnológicas'].female, startColor: '#38bdf8', endColor: '#0369a1' },
-    { label: 'Biológicas e Criativas', value: vocationalGroups['Biológicas e Criativas'].total, maleCount: vocationalGroups['Biológicas e Criativas'].male, femaleCount: vocationalGroups['Biológicas e Criativas'].female, startColor: '#fb7185', endColor: '#be123c' },
-    { label: 'Negócios e Gestão', value: vocationalGroups['Negócios e Gestão'].total, maleCount: vocationalGroups['Negócios e Gestão'].male, femaleCount: vocationalGroups['Negócios e Gestão'].female, startColor: '#f59e0b', endColor: '#b45309' },
-    { label: 'Criativo e Tecnológico', value: vocationalGroups['Criativo e Tecnológico'].total, maleCount: vocationalGroups['Criativo e Tecnológico'].male, femaleCount: vocationalGroups['Criativo e Tecnológico'].female, startColor: '#a78bfa', endColor: '#6d28d9' }
+    { label: displayCanonical('Humanas e Sociais', locale), value: vocationalGroups['Humanas e Sociais'].total, maleCount: vocationalGroups['Humanas e Sociais'].male, femaleCount: vocationalGroups['Humanas e Sociais'].female, startColor: '#f472b6', endColor: '#db2777' },
+    { label: displayCanonical('Exatas e Tecnológicas', locale), value: vocationalGroups['Exatas e Tecnológicas'].total, maleCount: vocationalGroups['Exatas e Tecnológicas'].male, femaleCount: vocationalGroups['Exatas e Tecnológicas'].female, startColor: '#38bdf8', endColor: '#0369a1' },
+    { label: displayCanonical('Biológicas e Criativas', locale), value: vocationalGroups['Biológicas e Criativas'].total, maleCount: vocationalGroups['Biológicas e Criativas'].male, femaleCount: vocationalGroups['Biológicas e Criativas'].female, startColor: '#fb7185', endColor: '#be123c' },
+    { label: displayCanonical('Negócios e Gestão', locale), value: vocationalGroups['Negócios e Gestão'].total, maleCount: vocationalGroups['Negócios e Gestão'].male, femaleCount: vocationalGroups['Negócios e Gestão'].female, startColor: '#f59e0b', endColor: '#b45309' },
+    { label: displayCanonical('Criativo e Tecnológico', locale), value: vocationalGroups['Criativo e Tecnológico'].total, maleCount: vocationalGroups['Criativo e Tecnológico'].male, femaleCount: vocationalGroups['Criativo e Tecnológico'].female, startColor: '#a78bfa', endColor: '#6d28d9' }
   ];
 
   if (isAluno) {
@@ -954,9 +957,9 @@ export default function DashboardView({
   });
 
   let healthChartData = [
-    { label: 'Qualidade de Vida Baixa', value: healthGroups['Qualidade de Vida Baixa'].total, maleCount: healthGroups['Qualidade de Vida Baixa'].male, femaleCount: healthGroups['Qualidade de Vida Baixa'].female, startColor: '#f87171', endColor: '#dc2626' },
-    { label: 'Qualidade de Vida Normal', value: healthGroups['Qualidade de Vida Normal'].total, maleCount: healthGroups['Qualidade de Vida Normal'].male, femaleCount: healthGroups['Qualidade de Vida Normal'].female, startColor: '#fbbf24', endColor: '#d97706' },
-    { label: 'Qualidade de Vida Alta', value: healthGroups['Qualidade de Vida Alta'].total, maleCount: healthGroups['Qualidade de Vida Alta'].male, femaleCount: healthGroups['Qualidade de Vida Alta'].female, startColor: '#34d399', endColor: '#059669' }
+    { label: displayCanonical('Qualidade de Vida Baixa', locale), value: healthGroups['Qualidade de Vida Baixa'].total, maleCount: healthGroups['Qualidade de Vida Baixa'].male, femaleCount: healthGroups['Qualidade de Vida Baixa'].female, startColor: '#f87171', endColor: '#dc2626' },
+    { label: displayCanonical('Qualidade de Vida Normal', locale), value: healthGroups['Qualidade de Vida Normal'].total, maleCount: healthGroups['Qualidade de Vida Normal'].male, femaleCount: healthGroups['Qualidade de Vida Normal'].female, startColor: '#fbbf24', endColor: '#d97706' },
+    { label: displayCanonical('Qualidade de Vida Alta', locale), value: healthGroups['Qualidade de Vida Alta'].total, maleCount: healthGroups['Qualidade de Vida Alta'].male, femaleCount: healthGroups['Qualidade de Vida Alta'].female, startColor: '#34d399', endColor: '#059669' }
   ];
 
   if (isAluno) {
@@ -985,9 +988,9 @@ export default function DashboardView({
   });
 
   let oralChartData = [
-    { label: 'Alto Desempenho', value: oralGroups['Alto Desempenho'].total, maleCount: oralGroups['Alto Desempenho'].male, femaleCount: oralGroups['Alto Desempenho'].female, startColor: '#34d399', endColor: '#059669' },
-    { label: 'Desempenho Moderado', value: oralGroups['Desempenho Moderado'].total, maleCount: oralGroups['Desempenho Moderado'].male, femaleCount: oralGroups['Desempenho Moderado'].female, startColor: '#fbbf24', endColor: '#d97706' },
-    { label: 'Baixo Desempenho', value: oralGroups['Baixo Desempenho'].total, maleCount: oralGroups['Baixo Desempenho'].male, femaleCount: oralGroups['Baixo Desempenho'].female, startColor: '#f87171', endColor: '#dc2626' }
+    { label: displayCanonical('Alto Desempenho', locale), value: oralGroups['Alto Desempenho'].total, maleCount: oralGroups['Alto Desempenho'].male, femaleCount: oralGroups['Alto Desempenho'].female, startColor: '#34d399', endColor: '#059669' },
+    { label: displayCanonical('Desempenho Moderado', locale), value: oralGroups['Desempenho Moderado'].total, maleCount: oralGroups['Desempenho Moderado'].male, femaleCount: oralGroups['Desempenho Moderado'].female, startColor: '#fbbf24', endColor: '#d97706' },
+    { label: displayCanonical('Baixo Desempenho', locale), value: oralGroups['Baixo Desempenho'].total, maleCount: oralGroups['Baixo Desempenho'].male, femaleCount: oralGroups['Baixo Desempenho'].female, startColor: '#f87171', endColor: '#dc2626' }
   ];
 
   if (isAluno) {
@@ -1016,9 +1019,9 @@ export default function DashboardView({
   });
 
   let autoChartData = [
-    { label: 'Autoestima Baixa', value: autoGroups['Autoestima Baixa'].total, maleCount: autoGroups['Autoestima Baixa'].male, femaleCount: autoGroups['Autoestima Baixa'].female, startColor: '#f87171', endColor: '#dc2626' },
-    { label: 'Autoestima Equilibrada', value: autoGroups['Autoestima Equilibrada'].total, maleCount: autoGroups['Autoestima Equilibrada'].male, femaleCount: autoGroups['Autoestima Equilibrada'].female, startColor: '#fbbf24', endColor: '#d97706' },
-    { label: 'Autoestima Alta', value: autoGroups['Autoestima Alta'].total, maleCount: autoGroups['Autoestima Alta'].male, femaleCount: autoGroups['Autoestima Alta'].female, startColor: '#a78bfa', endColor: '#6d28d9' }
+    { label: displayCanonical('Autoestima Baixa', locale), value: autoGroups['Autoestima Baixa'].total, maleCount: autoGroups['Autoestima Baixa'].male, femaleCount: autoGroups['Autoestima Baixa'].female, startColor: '#f87171', endColor: '#dc2626' },
+    { label: displayCanonical('Autoestima Equilibrada', locale), value: autoGroups['Autoestima Equilibrada'].total, maleCount: autoGroups['Autoestima Equilibrada'].male, femaleCount: autoGroups['Autoestima Equilibrada'].female, startColor: '#fbbf24', endColor: '#d97706' },
+    { label: displayCanonical('Autoestima Alta', locale), value: autoGroups['Autoestima Alta'].total, maleCount: autoGroups['Autoestima Alta'].male, femaleCount: autoGroups['Autoestima Alta'].female, startColor: '#a78bfa', endColor: '#6d28d9' }
   ];
 
   if (isAluno) {
@@ -1047,9 +1050,9 @@ export default function DashboardView({
   });
 
   let iasChartData = [
-    { label: 'Dieta de Má Qualidade', value: iasGroups['Dieta de Má Qualidade'].total, maleCount: iasGroups['Dieta de Má Qualidade'].male, femaleCount: iasGroups['Dieta de Má Qualidade'].female, startColor: '#f87171', endColor: '#dc2626' },
-    { label: 'Necessita de Modificações', value: iasGroups['Necessita de Modificações'].total, maleCount: iasGroups['Necessita de Modificações'].male, femaleCount: iasGroups['Necessita de Modificações'].female, startColor: '#fbbf24', endColor: '#d97706' },
-    { label: 'Boa Qualidade (Saudável)', value: iasGroups['Boa Qualidade (Saudável)'].total, maleCount: iasGroups['Boa Qualidade (Saudável)'].male, femaleCount: iasGroups['Boa Qualidade (Saudável)'].female, startColor: '#34d399', endColor: '#059669' }
+    { label: displayCanonical('Dieta de Má Qualidade', locale), value: iasGroups['Dieta de Má Qualidade'].total, maleCount: iasGroups['Dieta de Má Qualidade'].male, femaleCount: iasGroups['Dieta de Má Qualidade'].female, startColor: '#f87171', endColor: '#dc2626' },
+    { label: displayCanonical('Necessita de Modificações', locale), value: iasGroups['Necessita de Modificações'].total, maleCount: iasGroups['Necessita de Modificações'].male, femaleCount: iasGroups['Necessita de Modificações'].female, startColor: '#fbbf24', endColor: '#d97706' },
+    { label: displayCanonical('Boa Qualidade (Saudável)', locale), value: iasGroups['Boa Qualidade (Saudável)'].total, maleCount: iasGroups['Boa Qualidade (Saudável)'].male, femaleCount: iasGroups['Boa Qualidade (Saudável)'].female, startColor: '#34d399', endColor: '#059669' }
   ];
 
   if (isAluno) {
@@ -1079,10 +1082,10 @@ export default function DashboardView({
   });
 
   let snapChartData = [
-    { label: 'Sinais de Desatenção', value: snapGroups['Sinais de Desatenção'].total, maleCount: snapGroups['Sinais de Desatenção'].male, femaleCount: snapGroups['Sinais de Desatenção'].female, startColor: '#f87171', endColor: '#dc2626' },
-    { label: 'Sinais de Hiperatividade/Impulsividade', value: snapGroups['Sinais de Hiperatividade/Impulsividade'].total, maleCount: snapGroups['Sinais de Hiperatividade/Impulsividade'].male, femaleCount: snapGroups['Sinais de Hiperatividade/Impulsividade'].female, startColor: '#fbbf24', endColor: '#d97706' },
-    { label: 'Sinais Combinados', value: snapGroups['Sinais Combinados'].total, maleCount: snapGroups['Sinais Combinados'].male, femaleCount: snapGroups['Sinais Combinados'].female, startColor: '#f472b6', endColor: '#db2777' },
-    { label: 'Sem Indícios Significativos', value: snapGroups['Sem Indícios Significativos'].total, maleCount: snapGroups['Sem Indícios Significativos'].male, femaleCount: snapGroups['Sem Indícios Significativos'].female, startColor: '#34d399', endColor: '#059669' }
+    { label: displayCanonical('Sinais de Desatenção', locale), value: snapGroups['Sinais de Desatenção'].total, maleCount: snapGroups['Sinais de Desatenção'].male, femaleCount: snapGroups['Sinais de Desatenção'].female, startColor: '#f87171', endColor: '#dc2626' },
+    { label: displayCanonical('Sinais de Hiperatividade/Impulsividade', locale), value: snapGroups['Sinais de Hiperatividade/Impulsividade'].total, maleCount: snapGroups['Sinais de Hiperatividade/Impulsividade'].male, femaleCount: snapGroups['Sinais de Hiperatividade/Impulsividade'].female, startColor: '#fbbf24', endColor: '#d97706' },
+    { label: displayCanonical('Sinais Combinados', locale), value: snapGroups['Sinais Combinados'].total, maleCount: snapGroups['Sinais Combinados'].male, femaleCount: snapGroups['Sinais Combinados'].female, startColor: '#f472b6', endColor: '#db2777' },
+    { label: displayCanonical('Sem Indícios Significativos', locale), value: snapGroups['Sem Indícios Significativos'].total, maleCount: snapGroups['Sem Indícios Significativos'].male, femaleCount: snapGroups['Sem Indícios Significativos'].female, startColor: '#34d399', endColor: '#059669' }
   ];
 
   if (isAluno) {
@@ -1110,8 +1113,8 @@ export default function DashboardView({
   });
 
   let aq10ChartData = [
-    { label: 'Dentro da média populacional', value: aq10Groups['Traços comportamentais dentro da média da população geral'].total, maleCount: aq10Groups['Traços comportamentais dentro da média da população geral'].male, femaleCount: aq10Groups['Traços comportamentais dentro da média da população geral'].female, startColor: '#34d399', endColor: '#059669' },
-    { label: 'Alerta de Traços Elevados de TEA', value: aq10Groups['Pontuação Indicativa (Alerta de Traços Elevados de TEA)'].total, maleCount: aq10Groups['Pontuação Indicativa (Alerta de Traços Elevados de TEA)'].male, femaleCount: aq10Groups['Pontuação Indicativa (Alerta de Traços Elevados de TEA)'].female, startColor: '#f87171', endColor: '#dc2626' }
+    { label: displayCanonical('Dentro da média populacional', locale), value: aq10Groups['Traços comportamentais dentro da média da população geral'].total, maleCount: aq10Groups['Traços comportamentais dentro da média da população geral'].male, femaleCount: aq10Groups['Traços comportamentais dentro da média da população geral'].female, startColor: '#34d399', endColor: '#059669' },
+    { label: displayCanonical('Alerta de Traços Elevados de TEA', locale), value: aq10Groups['Pontuação Indicativa (Alerta de Traços Elevados de TEA)'].total, maleCount: aq10Groups['Pontuação Indicativa (Alerta de Traços Elevados de TEA)'].male, femaleCount: aq10Groups['Pontuação Indicativa (Alerta de Traços Elevados de TEA)'].female, startColor: '#f87171', endColor: '#dc2626' }
   ];
 
   if (isAluno) {
@@ -1144,7 +1147,7 @@ export default function DashboardView({
   ];
 
   let pcdChartData = PCD_PERFIS.map((label, i) => ({
-    label,
+    label: displayCanonical(label, locale),
     value: pcdGroups[label].total,
     maleCount: pcdGroups[label].male,
     femaleCount: pcdGroups[label].female,
@@ -1190,7 +1193,7 @@ export default function DashboardView({
     .map((nome, i) => {
       const v = pcdSugeridasMap[nome];
       return {
-        label: nome,
+        label: displayCanonical(nome, locale),
         value: v?.total ?? 0,
         maleCount: v?.male ?? 0,
         femaleCount: v?.female ?? 0,
@@ -1202,7 +1205,7 @@ export default function DashboardView({
       Object.entries(pcdSugeridasMap)
         .filter(([label]) => label === 'Não definida')
         .map(([label, v], i) => ({
-          label,
+          label: displayCanonical(label, locale),
           value: v.total,
           maleCount: v.male,
           femaleCount: v.female,
@@ -1234,7 +1237,7 @@ export default function DashboardView({
   const pcdGrupoChartData = [1, 2, 3, 4, 5, 6].map((g, i) => {
     const v = pcdGruposMap[String(g)];
     return {
-      label: PCD_GRUPO_NOMES[g] || `Grupo ${g}`,
+      label: displayCanonical(PCD_GRUPO_NOMES[g] || `Grupo ${g}`, locale),
       value: v?.total ?? 0,
       maleCount: v?.male ?? 0,
       femaleCount: v?.female ?? 0,
@@ -1262,7 +1265,7 @@ export default function DashboardView({
       : filteredStudentsList.filter(s => (m.enrolledStudentIds || []).includes(s.id));
     
     return {
-      label: m.name,
+      label: displayCanonical(m.name, locale),
       value: enrolledStudents.length,
       maleCount: enrolledStudents.filter(s => s!.gender === 'Masculino').length,
       femaleCount: enrolledStudents.filter(s => s!.gender !== 'Masculino').length,
@@ -1326,9 +1329,9 @@ export default function DashboardView({
       }
       return {
         name,
-        'Matrículas acumuladas': cumulative,
-        'Frequência (%)': freq,
-        'Ausência (%)': freq === null ? null : 100 - freq
+        matriculasAcumuladas: cumulative,
+        frequenciaPct: freq,
+        ausenciaPct: freq === null ? null : 100 - freq
       };
     });
     return { data: rows, enrollmentNoDate: semData };
@@ -1660,13 +1663,14 @@ export default function DashboardView({
                           <div className="bg-[#0b1326]/95 border border-[#3e484f] px-3.5 py-2.5 rounded-xl shadow-2xl backdrop-blur-md animate-in fade-in duration-200">
                             <p className="text-xs font-bold text-[#dae2fd] border-b border-[#3e484f]/40 pb-1.5 mb-1.5 font-sans">{label}</p>
                             {payload.map((entry: TooltipEntry, index: number) => {
-                              const isPct = entry.name !== 'Matrículas acumuladas';
-                              const dotColor = entry.name === 'Frequência (%)' ? '#34d399' : entry.name === 'Ausência (%)' ? '#f87171' : '#38bdf8';
+                              const isPct = entry.dataKey !== 'matriculasAcumuladas';
+                              const dotColor = entry.dataKey === 'frequenciaPct' ? '#34d399' : entry.dataKey === 'ausenciaPct' ? '#f87171' : '#38bdf8';
+                              const seriesLabel = entry.dataKey === 'matriculasAcumuladas' ? t('matriculas') : entry.dataKey === 'frequenciaPct' ? t('frequencia') : t('ausencia');
                               return (
                                 <div key={index} className="flex items-center justify-between gap-6 text-xs mt-1 font-sans">
                                   <div className="flex items-center gap-1.5">
                                     <span className="w-2 h-2 rounded-full" style={{ backgroundColor: dotColor }} />
-                                    <span className="text-[#bdc8d1] font-medium">{entry.name}:</span>
+                                    <span className="text-[#bdc8d1] font-medium">{seriesLabel}:</span>
                                   </div>
                                   <span className="font-bold text-white text-right">{isPct ? `${entry.value}%` : entry.value}</span>
                                 </div>
@@ -1701,7 +1705,7 @@ export default function DashboardView({
                   <Area 
                     yAxisId="count"
                     type="monotone" 
-                    dataKey="Matrículas acumuladas" 
+                    dataKey="matriculasAcumuladas" 
                     stroke="#38bdf8" 
                     strokeWidth={2.5}
                     fillOpacity={1} 
@@ -1711,7 +1715,7 @@ export default function DashboardView({
                   <Area
                     yAxisId="pct"
                     type="monotone"
-                    dataKey="Frequência (%)"
+                    dataKey="frequenciaPct"
                     stroke="#34d399"
                     strokeWidth={2}
                     fillOpacity={1}
@@ -1722,7 +1726,7 @@ export default function DashboardView({
                   <Area
                     yAxisId="pct"
                     type="monotone"
-                    dataKey="Ausência (%)"
+                    dataKey="ausenciaPct"
                     stroke="#f87171"
                     strokeWidth={2}
                     strokeDasharray="5 4"

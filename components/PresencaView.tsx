@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { 
   Check, 
   X, 
@@ -28,6 +28,7 @@ import { getDb } from '../lib/dbFacade';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { addReportBackground } from '../lib/pdfUtils';
+import { setupPdfFont } from '../lib/pdfFont';
 import * as XLSX from 'xlsx';
 
 interface PresencaViewProps {
@@ -48,6 +49,7 @@ interface PresencaViewProps {
 }
 
 export default function PresencaView({ students, runWithPermission, contratos, user }: PresencaViewProps) {
+  const locale = useLocale();
   const t = useTranslations('presenca');
   const ta = useTranslations('alunos');
 
@@ -882,41 +884,42 @@ export default function PresencaView({ students, runWithPermission, contratos, u
       const stats = monthlyStats[student.id] || { present: 0, absent: 0, rate: 100 };
       const { presents, absents } = buildDateLists(student);
       return {
-        'Nome': student.name,
-        'ID Matrícula': student.enrollmentId,
-        'Turma': student.grade,
-        'Localidade': student.locality || 'Centro',
-        [`Presenças (${activeMonthName})`]: stats.present,
-        [`Faltas (${activeMonthName})`]: stats.absent,
-        [`Frequência (%) (${activeMonthName})`]: `${stats.rate}%`,
-        [`Datas de Presença (${activeMonthName})`]: presents,
-        [`Datas de Falta (${activeMonthName})`]: absents
+        [ta('expNome')]: student.name,
+        [ta('expMatricula')]: student.enrollmentId,
+        [ta('expTurma')]: student.grade,
+        [ta('expLocalidade')]: student.locality || ta('expLocalidadePadrao'),
+        [t('expPresencas', { p0: activeMonthName })]: stats.present,
+        [t('expFaltas', { p0: activeMonthName })]: stats.absent,
+        [t('expFrequencia', { p0: activeMonthName })]: `${stats.rate}%`,
+        [t('expDatasPresenca', { p0: activeMonthName })]: presents,
+        [t('expDatasFalta', { p0: activeMonthName })]: absents
       };
     });
     
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Presença");
-    XLSX.writeFile(workbook, `Frequencia_${selectedGrade}_${date}.xlsx`);
+    XLSX.utils.book_append_sheet(workbook, worksheet, t('expAbaPresenca'));
+    XLSX.writeFile(workbook, `${t('expArquivoPresenca')}_${selectedGrade}_${date}.xlsx`);
   };
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     const doc = new jsPDF();
+    await setupPdfFont(doc);
     addReportBackground(doc);
     const activeMonthName = MONTH_NAMES.find(m => m.value === selectedMonth)?.label || '';
     
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.setTextColor(11, 19, 38);
-    doc.text("EDUKYNE - Relatório de Frequência", 14, 15);
+    doc.text(t('expTituloPdfPresenca'), 14, 15);
     
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(100, 100, 100);
-    doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, 14, 21);
-    doc.text(`Filtros Ativos - Data: ${date.split('-').reverse().join('/')} | Turma: ${selectedGrade} | Unidade: ${localityFilter}`, 14, 26);
+    doc.text(t('expGeradoEmAs', { p0: new Date().toLocaleDateString(locale), p1: new Date().toLocaleTimeString(locale) }), 14, 21);
+    doc.text(t('expFiltrosAtivosPresenca', { p0: date.split('-').reverse().join('/'), p1: selectedGrade, p2: localityFilter }), 14, 26);
     
-    const tableColumn = ["Nome", "Turma", `Presenças (${activeMonthName})`, `Faltas (${activeMonthName})`, `Frequência (%)`, `Datas de Presença (${activeMonthName})`, `Datas de Falta (${activeMonthName})`];
+    const tableColumn = [ta('expNome'), ta('expTurma'), t('expPresencas', { p0: activeMonthName }), t('expFaltas', { p0: activeMonthName }), t('expFrequenciaSimples'), t('expDatasPresenca', { p0: activeMonthName }), t('expDatasFalta', { p0: activeMonthName })];
     const tableRows = gradeStudents.map(student => {
       const stats = monthlyStats[student.id] || { present: 0, absent: 0, rate: 100 };
       const { presents, absents } = buildDateLists(student);
@@ -945,7 +948,7 @@ export default function PresencaView({ students, runWithPermission, contratos, u
       }
     });
     
-    doc.save(`Relatorio_Frequencia_${selectedGrade}_${date}.pdf`);
+    doc.save(`${t('expArquivoPresenca')}_${selectedGrade}_${date}.pdf`);
   };
 
   return (

@@ -197,7 +197,26 @@
     "erroCaptura": "Failed to capture the photo.",
     "erroCamposObrigatorios": "Please fill in all required fields (including Contract, State, Region, Locality and Password).",
     "erroCpf": "Please enter the full CPF in the format 000.000.000-00.",
-    "erroTelefone": "Please enter the full Contact Phone in the format (00) 00000-0000."
+    "erroTelefone": "Please enter the full Contact Phone in the format (00) 00000-0000.",
+    "expNome": "Name",
+    "expEmail": "Email",
+    "expMatricula": "Enrollment ID",
+    "expTurma": "Class",
+    "expLocalidade": "Locality",
+    "expContrato": "Contract",
+    "expEstado": "State",
+    "expRegiao": "Region",
+    "expCpf": "CPF",
+    "expTelefone": "Phone",
+    "expResponsavel": "Guardian",
+    "expNascimento": "Birth Date",
+    "expStatus": "Status",
+    "expGeradoEmAs": "Generated on: {p0} at {p1}",
+    "expFiltrosAtivosAlunos": "Active Filters - Status: {p0} | Contract: {p1} | Grade: {p2}",
+    "expTituloPdfAlunos": "EDUKYNE - Student Report",
+    "expAbaAlunos": "Students",
+    "expArquivoAlunos": "Filtered_Students",
+    "expLocalidadePadrao": "Center"
   },
   "dashboard": {
     "filtroTitulo": "Unified Filter - Managed Territories & Contracts",
@@ -374,7 +393,17 @@
     "mes09": "September",
     "mes10": "October",
     "mes11": "November",
-    "mes12": "December"
+    "mes12": "December",
+    "expPresencas": "Presences ({p0})",
+    "expFaltas": "Absences ({p0})",
+    "expFrequencia": "Attendance (%) ({p0})",
+    "expFrequenciaSimples": "Attendance (%)",
+    "expDatasPresenca": "Attendance Dates ({p0})",
+    "expDatasFalta": "Absence Dates ({p0})",
+    "expAbaPresenca": "Attendance",
+    "expArquivoPresenca": "Attendance",
+    "expTituloPdfPresenca": "EDUKYNE - Attendance Report",
+    "expFiltrosAtivosPresenca": "Active Filters - Date: {p0} | Class: {p1} | Unit: {p2}"
   },
   "modalidades": {
     "titulo": "Modalities",
@@ -417,7 +446,17 @@
     "desvincularAluno": "Unlink Student",
     "fechar": "Close",
     "confirmarExclusaoTexto": "Are you sure you want to delete the modality {nome}?",
-    "avisoIrreversivel": "This action is irreversible and will remove the link for all students enrolled in this record."
+    "avisoIrreversivel": "This action is irreversible and will remove the link for all students enrolled in this record.",
+    "campoProfissional": "Professional",
+    "avisoCamposObrigatorios": "Warning: To create a new modality, you must fill in the following fields:",
+    "prefixoProf": "Prof.",
+    "profSemNome": "Unnamed Professional",
+    "expAbaMatriculados": "Enrolled Students",
+    "expArquivoMatriculados": "Enrolled",
+    "expTituloPdfMatriculados": "EDUKYNE - Enrolled in {p0}",
+    "expProfessorCategoria": "Teacher/Coach: {p0} | Category: {p1}",
+    "expUnidadeGerado": "Unit: {p0} | Generated on: {p1}",
+    "expLocalidadePadrao": "Center"
   },
   "planoAcao": {
     "servidorIndisponivel": "Server unavailable or offline mode.",
@@ -469,7 +508,8 @@
     "tipoArquivo": "file",
     "removidoPermanentemente": "\"{nome}\" will be permanently removed",
     "removidoComPdf": " along with all PDFs contained in it",
-    "excluindo": "Deleting..."
+    "excluindo": "Deleting...",
+    "nomeArquivoPadrao": "plan.pdf"
   },
   "perfil": {
     "fotoSalvaSemPerfil": "Photo uploaded, but the server did not save it to the profile ({erro}). If you reload, the old photo will return.",
@@ -1320,7 +1360,15 @@
     "colunaForcaExplosivaNota": "Explosive Strength (score)",
     "colunaForcaMembrosSupNota": "Upper Limb Strength (score)",
     "colunaCoreNota": "Core (score)",
-    "colunaDirecionamento": "Guidance"
+    "colunaDirecionamento": "Guidance",
+    "tplParecerPcdPadrao": "Screening group {p0} ({p1}). Profile: {p2}. Suggested sports direction: {p3}.",
+    "tplIarBruto": "IAR {p0} (raw)",
+    "expArquivoAvaliacoes": "Assessments",
+    "tplPcdDirecionamento": "Pre-selection (physical matrix): {p0}. Preliminary indication, subject to the qualitative funnel (clinical-functional, cognitive-sensory and participant preference filters).",
+    "valorAguardandoAvaliacaoCompleta": "Awaiting full assessment",
+    "tplPcdFunilItem": "{p0}. **{p1}:** {p2}",
+    "tplPcdAdaptacaoItem": "- **{p0}** ({p1}): {p2}",
+    "tplExemploValor": "E.g.: {p0}"
   },
   "questionario": {
     "preencha_o_nome_do_grupo": "Fill in the group name.",
@@ -2345,7 +2393,9 @@
     "valorRegular": "Average",
     "valorBasquete": "BASKETBALL",
     "valorHandebol": "HANDBALL",
-    "valorAtletismo": "ATHLETICS"
+    "valorAtletismo": "ATHLETICS",
+    "tplPcdFunilItem": "{p0}. **{p1}:** {p2}",
+    "tplPcdAdaptacaoItem": "- **{p0}** ({p1}): {p2}"
   },
   "globalError": {
     "title": "Critical Global Error",
@@ -2461,5 +2511,47 @@
     "rbacFalhaSemearPermissoes": "Failed to seed permissions.",
     "rbacPayloadInvalido": "Invalid RBAC payload.",
     "rbacFalhaGravarPermissoes": "Failed to save permissions."
+  },
+  "canonical": {
+    "velocidade": "Speed",
+    "nivelInsuficiente": "INSUFFICIENT",
+    "nivelExcelente": "EXCELLENT",
+    "forcaMuscular": "Muscular strength",
+    "nivelBom": "GOOD",
+    "abdomen": "Abdominal",
+    "nivelRegular": "REGULAR",
+    "impulsao": "Explosiveness/Jumping power",
+    "agilidade": "Agility",
+    "forcaFuncionalRotina": "The student has functional strength for routine activities, but fails or loses body alignment when exposed to slightly longer periods of exertion. The health condition is stable, but the stabilizing muscles fatigue quickly, leading to postural decompensations during games.",
+    "pcdIntelectual": "Intellectual Disability",
+    "pcdFisicaLocomocao": "Physical Disability (Independent Mobility)",
+    "pcdFisicaCadeira": "Physical Disability (Wheelchair)",
+    "pcdParalisiaCerebral": "Cerebral Palsy (GMFCS)",
+    "pcdVisual": "Visual Impairment (B1-B3)",
+    "pcdAuditiva": "Hearing Impairment",
+    "pcdBasqueteRugby": "Wheelchair Basketball / Rugby",
+    "pcdBoccia": "Boccia (Adapted Boules)",
+    "pcdAtletismoVelocidade": "Athletics (Speed)",
+    "pcdNatacaoAdaptada": "Adapted Swimming",
+    "pcdHalterofilismo": "Adapted Weightlifting",
+    "pcdGoalball": "Goalball / Football 5-a-Side",
+    "testeSalto": "Jump",
+    "testeAbdominal": "Abdominal",
+    "testeFlexao": "Flexion",
+    "filtroClinicoGrupo": "Clinical/Group Filter",
+    "filtroCognitivoSensorial": "Cognitive/Sensory Filter",
+    "filtroPreferencia": "Preference and Personal Desire Filter",
+    "pcdPerfilElevado": "High Motor Profile",
+    "pcdPerfilMediano": "Average Motor Profile",
+    "pcdPerfilLimitacoes": "Motor Profile with Limitations",
+    "pesoIdeal": "Ideal Weight",
+    "aq10DentroMedia": "Within Population Average",
+    "aq10AlertaTracos": "Alert for Elevated ASD Traits",
+    "testeAbdominalPrancha": "Abdominal (Plank)",
+    "testeVelocidadeCorrida20m": "Speed (20m Run)",
+    "testeAgilidadeShuttleRun": "Agility (Shuttle Run)",
+    "testeSaltoHorizontal": "Standing Long Jump",
+    "testeFlexaoBraco": "Push-up",
+    "pcdForcaResistenciaMembrosSup": "Strength/Endurance (Upper Limbs)"
   }
 }

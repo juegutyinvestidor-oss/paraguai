@@ -8,9 +8,10 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import JSZip from 'jszip';
 import { addReportBackground } from '../lib/pdfUtils';
+import { setupPdfFont } from '../lib/pdfFont';
 import { type Student, type ContratoItem, type PerformanceReport, type ImcRecord, type MotorRecord, type SportRecord, type VocationalRecord, type HealthRecord, type OralRecord, type AutoconceptRecord, type IasRecord, type SnapRecord, type Aq10Record, type PcdRecord, type EstHierarchical, type RegHierarchical, type LocHierarchical } from '../types/edukyne';
 import { buildAssessmentReport, type ReportBuildCtx } from '../lib/reportBuilder';
-import { localizeAssessmentReport, type ReportTranslator } from '../lib/reportI18n';
+import { displayCanonical, localizeAssessmentReport, type ReportTranslator } from '../lib/reportI18n';
 import { backfillReportsForStudentIds } from '../lib/autoReport';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { getDb } from '../lib/dbFacade';
@@ -117,9 +118,16 @@ const DISPLAY_KEYS: Record<string, string> = {
   "ATLETISMO": "valorAtletismo",
 };
 
+let displayLocale = 'pt-BR';
+
+function setDisplayLocale(locale: string): void {
+  displayLocale = locale;
+}
+
 function displayValue(value: unknown, t: (key: string) => string): string {
   const text = String(value ?? '');
-  return DISPLAY_KEYS[text] ? t(DISPLAY_KEYS[text]) : text;
+  if (DISPLAY_KEYS[text]) return t(DISPLAY_KEYS[text]);
+  return displayCanonical(text, displayLocale);
 }
 
 interface PerformanceViewUser {
@@ -378,6 +386,7 @@ function FocusAreaSelect({ value, onChange, className }: { value: string; onChan
 export default function PerformanceView({ students, contratos, user, isAnaliseGeral, isPainelEstatistico, imcRecords: imcRecordsProp, motorRecords: motorRecordsProp, sportRecords: sportRecordsProp, vocationalRecords: vocationalRecordsProp, healthRecords: healthRecordsProp, oralRecords: oralRecordsProp, autoconceptRecords: autoconceptRecordsProp, iasRecords: iasRecordsProp, snapRecords: snapRecordsProp, aq10Records: aq10RecordsProp, pcdRecords: pcdRecordsProp, runWithPermission }: PerformanceViewProps) {
   const t = useTranslations('desempenho');
   const locale = useLocale();
+  setDisplayLocale(locale);
 
   // Match logged in Student object for Aluno role
   const loggedInStudentObj = useMemo(() => {
@@ -1834,6 +1843,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
 
   const createStudentPDF = async (studentObj: Student, reportText: string, area: string) => {
     const doc = new jsPDF();
+    await setupPdfFont(doc);
     addReportBackground(doc);
     const margin = 20;
     let y = 20;
@@ -1966,7 +1976,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
 
     try {
       // Garante relatorios atualizados dos selecionados antes de baixar (sem avisar).
-      try { await backfillReportsForStudentIds(selectedStudentIdsForBatch); }
+      try { await backfillReportsForStudentIds(selectedStudentIdsForBatch, { locale }); }
       catch (e) { console.error('Backfill pre-download falhou:', e); }
 
       // Busca os relatorios da dimensao escolhida direto do banco (sempre atual).
@@ -2355,8 +2365,9 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
     return { total, dims, frequency };
   }, [statsStudentsList, imcRecordsProp, motorRecordsProp, sportRecordsProp, vocationalRecordsProp, healthRecordsProp, oralRecordsProp, autoconceptRecordsProp, iasRecordsProp, snapRecordsProp, aq10RecordsProp, pcdRecordsProp, attendanceByStudent, t]);
 
-  const handleDownloadStats = () => {
+  const handleDownloadStats = async () => {
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    await setupPdfFont(doc);
     doc.setFontSize(15); doc.setTextColor(11, 19, 38);
     doc.text(t('tplPainelEstatisticoStatsscopelabel', { p0: displayValue(statsScopeLabel, t) }), 40, 46);
     doc.setFontSize(9); doc.setTextColor(90);
@@ -2559,7 +2570,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
       const reportCtx = makeReportCtx(focusArea, studentObj.name, studentObj.grade, observations, dateStr, savedReports.filter(r => r.studentId === studentObj.id).map(r => ({ focusArea: r.focusArea, report: r.report })));
       const builtReport = locale === 'pt-BR'
         ? buildAssessmentReport(reportCtx)
-        : localizeAssessmentReport(reportCtx, t as ReportTranslator);
+        : localizeAssessmentReport(reportCtx, t as ReportTranslator, locale);
       if (builtReport) {
         generatedReport = builtReport.report;
       } else
@@ -2738,7 +2749,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           const basicDataRec = recRow?.basicData || t('tplDiretrizesPedagogicasNaoCadastradasParaOPerfil', { p0: displayValue(profile, t) });
           const reflectionRec = recRow?.reflection || t('tplImersaoDeMercadoNaoCadastradaParaO', { p0: displayValue(profile, t) });
 
-          generatedReport = t('tplRelatorioDeDesempenhoVocacionalEstudanteStudentobjName', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedVocation.date ? selectedVocation.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(profile, t), p3: displayValue(basicDataMapa, t), p4: displayValue(reflectionMapa !== (selectedVocation.technicalOpinion || '') ? t('tplAnaliseCognitivaPsicologica', { p0: displayValue(reflectionMapa, t) }) : '', t), p5: displayValue(basicDataRec, t), p6: displayValue(reflectionRec, t), p7: displayValue(selectedVocation.technicalOpinion || 'Nenhum parecer técnico inserido no registro de vocacionamento original.', t), p8: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p9: displayValue(dateStr, t) });
+          generatedReport = t('tplRelatorioDeDesempenhoVocacionalEstudanteStudentobjName', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedVocation.date ? selectedVocation.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(profile, t), p3: displayValue(basicDataMapa, t), p4: displayValue(reflectionMapa !== (selectedVocation.technicalOpinion || '') ? t('tplAnaliseCognitivaPsicologica', { p0: displayValue(reflectionMapa, t) }) : '', t), p5: displayValue(basicDataRec, t), p6: displayValue(reflectionRec, t), p7: displayValue(selectedVocation.technicalOpinion || t('valorNenhumParecerTecnicoInseridoNoRegistroDe'), t), p8: displayValue(observations || t('valorNenhumaObservacaoComplementarRegistradaParaEstePeriodo'), t), p9: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Saúde Global') {
         const selectedHealth = healthRecords.find(r => r.id === selectedHealthId);
@@ -2751,7 +2762,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           const basicData = m9match?.basicData || t('tplDadosDaClassificacaoClassificationNaoCadastradosNo', { p0: displayValue(classification, t) });
           const reflection = m9match?.reflection || '';
 
-          generatedReport = t('tplRelatorioDeDesempenhoSaudeGlobalKidscreen10', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedHealth.date ? selectedHealth.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedHealth.rawScore, t), p3: displayValue(Number(selectedHealth.tScore).toFixed(2), t), p4: displayValue(classification, t), p5: displayValue(basicData, t), p6: displayValue(selectedHealth.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Saúde Global original.', t), p7: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p8: displayValue(dateStr, t) });
+          generatedReport = t('tplRelatorioDeDesempenhoSaudeGlobalKidscreen10', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedHealth.date ? selectedHealth.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedHealth.rawScore, t), p3: displayValue(Number(selectedHealth.tScore).toFixed(2), t), p4: displayValue(classification, t), p5: displayValue(basicData, t), p6: displayValue(selectedHealth.technicalOpinion || reflection || t('valorNenhumParecerTecnicoInseridoNoRegistroDe2'), t), p7: displayValue(observations || t('valorNenhumaObservacaoComplementarRegistradaParaEstePeriodo'), t), p8: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Higiene Bucal') {
         const selectedOral = oralRecords.find(r => r.id === selectedOralId);
@@ -2764,7 +2775,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           const basicData = m10match?.basicData || t('tplFaixaDaClassificacaoClassificationNaoCadastradaNo', { p0: displayValue(classification, t) });
           const reflection = m10match?.reflection || '';
 
-          generatedReport = t('tplRelatorioDeDesempenhoHigieneBucalHuDbi', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedOral.date ? selectedOral.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedOral.score, t), p3: displayValue(classification, t), p4: displayValue(basicData, t), p5: displayValue(selectedOral.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Higiene Bucal original.', t), p6: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p7: displayValue(dateStr, t) });
+          generatedReport = t('tplRelatorioDeDesempenhoHigieneBucalHuDbi', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedOral.date ? selectedOral.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedOral.score, t), p3: displayValue(classification, t), p4: displayValue(basicData, t), p5: displayValue(selectedOral.technicalOpinion || reflection || t('valorNenhumParecerTecnicoInseridoNoRegistroDe3'), t), p6: displayValue(observations || t('valorNenhumaObservacaoComplementarRegistradaParaEstePeriodo'), t), p7: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Autoconceito') {
         const selectedAuto = autoconceptRecords.find(r => r.id === selectedAutoId);
@@ -2777,7 +2788,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           const basicData = m11match?.basicData || t('tplFaixaDaClassificacaoClassificationNaoCadastradaNo2', { p0: displayValue(classification, t) });
           const reflection = m11match?.reflection || '';
 
-          generatedReport = t('tplRelatorioDeDesempenhoAutoconceitoEscalaDeRosenberg', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedAuto.date ? selectedAuto.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedAuto.score, t), p3: displayValue(classification, t), p4: displayValue(basicData, t), p5: displayValue(selectedAuto.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Autoconceito original.', t), p6: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p7: displayValue(dateStr, t) });
+          generatedReport = t('tplRelatorioDeDesempenhoAutoconceitoEscalaDeRosenberg', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedAuto.date ? selectedAuto.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedAuto.score, t), p3: displayValue(classification, t), p4: displayValue(basicData, t), p5: displayValue(selectedAuto.technicalOpinion || reflection || t('valorNenhumParecerTecnicoInseridoNoRegistroDe4'), t), p6: displayValue(observations || t('valorNenhumaObservacaoComplementarRegistradaParaEstePeriodo'), t), p7: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Índice Alimentar') {
         const selectedIas = iasRecords.find(r => r.id === selectedIasId);
@@ -2790,7 +2801,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           const basicData = m12match?.basicData || t('tplFaixaDaClassificacaoClassificationNaoCadastradaNo3', { p0: displayValue(classification, t) });
           const reflection = m12match?.reflection || '';
 
-          generatedReport = t('tplRelatorioDeDesempenhoIndiceAlimentarIasEstudante', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedIas.date ? selectedIas.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedIas.totalScore, t), p3: displayValue(classification, t), p4: displayValue(basicData, t), p5: displayValue(selectedIas.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Índice Alimentar original.', t), p6: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p7: displayValue(dateStr, t) });
+          generatedReport = t('tplRelatorioDeDesempenhoIndiceAlimentarIasEstudante', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedIas.date ? selectedIas.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedIas.totalScore, t), p3: displayValue(classification, t), p4: displayValue(basicData, t), p5: displayValue(selectedIas.technicalOpinion || reflection || t('valorNenhumParecerTecnicoInseridoNoRegistroDe5'), t), p6: displayValue(observations || t('valorNenhumaObservacaoComplementarRegistradaParaEstePeriodo'), t), p7: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Rastreamento TDAH') {
         const selectedSnap = snapRecords.find(r => r.id === selectedSnapId);
@@ -2803,7 +2814,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           const basicData = m13match?.basicData || t('tplClassificacaoClassificationNaoCadastradaNoModulo13', { p0: displayValue(classification, t) });
           const reflection = m13match?.reflection || '';
 
-          generatedReport = t('tplRelatorioDeDesempenhoRastreamentoDoTdahSnap', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedSnap.date ? selectedSnap.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedSnap.respondent || 'Não informado', t), p3: displayValue(selectedSnap.inattentionScore, t), p4: displayValue(selectedSnap.hyperactivityScore, t), p5: displayValue(classification, t), p6: displayValue(basicData, t), p7: displayValue(selectedSnap.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Rastreamento do TDAH original.', t), p8: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p9: displayValue(dateStr, t) });
+          generatedReport = t('tplRelatorioDeDesempenhoRastreamentoDoTdahSnap', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedSnap.date ? selectedSnap.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedSnap.respondent || 'Não informado', t), p3: displayValue(selectedSnap.inattentionScore, t), p4: displayValue(selectedSnap.hyperactivityScore, t), p5: displayValue(classification, t), p6: displayValue(basicData, t), p7: displayValue(selectedSnap.technicalOpinion || reflection || t('valorNenhumParecerTecnicoInseridoNoRegistroDe6'), t), p8: displayValue(observations || t('valorNenhumaObservacaoComplementarRegistradaParaEstePeriodo'), t), p9: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Rastreamento Precoce do TEA') {
         const selectedAq10 = aq10Records.find(r => r.id === selectedAq10Id);
@@ -2816,9 +2827,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
           const basicData = m14match?.basicData || t('tplClassificacaoClassificationNaoCadastradaNoModulo14', { p0: displayValue(classification, t) });
           const reflection = m14match?.reflection || '';
 
-          generatedReport = t('tplRelatorioDeDesempenhoRastreamentoPrecoceDoTea', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedAq10.date ? selectedAq10.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedAq10.respondent || 'Não informado', t), p3: displayValue(selectedAq10.version === 'adolescente' ? 'Adolescente (12 a 15 anos)' : 'Criança (4 a 11 anos)', t), p4: displayValue(selectedAq10.totalScore, t), p5: displayValue(classification, t), p6: displayValue(basicData, t), p7: displayValue(selectedAq10.technicalOpinion || reflection || 'Nenhum parecer técnico inserido no registro de Rastreamento Precoce do TEA original.', t), p8: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p9: displayValue((selectedAq10.totalScore ?? 0) <= 6
-    ? 'Pontuação de 0 a 6: traços comportamentais dentro da média da população geral; acompanhamento rotineiro do desenvolvimento.'
-    : 'Pontuação de 7 a 10: alerta de traços elevados de TEA; recomendação de encaminhamento prioritário para avaliação multidisciplinar especializada (neuropediatra ou psiquiatra infantil e neuropsicólogo).', t), p10: displayValue(dateStr, t) });
+          generatedReport = t('tplRelatorioDeDesempenhoRastreamentoPrecoceDoTea', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedAq10.date ? selectedAq10.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(selectedAq10.respondent || 'Não informado', t), p3: t(selectedAq10.version === 'adolescente' ? 'uiAdolescente12A15Anos' : 'uiCrianca4A11Anos'), p4: displayValue(selectedAq10.totalScore, t), p5: displayValue(classification, t), p6: displayValue(basicData, t), p7: displayValue(selectedAq10.technicalOpinion || reflection || t('valorNenhumParecerTecnicoInseridoNoRegistroDe7'), t), p8: displayValue(observations || t('valorNenhumaObservacaoComplementarRegistradaParaEstePeriodo'), t), p9: t((selectedAq10.totalScore ?? 0) <= 6 ? 'textoPontuacaoDe0A6TracosComportamentais' : 'textoPontuacaoDe7A10AlertaDe'), p10: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Qualidade Motora PCD') {
         const selectedPcd = pcdRecords.find(r => r.id === selectedPcdId);
@@ -2838,14 +2847,14 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
             : t('uiSemDadosDeCompatibilidadeRegistrados');
           const funilPcd = selectedPcd.funil ?? [];
           const funilStr = funilPcd.length
-            ? funilPcd.map(f => `${f.momento}. **${f.titulo}:** ${f.regra}`).join('\n')
+            ? funilPcd.map(f => t('tplPcdFunilItem', { p0: displayValue(f.momento, t), p1: displayValue(f.titulo, t), p2: displayValue(f.regra, t) })).join('\n')
             : t('uiFunilQualitativoNaoRegistradoNestaAvaliacao');
           const adaptStr = (selectedPcd.adaptacoesAplicadas ?? [])
             .filter(a => a.status === 'Adaptado' || a.status === 'Substituído')
-            .map(a => `- **${a.teste}** (${a.status}): ${a.instrucao}`).join('\n');
+            .map(a => t('tplPcdAdaptacaoItem', { p0: displayValue(a.teste, t), p1: displayValue(a.status, t), p2: displayValue(a.instrucao, t) })).join('\n');
           const topPcd = selectedPcd.compatibilidade.length > 0 ? selectedPcd.compatibilidade[0].modalidade : t('uiAComplementar');
 
-          generatedReport = t('tplRelatorioDeDesempenhoQualidadeMotoraPcdEstudante', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedPcd.date ? selectedPcd.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(grupoNome, t), p3: displayValue(selectedPcd.detalheClassificacao || 'Geral', t), p4: displayValue(selectedPcd.classificacaoPerfil, t), p5: displayValue(valenciaStr, t), p6: displayValue(compat, t), p7: displayValue(topPcd, t), p8: displayValue(adaptStr || '- Nenhum teste adaptado ou substituído neste grupo.', t), p9: displayValue(funilStr, t), p10: displayValue(selectedPcd.technicalOpinion || 'Nenhum parecer técnico inserido no registro de Avaliação PCD original.', t), p11: displayValue(observations || 'Nenhuma observação complementar registrada para este período.', t), p12: displayValue(dateStr, t) });
+          generatedReport = t('tplRelatorioDeDesempenhoQualidadeMotoraPcdEstudante', { p0: displayValue(studentObj.name, t), p1: displayValue(selectedPcd.date ? selectedPcd.date.split('-').reverse().join('/') : 'N/A', t), p2: displayValue(grupoNome, t), p3: displayValue(selectedPcd.detalheClassificacao || 'Geral', t), p4: displayValue(selectedPcd.classificacaoPerfil, t), p5: displayValue(valenciaStr, t), p6: displayValue(compat, t), p7: displayValue(topPcd, t), p8: adaptStr ? displayValue(adaptStr, t) : t('valorNenhumTesteAdaptadoOuSubstituidoNesteGrupo'), p9: displayValue(funilStr, t), p10: displayValue(selectedPcd.technicalOpinion || t('valorNenhumParecerTecnicoInseridoNoRegistroDe8'), t), p11: displayValue(observations || t('valorNenhumaObservacaoComplementarRegistradaParaEstePeriodo'), t), p12: displayValue(dateStr, t) });
         }
       } else if (focusArea === 'Desempenho Completo') {
         const reportEscolar = savedReports.find(r => r.focusArea === 'Desempenho Escolar');
@@ -3068,28 +3077,31 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
       const cleanText = (s: string) => s.replace(/#+/g, '').replace(/\*\*/g, '');
       const existing = studentReports.map(r => ({ focusArea: r.focusArea, report: r.report }));
 
-      const upsertOne = async (t: { fa: string; id: string; rid: string | null }) => {
+      const upsertOne = async (item: { fa: string; id: string; rid: string | null }) => {
         // Sempre regenera o corpo (texto atual das configs/registros) preservando a anotacao existente.
-        const existingObs = studentReports.find(r => r.id === t.id)?.observations ?? '';
-        const built = buildAssessmentReport(makeReportCtx(t.fa, studentObj.name, studentObj.grade, existingObs, dateStr, existing));
+        const existingObs = studentReports.find(r => r.id === item.id)?.observations ?? '';
+        const reportCtx = makeReportCtx(item.fa, studentObj.name, studentObj.grade, existingObs, dateStr, existing);
+        const built = locale === 'pt-BR'
+          ? buildAssessmentReport(reportCtx)
+          : localizeAssessmentReport(reportCtx, t as ReportTranslator, locale);
         if (!built) return;
         const report = cleanText(built.report);
         // Rede de seguranca: nunca rebaixa um relatorio ja bom para o texto de
         // config ausente (ex.: parecer ainda nao carregado ao abrir o aluno).
         const isFallbackText = /não cadastrad[oa]s?/i.test(report);
-        const current = studentReports.find(r => r.id === t.id);
+        const current = studentReports.find(r => r.id === item.id);
         if (isFallbackText && current && !/não cadastrad[oa]s?/i.test(current.report)) {
           return;
         }
         try {
           const { error } = await supabase.from('performance_reports').upsert({
-            id: t.id, student_id: studentObj.id, student_name: studentObj.name, grade: studentObj.grade,
-            focus_area: t.fa, observations: existingObs, report, date: today, evaluation_id: t.rid, evaluation_result: built.evaluationResult || null
+            id: item.id, student_id: studentObj.id, student_name: studentObj.name, grade: studentObj.grade,
+            focus_area: item.fa, observations: existingObs, report, date: today, evaluation_id: item.rid, evaluation_result: built.evaluationResult || null
           });
           if (error) { console.error('Falha no auto-relatorio:', error.message); return; }
-          const rec: PerformanceReport = { id: t.id, studentId: studentObj.id, studentName: studentObj.name, grade: studentObj.grade, focusArea: t.fa, observations: existingObs, report, date: today, evaluationId: t.rid || undefined, evaluationResult: built.evaluationResult || undefined, createdAt: new Date().toISOString() };
-          setSavedReports(prev => prev.some(r => r.id === t.id) ? prev.map(r => r.id === t.id ? { ...r, report, observations: existingObs } : r) : [rec, ...prev]);
-          setAllSavedReports(prev => prev.some(r => r.id === t.id) ? prev.map(r => r.id === t.id ? { ...r, report, observations: existingObs } : r) : [rec, ...prev]);
+          const rec: PerformanceReport = { id: item.id, studentId: studentObj.id, studentName: studentObj.name, grade: studentObj.grade, focusArea: item.fa, observations: existingObs, report, date: today, evaluationId: item.rid || undefined, evaluationResult: built.evaluationResult || undefined, createdAt: new Date().toISOString() };
+          setSavedReports(prev => prev.some(r => r.id === item.id) ? prev.map(r => r.id === item.id ? { ...r, report, observations: existingObs } : r) : [rec, ...prev]);
+          setAllSavedReports(prev => prev.some(r => r.id === item.id) ? prev.map(r => r.id === item.id ? { ...r, report, observations: existingObs } : r) : [rec, ...prev]);
         } catch (e) {
           console.error('Erro ao gerar relatorio:', e);
         }
@@ -3119,21 +3131,22 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
     };
     run();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedStudentId, students, savedReports, allSavedReports, attendanceRate, isAnaliseGeral, user, selectedImcId, selectedMotorId, selectedSportId, selectedVocationId, selectedHealthId, selectedOralId, selectedAutoId, selectedIasId, selectedSnapId, selectedAq10Id, m4ImcData, m5Data, m6Modalidades, m6Diretrizes, m7Rows, m9Rows, m10Rows, m11Rows, m12Rows, m13Rows, m14Rows]);
+  }, [selectedStudentId, students, savedReports, allSavedReports, attendanceRate, isAnaliseGeral, user, locale, selectedImcId, selectedMotorId, selectedSportId, selectedVocationId, selectedHealthId, selectedOralId, selectedAutoId, selectedIasId, selectedSnapId, selectedAq10Id, m4ImcData, m5Data, m6Modalidades, m6Diretrizes, m7Rows, m9Rows, m10Rows, m11Rows, m12Rows, m13Rows, m14Rows]);
 
   // (B) Ao escolher uma Turma, preenche em segundo plano os relatorios dos alunos dela.
   const turmaBackfillRef = useRef('');
   useEffect(() => {
     if (isAnaliseGeral) return;
     if (!gradeFilter || user?.role === 'Aluno' || !isSupabaseConfigured) return;
-    if (turmaBackfillRef.current === gradeFilter) return;
+    const backfillKey = `${locale}|${gradeFilter}`;
+    if (turmaBackfillRef.current === backfillKey) return;
     const ids = students.filter(s => s.grade === gradeFilter).map(s => s.id);
     if (ids.length === 0) return;
-    turmaBackfillRef.current = gradeFilter;
-    backfillReportsForStudentIds(ids)
+    turmaBackfillRef.current = backfillKey;
+    backfillReportsForStudentIds(ids, { locale })
       .then(() => setRefreshToggle(prev => !prev)) // recarrega a lista global p/ refletir os novos relatorios
       .catch(e => console.error('Backfill de turma falhou:', e));
-  }, [gradeFilter, students, isAnaliseGeral, user]);
+  }, [gradeFilter, locale, students, isAnaliseGeral, user]);
 
   // (C) Acao manual: preencher relatorios de todos os alunos da turma atual (Análise Geral).
   const handleFillReportsTurma = async () => {
@@ -3145,6 +3158,7 @@ export default function PerformanceView({ students, contratos, user, isAnaliseGe
     try {
       const wrote = await backfillReportsForStudentIds(ids, {
         onProgress: (done, total) => setBackfillProgress({ done, total }),
+        locale,
       });
       setRefreshToggle(prev => !prev);
       setBackfillMsg(t('tplProntoWroteRelatorioSGeradoSAtualizado', { p0: displayValue(wrote, t) }));

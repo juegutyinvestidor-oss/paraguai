@@ -197,7 +197,26 @@
     "erroCaptura": "Falha ao capturar a foto.",
     "erroCamposObrigatorios": "Por favor, preencha todos os campos obrigatórios (incluindo Contrato, Estado, Região, Localidade e Senha).",
     "erroCpf": "Por favor, digite o CPF completo no formato 000.000.000-00.",
-    "erroTelefone": "Por favor, digite o Telefone de Contato completo no formato (00) 00000-0000."
+    "erroTelefone": "Por favor, digite o Telefone de Contato completo no formato (00) 00000-0000.",
+    "expNome": "Nome",
+    "expEmail": "E-mail",
+    "expMatricula": "Matrícula",
+    "expTurma": "Turma",
+    "expLocalidade": "Localidade",
+    "expContrato": "Contrato",
+    "expEstado": "Estado",
+    "expRegiao": "Região",
+    "expCpf": "CPF",
+    "expTelefone": "Telefone",
+    "expResponsavel": "Responsável",
+    "expNascimento": "Nascimento",
+    "expStatus": "Status",
+    "expGeradoEmAs": "Gerado em: {p0} às {p1}",
+    "expFiltrosAtivosAlunos": "Filtros Ativos - Status: {p0} | Contrato: {p1} | Série: {p2}",
+    "expTituloPdfAlunos": "EDUKYNE - Relatório de Alunos",
+    "expAbaAlunos": "Alunos",
+    "expArquivoAlunos": "Alunos_Filtrados",
+    "expLocalidadePadrao": "Centro"
   },
   "dashboard": {
     "filtroTitulo": "Filtro Unificado - Territórios & Contratos administrados",
@@ -374,7 +393,17 @@
     "mes09": "Setembro",
     "mes10": "Outubro",
     "mes11": "Novembro",
-    "mes12": "Dezembro"
+    "mes12": "Dezembro",
+    "expPresencas": "Presenças ({p0})",
+    "expFaltas": "Faltas ({p0})",
+    "expFrequencia": "Frequência (%) ({p0})",
+    "expFrequenciaSimples": "Frequência (%)",
+    "expDatasPresenca": "Datas de Presença ({p0})",
+    "expDatasFalta": "Datas de Falta ({p0})",
+    "expAbaPresenca": "Presença",
+    "expArquivoPresenca": "Frequencia",
+    "expTituloPdfPresenca": "EDUKYNE - Relatório de Frequência",
+    "expFiltrosAtivosPresenca": "Filtros Ativos - Data: {p0} | Turma: {p1} | Unidade: {p2}"
   },
   "modalidades": {
     "titulo": "Modalidades",
@@ -417,7 +446,17 @@
     "desvincularAluno": "Desvincular Aluno",
     "fechar": "Fechar",
     "confirmarExclusaoTexto": "Tem certeza de que deseja excluir a modalidade {nome}?",
-    "avisoIrreversivel": "Esta ação é irreversível e removerá o vínculo de todos os alunos matriculados neste registro."
+    "avisoIrreversivel": "Esta ação é irreversível e removerá o vínculo de todos os alunos matriculados neste registro.",
+    "campoProfissional": "Profissional",
+    "avisoCamposObrigatorios": "Aviso: Para criar uma nova modalidade, é obrigatório preencher os seguintes campos:",
+    "prefixoProf": "Prof.",
+    "profSemNome": "Prof. Sem Nome",
+    "expAbaMatriculados": "Alunos Matriculados",
+    "expArquivoMatriculados": "Matriculados",
+    "expTituloPdfMatriculados": "EDUKYNE - Matriculados em {p0}",
+    "expProfessorCategoria": "Professor/Treinador: {p0} | Categoria: {p1}",
+    "expUnidadeGerado": "Unidade: {p0} | Gerado em: {p1}",
+    "expLocalidadePadrao": "Centro"
   },
   "planoAcao": {
     "servidorIndisponivel": "Servidor indisponível ou modo offline.",
@@ -469,7 +508,8 @@
     "tipoArquivo": "arquivo",
     "removidoPermanentemente": "\"{nome}\" será removido permanentemente",
     "removidoComPdf": " junto com todos os PDFs contidos nele",
-    "excluindo": "Excluindo..."
+    "excluindo": "Excluindo...",
+    "nomeArquivoPadrao": "plano.pdf"
   },
   "perfil": {
     "fotoSalvaSemPerfil": "Foto enviada, mas o servidor não salvou no perfil ({erro}). Se você recarregar, a foto antiga voltará.",
@@ -1320,7 +1360,15 @@
     "colunaForcaExplosivaNota": "Força Explosiva (nota)",
     "colunaForcaMembrosSupNota": "Força Membros Sup. (nota)",
     "colunaCoreNota": "Core (nota)",
-    "colunaDirecionamento": "Direcionamento"
+    "colunaDirecionamento": "Direcionamento",
+    "tplParecerPcdPadrao": "Grupo de triagem {p0} ({p1}). Perfil: {p2}. Direcionamento esportivo sugerido: {p3}.",
+    "tplIarBruto": "IAR {p0} (bruto)",
+    "expArquivoAvaliacoes": "Avaliacoes",
+    "tplPcdDirecionamento": "Pré-seleção (matriz física): {p0}. Indicação preliminar, sujeita ao funil qualitativo (filtros clínico-funcional, cognitivo-sensorial e de preferência do participante).",
+    "valorAguardandoAvaliacaoCompleta": "Aguardando avaliação completa",
+    "tplPcdFunilItem": "{p0}. **{p1}:** {p2}",
+    "tplPcdAdaptacaoItem": "- **{p0}** ({p1}): {p2}",
+    "tplExemploValor": "Ex.: {p0}"
   },
   "questionario": {
     "preencha_o_nome_do_grupo": "Preencha o nome do grupo.",
@@ -2345,7 +2393,9 @@
     "valorRegular": "Regular",
     "valorBasquete": "BASQUETE",
     "valorHandebol": "HANDEBOL",
-    "valorAtletismo": "ATLETISMO"
+    "valorAtletismo": "ATLETISMO",
+    "tplPcdFunilItem": "{p0}. **{p1}:** {p2}",
+    "tplPcdAdaptacaoItem": "- **{p0}** ({p1}): {p2}"
   },
   "globalError": {
     "title": "Erro Crítico Global",
@@ -2461,5 +2511,47 @@
     "rbacFalhaSemearPermissoes": "Falha ao semear permissoes.",
     "rbacPayloadInvalido": "Payload RBAC invalido.",
     "rbacFalhaGravarPermissoes": "Falha ao gravar permissoes."
+  },
+  "canonical": {
+    "velocidade": "velocidade",
+    "nivelInsuficiente": "INSUFICIENTE",
+    "nivelExcelente": "EXCELENTE",
+    "forcaMuscular": "forca_muscular",
+    "nivelBom": "BOM",
+    "abdomen": "abdomen",
+    "nivelRegular": "REGULAR",
+    "impulsao": "impulsao",
+    "agilidade": "agilidade",
+    "forcaFuncionalRotina": "O aluno possui uma força funcional para atividades rotineiras, mas falha ou perde o alinhamento corporal quando exposto a esforços um pouco mais prolongados. A estrutura de saúde é estável, porém a musculatura estabilizadora cansa rápido, gerando descompensações posturais durante os jogos.",
+    "pcdIntelectual": "Deficiência Intelectual",
+    "pcdFisicaLocomocao": "Deficiência Física (Locomoção Independente)",
+    "pcdFisicaCadeira": "Deficiência Física (Cadeira de Rodas)",
+    "pcdParalisiaCerebral": "Paralisia Cerebral (GMFCS)",
+    "pcdVisual": "Deficiência Visual (B1-B3)",
+    "pcdAuditiva": "Deficiência Auditiva",
+    "pcdBasqueteRugby": "Basquete / Rugby em Cadeira",
+    "pcdBoccia": "Boccia (Bocha Adaptada)",
+    "pcdAtletismoVelocidade": "Atletismo (Velocidade)",
+    "pcdNatacaoAdaptada": "Natação Adaptada",
+    "pcdHalterofilismo": "Halterofilismo Adaptado",
+    "pcdGoalball": "Goalball / Futebol de 5",
+    "testeSalto": "salto",
+    "testeAbdominal": "abdominal",
+    "testeFlexao": "flexao",
+    "filtroClinicoGrupo": "Filtro Clínico/Grupo",
+    "filtroCognitivoSensorial": "Filtro Cognitivo/Sensorial",
+    "filtroPreferencia": "Filtro de Preferência e Desejo Pessoal",
+    "pcdPerfilElevado": "Perfil Motor Elevado",
+    "pcdPerfilMediano": "Perfil Motor Mediano",
+    "pcdPerfilLimitacoes": "Perfil Motor com Limitações",
+    "pesoIdeal": "Peso Ideal",
+    "aq10DentroMedia": "Dentro da média populacional",
+    "aq10AlertaTracos": "Alerta de Traços Elevados de TEA",
+    "testeAbdominalPrancha": "Abdominal (Prancha)",
+    "testeVelocidadeCorrida20m": "Velocidade (Corrida 20m)",
+    "testeAgilidadeShuttleRun": "Agilidade (Shuttle Run)",
+    "testeSaltoHorizontal": "Salto Horizontal",
+    "testeFlexaoBraco": "Flexão de Braço",
+    "pcdForcaResistenciaMembrosSup": "Força/Resistência (Membros Sup.)"
   }
 }
