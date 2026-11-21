@@ -3,8 +3,35 @@
 ## Objetivo
 Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrão), `pt-PT`, `es-PY`, `gn-PY` (Guarani) e `en`. Critério de aceite: nenhuma string visível ao usuário permaneça em pt-BR quando o locale não for pt-BR, exceto dados inseridos pelo próprio usuário e textos explicitamente marcados como pendentes.
 
-## PONTO DE CONTINUAÇÃO — MARCADOR (20/11/2026 — atualizado para 2.503 chaves/idioma)
-### Estado atual (última sessão)
+## PONTO DE CONTINUAÇÃO — ESTADO FINAL (21/11/2026)
+
+### Tudo que foi concluído
+- Infraestrutura: `next-intl@4.15.1`, App Router com `[locale]`, middleware, navegação, metadata por locale, `global-error` com provider próprio e seletor de idioma no login/sidebar.
+- Dicionários UI: 5 idiomas (`pt-BR`, `pt-PT`, `es-PY`, `gn-PY`, `en`), **2.503 chaves por idioma** em 24 namespaces; `pt-BR` é a fonte canônica e não foi alterado.
+- Telas/rotas traduzidas e fora do scan strict: Dashboard, Alunos, Profissionais, Contratos, Presença, Modalidades, Plano de Ação, Perfil, Configurações, Estudo Comparativo, shell, Avaliações, Questionário, Performance, política de privacidade, `global-error` e 103 mensagens de API em 10 rotas.
+- Camada de conteúdo: `content/<locale>.json` + `content/generated/<locale>.json`, **551 entradas por idioma**; apenas texto descritivo traduzido, com `delocalizeRows` preservando valores canônicos no Supabase.
+- Relatórios/exports: `lib/reportI18n.ts` (`localizeAssessmentReport`, `displayValue`, `displayCanonical`, 115 chaves), PDFs com fonte Unicode `NotoSans` em 8 fluxos, Excel com 54 chaves `exp*`, `autoReport`/`PerformanceView` preservando relatórios salvos e anotações do educador.
+- Correções de qualidade: 346 valores corrigidos em es/gn/en, traduções antigas de `desempenho` reescritas, rótulos canônicos em UI/PDF/Excel/análise automática, auditoria por idioma e paridade de placeholders `{pN}`/ICU.
+- Login: texto pt-BR embutido em `public/login-bg.webp` detectado por OCR e neutralizado fora do `pt-BR` em `components/LoginView.tsx`.
+- `pt-PT`: revisão terminológica concluída (138 valores + ajustes manuais) e 3 ajustes em `content/pt-PT.json`.
+- Guarani: rascunho completo gerado em `messages/gn-PY.json` (2.503 chaves) e `content/gn-PY.json` (713 folhas / 551 entradas geradas) com glossário CONACYT/SPL e versionado em `49492e2 att v6`; `es-PY` ficou intacto; 26 resíduos óbvios corrigidos; 97 valores idênticos ao espanhol são legítimos (siglas, unidades, opções A/B/C/D e nomes canônicos).
+- Validações: `i18n:check` OK (5 idiomas/2.503 chaves), `i18n:scan` 6 ocorrências/4 arquivos (todas intencionais), `i18n:extract` 4 strings, `content:build` 551 entradas/idioma, `lint` 0 erros/2 avisos prévios, `npx tsc --noEmit` limpo e `npm run build` OK (13 páginas, middleware 46,4 kB).
+
+### Decisões que não mudam
+- Supabase permanece em pt-BR; os 69 `performance_reports.report` já salvos não são traduzidos nem regenerados.
+- Valores canônicos usados em filtro/gravação permanecem em pt-BR; a tradução é apenas de exibição.
+- Marca/identidade (`EDUKYNE`, `EDU`, `KYNE`, `lgpd@edukyne.com.br`) não é traduzida: são as 6 ocorrências intencionais do scan.
+- Não usar `git commit` sem pedido explícito.
+
+### Próximo passo (único)
+- O usuário vai analisar o rascunho de Guarani e encaminhar a revisão de falante nativo. Quando o retorno chegar, aplicar as correções somente em `messages/gn-PY.json` e `content/gn-PY.json`, rodar as validações e atualizar este marcador. **Não há outra tradução pendente.**
+
+### Estado do git
+- Commits do usuário: `05f6f79 att  v5` (traduções/correções anteriores) e `49492e2 att v6` (rascunho completo de Guarani + relatórios).
+- Não commitado neste momento: apenas `readm.md` (esta consolidação final). O rascunho Guarani já está versionado no `v6`.
+
+## Registro histórico (seções abaixo; em caso de conflito, vale o resumo final acima)
+### Estado da sessão de 20/11/2026
 - Infraestrutura i18n completa: `next-intl`, `[locale]`, middleware, navegação, 5 dicionários, seletor de idioma e camada de conteúdo com fallback pt-BR.
 - UI zerada no scan strict: `DashboardView`, `AlunosView`, `ProfissionaisView`, `ContratosView`, `PresencaView`, `ModalidadesView`, `PlanoAcaoView`, `PerfilView`, `ConfiguracoesView`, `ComparativeStudyView`, `app/[locale]/page.tsx`, `AvaliacoesView`, `QuestionarioView`, `PerformanceView` e `global-error.tsx`.
 - `global-error.tsx` fora do provider: monta `NextIntlClientProvider` próprio e detecta idioma por cookie `NEXT_LOCALE` → path → `navigator.language`.
@@ -39,7 +66,7 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
 - Texto gerado PCD localizado: `avaliacoes.tplPcdDirecionamento`, `valorAguardandoAvaliacaoCompleta`, templates de funil/adaptações; `displayCanonical` agora traduz prosa canônica residual para `es-PY`/`gn-PY`/`en`.
 - `AvaliacoesView` e `QuestionarioView`: detalhes, unidades, notas, descrições de grupos/modalidades e laudos passam por `displayValue`/`displayCanonical`; `PlanoAcaoView` usa datas por locale e `planoAcao.nomeArquivoPadrao`.
 - Validações finais desta fase: `i18n:check` **2.503 chaves por idioma**; `i18n:scan` 6/4 (intencionais); `i18n:extract` 4; `content:build` 551/idioma; `lint` 0 erros/2 avisos prévios; `tsc --noEmit` limpo; `build` OK (13 páginas, middleware 46,4 kB).
-- Pendência conhecida: algumas traduções antigas geradas por glossário em `desempenho` ainda soam como pt-BR/inglês misto; revisar antes de considerar o texto de relatório definitivo.
+- Pendência daquele ponto resolvida em 21/11/2026: as traduções antigas de `desempenho` foram reescritas e validadas; ver seção final.
 
 ### Fechamento da sessão (20/11/2026) — inventário completo do que foi feito
 - **Dicionários (`messages/<locale>.json`)**: paridade em 5 idiomas subiu de 2.413 → 2.503 chaves. Namespace `canonical` ficou com 40 chaves. Foram adicionadas/consolidadas chaves para:
@@ -69,7 +96,7 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
 - Corrigidas todas as traduções geradas por glossário com resíduo pt-BR/inglês/espanhol misto em `messages/es-PY.json`, `messages/gn-PY.json` e `messages/en.json` (65 chaves contaminadas em `desempenho` + contaminações em `comparativo`, `questionario`, `avaliacoes` e outros namespaces). `pt-BR` e `pt-PT` não foram alterados.
 - As 6 chaves prioritárias do marcador foram reescritas: `textoParabenizamosPeloOtimoHistoricoFisicoContinuaremosDesafiando`, `textoOIndiceIndicaUmFatorDeRisco`, `textoDiagnosticamosNoAEstudanteUmaEstruturaCognitiva` (reaproveitou a boa tradução de `textoM7ExatasTecnologicasReflection`), `tplDownloadConcluidoAddedcountRelatoriosForamExportados`, `uiConsultandoFrequenciaDoEstudanteNoSistemaEletronico` e `tplFrequenciaEscolarAcumuladaRateStatusResumoDo` (tabela markdown e placeholders `{p0}`–`{p12}` preservados).
 - Templates de relatório (`tplRelatorioDeDesempenho*`, `tplRelatorioDeDiretrizes...`, `tplParecerIntegrado...`) traduzidos por completo usando `tplRelatorioDeDesempenhoQualidadeMotoraPcdEstudante` como referência de estilo; cabeçalhos, seções e rótulos agora estão no idioma ativo.
-- `gn-PY` segue com empréstimos do espanhol, conforme decisão vigente; revisão por falante nativo continua pendente.
+- Naquele ponto `gn-PY` ainda usava empréstimos do espanhol; em 21/11/2026 foi substituído por um rascunho completo em guarani, conforme seção final.
 - Detector de resíduo pt-BR nos 3 idiomas: **0 chaves**. Conferência de placeholders `{pN}`/ICU: nenhuma divergência nas chaves alteradas (os 21 avisos de plural são pré-existentes e esperados).
 - Validações: `i18n:check` 2.503 chaves/idioma; `i18n:scan` 6/4 (marca intencional); `i18n:extract` 4 strings; `content:build` 551 entradas/idioma; `lint` 0 erros/2 avisos prévios; `tsc --noEmit` limpo; `build` OK (13 páginas, middleware 46,4 kB).
 - **Git**: alterações não commitadas em `messages/{es-PY,gn-PY,en}.json` e nos relatórios regenerados (`reports/i18n-*.json`).
@@ -84,7 +111,7 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
 - Rotas renderizadas com `npm run dev`: `/` 200, `/pt-BR` 307 (esperado), `/pt-PT`, `/es-PY`, `/gn-PY`, `/en` e as respectivas `/politica-privacidade` 200, todas com `<html lang>` correto. As ocorrências de “Senha/Cadastrar/Carregando” no HTML são nomes de chaves no payload RSC, não texto visível.
 - PDF: `public/fonts/NotoSans-Regular.ttf` e `NotoSans-Bold.ttf` presentes; `setupPdfFont` chamado nos 8 fluxos que instanciam `jsPDF` (Alunos, Presenca, Modalidades, Avaliacoes ×2, Performance ×2, ComparativeStudy). Excel: 54 chaves `exp*`, sem resíduo pt-BR real. Rótulos canônicos/gráficos: 40 chaves em `canonical`, sem resíduo pt-BR real.
 - Validações repetidas após os ajustes: `i18n:check` 2.503 chaves/idioma; `i18n:scan` 6/4 (marca intencional); `i18n:extract` 4; `content:build` 551/idioma; `lint` 0 erros/2 avisos prévios; `tsc --noEmit` limpo; `build` OK (13 páginas, middleware 46,4 kB).
-- Observação: `pt-PT` permanece muito próximo do pt-BR por decisão histórica (1.851 strings idênticas); revisão terminológica dissolve-a separadamente, se desejada.
+- Observação: `pt-PT` estava próximo do pt-BR (1.851 strings idênticas) naquele ponto; a revisão terminológica foi concluída em 21/11/2026 (138 valores).
 
 ### Atualização (21/11/2026 — texto embutido na arte do login)
 - OCR de `public/login-bg.webp` detectou texto pt-BR embutido na arte (“EDUCAÇÃO”, “PLATAFORMA MULTIDISCIPLINAR DE PROSPECÇÃO E DESENVOLVIMENTO”, “Acesso Institucional”, “Política de Privacidade — LGPD”, “ESPORTE MULTIDISCIPLINAR”, “QUALIDADE DE VIDA”, entre outros), visível em todos os idiomas no overlay desktop.
@@ -157,7 +184,7 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
    - `layout.tsx` (async, valida locale, `<html lang={locale}>`, `NextIntlClientProvider`)
    - `page.tsx` (imports `../` ajustados para `../../`)
    - `error.tsx`, `not-found.tsx`, `politica-privacidade/page.tsx`
-   - `global-error.tsx` permaneceu na raiz e ainda está em pt-BR (não há provider nesse ponto).
+   - `global-error.tsx` permaneceu na raiz e foi traduzido depois com provider próprio (ver item 13 de 19/11/2026).
 4. `components/LanguageSwitcher.tsx` criado; integrado em:
    - `components/Sidebar.tsx:278` (rodapé, acima do mini-perfil)
    - `components/LoginView.tsx:116` (cartão de login)
@@ -230,19 +257,10 @@ Traduzir todo o front-end para 5 idiomas sem alterar o Supabase: `pt-BR` (padrã
   - `/en/politica-privacidade` → 200
   - `/pt-BR` → 307 (esperado)
 
-## O que falta (ordem recomendada)
-1. **Ocorrências restantes do scan (intencionais)**: `politica-privacidade` (3: `EDU`, `KYNE` e `lgpd@edukyne.com.br`) e marca `EDUKYNE` em Header/Login/Sidebar. Não traduzir sem decisão de produto; `reports/i18n-pending.json` contém apenas essas 4 strings.
-2. **Conteúdo do Supabase restante**, ampliando `content/<locale>.json` por tabela:
-   - ~~Perguntas curtas: `m9_health_questions`, `m10_oral_questions`, `m11_autoconcept_questions`, `m13_snap_questions`, `m14_aq10_questions`, `ias_questions`~~ (concluído)
-   - ~~Configs (texto descritivo), pareceres e PCD~~ (concluído; campos canônicos preservados)
-   - ~~Assessments (texto de sistema de 9 tabelas)~~ (concluído)
-   - ~~`performance_reports.report` (69 relatórios salvos)~~ (não requer tradução: decisão do usuário em 21/11/2026 de manter os textos salvos em pt-BR); `rbac_permissions` com rótulos já traduzidos no front.
-    - ~~Rótulos canônicos principais (`m2.name`, níveis/categorias, perfis/classificações, grupos/testes/status PCD)~~ (concluído via `canonical`/`displayCanonical` em UI, PDF, Excel e análise automática; `reportBuilder.ts` continua canônico em pt-BR por decisão de produto).
-    - Observação: `reportBuilder.ts` gera o corpo canônico em pt-BR; `reportI18n.ts` localiza os templates via `localizeAssessmentReport` e `autoReport.ts`/`PerformanceView` já aplicam o locale ativo na exibição. `comparativeAnalysis.ts` usa `AnalysisTranslator` e `localizeLabel`. Os 69 relatórios salvos permanecem em pt-BR no Supabase; nenhuma regeneração em lote foi executada.
-3. **Documentos gerados**: PDF já usa fonte Unicode (`NotoSans`; `ã`, `ñ`, `’`) via `lib/pdfFont.ts`; conferir a saída final por idioma. Não existe geração DOCX real no código (dependência `docx` não é usada).
-4. ~~**Imagens/texto embutido**: verificar se `login-bg.webp` contém texto; se sim, criar versões por idioma ou overlay.~~ (concluído em 21/11/2026: texto detectado por OCR e neutralizado fora do `pt-BR` em `LoginView.tsx`).
-5. **Revisão de qualidade textual**: revisar traduções antigas geradas por glossário no namespace `desempenho` (especialmente pareceres e cabeçalhos de relatório) e confirmar a prosa PCD em `es-PY`/`gn-PY`/`en`.
-6. **Revisão final**: `i18n:check`, `content:build`, `i18n:scan` com apenas as 6 ocorrências intencionais, lint, tsc, build e checklist manual por idioma.
+## O que falta (estado final — 21/11/2026)
+1. **Revisão do Guarani (único passo pendente)**: o rascunho completo já existe e está commitado em `49492e2 att v6`; o usuário vai analisar e encaminhar a revisão de falante nativo. Ao retornar, aplicar e revalidar.
+2. **Não fazer**: traduzir as 6 ocorrências intencionais do scan (`EDUKYNE` em Header/Login/Sidebar; `EDU`, `KYNE` e `lgpd@edukyne.com.br` em `politica-privacidade`), os 69 relatórios salvos no Supabase ou os valores canônicos de filtro/gravação.
+3. **Concluído e não precisa repetir**: tradução de UI (2.503 chaves/idioma), conteúdo (551 entradas/idioma), PDF/Excel, imagens, `pt-PT`, correções de glossário e todas as validações (`i18n:check`, `i18n:scan`, `i18n:extract`, `content:build`, lint, tsc, build).
 
 ## Como retomar
 ```powershell
@@ -257,8 +275,8 @@ npm run build
 ```
 
 ## Riscos / atenção
-- Guarani: revisão humana obrigatória; não confiar em tradução automática.
-- `es-PY` e `pt-PT`: revisar terminologia esportiva/pedagógica (ex.: “Desportivas” em PT-PT, “Rendimiento” em es-PY).
+- Guarani: rascunho completo já gerado, mas revisão humana obrigatória antes de chamar de definitivo.
+- `es-PY`: prosa revisada e estável. `pt-PT`: revisão terminológica concluída (138 valores + 3 em conteúdo).
 - Trocar idioma recarrega a rota; a aba ativa pode voltar ao Dashboard (estado local em `app/[locale]/page.tsx`).
 - Pluralização/ICU e gênero (“o(a) aluno(a)”) precisam de tratamento por idioma.
 - Strings iguais com sentidos diferentes devem usar chaves semânticas por tela, não uma chave global.
